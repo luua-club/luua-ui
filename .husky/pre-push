@@ -1,0 +1,4 @@
+echo "Running ESLint and Prettier checks before pushing..."
+pnpm lint
+pnpm format:check
+
