@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-router": "^1.121.34",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.523.0",
@@ -13,6 +14,7 @@
     "@commitlint/config-conventional": "^19.8.0",
     "@eslint/js": "^9.24.0",
     "@tailwindcss/vite": "^4.1.10",
+    "@tanstack/react-router-devtools": "^1.121.34",
     "@types/node": "^24.0.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
