@@ -1,17 +1,31 @@
-import { createRoute, createRouter, redirect } from '@tanstack/react-router'
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router'
 
-import rootRoute from '@/App'
+import App from '@/App'
+import SidebarLayout from '@/core/layouts/SidebarLayout'
+import authRoute from '@/features/auth/routes'
 import dashboardRoute from '@/features/dashboard/routes'
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/dashboard' })
-  },
+import { AuthGuard } from './guards'
+
+export const rootRoute = createRootRoute({
+  component: App,
+  loader: ({ location }) => AuthGuard({ location }),
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, dashboardRoute])
+export const privateRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: SidebarLayout,
+})
+
+const routeTree = rootRoute.addChildren([
+  authRoute,
+  privateRoute.addChildren([dashboardRoute]),
+])
 
 const router = createRouter({
   routeTree,

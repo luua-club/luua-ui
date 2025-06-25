@@ -1,9 +1,9 @@
 import { createRoute } from '@tanstack/react-router'
 
-import rootRoute from '@/App'
+import { privateRoute } from '@/router'
 
 const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => privateRoute,
   path: '/dashboard',
 }).lazy(() => import('../pages/Dashboard').then(d => d.Route))
 
