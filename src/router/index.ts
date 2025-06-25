@@ -8,6 +8,7 @@ import App from '@/App'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
 import authRoute from '@/features/auth/routes'
 import dashboardRoute from '@/features/dashboard/routes'
+import settingsRoute from '@/features/settings/routes'
 
 import { AuthGuard } from './guards'
 
@@ -24,7 +25,7 @@ export const privateRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   authRoute,
-  privateRoute.addChildren([dashboardRoute]),
+  privateRoute.addChildren([dashboardRoute, settingsRoute]),
 ])
 
 const router = createRouter({
