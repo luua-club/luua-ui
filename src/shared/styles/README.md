@@ -1,1 +1,0 @@
-Global styling across app
