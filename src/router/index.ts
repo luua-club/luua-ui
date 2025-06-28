@@ -10,7 +10,7 @@ import SidebarLayout from '@/core/layouts/SidebarLayout'
 import dashboardRoute from '@/dashboard/router'
 import settingsRoute from '@/settings/router'
 
-import { AuthGuard } from './guards/guards'
+import { AuthGuard } from './guards'
 
 export const rootRoute = createRootRoute({
   component: App,
