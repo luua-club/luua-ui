@@ -5,12 +5,12 @@ import {
 } from '@tanstack/react-router'
 
 import App from '@/App'
+import authRoute from '@/auth/routes'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
-import authRoute from '@/features/auth/routes'
-import dashboardRoute from '@/features/dashboard/routes'
-import settingsRoute from '@/features/settings/routes'
+import dashboardRoute from '@/dashboard/router'
+import settingsRoute from '@/settings/routes'
 
-import { AuthGuard } from './guards'
+import { AuthGuard } from './guards/guards'
 
 export const rootRoute = createRootRoute({
   component: App,
