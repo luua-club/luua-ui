@@ -5,6 +5,6 @@ import { privateRoute } from '@/router'
 const dashboardRoute = createRoute({
   getParentRoute: () => privateRoute,
   path: '/dashboard',
-}).lazy(() => import('../pages/Dashboard').then(d => d.Route))
+}).lazy(() => import('../pages').then(d => d.Route))
 
 export default dashboardRoute

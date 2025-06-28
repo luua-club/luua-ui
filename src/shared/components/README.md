@@ -1,1 +1,3 @@
-Would contain resuble UI components, molecular to organism ones
+# Components Folder
+
+This folder contains generic organism and molecular level components.

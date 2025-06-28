@@ -1,1 +1,3 @@
-Config folder contains contants, env or settings related stuff.
+# Config Folder
+
+This folder contains app-wide configuration and environment settings.

@@ -1,1 +1,3 @@
-API are responsible for external api calls.
+# API Folder
+
+This folder contains app-wide API services and network requests.
