@@ -5,10 +5,10 @@ import {
 } from '@tanstack/react-router'
 
 import App from '@/App'
-import authRoute from '@/auth/routes'
+import authRoute from '@/auth/router'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
 import dashboardRoute from '@/dashboard/router'
-import settingsRoute from '@/settings/routes'
+import settingsRoute from '@/settings/router'
 
 import { AuthGuard } from './guards/guards'
 
