@@ -6,7 +6,9 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios'
 
+import { LUUA_USER_KEY } from '../config/constant'
 import { BASE_API_URL } from '../config/urls'
+import { removeLocalStorageItem } from '../config/utils/localstorage.util'
 import { authInterceptor } from '../interceptors/auth.interceptor'
 import { ApiError, ApiResponse } from '../models/api.model'
 
@@ -192,9 +194,11 @@ export class BaseApiService {
    * @returns An ApiError containing the error message, status, and optional code/detail.
    */
   private handleError(error: AxiosError): ApiError {
+    const status = error.response?.status
+
     const apiError: ApiError = {
       message: error.message || 'An unexpected error occurred',
-      status: error.response?.status || 500,
+      status: status || 500,
     }
 
     if (error.response?.data) {
@@ -215,7 +219,21 @@ export class BaseApiService {
       }
     }
 
+    // 🔥 Auto-logout on 401 or 403 (unauthorized)
+    if (status === 401 || status === 403) {
+      this.handleUnauthorized()
+    }
+
     return apiError
+  }
+
+  /**
+   * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
+   * this redirection will also clear all state in redux store and cancel all pending requests
+   */
+  private handleUnauthorized() {
+    removeLocalStorageItem(LUUA_USER_KEY)
+    window.location.href = '/login'
   }
 
   /**
