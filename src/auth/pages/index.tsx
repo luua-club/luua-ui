@@ -1,8 +1,25 @@
-import { GoogleLogin } from '@react-oauth/google'
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
 
+import { authApi } from '@/core/api/auth.api'
 import { cn } from '@/shared/utils'
 
-const Login = () => {
+function Login() {
+  //TODO: WIP
+  const onLogin = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) return
+
+    authApi
+      .login({
+        token: credentialResponse.credential,
+      })
+      .then(response => {
+        console.log(response, 'response')
+      })
+      .catch(error => {
+        console.log(error, 'error')
+      })
+  }
+
   return (
     <div className="bg-background flex h-screen w-screen">
       <div
@@ -25,12 +42,13 @@ const Login = () => {
           </p>
           <div className="w-[80%] pt-8">
             <GoogleLogin
-              onSuccess={credentialResponse => {
-                console.log('Google login success:', credentialResponse)
-              }}
+              onSuccess={onLogin}
               onError={() => {
+                /** TODO: Show error notification */
                 console.log('Google login failed')
               }}
+              theme="filled_black"
+              text="continue_with"
             />
           </div>
         </div>
