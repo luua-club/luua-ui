@@ -1,20 +1,14 @@
-import { ChevronRight, Mail } from 'lucide-react'
+import { GoogleLogin } from '@react-oauth/google'
 
-import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/utils'
 
 const Login = () => {
   return (
     <div className="bg-background flex h-screen w-screen">
       <div
-        className={cn(
-          'flex w-full items-center justify-center',
-          'md:flex-1/2',
-          'lg:justify-start lg:pl-15',
-          'xl:pl-20'
-        )}
+        className={cn('flex w-full items-center justify-center', 'md:flex-1/2')}
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col items-center">
           <h1
             className={cn('text-5xl font-bold', 'lg:text-6xl', 'xl:text-7xl')}
           >
@@ -22,22 +16,23 @@ const Login = () => {
           </h1>
           <p
             className={cn(
-              'pt-4 text-base text-gray-400',
+              'pt-4 text-center text-base text-gray-400',
               'lg:text-xl',
               'xl:text-2xl'
             )}
           >
-            Step into high class marketing boost <br /> your productivity.
+            Step into high class marketing <br /> boost your productivity.
           </p>
-          <Button
-            className={cn('mt-8 w-full text-xs', 'lg:text-sm', 'xl:text-base')}
-            variant={'brandAccent'}
-            size={'lg'}
-          >
-            <Mail />
-            Sign in with Google
-            <ChevronRight />
-          </Button>
+          <div className="w-[80%] pt-8">
+            <GoogleLogin
+              onSuccess={credentialResponse => {
+                console.log('Google login success:', credentialResponse)
+              }}
+              onError={() => {
+                console.log('Google login failed')
+              }}
+            />
+          </div>
         </div>
       </div>
       <div
