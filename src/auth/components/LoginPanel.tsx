@@ -23,11 +23,9 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
       >
         Step into high class marketing <br /> boost your productivity.
       </p>
-      <div className="w-[80%] pt-8">
+      <div className="flex items-center justify-center pt-8">
         {isLoading ? (
-          <div className="flex items-center justify-center">
-            <Loader2 className="h-10 w-10 animate-spin" />
-          </div>
+          <Loader2 className="h-10 w-10 animate-spin" />
         ) : (
           <GoogleLogin
             onSuccess={onLogin}
@@ -37,7 +35,7 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
             }}
             theme="filled_black"
             text="continue_with"
-            width={'100%'}
+            width={300}
           />
         )}
       </div>
