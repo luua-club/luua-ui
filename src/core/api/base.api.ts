@@ -229,7 +229,7 @@ export class BaseApiService {
 
   /**
    * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
-   * this redirection will also clear all state in redux store
+   * this redirection will also clear all state in redux store and cancel all pending requests
    */
   private handleUnauthorized() {
     removeLocalStorageItem(LUUA_USER_KEY)

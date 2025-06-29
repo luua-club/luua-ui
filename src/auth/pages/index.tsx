@@ -17,7 +17,7 @@ import LoginPanel from '../components/LoginPanel'
 
 function Login() {
   // UseStates
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
   // UseHooks
   const router = useRouter()
