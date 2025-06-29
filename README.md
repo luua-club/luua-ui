@@ -1,7 +1,3 @@
-# WIP, currently work in progress
+# Luua UI
 
-## TODO
-
-- [ ] Add testing
-- [ ] Add routing
-- [ ] External API calling setup
+Testing - https://luua-ui.onrender.com/login
