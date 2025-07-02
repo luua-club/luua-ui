@@ -37,14 +37,8 @@ export function NavUser({ user }: INavUserProps) {
           className="h-12 cursor-pointer border-1 border-dashed focus-visible:ring-0"
         >
           <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage
-              className="rounded-full"
-              src={user.profile_image}
-              alt={user.name}
-            />
-            <AvatarFallback className="rounded-full">
-              {user.name.charAt(0)}
-            </AvatarFallback>
+            <AvatarImage src={user.profile_image} alt={user.name} />
+            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{user.name}</span>
