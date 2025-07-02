@@ -3,3 +3,7 @@
 @import './shared/styles/theme.css';
 
 @custom-variant dark (&:is(.dark *));
+
+body.dark {
+  background-color: var(--brand-background-dark);
+}

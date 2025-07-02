@@ -3,6 +3,7 @@ import { LucidePanelRight } from 'lucide-react'
 
 import { useAppSelector } from '@/core/hooks/global-state.hook'
 import { urlType } from '@/core/models/urls.model'
+import ThemeToggle from '@/shared/components/theme-toggle'
 
 import { NavUser } from './NavUser'
 
@@ -19,20 +20,25 @@ function Nav({ handleSidebar }: INavProps) {
   const currentPageTitle = getCurrentPageTitle(pathname)
 
   return (
-    <nav className="flex h-14 justify-between border-b-1 p-2">
+    <nav className="dark:bg-sidebar flex h-14 justify-between border-b-1 p-2">
       <div className="flex items-center">
         {/* Sidebar toggle */}
         <LucidePanelRight
-          className="cursor-pointer text-gray-500"
+          className="cursor-pointer text-gray-500 dark:text-white"
           onClick={handleSidebar}
         />
         {/* Page title */}
-        <h1 className="pl-4 text-lg font-medium text-gray-500">
+        <h1 className="pl-4 text-lg font-medium text-gray-500 dark:text-white">
           {currentPageTitle}
         </h1>
       </div>
-      {/* User info */}
-      <div className="flex items-center">{user && <NavUser user={user} />}</div>
+      <div className="flex items-center">
+        {/* Dark mode toggle */}
+        <ThemeToggle className="mr-4" />
+
+        {/* User info */}
+        {user && <NavUser user={user} />}
+      </div>
     </nav>
   )
 }

@@ -34,7 +34,7 @@ export function NavUser({ user }: INavUserProps) {
         <Button
           variant="ghost"
           size="lg"
-          className="h-12 cursor-pointer border-1 border-dashed"
+          className="h-12 cursor-pointer border-1 border-dashed focus-visible:ring-0"
         >
           <Avatar className="h-8 w-8 rounded-lg">
             <AvatarImage
@@ -64,7 +64,7 @@ export function NavUser({ user }: INavUserProps) {
 const NavUserDropdownContent = () => {
   return (
     <DropdownMenuContent
-      className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+      className="dark:bg-sidebar w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
       side={'bottom'}
       align="end"
     >
