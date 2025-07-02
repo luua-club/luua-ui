@@ -36,7 +36,7 @@ export function NavUser({ user }: INavUserProps) {
           size="lg"
           className="h-12 cursor-pointer border-1 border-dashed focus-visible:ring-0"
         >
-          <Avatar className="h-8 w-8 rounded-lg">
+          <Avatar className="h-8 w-8 rounded-full">
             <AvatarImage src={user.profile_image} alt={user.name} />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
