@@ -10,6 +10,7 @@ import {
 import { SidebarMenuItem } from '@/shared/ui/sidebar'
 import { SidebarMenuButton } from '@/shared/ui/sidebar'
 import { useSidebar } from '@/shared/ui/sidebar'
+import { cn } from '@/shared/utils'
 
 import AppSidebarCollapsedItem from './AppSidebarCollapsedItem'
 
@@ -23,7 +24,7 @@ function AppSidebarCreation({ creationsData }: IAppSidebarCreationProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
-        <span>Creations</span>
+        <span className="dark:text-white">Creations</span>
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <CreateNewSidebarMenuButton />
@@ -35,7 +36,12 @@ function AppSidebarCreation({ creationsData }: IAppSidebarCreationProps) {
           </SidebarMenu>
         ) : (
           state === 'expanded' && (
-            <span className="truncate rounded-md border-1 border-dashed border-gray-300 p-4 text-xs text-gray-500">
+            <span
+              className={cn(
+                'truncate rounded-md border-1 border-dashed border-gray-300 p-4 text-xs text-gray-500',
+                'dark:border-gray-400 dark:text-gray-400'
+              )}
+            >
               Create new to get started,
               <br />
               or interact with chat on dashboard

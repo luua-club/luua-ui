@@ -27,7 +27,7 @@ function App() {
       return
     }
 
-    // If user logged in, but page is refreshed, get fresh user data for redux store
+    // If user logged in, but page is refreshed, get fresh user data to hydrate store
     // If user is not logged in, the base API will handle the 401 error and redirect to login
     userApi.getUser().then(res => dispatch(setUser(res.data)))
   }, [])

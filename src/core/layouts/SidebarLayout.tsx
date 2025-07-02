@@ -3,13 +3,15 @@ import {
   LucideCable,
   LucideCalendar,
   LucideLayoutDashboard,
-  LucidePanelRight,
 } from 'lucide-react'
 import { useState } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar'
+import { THEME_LOCAL_STORAGE_KEY } from '@/shared/constant'
+import { ThemeProvider } from '@/shared/provider/theme-provider'
 import { SidebarProvider } from '@/shared/ui/sidebar'
 
+import Nav from '../components/nav'
 import { ISidebarItem } from '../models/sidebar.model'
 
 function SidebarLayout() {
@@ -29,25 +31,23 @@ function SidebarLayout() {
     {
       title: 'Socials',
       url: undefined,
+      ping: 'success',
       icon: <LucideCable />,
     },
   ]
 
   return (
-    <SidebarProvider open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-      <AppSidebar platformItems={platformItems} creationsData={[]} />
-      <div className="w-full">
-        <nav className="flex h-12 items-center border-b-1 p-2">
-          <LucidePanelRight
-            className="cursor-pointer text-gray-400"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
-        </nav>
-        <main>
-          <Outlet />
-        </main>
-      </div>
-    </SidebarProvider>
+    <ThemeProvider defaultTheme="dark" storageKey={THEME_LOCAL_STORAGE_KEY}>
+      <SidebarProvider open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <AppSidebar platformItems={platformItems} creationsData={[]} />
+        <div className="w-full">
+          <Nav handleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+          <main>
+            <Outlet />
+          </main>
+        </div>
+      </SidebarProvider>
+    </ThemeProvider>
   )
 }
 

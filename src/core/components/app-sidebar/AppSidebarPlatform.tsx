@@ -16,7 +16,7 @@ function AppSidebarPlatform({ platformItems }: IAppSidebarPlatformProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
-        <span>Platform</span>
+        <span className="dark:text-white">Platform</span>
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
