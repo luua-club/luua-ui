@@ -20,7 +20,7 @@ export class BaseApiService {
 
     this.api = axios.create({
       baseURL: `${url}${endpoint}`,
-      timeout: 10000,
+      timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
       },

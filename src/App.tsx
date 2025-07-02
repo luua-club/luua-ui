@@ -35,7 +35,7 @@ function App() {
   return (
     <>
       <Outlet />
-      <TanStackRouterDevtools />
+      <TanStackRouterDevtools position="bottom-right" />
     </>
   )
 }
