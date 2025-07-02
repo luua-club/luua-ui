@@ -1,16 +1,6 @@
 import { createLazyRoute } from '@tanstack/react-router'
 
 const Dashboard = () => {
-  // TODO: logout
-  // const router = useRouter()
-  // const dispatch = useAppDispatch()
-
-  // const handleLogout = () => {
-  //   dispatch(clearUser())
-  //   removeLocalStorageItem(LUUA_USER_KEY)
-  //   router.navigate({ to: '/login' })
-  // }
-
   return (
     <div>
       <h1>{''}</h1>

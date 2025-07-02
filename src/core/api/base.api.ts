@@ -6,9 +6,8 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios'
 
-import { LUUA_USER_KEY } from '../config/constant'
 import { BASE_API_URL } from '../config/urls'
-import { removeLocalStorageItem } from '../config/utils/localstorage.util'
+import { logout } from '../config/utils/common.util'
 import { authInterceptor } from '../interceptors/auth.interceptor'
 import { ApiError, ApiResponse } from '../models/api.model'
 
@@ -219,21 +218,14 @@ export class BaseApiService {
       }
     }
 
-    // 🔥 Auto-logout on 401 or 403 (unauthorized)
+    /**
+     * Auto-logout on 401 or 403 (unauthorized)
+     */
     if (status === 401 || status === 403) {
-      this.handleUnauthorized()
+      logout()
     }
 
     return apiError
-  }
-
-  /**
-   * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
-   * this redirection will also clear all state in redux store and cancel all pending requests
-   */
-  private handleUnauthorized() {
-    removeLocalStorageItem(LUUA_USER_KEY)
-    window.location.href = '/login'
   }
 
   /**

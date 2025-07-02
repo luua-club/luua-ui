@@ -1,7 +1,7 @@
 import { createLazyRoute } from '@tanstack/react-router'
 
 const Settings = () => {
-  return <div>Settings</div>
+  return <div>{''}</div>
 }
 
 export const Route = createLazyRoute('/settings')({
