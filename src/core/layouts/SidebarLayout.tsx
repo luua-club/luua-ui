@@ -8,7 +8,7 @@ import {
 import { useState } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar'
-import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
+import { SidebarProvider } from '@/shared/ui/sidebar'
 
 import { ISidebarItem } from '../models/sidebar.model'
 
