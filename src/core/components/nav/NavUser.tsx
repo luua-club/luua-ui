@@ -34,19 +34,19 @@ export function NavUser({ user }: INavUserProps) {
         <Button
           variant="ghost"
           size="lg"
-          className="h-12 cursor-pointer border-1 border-dashed focus-visible:ring-0"
+          className="h-12 cursor-pointer focus-visible:ring-0 lg:border-1 lg:border-dashed"
         >
           <Avatar className="h-8 w-8 rounded-full">
             <AvatarImage src={user.profile_image} alt={user.name} />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
+          <div className="hidden flex-1 text-left text-sm leading-tight lg:grid">
             <span className="truncate font-semibold">{user.name}</span>
             <span className="truncate text-xs font-medium text-gray-400">
               {user.email}
             </span>
           </div>
-          <LucideChevronsUpDown className="ml-auto size-4 text-gray-400" />
+          <LucideChevronsUpDown className="ml-auto hidden size-4 text-gray-400 lg:block" />
         </Button>
       </DropdownMenuTrigger>
       {/* Content - the dropdown menu */}

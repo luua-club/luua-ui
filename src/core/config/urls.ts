@@ -1,1 +1,1 @@
-export const BASE_API_URL = 'https://luua-backend.onrender.com/api/v1'
+export const BASE_API_URL = import.meta.env.VITE_LUUA_BACKEND_URL
