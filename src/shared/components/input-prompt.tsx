@@ -5,7 +5,7 @@ import {
   SendHorizontal,
   TriangleAlert,
 } from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
@@ -20,6 +20,9 @@ interface InputPromptProps {
     icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
     tooltip: string
   }[]
+  preFilledValue?: string
+  btnText?: string
+  btnIcon?: React.ReactNode
   onChange: (value: string) => void
 }
 
@@ -28,10 +31,21 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   placeholder = [],
   socialStatus,
   socials = [],
+  preFilledValue,
+  btnText = 'Generate Post',
+  btnIcon = <SendHorizontal className="size-3" />,
   onChange,
 }) => {
   const [value, setValue] = useState('')
   const divRef = useRef<HTMLDivElement>(null)
+
+  // Update the div content when preFilledValue changes
+  useEffect(() => {
+    if (divRef.current && preFilledValue) {
+      divRef.current.textContent = preFilledValue
+      setValue(preFilledValue)
+    }
+  }, [preFilledValue])
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const text = e.currentTarget.textContent || ''
@@ -41,9 +55,13 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      if (value.trim()) {
-        onChange(value.trim())
-      }
+      handleGeneratePost()
+    }
+  }
+
+  const handleGeneratePost = () => {
+    if (value.trim()) {
+      onChange(value.trim())
     }
   }
 
@@ -78,17 +96,25 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
         loading={loading}
         socialStatus={socialStatus}
         socials={socials}
+        handleGeneratePost={handleGeneratePost}
+        btnText={btnText}
+        btnIcon={btnIcon}
       ></PromptControls>
     </div>
   )
 }
 
-type PromptControlsType = Omit<InputPromptProps, 'placeholder' | 'onChange'>
+type PromptControlsType = Omit<InputPromptProps, 'placeholder' | 'onChange'> & {
+  handleGeneratePost: () => void
+}
 
 const PromptControls: React.FC<PromptControlsType> = ({
   loading,
   socialStatus,
   socials,
+  handleGeneratePost,
+  btnText,
+  btnIcon,
 }) => {
   return (
     <div className="flex justify-between p-2">
@@ -131,13 +157,10 @@ const PromptControls: React.FC<PromptControlsType> = ({
         variant={'outline'}
         size={'sm'}
         className={cn('text-xs', loading ? 'bg-accent !cursor-default' : '')}
+        onClick={handleGeneratePost}
       >
-        Generate Post
-        {loading ? (
-          <Loader2 className="size-3 animate-spin" />
-        ) : (
-          <SendHorizontal className="size-3" />
-        )}
+        {btnText}
+        {loading ? <Loader2 className="size-3 animate-spin" /> : btnIcon}
       </Button>
     </div>
   )
