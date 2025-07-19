@@ -1,10 +1,9 @@
+import { Icon, IconProps } from '@tabler/icons-react'
 import {
   CircleCheckBig,
-  Linkedin,
   Loader2,
   SendHorizontal,
   TriangleAlert,
-  Twitter,
 } from 'lucide-react'
 import React, { useRef, useState } from 'react'
 
@@ -14,9 +13,13 @@ import { WordRotate } from '../ui/word-rotate'
 import { cn } from '../utils'
 
 interface InputPromptProps {
-  loading?: boolean
+  loading?: boolean | undefined
   placeholder?: string[]
   socialStatus: 'OK' | 'WARNING'
+  socials: {
+    icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
+    tooltip: string
+  }[]
   onChange: (value: string) => void
 }
 
@@ -24,6 +27,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   loading = false,
   placeholder = [],
   socialStatus,
+  socials = [],
   onChange,
 }) => {
   const [value, setValue] = useState('')
@@ -44,7 +48,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   }
 
   return (
-    <div className={'relative flex max-w-[700px] flex-col rounded-sm border-1'}>
+    <div className={'relative flex flex-col rounded-sm border-1'}>
       <div className="relative">
         <div
           ref={divRef}
@@ -73,6 +77,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
       <PromptControls
         loading={loading}
         socialStatus={socialStatus}
+        socials={socials}
       ></PromptControls>
     </div>
   )
@@ -83,32 +88,24 @@ type PromptControlsType = Omit<InputPromptProps, 'placeholder' | 'onChange'>
 const PromptControls: React.FC<PromptControlsType> = ({
   loading,
   socialStatus,
+  socials,
 }) => {
   return (
     <div className="flex justify-between p-2">
       <div className="flex items-center justify-center gap-1">
         <div className="flex -space-x-2">
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="rounded-full border-1 border-dashed p-2">
-                <Linkedin className="size-4" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <span>Linkedin</span>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="rounded-full border-1 border-dashed p-2">
-                <Twitter className="size-4" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <span>Twitter / X.com</span>
-            </TooltipContent>
-          </Tooltip>
+          {socials.map((social, index) => (
+            <Tooltip key={index}>
+              <TooltipTrigger>
+                <div className="rounded-full border-1 border-dashed p-2">
+                  <social.icon className="size-4" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span>{social.tooltip}</span>
+              </TooltipContent>
+            </Tooltip>
+          ))}
         </div>
         {socialStatus === 'OK' ? (
           <Tooltip>
