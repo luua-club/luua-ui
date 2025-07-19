@@ -1,31 +1,61 @@
 import { createLazyRoute } from '@tanstack/react-router'
 import { Play } from 'lucide-react'
 
+import Post from '@/core/components/Post'
 import PromptInput from '@/core/containers/PromptInput'
+import mockRecentPost from '@/core/mocks/recent-post.json'
+import { IPost } from '@/core/models/post.model'
 import { Button } from '@/shared/ui/button'
 
 const Dashboard = () => {
+  const recentPost: IPost[] = [mockRecentPost as IPost]
+
   return (
-    <div className="m-auto grid max-w-7xl grid-cols-1 gap-8 p-5 md:grid-cols-1 md:grid-rows-none lg:grid-cols-3 lg:grid-rows-2 lg:gap-16">
-      {/* User prompt */}
-      <div className="lg:col-span-2 lg:row-span-1">
-        <h2 className="pb-4 text-2xl text-gray-500">Ready when you are.</h2>
-        <PromptInput />
-        <div className="mt-4 flex w-full max-w-[700px] items-center justify-end gap-2">
-          <p className="text-sm text-gray-600">Not sure where to start ? </p>
-          <Button className="bg-brand-accent-yellow border-1 border-black text-sm text-black hover:text-white">
-            Click here
-            <Play />
-          </Button>
+    <div className="m-auto flex max-w-7xl flex-col gap-8 p-5 lg:flex-row lg:gap-16">
+      {/* Left column: User prompt + Recent Posts */}
+      <div className="flex w-full flex-col gap-8 lg:w-2/3">
+        {/* User prompt */}
+        <div>
+          <h2 className="pb-4 text-2xl text-gray-800">Ready when you are.</h2>
+          <PromptInput />
+          <div className="mt-4 flex w-full items-center justify-end gap-2">
+            <p className="text-sm text-gray-600">Not sure where to start ? </p>
+            <Button className="bg-brand-accent-yellow border-1 border-black text-sm text-black hover:text-white">
+              Create New
+              <Play />
+            </Button>
+          </div>
+        </div>
+        {/* Recent Posts */}
+        <div className="rounded-lg">
+          <h2 className="pb-4 text-2xl text-gray-800">Recent Posts</h2>
+          {recentPost && recentPost.length === 0 ? (
+            <div className="flex w-full items-center justify-center rounded-lg border border-dashed p-5">
+              <p className="text-sm text-gray-500">
+                Seems Empty, Create new post to get started.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-5 lg:grid-cols-2">
+              {recentPost.map(post => (
+                <Post
+                  id={post.id}
+                  key={post.id}
+                  channel={post.channel}
+                  content={post.content}
+                  attachedMedia={post.attachedMedia}
+                  status={post.status}
+                  created_at={post.created_at}
+                  updated_at={post.updated_at}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {/* Recent post */}
-      <div className="rounded-lg lg:col-span-1 lg:row-span-2">
-        {/* Content for the second column */}
-      </div>
-      {/* Scheduled post */}
-      <div className="rounded-lg lg:col-span-2 lg:row-span-1">
-        {/* Content for the first column, second row */}
+      {/* Right column: Placeholder for future component */}
+      <div className="flex min-h-[400px] w-full flex-shrink-0 flex-col rounded-lg lg:w-1/3">
+        {/* Content for the second column (to be added later) */}
       </div>
     </div>
   )
