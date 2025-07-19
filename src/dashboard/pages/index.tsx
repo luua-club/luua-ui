@@ -20,7 +20,7 @@ const Dashboard = () => {
           <PromptInput />
           <div className="mt-4 flex w-full items-center justify-end gap-2">
             <p className="text-sm text-gray-600">Not sure where to start ? </p>
-            <Button className="bg-brand-accent-yellow border-1 border-black text-sm text-black hover:text-white">
+            <Button variant="brandAccent" size="sm">
               Create New
               <Play />
             </Button>
