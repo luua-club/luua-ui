@@ -1,10 +1,25 @@
+import { useRouter } from '@tanstack/react-router'
+
 import { InputPrompt } from '@/shared/components/input-prompt'
 
 import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
 
-const PromptInput = () => {
+interface PromptInputProps {
+  btnText?: string
+  btnIcon?: React.ReactNode
+  preFilledValue?: string
+}
+
+const PromptInput = ({
+  btnText,
+  btnIcon,
+  preFilledValue,
+}: PromptInputProps) => {
+  const router = useRouter()
+
   const onUserPrompt = (value: string) => {
     console.log(value)
+    router.navigate({ to: '/quick-share' })
   }
 
   const connectedSocials = SOCIAL_PLATFORM
@@ -20,6 +35,9 @@ const PromptInput = () => {
           tooltip: social.tooltip,
         })),
       ]}
+      preFilledValue={preFilledValue}
+      btnText={btnText}
+      btnIcon={btnIcon}
     />
   )
 }
