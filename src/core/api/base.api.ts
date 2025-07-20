@@ -229,11 +229,47 @@ export class BaseApiService {
   }
 
   /**
-   * Sets up Axios request interceptors for authentication.
+   * Sets up Axios request interceptors.
    */
   private setInterceptors() {
     this.api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       return authInterceptor(config) as InternalAxiosRequestConfig
     })
+
+    this.api.interceptors.response.use(
+      response => response,
+      async (error: AxiosError) => {
+        const { config, response, code } = error
+
+        // if there is no config, we can't retry
+        if (!config) {
+          return Promise.reject(error)
+        }
+
+        const shouldRetry =
+          (response && response.status >= 500) || code === 'ECONNABORTED'
+
+        if (shouldRetry) {
+          const maxRetries = 3
+          const retryCount = (config.headers['X-Retry-Count'] as number) || 0
+
+          if (retryCount < maxRetries) {
+            config.headers['X-Retry-Count'] = retryCount + 1
+
+            // Adding a small delay before retrying
+            await new Promise(resolve =>
+              setTimeout(resolve, 1000 * (retryCount + 1))
+            )
+
+            return this.api(config)
+          } else {
+            // If all retries fail, logout
+            logout()
+          }
+        }
+
+        return Promise.reject(error)
+      }
+    )
   }
 }

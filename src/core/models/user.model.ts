@@ -5,3 +5,7 @@ export interface IUser {
   deactivated: boolean
   plan: string
 }
+
+export interface IUserState extends IUser {
+  logout: () => void
+}

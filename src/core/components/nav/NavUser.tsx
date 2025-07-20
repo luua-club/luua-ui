@@ -7,8 +7,7 @@ import {
   LucideSparkles,
 } from 'lucide-react'
 
-import { logout } from '@/core/config/utils/common.util'
-import { IUser } from '@/core/models/user.model'
+import { IUserState } from '@/core/models/user.model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import {
@@ -19,14 +18,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
-
-export type INavUser = Pick<IUser, 'name' | 'email' | 'profile_image'>
+import { Skeleton } from '@/shared/ui/skeleton'
 
 interface INavUserProps {
-  user: INavUser
+  user: IUserState | null
 }
 
 export function NavUser({ user }: INavUserProps) {
+  if (!user) {
+    return (
+      <div className="flex h-full items-center gap-2 rounded px-3 focus-visible:ring-0 lg:w-50 lg:border-1 lg:border-dashed">
+        <Skeleton className="size-8 rounded-full" />
+        <div className="hidden flex-1 gap-1 text-left text-sm leading-tight lg:grid">
+          <Skeleton className="h-4 w-[80%]" />
+          <Skeleton className="h-3 w-full" />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <DropdownMenu>
       {/* Trigger - the button that opens the dropdown */}
@@ -50,12 +60,12 @@ export function NavUser({ user }: INavUserProps) {
         </Button>
       </DropdownMenuTrigger>
       {/* Content - the dropdown menu */}
-      <NavUserDropdownContent />
+      <NavUserDropdownContent logout={user.logout} />
     </DropdownMenu>
   )
 }
 
-const NavUserDropdownContent = () => {
+const NavUserDropdownContent = ({ logout }: { logout: () => void }) => {
   return (
     <DropdownMenuContent
       className="dark:bg-sidebar w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
