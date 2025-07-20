@@ -19,7 +19,7 @@ function Post({ channel, content, attachedMedia }: PostProps) {
   }
 
   return (
-    <Card className="group relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none">
+    <Card className="relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none">
       <CardContent className="flex flex-1 flex-col p-0">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
@@ -41,7 +41,9 @@ function Post({ channel, content, attachedMedia }: PostProps) {
           )}
         </div>
         <hr />
-        <p className="mt-3 line-clamp-5 px-4 text-sm">{content}</p>
+        <p className="mt-3 line-clamp-5 px-4 text-sm text-gray-600">
+          {content}
+        </p>
 
         {attachedMedia && attachedMedia.length !== 0 && (
           <>

@@ -1,7 +1,7 @@
 import { useRouterState } from '@tanstack/react-router'
 import { LucidePanelRight } from 'lucide-react'
 
-import { useAppSelector } from '@/core/hooks/global-state.hook'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { urlType } from '@/core/models/urls.model'
 import ThemeToggle from '@/shared/components/theme-toggle'
 
@@ -13,7 +13,7 @@ interface INavProps {
 
 function Nav({ handleSidebar }: INavProps) {
   const state = useRouterState()
-  const user = useAppSelector(state => state.auth.user)
+  const user = useUserState()
 
   // Variables
   const pathname = state.location.pathname as urlType
@@ -37,7 +37,7 @@ function Nav({ handleSidebar }: INavProps) {
         <ThemeToggle className="mr-4" />
 
         {/* User info */}
-        {user && <NavUser user={user} />}
+        <NavUser user={user} />
       </div>
     </nav>
   )
