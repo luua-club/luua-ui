@@ -23,6 +23,7 @@ interface InputPromptProps {
   preFilledValue?: string
   btnText?: string
   btnIcon?: React.ReactNode
+  backdrop?: boolean
   onChange: (value: string) => void
 }
 
@@ -34,6 +35,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   preFilledValue,
   btnText = 'Generate Post',
   btnIcon = <SendHorizontal className="size-3" />,
+  backdrop = false,
   onChange,
 }) => {
   const [value, setValue] = useState('')
@@ -66,7 +68,13 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   }
 
   return (
-    <div className={'relative flex flex-col rounded-sm border-1'}>
+    <div
+      className={cn(
+        'relative flex flex-col rounded-sm border-1',
+        backdrop &&
+          'rounded-lg border border-gray-200/50 bg-white/80 shadow-lg shadow-black/5 backdrop-blur-md'
+      )}
+    >
       <div className="relative">
         <div
           ref={divRef}

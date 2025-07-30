@@ -2,7 +2,7 @@ import { createLazyRoute } from '@tanstack/react-router'
 import { Play } from 'lucide-react'
 
 import Post from '@/core/components/Post'
-import PromptInput from '@/core/containers/PromptInput'
+import { PromptInput } from '@/core/containers/PromptInput'
 import mockRecentPost from '@/core/mocks/recent-post.json'
 import { IPost } from '@/core/models/post.model'
 import { Button } from '@/shared/ui/button'

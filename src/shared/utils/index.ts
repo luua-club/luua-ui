@@ -22,3 +22,17 @@ export function cn(...inputs: ClassValue[]) {
 export const capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
+
+/**
+ * Extracts the domain from a URL
+ * @param url The URL to extract the domain from
+ * @returns The domain of the URL
+ */
+export const extractDomain = (url: string): string => {
+  try {
+    const urlObj = new URL(url)
+    return urlObj.hostname
+  } catch {
+    return url
+  }
+}
