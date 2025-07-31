@@ -1,9 +1,10 @@
-import { createLazyRoute, Link } from '@tanstack/react-router'
+import { createLazyRoute, Link, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, RotateCcw } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import Post from '@/core/components/Post'
-import { FloatingPromptInput } from '@/core/containers/PromptInput'
-import mockRecentPost from '@/core/mocks/recent-post.json'
+import { FloatingPromptInput } from '@/core/components/PromptInput'
+import { useAppSelector } from '@/core/hooks/global-state.hook'
 import { IPost } from '@/core/models/post.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
@@ -12,10 +13,21 @@ import QuickShareHeader from '../components/QuickShareHeader'
 
 //TODO: GET DATA FROM CONTEXT IF NO DATA THEN REDIRECT TO DASHBOARD
 const QuickShare = () => {
-  const recentPost: IPost[] = [
-    { ...(mockRecentPost as IPost), id: '1' },
-    { ...(mockRecentPost as IPost), id: '2' },
-  ]
+  const preUserPrompt = useAppSelector(state => state.promptState.prompt)
+  const navigate = useNavigate()
+  const [recentPost, setRecentPost] = useState<IPost[]>([])
+
+  useEffect(() => {
+    if (preUserPrompt) {
+      handleGeneratePost(preUserPrompt)
+    } else {
+      navigate({ to: '/dashboard' })
+    }
+  }, [preUserPrompt])
+
+  const handleGeneratePost = (value: string) => {
+    // CALL API
+  }
 
   return (
     <>
@@ -32,7 +44,7 @@ const QuickShare = () => {
 
         {/* Posts */}
         <div className="mt-8 grid grid-cols-1 gap-6 pb-72 lg:grid-cols-2">
-          {recentPost.map(post => (
+          {recentPost.slice(0, 2).map(post => (
             <Post
               id={post.id}
               key={post.id}
@@ -46,10 +58,13 @@ const QuickShare = () => {
           ))}
         </div>
       </div>
+
+      {/* Floating Prompt Input */}
       <FloatingPromptInput
         btnText="Regenerate Post"
         btnIcon={<RotateCcw className="size-3" />}
-        preFilledValue="Generate me a post where I talk about my newly shipped component for library shadcn/ui"
+        preFilledValue={preUserPrompt || ''}
+        onChange={handleGeneratePost}
       >
         <div className="mb-4 flex flex-wrap gap-2">
           <ExternalResourceChip

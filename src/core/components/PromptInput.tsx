@@ -1,5 +1,3 @@
-import { useRouter } from '@tanstack/react-router'
-
 import { InputPrompt } from '@/shared/components/input-prompt'
 
 import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
@@ -9,6 +7,7 @@ interface PromptInputProps {
   btnIcon?: React.ReactNode
   preFilledValue?: string
   backdrop?: boolean
+  onChange: (value: string) => void
 }
 
 export const PromptInput = ({
@@ -16,19 +15,13 @@ export const PromptInput = ({
   btnIcon,
   preFilledValue,
   backdrop,
+  onChange,
 }: PromptInputProps) => {
-  const router = useRouter()
-
-  const onUserPrompt = (value: string) => {
-    console.log(value)
-    router.navigate({ to: '/quick-share' })
-  }
-
   const connectedSocials = SOCIAL_PLATFORM
 
   return (
     <InputPrompt
-      onChange={onUserPrompt}
+      onChange={onChange}
       placeholder={[...SUGGESTED_PROMPT_TEXT]}
       socialStatus={'OK'}
       socials={[

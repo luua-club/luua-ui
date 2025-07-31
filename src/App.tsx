@@ -4,11 +4,11 @@ import { Outlet, useRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { useEffect } from 'react'
 
-import { setUser } from './auth/auth-slice'
 import { userApi } from './core/api/user.api'
 import { LUUA_USER_KEY } from './core/config/constant'
 import { getLocalStorageItem } from './core/config/utils/localstorage.util'
 import { useAppDispatch } from './core/hooks/global-state.hook'
+import { setUser } from './core/store/auth-slice'
 
 function App() {
   const dispatch = useAppDispatch()

@@ -232,10 +232,12 @@ export class BaseApiService {
    * Sets up Axios request interceptors.
    */
   private setInterceptors() {
+    // REQUEST INTERCEPTORS
     this.api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       return authInterceptor(config) as InternalAxiosRequestConfig
     })
 
+    // RESPONSE INTERCEPTORS
     this.api.interceptors.response.use(
       response => response,
       async (error: AxiosError) => {
