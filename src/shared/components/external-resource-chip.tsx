@@ -12,7 +12,7 @@ interface IExternalResourceChip {
 const ExternalResourceChip = ({ url, title }: IExternalResourceChip) => {
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <Button
           variant="outline"
           size="lg"

@@ -11,9 +11,9 @@ const QuickShareHeader = () => {
         <p className="text-gray-600">Your AI generated post</p>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div className="mt-5 flex justify-end gap-2 lg:mt-0">
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline">
               <Calendar className="h-4 w-4" />
             </Button>
@@ -24,7 +24,7 @@ const QuickShareHeader = () => {
         </Tooltip>
 
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline">
               <Share2 className="h-4 w-4" />
             </Button>

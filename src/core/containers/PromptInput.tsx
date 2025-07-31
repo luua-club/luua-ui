@@ -1,7 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
-import { RotateCcw } from 'lucide-react'
 
-import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { InputPrompt } from '@/shared/components/input-prompt'
 
 import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
@@ -56,7 +54,7 @@ export const FloatingPromptInput = ({
   ...props
 }: FloatingPromptInputProps) => {
   return (
-    <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center bg-white/60 backdrop-blur-md">
+    <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center bg-white/60 px-5 backdrop-blur-md lg:px-0">
       <div className="w-full max-w-2xl pt-4 pb-8">
         {children}
         <PromptInput {...props} backdrop />

@@ -12,7 +12,10 @@ import QuickShareHeader from '../components/QuickShareHeader'
 
 //TODO: GET DATA FROM CONTEXT IF NO DATA THEN REDIRECT TO DASHBOARD
 const QuickShare = () => {
-  const recentPost: IPost[] = [mockRecentPost as IPost, mockRecentPost as IPost]
+  const recentPost: IPost[] = [
+    { ...(mockRecentPost as IPost), id: '1' },
+    { ...(mockRecentPost as IPost), id: '2' },
+  ]
 
   return (
     <>
@@ -28,7 +31,7 @@ const QuickShare = () => {
         <QuickShareHeader />
 
         {/* Posts */}
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-6 pb-72 lg:grid-cols-2">
           {recentPost.map(post => (
             <Post
               id={post.id}
