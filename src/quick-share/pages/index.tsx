@@ -2,6 +2,7 @@ import { createLazyRoute, Link, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { generateApi } from '@/core/api/generate-post.api'
 import Post from '@/core/components/Post'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
@@ -15,7 +16,9 @@ import QuickShareHeader from '../components/QuickShareHeader'
 const QuickShare = () => {
   const preUserPrompt = useAppSelector(state => state.promptState.prompt)
   const navigate = useNavigate()
-  const [recentPost, setRecentPost] = useState<IPost[]>([])
+  const [recentPost, setRecentPost] = useState<
+    Pick<IPost, 'id' | 'channel' | 'content'>[]
+  >([])
 
   useEffect(() => {
     if (preUserPrompt) {
@@ -25,8 +28,26 @@ const QuickShare = () => {
     }
   }, [preUserPrompt])
 
-  const handleGeneratePost = (value: string) => {
-    // CALL API
+  const handleGeneratePost = async (value: string) => {
+    try {
+      const response = await generateApi.generatePost({
+        user_prompt: value,
+      })
+      setRecentPost([
+        {
+          id: '0',
+          channel: 'Linkedin',
+          content: response.data.generated_linkedin_post.content,
+        },
+        {
+          id: '1',
+          channel: 'X',
+          content: response.data.generated_twitter_post.content,
+        },
+      ])
+    } catch (error) {
+      console.log(error, 'from quick share')
+    }
   }
 
   return (
@@ -44,16 +65,12 @@ const QuickShare = () => {
 
         {/* Posts */}
         <div className="mt-8 grid grid-cols-1 gap-6 pb-72 lg:grid-cols-2">
-          {recentPost.slice(0, 2).map(post => (
+          {recentPost.map(post => (
             <Post
               id={post.id}
               key={post.id}
               channel={post.channel}
               content={post.content}
-              attachedMedia={post.attachedMedia}
-              status={post.status}
-              created_at={post.created_at}
-              updated_at={post.updated_at}
             />
           ))}
         </div>

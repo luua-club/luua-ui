@@ -6,7 +6,7 @@ import { BaseApiService } from './base.api'
 
 class GenerateApi extends BaseApiService {
   constructor() {
-    super('/generate')
+    super('/generate/')
   }
 
   async generatePost(data: IGeneratePostRequest) {
