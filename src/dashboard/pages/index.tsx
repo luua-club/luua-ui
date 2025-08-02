@@ -1,14 +1,25 @@
 import { createLazyRoute } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { Play } from 'lucide-react'
 
 import Post from '@/core/components/Post'
-import PromptInput from '@/core/containers/PromptInput'
+import { PromptInput } from '@/core/components/PromptInput'
+import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import mockRecentPost from '@/core/mocks/recent-post.json'
 import { IPost } from '@/core/models/post.model'
+import { setPrompt } from '@/core/store/prompt-slice'
 import { Button } from '@/shared/ui/button'
 
 const Dashboard = () => {
+  const dispatch = useAppDispatch()
+  const router = useRouter()
+
   const recentPost: IPost[] = [mockRecentPost as IPost]
+
+  const handleUserPrompt = (value: string) => {
+    dispatch(setPrompt(value))
+    router.navigate({ to: '/quick-share' })
+  }
 
   return (
     <div className="m-auto flex max-w-7xl flex-col gap-8 p-5 lg:flex-row lg:gap-16">
@@ -17,7 +28,7 @@ const Dashboard = () => {
         {/* User prompt */}
         <div>
           <h2 className="pb-4 text-2xl text-gray-800">Ready when you are.</h2>
-          <PromptInput />
+          <PromptInput onChange={handleUserPrompt} />
           <div className="mt-4 flex w-full items-center justify-end gap-2">
             <p className="text-sm text-gray-600">Not sure where to start ? </p>
             <Button variant="brandAccent" size="sm">

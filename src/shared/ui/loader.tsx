@@ -182,7 +182,7 @@ export const LoaderFour = ({ text = 'Loading...' }: { text?: string }) => {
 
 export const LoaderFive = ({ text }: { text: string }) => {
   return (
-    <div className="font-sans font-bold [--shadow-color:var(--color-neutral-500)] dark:[--shadow-color:var(--color-neutral-100)]">
+    <div className="font-sans font-medium [--shadow-color:var(--color-neutral-500)] dark:[--shadow-color:var(--color-neutral-100)]">
       {text.split('').map((char, i) => (
         <motion.span
           key={i}

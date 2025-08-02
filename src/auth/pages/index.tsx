@@ -12,7 +12,7 @@ import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { ILoginResponse } from '@/core/models/auth.model'
 import { cn } from '@/shared/utils'
 
-import { clearUser, setUser } from '../auth-slice'
+import { clearUser, setUser } from '../../core/store/auth-slice'
 import LoginPanel from '../components/LoginPanel'
 
 function Login() {

@@ -1,85 +1,109 @@
-import { createLazyRoute, Link } from '@tanstack/react-router'
-import {
-  Calendar,
-  ChevronLeft,
-  PencilRuler,
-  RotateCcw,
-  Share2,
-} from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { createLazyRoute, useNavigate } from '@tanstack/react-router'
+import { RotateCcw } from 'lucide-react'
+import { useEffect } from 'react'
 
-import Post from '@/core/components/Post'
-import PromptInput from '@/core/containers/PromptInput'
-import mockRecentPost from '@/core/mocks/recent-post.json'
-import { IPost } from '@/core/models/post.model'
+import Post, { PostSkeleton } from '@/core/components/Post'
+import { FloatingPromptInput } from '@/core/components/PromptInput'
+import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
+import { useAppSelector } from '@/core/hooks/global-state.hook'
+import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 
-//TODO: GET DATA FROM CONTEXT IF NO DATA THEN REDIRECT TO DASHBOARD,
-//NOTE: CALL API IN DASHBOARD AND STORE IN CONTEXT
+import QuickShareHeader from '../components/QuickShareHeader'
+
 const QuickShare = () => {
-  const recentPost: IPost[] = [mockRecentPost as IPost, mockRecentPost as IPost]
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const preUserPrompt = useAppSelector(state => state.promptState.prompt)
+  const {
+    posts,
+    extractedLinks,
+    isLoading,
+    isFetching,
+    setUserPrompt,
+    key,
+    activePrompt,
+    refetch,
+  } = useGeneratePosts(preUserPrompt || '')
+
+  const isDataFetching = isLoading || isFetching
+
+  useEffect(() => {
+    // Redirect to dashboard if no prompt is available
+    if (!preUserPrompt) {
+      navigate({ to: '/dashboard' })
+    }
+  }, [preUserPrompt, navigate])
+
+  useEffect(() => {
+    return () => {
+      // Cancel any ongoing generate-ai-post queries
+      queryClient.cancelQueries({ queryKey: [key] })
+    }
+  }, [queryClient, key])
 
   return (
-    <div className="m-auto flex max-w-4xl flex-col p-5">
-      {/* Back to Dashboard */}
-      <Link to="/dashboard">
-        <Button variant="link" className="w-fit !p-0">
-          <ChevronLeft className="size-3" />
-          Dashboard
-        </Button>
-      </Link>
+    <>
+      <div className="m-auto flex max-w-4xl flex-col p-5">
+        {/* Header */}
+        <QuickShareHeader isLoading={isDataFetching} />
 
-      {/* Prompt Section */}
-      <div className="mt-6 space-y-1">
-        <h1 className="text-2xl font-semibold">Your prompt</h1>
-        <PromptInput
-          btnText="Regenerate Post"
-          btnIcon={<RotateCcw className="size-3" />}
-          preFilledValue="Generate me a post where I talk about my newly shipped component for library shadcn/ui"
-        />
+        {/* Posts */}
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {isDataFetching ? (
+            <>
+              <PostSkeleton />
+              <PostSkeleton />
+            </>
+          ) : (
+            posts.map(post => (
+              <Post
+                id={post.id}
+                key={post.id}
+                channel={post.channel}
+                content={post.content}
+              />
+            ))
+          )}
+        </div>
+
+        {/** User added prompt */}
+        <div className="mb-72 flex flex-col">
+          <p className="mt-4 rounded-md border-1 border-dashed p-2 text-sm text-gray-600">
+            <span className="font-semibold text-black">
+              {isDataFetching ? 'Generating' : 'Results'} for -{' '}
+            </span>
+            {activePrompt}
+          </p>
+          <Button
+            variant={'ghost'}
+            className="mt-2 self-end !py-0 font-normal text-gray-500"
+            onClick={() => refetch()}
+            disabled={isDataFetching}
+          >
+            <RotateCcw className="size-3" />
+            Retry
+          </Button>
+        </div>
       </div>
 
-      {/* Review and Publish Section */}
-      <div className="mt-12 space-y-6">
-        <div className="flex flex-wrap items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold">Review and publish</h2>
-            <p className="text-gray-600">Your AI generated post</p>
+      {/* Floating Prompt Input */}
+      <FloatingPromptInput onChange={setUserPrompt} loading={isDataFetching}>
+        {extractedLinks.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {extractedLinks.map(link_data => (
+              <ExternalResourceChip
+                key={link_data.url}
+                url={link_data.url}
+                title={link_data.title}
+              />
+            ))}
           </div>
-          <Button variant="default" className="mt-4 gap-2 lg:mt-0">
-            <PencilRuler />
-            Customize these posts
-          </Button>
-        </div>
-
-        {/* Post Cards Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {recentPost.map(post => (
-            <Post
-              id={post.id}
-              key={post.id}
-              channel={post.channel}
-              content={post.content}
-              attachedMedia={post.attachedMedia}
-              status={post.status}
-              created_at={post.created_at}
-              updated_at={post.updated_at}
-            />
-          ))}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4">
-          <Button variant="outline" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Schedule
-          </Button>
-          <Button variant="brandAccent" className="gap-2">
-            <Share2 className="h-4 w-4" />
-            Share All
-          </Button>
-        </div>
-      </div>
-    </div>
+        )}
+      </FloatingPromptInput>
+    </>
   )
 }
 

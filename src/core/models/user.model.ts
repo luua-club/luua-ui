@@ -3,7 +3,6 @@ export interface IUser {
   name: string
   profile_image: string
   deactivated: boolean
-  plan: string
 }
 
 export interface IUserState extends IUser {

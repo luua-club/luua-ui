@@ -20,9 +20,9 @@ interface InputPromptProps {
     icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
     tooltip: string
   }[]
-  preFilledValue?: string
   btnText?: string
   btnIcon?: React.ReactNode
+  backdrop?: boolean
   onChange: (value: string) => void
 }
 
@@ -31,21 +31,13 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   placeholder = [],
   socialStatus,
   socials = [],
-  preFilledValue,
   btnText = 'Generate Post',
   btnIcon = <SendHorizontal className="size-3" />,
+  backdrop = false,
   onChange,
 }) => {
   const [value, setValue] = useState('')
   const divRef = useRef<HTMLDivElement>(null)
-
-  // Update the div content when preFilledValue changes
-  useEffect(() => {
-    if (divRef.current && preFilledValue) {
-      divRef.current.textContent = preFilledValue
-      setValue(preFilledValue)
-    }
-  }, [preFilledValue])
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const text = e.currentTarget.textContent || ''
@@ -53,6 +45,8 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (loading) return
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleGeneratePost()
@@ -60,17 +54,30 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   }
 
   const handleGeneratePost = () => {
+    if (loading) return
+
     if (value.trim()) {
       onChange(value.trim())
+
+      if (divRef.current) {
+        divRef.current.textContent = ''
+        setValue('')
+      }
     }
   }
 
   return (
-    <div className={'relative flex flex-col rounded-sm border-1'}>
+    <div
+      className={cn(
+        'relative flex flex-col rounded-sm border-1',
+        backdrop &&
+          'rounded-lg border border-gray-200/50 bg-white/80 shadow-lg shadow-black/5 backdrop-blur-md'
+      )}
+    >
       <div className="relative">
         <div
           ref={divRef}
-          contentEditable={!loading}
+          contentEditable={true}
           role="textbox"
           aria-multiline="true"
           spellCheck={true}
@@ -78,8 +85,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           className={cn(
-            'max-h-70 min-h-24 min-w-72 overflow-y-auto px-3 py-4 text-sm outline-none',
-            loading ? 'text-gray-400' : 'text-gray-600'
+            'max-h-70 min-h-24 min-w-72 overflow-y-auto px-3 py-4 text-sm text-gray-600 outline-none'
           )}
           suppressContentEditableWarning
         />
