@@ -130,8 +130,8 @@ const QuickShare = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex w-full items-center justify-center rounded-lg border border-dashed p-5">
-                <p className="text-sm text-gray-500">No sources found</p>
+              <div className="mt-4 flex w-full items-center justify-center rounded-lg border border-dashed p-5">
+                <p className="text-sm text-gray-500">No sources used</p>
               </div>
             )}
           </TabsContent>
