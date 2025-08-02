@@ -51,3 +51,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .scrollbar-thin {
+    @apply overflow-x-auto;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    @apply h-1.5;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gray-200 dark:bg-neutral-500;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+}

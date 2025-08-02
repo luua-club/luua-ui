@@ -91,8 +91,8 @@ const QuickShare = () => {
 
       {/* Floating Prompt Input */}
       <FloatingPromptInput onChange={setUserPrompt} loading={isDataFetching}>
-        {extractedLinks.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
+        {extractedLinks.length > 0 && !isDataFetching && (
+          <div className="scrollbar-thin mb-4 flex items-center gap-2 pb-2">
             {extractedLinks.map(link_data => (
               <ExternalResourceChip
                 key={link_data.url}
