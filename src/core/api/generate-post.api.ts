@@ -9,8 +9,8 @@ class GenerateApi extends BaseApiService {
     super('/generate/')
   }
 
-  async generatePost(data: IGeneratePostRequest) {
-    return this.post<IGeneratePostResponse>(data)
+  async generatePost(data: IGeneratePostRequest, signal?: AbortSignal) {
+    return this.post<IGeneratePostResponse>(data, undefined, { signal })
   }
 }
 

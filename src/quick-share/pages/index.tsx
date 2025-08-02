@@ -1,98 +1,107 @@
-import { createLazyRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft, RotateCcw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { createLazyRoute, useNavigate } from '@tanstack/react-router'
+import { RotateCcw } from 'lucide-react'
+import { useEffect } from 'react'
 
-import { generateApi } from '@/core/api/generate-post.api'
-import Post from '@/core/components/Post'
+import Post, { PostSkeleton } from '@/core/components/Post'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
+import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
-import { IPost } from '@/core/models/post.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 
 import QuickShareHeader from '../components/QuickShareHeader'
 
-//TODO: GET DATA FROM CONTEXT IF NO DATA THEN REDIRECT TO DASHBOARD
 const QuickShare = () => {
-  const preUserPrompt = useAppSelector(state => state.promptState.prompt)
   const navigate = useNavigate()
-  const [recentPost, setRecentPost] = useState<
-    Pick<IPost, 'id' | 'channel' | 'content'>[]
-  >([])
+  const queryClient = useQueryClient()
+
+  const preUserPrompt = useAppSelector(state => state.promptState.prompt)
+  const {
+    posts,
+    extractedLinks,
+    isLoading,
+    isFetching,
+    setUserPrompt,
+    key,
+    activePrompt,
+    refetch,
+  } = useGeneratePosts(preUserPrompt || '')
+
+  const isDataFetching = isLoading || isFetching
 
   useEffect(() => {
-    if (preUserPrompt) {
-      handleGeneratePost(preUserPrompt)
-    } else {
+    // Redirect to dashboard if no prompt is available
+    if (!preUserPrompt) {
       navigate({ to: '/dashboard' })
     }
-  }, [preUserPrompt])
+  }, [preUserPrompt, navigate])
 
-  const handleGeneratePost = async (value: string) => {
-    try {
-      const response = await generateApi.generatePost({
-        user_prompt: value,
-      })
-      setRecentPost([
-        {
-          id: '0',
-          channel: 'Linkedin',
-          content: response.data.generated_linkedin_post.content,
-        },
-        {
-          id: '1',
-          channel: 'X',
-          content: response.data.generated_twitter_post.content,
-        },
-      ])
-    } catch (error) {
-      console.log(error, 'from quick share')
+  useEffect(() => {
+    return () => {
+      // Cancel any ongoing generate-ai-post queries
+      queryClient.cancelQueries({ queryKey: [key] })
     }
-  }
+  }, [queryClient, key])
 
   return (
     <>
       <div className="m-auto flex max-w-4xl flex-col p-5">
-        <Link to="/dashboard">
-          <Button variant="link" className="mb-6 w-fit !p-0">
-            <ChevronLeft className="size-3" />
-            Dashboard
-          </Button>
-        </Link>
-
         {/* Header */}
-        <QuickShareHeader />
+        <QuickShareHeader isLoading={isDataFetching} />
 
         {/* Posts */}
-        <div className="mt-8 grid grid-cols-1 gap-6 pb-72 lg:grid-cols-2">
-          {recentPost.map(post => (
-            <Post
-              id={post.id}
-              key={post.id}
-              channel={post.channel}
-              content={post.content}
-            />
-          ))}
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {isDataFetching ? (
+            <>
+              <PostSkeleton />
+              <PostSkeleton />
+            </>
+          ) : (
+            posts.map(post => (
+              <Post
+                id={post.id}
+                key={post.id}
+                channel={post.channel}
+                content={post.content}
+              />
+            ))
+          )}
+        </div>
+
+        {/** User added prompt */}
+        <div className="mb-72 flex flex-col">
+          <p className="mt-4 rounded-md border-1 border-dashed p-2 text-sm text-gray-600">
+            <span className="font-semibold text-black">
+              {isDataFetching ? 'Generating' : 'Results'} for -{' '}
+            </span>
+            {activePrompt}
+          </p>
+          <Button
+            variant={'ghost'}
+            className="mt-2 self-end !py-0 font-normal text-gray-500"
+            onClick={() => refetch()}
+            disabled={isDataFetching}
+          >
+            <RotateCcw className="size-3" />
+            Retry
+          </Button>
         </div>
       </div>
 
       {/* Floating Prompt Input */}
-      <FloatingPromptInput
-        btnText="Regenerate Post"
-        btnIcon={<RotateCcw className="size-3" />}
-        preFilledValue={preUserPrompt || ''}
-        onChange={handleGeneratePost}
-      >
-        <div className="mb-4 flex flex-wrap gap-2">
-          <ExternalResourceChip
-            url="https://en.wikipedia.org/wiki/2025_Cambodia%E2%80%93Thailand_clashes"
-            title="Cambodia Thailand clashes - Wikipedia"
-          />
-          <ExternalResourceChip
-            url="https://en.wikipedia.org/wiki/2025_Cambodia%E2%80%93Thailand_clashes"
-            title="Cambodia Thailand clashes - Wikipedia"
-          />
-        </div>
+      <FloatingPromptInput onChange={setUserPrompt} loading={isDataFetching}>
+        {extractedLinks.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {extractedLinks.map(link_data => (
+              <ExternalResourceChip
+                key={link_data.url}
+                url={link_data.url}
+                title={link_data.title}
+              />
+            ))}
+          </div>
+        )}
       </FloatingPromptInput>
     </>
   )

@@ -4,7 +4,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 
-import App from '@/App'
+import { AppContent } from '@/App'
 import authRoute from '@/auth/router'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
 import dashboardRoute from '@/dashboard/router'
@@ -14,7 +14,7 @@ import settingsRouteTree from '@/settings/router'
 import { AuthGuard } from './guards'
 
 export const rootRoute = createRootRoute({
-  component: App,
+  component: AppContent,
   loader: ({ location }) => AuthGuard({ location }),
 })
 

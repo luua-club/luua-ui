@@ -2,13 +2,19 @@ import { Paperclip } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Card, CardContent } from '@/shared/ui/card'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
 import { IPost } from '../models/post.model'
 
-type PostProps = IPost
+type PostProps = IPost & { isLoading?: boolean }
 
-function Post({ channel, content, attachedMedia }: PostProps) {
+function Post({
+  channel,
+  content,
+  attachedMedia,
+  isLoading = false,
+}: PostProps) {
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
 
   //TODO: get user from context
@@ -16,6 +22,10 @@ function Post({ channel, content, attachedMedia }: PostProps) {
     name: 'shadcn',
     username: '@shadcn',
     image: 'https://github.com/shadcn.png',
+  }
+
+  if (isLoading) {
+    return <PostSkeleton />
   }
 
   return (
@@ -52,6 +62,31 @@ function Post({ channel, content, attachedMedia }: PostProps) {
             </span>
           </>
         )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export const PostSkeleton = () => {
+  return (
+    <Card className="relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none">
+      <CardContent className="flex flex-1 flex-col p-0">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="flex flex-col pl-2">
+              <Skeleton className="mb-1 h-4 w-20" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-10 rounded-full" />
+        </div>
+        <hr />
+        <div className="mt-3 space-y-2 px-4">
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
       </CardContent>
     </Card>
   )

@@ -265,7 +265,7 @@ export class BaseApiService {
 
             return this.api(config)
           } else {
-            // If all retries fail, logout
+            // TODO: If all retries fail, logout
             logout()
           }
         }

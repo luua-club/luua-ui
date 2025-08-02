@@ -5,16 +5,16 @@ import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
 interface PromptInputProps {
   btnText?: string
   btnIcon?: React.ReactNode
-  preFilledValue?: string
   backdrop?: boolean
+  loading?: boolean
   onChange: (value: string) => void
 }
 
 export const PromptInput = ({
   btnText,
   btnIcon,
-  preFilledValue,
   backdrop,
+  loading,
   onChange,
 }: PromptInputProps) => {
   const connectedSocials = SOCIAL_PLATFORM
@@ -30,10 +30,10 @@ export const PromptInput = ({
           tooltip: social.tooltip,
         })),
       ]}
-      preFilledValue={preFilledValue}
       btnText={btnText}
       btnIcon={btnIcon}
       backdrop={backdrop}
+      loading={loading}
     />
   )
 }
