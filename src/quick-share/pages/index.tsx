@@ -77,10 +77,9 @@ const QuickShare = () => {
             />
 
             {/** External Resources */}
-            <div className="mt-4 hidden w-full gap-2 lg:flex">
-              {extractedLinks.length > 0 &&
-                !isDataFetching &&
-                extractedLinks.slice(0, 5).map(link_data => (
+            {extractedLinks.length > 0 && !isDataFetching && (
+              <div className="mt-4 hidden w-full gap-2 lg:flex">
+                {extractedLinks.slice(0, 5).map(link_data => (
                   <div key={link_data.url} className="flex-1">
                     <ExternalResourceChip
                       url={link_data.url}
@@ -88,15 +87,11 @@ const QuickShare = () => {
                     />
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
 
             {/** Generated Posts */}
-            <div
-              className={cn(
-                'grid grid-cols-1 gap-6 lg:grid-cols-2',
-                extractedLinks.length > 0 && !isDataFetching ? 'mt-4' : 'mt-2'
-              )}
-            >
+            <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
               {isDataFetching ? (
                 <>
                   <PostSkeleton />
@@ -118,7 +113,7 @@ const QuickShare = () => {
           <TabsContent value="sources">
             <h2 className="mt-2 text-2xl font-semibold">All sources used</h2>
             {extractedLinks.length > 0 && !isDataFetching ? (
-              <div className="mt-4 grid grid-cols-3 gap-4">
+              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
                 {extractedLinks.map(link_data => (
                   <div key={link_data.url}>
                     <ExternalResourceChip

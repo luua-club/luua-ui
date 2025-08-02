@@ -13,9 +13,9 @@ const GeneratedPostControls = ({
   onRetry,
 }: GeneratedPostControlsProps) => {
   return (
-    <div className="mt-2 flex items-center justify-between">
+    <div className="mt-2 flex flex-col items-center justify-between md:flex-row">
       <h2 className="text-2xl font-semibold">Review and Publish</h2>
-      <div className="flex justify-center gap-1">
+      <div className="mt-4 flex justify-center gap-1 md:mt-0">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button variant="ghost" disabled={isLoading} className="!p-2">
