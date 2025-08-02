@@ -90,7 +90,7 @@ const QuickShare = () => {
             )}
 
             {/** Generated Posts */}
-            <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-6 pb-48 lg:grid-cols-2">
               {isDataFetching ? (
                 <>
                   <PostSkeleton />
@@ -112,7 +112,7 @@ const QuickShare = () => {
           <TabsContent value="sources">
             <h2 className="mt-2 text-2xl font-semibold">All sources used</h2>
             {extractedLinks.length > 0 && !isDataFetching ? (
-              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-4 pb-48 lg:grid-cols-3">
                 {extractedLinks.map(link_data => (
                   <div key={link_data.url}>
                     <ExternalResourceChip
