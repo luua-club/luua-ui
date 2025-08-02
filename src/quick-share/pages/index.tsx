@@ -8,7 +8,6 @@ import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
-import { cn } from '@/shared/utils'
 
 import GeneratedPostControls from '../components/GeneratedPostControls'
 
