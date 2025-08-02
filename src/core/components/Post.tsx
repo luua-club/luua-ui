@@ -3,17 +3,19 @@ import { Paperclip } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
 import { IPost } from '../models/post.model'
 
-type PostProps = IPost & { isLoading?: boolean }
+type PostProps = IPost & { isLoading?: boolean; fullView?: boolean }
 
 function Post({
   channel,
   content,
   attachedMedia,
   isLoading = false,
+  fullView = false,
 }: PostProps) {
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
 
@@ -29,7 +31,12 @@ function Post({
   }
 
   return (
-    <Card className="relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none">
+    <Card
+      className={cn(
+        'relative flex flex-col rounded-md p-0 shadow-none',
+        fullView ? 'h-fit' : 'min-h-52 overflow-hidden'
+      )}
+    >
       <CardContent className="flex flex-1 flex-col p-0">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
@@ -51,7 +58,12 @@ function Post({
           )}
         </div>
         <hr />
-        <p className="mt-3 line-clamp-5 px-4 text-sm text-gray-600">
+        <p
+          className={cn(
+            'mt-3 px-4 text-sm text-gray-600',
+            fullView ? 'pb-4' : 'line-clamp-5'
+          )}
+        >
           {content}
         </p>
 

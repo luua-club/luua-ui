@@ -7,19 +7,24 @@ import { extractDomain } from '../utils'
 interface IExternalResourceChip {
   url: string
   title: string
+  showIcon?: boolean
 }
 
-const ExternalResourceChip = ({ url, title }: IExternalResourceChip) => {
+const ExternalResourceChip = ({
+  url,
+  title,
+  showIcon = false,
+}: IExternalResourceChip) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           variant="outline"
           size="lg"
-          className="cursor-pointer justify-start border-1 border-dashed px-4 py-6 focus-visible:ring-0"
+          className="w-full cursor-pointer justify-between border-1 border-dashed px-4 py-6 focus-visible:ring-0"
           onClick={() => window.open(url, '_blank')}
         >
-          <div className="max-w-32 flex-1 text-left text-sm">
+          <div className="text-left text-sm">
             <span className="block truncate text-xs font-medium text-gray-400">
               {extractDomain(url)}
             </span>
@@ -27,6 +32,7 @@ const ExternalResourceChip = ({ url, title }: IExternalResourceChip) => {
               {title}
             </span>
           </div>
+          {showIcon && <SquareArrowOutUpRight className="size-4" />}
         </Button>
       </TooltipTrigger>
       <TooltipContent>

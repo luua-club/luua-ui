@@ -1,18 +1,20 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
-import { RotateCcw } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import Post, { PostSkeleton } from '@/core/components/Post'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
-import { Button } from '@/shared/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
+import { cn } from '@/shared/utils'
 
-import QuickShareHeader from '../components/QuickShareHeader'
+import GeneratedPostControls from '../components/GeneratedPostControls'
 
 const QuickShare = () => {
+  const [activeTab, setActiveTab] = useState<string>('created-post')
+
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -24,7 +26,6 @@ const QuickShare = () => {
     isFetching,
     setUserPrompt,
     key,
-    activePrompt,
     refetch,
   } = useGeneratePosts(preUserPrompt || '')
 
@@ -47,62 +48,104 @@ const QuickShare = () => {
   return (
     <>
       <div className="m-auto flex max-w-4xl flex-col p-5">
-        {/* Header */}
-        <QuickShareHeader isLoading={isDataFetching} />
+        <Tabs
+          className="w-full"
+          defaultValue="created-post"
+          value={activeTab}
+          onValueChange={val => setActiveTab(val)}
+        >
+          <TabsList className="w-full px-2 py-6 lg:w-fit">
+            <TabsTrigger
+              value="created-post"
+              className="px-2 py-4 text-sm lg:px-4 lg:text-base"
+            >
+              Created Posts
+            </TabsTrigger>
+            <TabsTrigger
+              value="sources"
+              className="px-2 py-4 text-sm lg:px-4 lg:text-base"
+              disabled={isDataFetching}
+            >
+              Sources
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="created-post" className="flex flex-col">
+            {/** Generated Post Controls */}
+            <GeneratedPostControls
+              isLoading={isDataFetching}
+              onRetry={refetch}
+            />
 
-        {/* Posts */}
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {isDataFetching ? (
-            <>
-              <PostSkeleton />
-              <PostSkeleton />
-            </>
-          ) : (
-            posts.map(post => (
-              <Post
-                id={post.id}
-                key={post.id}
-                channel={post.channel}
-                content={post.content}
-              />
-            ))
-          )}
-        </div>
+            {/** External Resources */}
+            <div className="mt-4 hidden w-full gap-2 lg:flex">
+              {extractedLinks.length > 0 &&
+                !isDataFetching &&
+                extractedLinks.slice(0, 5).map(link_data => (
+                  <div key={link_data.url} className="flex-1">
+                    <ExternalResourceChip
+                      url={link_data.url}
+                      title={link_data.title}
+                    />
+                  </div>
+                ))}
+            </div>
 
-        {/** User added prompt */}
-        <div className="mb-72 flex flex-col">
-          <p className="mt-4 rounded-md border-1 border-dashed p-2 text-sm text-gray-600">
-            <span className="font-semibold text-black">
-              {isDataFetching ? 'Generating' : 'Results'} for -{' '}
-            </span>
-            {activePrompt}
-          </p>
-          <Button
-            variant={'ghost'}
-            className="mt-2 self-end !py-0 font-normal text-gray-500"
-            onClick={() => refetch()}
-            disabled={isDataFetching}
-          >
-            <RotateCcw className="size-3" />
-            Retry
-          </Button>
-        </div>
+            {/** Generated Posts */}
+            <div
+              className={cn(
+                'grid grid-cols-1 gap-6 lg:grid-cols-2',
+                extractedLinks.length > 0 && !isDataFetching ? 'mt-4' : 'mt-2'
+              )}
+            >
+              {isDataFetching ? (
+                <>
+                  <PostSkeleton />
+                  <PostSkeleton />
+                </>
+              ) : (
+                //TODO: Replace with post preview
+                posts.map(post => (
+                  <Post
+                    id={post.id}
+                    key={post.id}
+                    channel={post.channel}
+                    content={post.content}
+                  />
+                ))
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="sources">
+            <h2 className="mt-2 text-2xl font-semibold">All sources used</h2>
+            {extractedLinks.length > 0 && !isDataFetching ? (
+              <div className="mt-4 grid grid-cols-3 gap-4">
+                {extractedLinks.map(link_data => (
+                  <div key={link_data.url}>
+                    <ExternalResourceChip
+                      url={link_data.url}
+                      title={link_data.title}
+                      showIcon
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex w-full items-center justify-center rounded-lg border border-dashed p-5">
+                <p className="text-sm text-gray-500">No sources found</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Floating Prompt Input */}
-      <FloatingPromptInput onChange={setUserPrompt} loading={isDataFetching}>
-        {extractedLinks.length > 0 && !isDataFetching && (
-          <div className="scrollbar-thin mb-4 flex items-center gap-2 pb-2">
-            {extractedLinks.map(link_data => (
-              <ExternalResourceChip
-                key={link_data.url}
-                url={link_data.url}
-                title={link_data.title}
-              />
-            ))}
-          </div>
-        )}
-      </FloatingPromptInput>
+      <FloatingPromptInput
+        onChange={prompt => {
+          setUserPrompt(prompt)
+          setActiveTab('created-post')
+        }}
+        loading={isDataFetching}
+      ></FloatingPromptInput>
     </>
   )
 }
