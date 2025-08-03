@@ -1,4 +1,5 @@
 {
+  "cSpell.words": ["LUUA", "Sonner", "tabler"],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },

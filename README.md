@@ -1,7 +1,5 @@
-# WIP, currently work in progress
+# Luua UI
 
-## TODO
+Testing - https://luua-ui.onrender.com/login
 
-- [ ] Add testing
-- [ ] Add routing
-- [ ] External API calling setup
+[ ] Show loading in nav user, create a store to handle user profile call globally

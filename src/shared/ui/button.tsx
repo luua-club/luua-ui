@@ -21,7 +21,7 @@ const buttonVariants = cva(
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
         brandAccent:
-          'bg-brand-accent-yellow text-black hover:cursor-pointer hover:bg-black hover:text-white',
+          'bg-brand-accent-yellow text-black hover:cursor-pointer hover:bg-black hover:text-white border-1 border-black',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
@@ -52,7 +52,10 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        'cursor-pointer'
+      )}
       {...props}
     />
   )

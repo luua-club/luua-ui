@@ -7,6 +7,7 @@ import axios, {
 } from 'axios'
 
 import { BASE_API_URL } from '../config/urls'
+import { logout } from '../config/utils/common.util'
 import { authInterceptor } from '../interceptors/auth.interceptor'
 import { ApiError, ApiResponse } from '../models/api.model'
 
@@ -18,7 +19,7 @@ export class BaseApiService {
 
     this.api = axios.create({
       baseURL: `${url}${endpoint}`,
-      timeout: 10000,
+      timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -192,9 +193,11 @@ export class BaseApiService {
    * @returns An ApiError containing the error message, status, and optional code/detail.
    */
   private handleError(error: AxiosError): ApiError {
+    const status = error.response?.status
+
     const apiError: ApiError = {
       message: error.message || 'An unexpected error occurred',
-      status: error.response?.status || 500,
+      status: status || 500,
     }
 
     if (error.response?.data) {
@@ -215,15 +218,61 @@ export class BaseApiService {
       }
     }
 
+    /**
+     * Auto-logout on 401 or 403 (unauthorized)
+     */
+    if (status === 401 || status === 403) {
+      logout()
+    }
+
     return apiError
   }
 
   /**
-   * Sets up Axios request interceptors for authentication.
+   * Sets up Axios request interceptors.
    */
   private setInterceptors() {
+    // REQUEST INTERCEPTORS
     this.api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       return authInterceptor(config) as InternalAxiosRequestConfig
     })
+
+    // TODO: May not be required because of react query
+    // RESPONSE INTERCEPTORS
+    // this.api.interceptors.response.use(
+    //   response => response,
+    //   async (error: AxiosError) => {
+    //     const { config, response, code } = error
+
+    //     // if there is no config, we can't retry
+    //     if (!config) {
+    //       return Promise.reject(error)
+    //     }
+
+    //     const shouldRetry =
+    //       (response && response.status >= 500) || code === 'ECONNABORTED'
+
+    //     if (shouldRetry) {
+    //       const maxRetries = 3
+    //       const retryCount = (config.headers['X-Retry-Count'] as number) || 0
+
+    //       if (retryCount < maxRetries) {
+    //         config.headers['X-Retry-Count'] = retryCount + 1
+
+    //         // Adding a small delay before retrying
+    //         await new Promise(resolve =>
+    //           setTimeout(resolve, 1000 * (retryCount + 1))
+    //         )
+
+    //         return this.api(config)
+    //       } else {
+    //         // TODO: If all retries fail, logout
+    //         logout()
+    //       }
+    //     }
+
+    //     return Promise.reject(error)
+    //   }
+    // )
   }
 }

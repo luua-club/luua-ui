@@ -1,13 +1,26 @@
 import { AxiosRequestConfig } from 'axios'
 
-//TODO: WIP
+import { capitalize } from '@/shared/utils'
+
+import { getLocalStorageItem } from '../../shared/utils/localstorage.util'
+import { LUUA_USER_KEY } from '../config/constant'
+import { ILoginResponse } from '../models/auth.model'
+
+/**
+ * Interceptor to add the JWT token to the request headers
+ *
+ * @param config - The request config
+ * @returns The request config with the JWT token
+ */
 export const authInterceptor = (config: AxiosRequestConfig) => {
-  // const token = localStorage.getItem('token')
-  // if (token) {
-  //   config.headers = {
-  //     ...config.headers,
-  //     Authorization: `Bearer ${token}`,
-  //   }
-  // }
+  const token = getLocalStorageItem<ILoginResponse>(LUUA_USER_KEY)
+
+  if (token) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `${capitalize(token.token_type)} ${token.access_token}`,
+    }
+  }
+
   return config
 }
