@@ -9,11 +9,11 @@ import { Provider } from 'react-redux'
 
 import { userApi } from './core/api/user.api'
 import { LUUA_USER_KEY } from './core/config/constant'
-import { getLocalStorageItem } from './core/config/utils/localstorage.util'
 import { useAppDispatch } from './core/hooks/global-state.hook'
 import { store } from './core/store'
 import { setUser } from './core/store/auth-slice'
 import router from './router'
+import { getLocalStorageItem } from './shared/utils/localstorage.util'
 
 const queryClient = new QueryClient({
   defaultOptions: {

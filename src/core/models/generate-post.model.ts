@@ -14,7 +14,7 @@ export const ExtractedLinksSchema = z.object({
   title: z.string(),
 })
 
-export type IExtractedLinks = z.infer<typeof ExtractedLinksSchema>
+export type extractedLinksType = z.infer<typeof ExtractedLinksSchema>
 
 // Zod schema for generate post response
 export const GeneratePostResponseSchema = z.object({
@@ -29,4 +29,6 @@ export const GeneratePostResponseSchema = z.object({
   }),
 })
 
-export type IGeneratePostResponse = z.infer<typeof GeneratePostResponseSchema>
+export type generatePostResponseType = z.infer<
+  typeof GeneratePostResponseSchema
+>

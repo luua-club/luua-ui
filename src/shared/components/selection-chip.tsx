@@ -7,6 +7,7 @@ type SelectionChipProps<T extends string> = {
   title: T
   isSelected: boolean
   icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
+  disabled?: boolean
   onSelect: (title: T) => void
 }
 
@@ -14,6 +15,7 @@ const SelectionChip = <T extends string>({
   title,
   isSelected,
   icon: Icon,
+  disabled,
   onSelect,
 }: SelectionChipProps<T>) => {
   return (
@@ -22,7 +24,7 @@ const SelectionChip = <T extends string>({
         'relative flex cursor-pointer flex-row items-center justify-start rounded-md border-2 p-2 shadow-none transition-all duration-200',
         isSelected ? 'border-black' : 'border-gray-100 hover:border-gray-200'
       )}
-      onClick={() => onSelect(title)}
+      onClick={!disabled ? () => onSelect(title) : undefined}
     >
       {/* Icon */}
       <div

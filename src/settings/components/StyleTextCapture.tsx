@@ -19,12 +19,16 @@ const FormSchema = z.object({
     .min(10, {
       message: 'Sample Text must be at least 10 characters.',
     })
-    .max(200, {
-      message: 'Sample Text must not be longer than 200 characters.',
+    .max(1000, {
+      message: 'Sample Text must not be longer than 1000 characters.',
     }),
 })
 
-const StyleTextCapture = () => {
+interface IStyleTextCapture {
+  handleSubmit: (data: string) => void
+}
+
+const StyleTextCapture = ({ handleSubmit }: IStyleTextCapture) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -33,7 +37,7 @@ const StyleTextCapture = () => {
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log(data)
+    handleSubmit(data.sampleText)
   }
 
   return (

@@ -1,10 +1,30 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { stylesApi } from '@/core/api/styles.api'
+import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleFileCapture from '../components/StyleFileCapture'
 import StyleTextCapture from '../components/StyleTextCapture'
+import { queryKeys } from '../utils'
 
 const Advanced = () => {
+  const queryClient = useQueryClient()
+
+  const setAdvancedUserStyleMutation = useMutation({
+    mutationFn: (payload: IUserAdvancedStyleRequest) =>
+      stylesApi.setUserAdvancedStyle(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeys.userStyle] })
+      toast.success('Advanced user style updated successfully')
+    },
+    onError: () => {
+      toast.error('Failed to update advanced user style')
+    },
+  })
+
   return (
     <>
       {/* Heading */}
@@ -29,7 +49,13 @@ const Advanced = () => {
               <TabsTrigger value="fileSample">File Sample</TabsTrigger>
             </TabsList>
             <TabsContent value="textSample">
-              <StyleTextCapture />
+              <StyleTextCapture
+                handleSubmit={data => {
+                  setAdvancedUserStyleMutation.mutate({
+                    style_text: data,
+                  })
+                }}
+              />
             </TabsContent>
             <TabsContent value="fileSample">
               <StyleFileCapture />

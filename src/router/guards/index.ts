@@ -1,7 +1,7 @@
 import { ParsedLocation, redirect } from '@tanstack/react-router'
 
 import { LUUA_USER_KEY } from '@/core/config/constant'
-import { getLocalStorageItem } from '@/core/config/utils/localstorage.util'
+import { getLocalStorageItem } from '@/shared/utils/localstorage.util'
 
 export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
   const isLoggedIn = getLocalStorageItem(LUUA_USER_KEY) !== null

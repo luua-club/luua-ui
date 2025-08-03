@@ -2,8 +2,8 @@ import { AxiosRequestConfig } from 'axios'
 
 import { capitalize } from '@/shared/utils'
 
+import { getLocalStorageItem } from '../../shared/utils/localstorage.util'
 import { LUUA_USER_KEY } from '../config/constant'
-import { getLocalStorageItem } from '../config/utils/localstorage.util'
 import { ILoginResponse } from '../models/auth.model'
 
 /**

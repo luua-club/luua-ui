@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 
 import { authApi } from '@/core/api/auth.api'
 import { LUUA_USER_KEY } from '@/core/config/constant'
-import {
-  removeLocalStorageItem,
-  setLocalStorageItem,
-} from '@/core/config/utils/localstorage.util'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { ILoginResponse } from '@/core/models/auth.model'
 import { cn } from '@/shared/utils'
+import {
+  removeLocalStorageItem,
+  setLocalStorageItem,
+} from '@/shared/utils/localstorage.util'
 
 import { clearUser, setUser } from '../../core/store/auth-slice'
 import LoginPanel from '../components/LoginPanel'
