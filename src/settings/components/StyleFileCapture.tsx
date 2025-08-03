@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CloudUpload, X } from 'lucide-react'
+import { ChevronRight, CloudUpload, Shredder, X } from 'lucide-react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -85,7 +85,10 @@ const StyleFileCapture = () => {
                   }}
                   multiple
                 >
-                  <FileUploadDropzone className="flex-row flex-wrap border-dotted text-center">
+                  <FormDescription className="font-base text-gray-600">
+                    Could upload up to 5 image upto 5MB each.
+                  </FormDescription>
+                  <FileUploadDropzone className="min-h-20 flex-row flex-wrap border-dotted text-center">
                     <CloudUpload className="size-4" />
                     Drag and drop or
                     <FileUploadTrigger asChild>
@@ -115,13 +118,14 @@ const StyleFileCapture = () => {
                   </FileUploadList>
                 </FileUpload>
               </FormControl>
-              <FormDescription>Upload up to 1 image up to 5MB.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="mt-2 w-fit">
-          Submit
+        <Button type="submit" variant="secondary" className="mt-4 w-fit">
+          <Shredder />
+          Analyze file
+          <ChevronRight />
         </Button>
       </form>
     </Form>

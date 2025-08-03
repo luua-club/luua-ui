@@ -1,10 +1,30 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { stylesApi } from '@/core/api/styles.api'
+import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleFileCapture from '../components/StyleFileCapture'
 import StyleTextCapture from '../components/StyleTextCapture'
+import { queryKeys } from '../utils'
 
 const Advanced = () => {
+  const queryClient = useQueryClient()
+
+  const setAdvancedUserStyleMutation = useMutation({
+    mutationFn: (payload: IUserAdvancedStyleRequest) =>
+      stylesApi.setUserAdvancedStyle(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeys.userStyle] })
+      toast.success('Advanced user style updated successfully')
+    },
+    onError: () => {
+      toast.error('Failed to update advanced user style')
+    },
+  })
+
   return (
     <>
       {/* Heading */}
@@ -18,22 +38,30 @@ const Advanced = () => {
         communicate - your word choices, humor, and tone - to create content
         that genuinely sounds like you.
       </p>
-      <div className="mt-4 flex max-w-4xl flex-col">
+      <div className="mt-4">
         <p className="text-base font-medium">
           Please provide your writing samples.
         </p>
-        <Tabs className="mt-4 w-full lg:w-2/3" defaultValue="textSample">
-          <TabsList className="w-full lg:w-fit">
-            <TabsTrigger value="textSample">Text Sample</TabsTrigger>
-            <TabsTrigger value="fileSample">File Sample</TabsTrigger>
-          </TabsList>
-          <TabsContent value="textSample">
-            <StyleTextCapture />
-          </TabsContent>
-          <TabsContent value="fileSample">
-            <StyleFileCapture />
-          </TabsContent>
-        </Tabs>
+        <div className="lg:w-2/3">
+          <Tabs className="mt-4 w-full flex-1" defaultValue="textSample">
+            <TabsList className="w-full lg:w-fit">
+              <TabsTrigger value="textSample">Text Sample</TabsTrigger>
+              <TabsTrigger value="fileSample">File Sample</TabsTrigger>
+            </TabsList>
+            <TabsContent value="textSample">
+              <StyleTextCapture
+                handleSubmit={data => {
+                  setAdvancedUserStyleMutation.mutate({
+                    style_text: data,
+                  })
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="fileSample">
+              <StyleFileCapture />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </>
   )

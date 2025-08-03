@@ -27,12 +27,12 @@ export type ToneStyleType =
   | 'Neutral'
   | 'Humorous'
 
-export interface ISelectionChip {
-  title: WritingStyleType | ToneStyleType
+export interface ISelectionChip<T extends string> {
+  title: T
   icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
 }
 
-export const writingStyles: ISelectionChip[] = [
+export const writingStyles: ISelectionChip<WritingStyleType>[] = [
   {
     title: 'Casual',
     icon: IconHandLoveYou,
@@ -55,7 +55,7 @@ export const writingStyles: ISelectionChip[] = [
   },
 ]
 
-export const toneStyles: ISelectionChip[] = [
+export const toneStyles: ISelectionChip<ToneStyleType>[] = [
   {
     title: 'Friendly',
     icon: IconMoodSmileBeam,

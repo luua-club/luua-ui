@@ -237,41 +237,42 @@ export class BaseApiService {
       return authInterceptor(config) as InternalAxiosRequestConfig
     })
 
+    // TODO: May not be required because of react query
     // RESPONSE INTERCEPTORS
-    this.api.interceptors.response.use(
-      response => response,
-      async (error: AxiosError) => {
-        const { config, response, code } = error
+    // this.api.interceptors.response.use(
+    //   response => response,
+    //   async (error: AxiosError) => {
+    //     const { config, response, code } = error
 
-        // if there is no config, we can't retry
-        if (!config) {
-          return Promise.reject(error)
-        }
+    //     // if there is no config, we can't retry
+    //     if (!config) {
+    //       return Promise.reject(error)
+    //     }
 
-        const shouldRetry =
-          (response && response.status >= 500) || code === 'ECONNABORTED'
+    //     const shouldRetry =
+    //       (response && response.status >= 500) || code === 'ECONNABORTED'
 
-        if (shouldRetry) {
-          const maxRetries = 3
-          const retryCount = (config.headers['X-Retry-Count'] as number) || 0
+    //     if (shouldRetry) {
+    //       const maxRetries = 3
+    //       const retryCount = (config.headers['X-Retry-Count'] as number) || 0
 
-          if (retryCount < maxRetries) {
-            config.headers['X-Retry-Count'] = retryCount + 1
+    //       if (retryCount < maxRetries) {
+    //         config.headers['X-Retry-Count'] = retryCount + 1
 
-            // Adding a small delay before retrying
-            await new Promise(resolve =>
-              setTimeout(resolve, 1000 * (retryCount + 1))
-            )
+    //         // Adding a small delay before retrying
+    //         await new Promise(resolve =>
+    //           setTimeout(resolve, 1000 * (retryCount + 1))
+    //         )
 
-            return this.api(config)
-          } else {
-            // TODO: If all retries fail, logout
-            logout()
-          }
-        }
+    //         return this.api(config)
+    //       } else {
+    //         // TODO: If all retries fail, logout
+    //         logout()
+    //       }
+    //     }
 
-        return Promise.reject(error)
-      }
-    )
+    //     return Promise.reject(error)
+    //   }
+    // )
   }
 }

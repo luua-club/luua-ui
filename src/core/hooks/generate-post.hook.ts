@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { generateApi } from '../api/generate-post.api'
-import { IExtractedLinks } from '../models/generate-post.model'
+import { extractedLinksType } from '../models/generate-post.model'
 import { IPost } from '../models/post.model'
 
 export const useGeneratePosts = (initialPrompt: string) => {
@@ -36,7 +36,7 @@ export const useGeneratePosts = (initialPrompt: string) => {
       ]
     : []
 
-  const extractedLinks: IExtractedLinks[] =
+  const extractedLinks: extractedLinksType[] =
     query.data?.data.extracted_links ?? []
 
   return {

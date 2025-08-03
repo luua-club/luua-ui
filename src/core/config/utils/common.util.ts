@@ -1,5 +1,5 @@
+import { removeLocalStorageItem } from '../../../shared/utils/localstorage.util'
 import { LUUA_USER_KEY } from '../constant'
-import { removeLocalStorageItem } from './localstorage.util'
 
 /**
  * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
