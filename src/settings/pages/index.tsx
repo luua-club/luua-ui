@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import Account from '../containers/Account'
 
-const Advanced = lazy(() => import('../containers/Advanced'))
 const Preferences = lazy(() => import('../containers/Preferences'))
 const Socials = lazy(() => import('../containers/Socials'))
 
@@ -25,7 +24,7 @@ const Settings = () => {
 
   return (
     <div className="m-auto flex max-w-4xl flex-col p-5">
-      <Tabs className="w-full md:mt-6" defaultValue="account">
+      <Tabs className="w-full" defaultValue="account">
         <TabsList className="w-full px-2 py-6 lg:w-fit">
           <TabsTrigger
             value="account"
@@ -43,13 +42,7 @@ const Settings = () => {
             value="preferences"
             className="px-2 py-4 text-sm lg:px-4 lg:text-base"
           >
-            Preferences
-          </TabsTrigger>
-          <TabsTrigger
-            value="advanced"
-            className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-          >
-            Advanced
+            Styles
           </TabsTrigger>
         </TabsList>
         <TabsContent value="account">
@@ -65,11 +58,6 @@ const Settings = () => {
         <TabsContent value="preferences">
           <SettingLazySubPages>
             <Preferences />
-          </SettingLazySubPages>
-        </TabsContent>
-        <TabsContent value="advanced">
-          <SettingLazySubPages>
-            <Advanced />
           </SettingLazySubPages>
         </TabsContent>
       </Tabs>

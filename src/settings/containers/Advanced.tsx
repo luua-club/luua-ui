@@ -18,22 +18,24 @@ const Advanced = () => {
         communicate - your word choices, humor, and tone - to create content
         that genuinely sounds like you.
       </p>
-      <div className="mt-4 flex max-w-4xl flex-col">
+      <div className="mt-4">
         <p className="text-base font-medium">
           Please provide your writing samples.
         </p>
-        <Tabs className="mt-4 w-full lg:w-2/3" defaultValue="textSample">
-          <TabsList className="w-full lg:w-fit">
-            <TabsTrigger value="textSample">Text Sample</TabsTrigger>
-            <TabsTrigger value="fileSample">File Sample</TabsTrigger>
-          </TabsList>
-          <TabsContent value="textSample">
-            <StyleTextCapture />
-          </TabsContent>
-          <TabsContent value="fileSample">
-            <StyleFileCapture />
-          </TabsContent>
-        </Tabs>
+        <div className="lg:w-2/3">
+          <Tabs className="mt-4 w-full flex-1" defaultValue="textSample">
+            <TabsList className="w-full lg:w-fit">
+              <TabsTrigger value="textSample">Text Sample</TabsTrigger>
+              <TabsTrigger value="fileSample">File Sample</TabsTrigger>
+            </TabsList>
+            <TabsContent value="textSample">
+              <StyleTextCapture />
+            </TabsContent>
+            <TabsContent value="fileSample">
+              <StyleFileCapture />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </>
   )

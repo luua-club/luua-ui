@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ChevronRight, TestTubeDiagonal } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -49,8 +50,8 @@ const StyleTextCapture = () => {
               <FormControl>
                 <Textarea
                   placeholder="Enter your sample text here"
-                  className="max-h-40 min-h-32 resize-none shadow-none"
-                  rows={5}
+                  className="min-h-28 resize-none shadow-none"
+                  rows={4}
                   {...field}
                 />
               </FormControl>
@@ -58,8 +59,10 @@ const StyleTextCapture = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" variant="default" className="mt-4 w-fit">
-          Analyze
+        <Button type="submit" variant="secondary" className="mt-4 w-fit">
+          <TestTubeDiagonal />
+          Analyze sample text
+          <ChevronRight />
         </Button>
       </form>
     </Form>
