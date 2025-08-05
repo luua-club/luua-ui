@@ -1,15 +1,21 @@
 import './App.css'
 
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Outlet, RouterProvider, useRouter } from '@tanstack/react-router'
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query'
+import { Outlet, RouterProvider } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { AxiosError } from 'axios'
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 
 import { userApi } from './core/api/user.api'
 import { LUUA_USER_KEY } from './core/config/constant'
 import { useAppDispatch } from './core/hooks/global-state.hook'
+import { ILoginResponse } from './core/models/auth.model'
 import { store } from './core/store'
 import { setUser } from './core/store/auth-slice'
 import router from './router'
@@ -28,25 +34,38 @@ const queryClient = new QueryClient({
 
 export function AppContent() {
   const dispatch = useAppDispatch()
-  const routerInstance = useRouter()
+
+  // Check if JWT token is present in local storage
+  const loginResponse = getLocalStorageItem<ILoginResponse>(LUUA_USER_KEY)
+  const isLoggedIn = loginResponse && loginResponse?.access_token
+
+  const { data: userData } = useQuery({
+    queryKey: ['user'],
+    queryFn: () => userApi.getUser(),
+    enabled: !!isLoggedIn, // Only run query if user is logged in
+    retry: (failureCount, error: AxiosError) => {
+      // Don't retry on authentication errors at all
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        return false
+      }
+      // Only retry on server errors (5xx) up to 3 times
+      if (
+        error.response?.status &&
+        error.response.status >= 500 &&
+        failureCount < 3
+      ) {
+        return true
+      }
+      return false
+    },
+  })
 
   useEffect(() => {
-    // Check if JWT token is present in local storage
-    const token = getLocalStorageItem(LUUA_USER_KEY)
-    if (!token) {
-      // If user is not logged in
-      // and the current path is not login, redirect to login
-      if (routerInstance.state.location.pathname === '/login') {
-        return
-      }
-      routerInstance.navigate({ to: '/login' })
-      return
+    // Update store with fresh user data when query succeeds
+    if (userData?.data) {
+      dispatch(setUser(userData?.data))
     }
-
-    // If user logged in, but page is refreshed, get fresh user data to hydrate store
-    // If user is not logged in, the base API will handle the 401 error and redirect to login
-    userApi.getUser().then(res => dispatch(setUser(res.data)))
-  }, [])
+  }, [userData, dispatch])
 
   return (
     <>
