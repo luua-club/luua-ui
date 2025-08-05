@@ -81,7 +81,7 @@ const QuickShare = () => {
           </TabsList>
           <TabsContent value="created-post" className="flex flex-col">
             {/** Generated Post Controls */}
-            {!error && (
+            {(!error || posts.length > 0) && (
               <div className="hidden md:block">
                 <GeneratedPostControls
                   isLoading={isDataFetching}
@@ -125,7 +125,7 @@ const QuickShare = () => {
               )}
             </div>
 
-            {error && (
+            {error && posts.length === 0 && (
               <div className="mt-4 mb-48 flex w-full items-center justify-center rounded-lg border border-dashed p-5">
                 <p className="pr-2 text-center text-sm text-gray-500">
                   Something went wrong please
@@ -174,7 +174,7 @@ const QuickShare = () => {
         }}
         loading={isDataFetching}
       >
-        {!error && (
+        {(!error || posts.length > 0) && (
           <div className="block md:hidden">
             <GeneratedPostControls
               isLoading={isDataFetching}
