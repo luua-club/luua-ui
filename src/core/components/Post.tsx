@@ -8,7 +8,11 @@ import { cn } from '@/shared/utils'
 import { SOCIAL_PLATFORM } from '../config/constant'
 import { IPost } from '../models/post.model'
 
-type PostProps = IPost & { isLoading?: boolean; fullView?: boolean }
+type PostProps = IPost & {
+  isLoading?: boolean
+  fullView?: boolean
+  tileView?: boolean
+}
 
 function Post({
   channel,
@@ -16,6 +20,7 @@ function Post({
   attachedMedia,
   isLoading = false,
   fullView = false,
+  tileView = false,
 }: PostProps) {
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
 
@@ -34,13 +39,19 @@ function Post({
     <Card
       className={cn(
         'relative flex flex-col rounded-md p-0 shadow-none',
-        fullView ? 'h-fit' : 'min-h-52 overflow-hidden'
+        fullView ? 'h-fit' : 'min-h-52 overflow-hidden',
+        tileView ? 'min-h-30' : 'h-fit'
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
-            <Avatar className="bg-accent h-12 w-12 rounded-full">
+            <Avatar
+              className={cn(
+                'rounded-full',
+                tileView ? 'h-10 w-10' : 'h-12 w-12'
+              )}
+            >
               <AvatarImage src={user.image} alt={user.name} />
               <AvatarFallback>{'DL'}</AvatarFallback>
             </Avatar>
@@ -57,11 +68,12 @@ function Post({
             <platform.logo className="size-10 rounded-full border-1 border-dashed p-2" />
           )}
         </div>
-        <hr />
+        {!tileView && <hr />}
         <p
           className={cn(
             'mt-3 px-4 text-sm text-gray-600',
-            fullView ? 'pb-4' : 'line-clamp-5'
+            fullView ? 'pb-4' : 'line-clamp-5',
+            tileView ? 'mt-0 line-clamp-2' : 'line-clamp-5'
           )}
         >
           {content}

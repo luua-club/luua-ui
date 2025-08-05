@@ -48,7 +48,7 @@ export const FloatingPromptInput = ({
 }: FloatingPromptInputProps) => {
   return (
     <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center bg-white/60 px-5 backdrop-blur-md lg:px-0">
-      <div className="w-full max-w-2xl pt-4 pb-8">
+      <div className="flex w-full max-w-2xl flex-col gap-2 pb-8">
         {children}
         <PromptInput {...props} backdrop />
       </div>
