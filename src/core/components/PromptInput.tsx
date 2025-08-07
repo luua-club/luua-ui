@@ -1,4 +1,5 @@
 import { InputPrompt } from '@/shared/components/input-prompt'
+import { SOCIAL_STATUS } from '@/shared/constant'
 
 import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
 
@@ -7,6 +8,7 @@ interface PromptInputProps {
   btnIcon?: React.ReactNode
   backdrop?: boolean
   loading?: boolean
+  socialStatus?: SOCIAL_STATUS
   onChange: (value: string) => void
 }
 
@@ -15,6 +17,7 @@ export const PromptInput = ({
   btnIcon,
   backdrop,
   loading,
+  socialStatus,
   onChange,
 }: PromptInputProps) => {
   const connectedSocials = SOCIAL_PLATFORM
@@ -23,7 +26,7 @@ export const PromptInput = ({
     <InputPrompt
       onChange={onChange}
       placeholder={[...SUGGESTED_PROMPT_TEXT]}
-      socialStatus={'OK'}
+      socialStatus={socialStatus || SOCIAL_STATUS.OK}
       socials={[
         ...connectedSocials.map(social => ({
           icon: social.logo,

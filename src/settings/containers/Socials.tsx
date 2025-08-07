@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { PlugZap } from 'lucide-react'
+import { Loader2, PlugZap } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { oauthApi } from '@/core/api/oauth.api'
@@ -20,6 +21,13 @@ import { cn } from '@/shared/utils'
 
 const Socials = ({ user }: { user: IUserState }) => {
   const queryClient = useQueryClient()
+  const [loadingStates, setLoadingStates] = useState<
+    Record<channelType, boolean>
+  >({
+    Twitter: false,
+    LinkedIn: false,
+  })
+
   const twitter = SOCIAL_PLATFORM.find(s => s.name === 'Twitter')!
   const linkedin = SOCIAL_PLATFORM.find(s => s.name === 'LinkedIn')!
 
@@ -28,6 +36,7 @@ const Socials = ({ user }: { user: IUserState }) => {
 
   const handleConnect = async (platform: channelType) => {
     try {
+      setSocialLoading(platform, true)
       // Use OAuth API service to get LinkedIn authorization URL
       // The API service will handle adding authentication headers
       const response =
@@ -41,11 +50,14 @@ const Socials = ({ user }: { user: IUserState }) => {
       }
     } catch {
       toast.error(`Failed to connect to ${platform}, Please try again`)
+    } finally {
+      setSocialLoading(platform, false)
     }
   }
 
   const handleDisconnectMutation = useMutation({
     mutationFn: async (payload: channelType) => {
+      setSocialLoading(payload, true)
       await userApi.disconnectSocial(payload)
       return payload
     },
@@ -56,7 +68,18 @@ const Socials = ({ user }: { user: IUserState }) => {
     onError: (_error: Error, payload: channelType) => {
       toast.error(`Failed to disconnect from ${payload}, Please try again`)
     },
+    onSettled: (
+      _data: channelType | undefined,
+      _error: Error | null,
+      payload: channelType
+    ) => {
+      setSocialLoading(payload, false)
+    },
   })
+
+  const setSocialLoading = (payload: channelType, isLoading: boolean) => {
+    setLoadingStates(prev => ({ ...prev, [payload]: isLoading }))
+  }
 
   return (
     <>
@@ -75,6 +98,7 @@ const Socials = ({ user }: { user: IUserState }) => {
           platform={twitter}
           isAccountConnected={isTwitterConnected}
           userChannel={user.connected_channels.twitter}
+          isLoading={loadingStates.Twitter}
           onConnect={() => handleConnect('Twitter')}
           onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
         />
@@ -82,6 +106,7 @@ const Socials = ({ user }: { user: IUserState }) => {
           platform={linkedin}
           isAccountConnected={isLinkedinConnected}
           userChannel={user.connected_channels.linkedin}
+          isLoading={loadingStates.LinkedIn}
           onConnect={() => handleConnect('LinkedIn')}
           onDisconnect={() => handleDisconnectMutation.mutate('LinkedIn')}
         />
@@ -94,12 +119,14 @@ const SocialCard = ({
   platform,
   isAccountConnected,
   userChannel,
+  isLoading,
   onConnect,
   onDisconnect,
 }: {
   platform: ISocialChannel
   userChannel: IUserConnectedChannel
   isAccountConnected?: boolean
+  isLoading?: boolean
   onConnect?: () => void
   onDisconnect?: () => void
 }) => {
@@ -165,8 +192,13 @@ const SocialCard = ({
           className="w-full"
           variant={isAccountConnected ? 'destructive' : 'default'}
           onClick={!isAccountConnected ? onConnect : onDisconnect}
+          disabled={isLoading}
         >
-          <PlugZap />
+          {isLoading ? (
+            <Loader2 className="size-3 animate-spin" />
+          ) : (
+            <PlugZap />
+          )}
           {isAccountConnected ? 'Disconnect' : 'Connect'}
         </Button>
       </CardFooter>

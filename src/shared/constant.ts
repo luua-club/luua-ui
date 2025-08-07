@@ -13,3 +13,11 @@ export const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
  * Theme constants
  */
 export const THEME_LOCAL_STORAGE_KEY = 'vite-ui-theme'
+
+/**
+ * Social status constants
+ */
+export enum SOCIAL_STATUS {
+  OK,
+  WARNING,
+}

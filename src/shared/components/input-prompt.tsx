@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import React, { useRef, useState } from 'react'
 
+import { SOCIAL_STATUS } from '../constant'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { WordRotate } from '../ui/word-rotate'
@@ -15,7 +16,7 @@ import { cn } from '../utils'
 interface InputPromptProps {
   loading?: boolean | undefined
   placeholder?: string[]
-  socialStatus: 'OK' | 'WARNING'
+  socialStatus: SOCIAL_STATUS
   socials: {
     icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
     tooltip: string
@@ -139,7 +140,7 @@ const PromptControls: React.FC<PromptControlsType> = ({
             </Tooltip>
           ))}
         </div>
-        {socialStatus === 'OK' ? (
+        {socialStatus === SOCIAL_STATUS.OK ? (
           <Tooltip>
             <TooltipTrigger>
               <CircleCheckBig className="size-3 animate-pulse text-green-600" />

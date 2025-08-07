@@ -5,13 +5,16 @@ import { Play } from 'lucide-react'
 import Post from '@/core/components/Post'
 import { PromptInput } from '@/core/components/PromptInput'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import mockRecentPost from '@/core/mocks/recent-post.json'
 import { IPost } from '@/core/models/post.model'
 import { setPrompt } from '@/core/store/prompt-slice'
+import { SOCIAL_STATUS } from '@/shared/constant'
 import { Button } from '@/shared/ui/button'
 
 const Dashboard = () => {
   const dispatch = useAppDispatch()
+  const userState = useUserState()
   const router = useRouter()
 
   const recentPost: IPost[] = [mockRecentPost as IPost]
@@ -21,6 +24,21 @@ const Dashboard = () => {
     router.navigate({ to: '/quick-share' })
   }
 
+  const getSocialStatus = () => {
+    if (!userState) {
+      return SOCIAL_STATUS.WARNING
+    }
+
+    if (
+      userState.connected_channels.linkedin.connected ||
+      userState.connected_channels.twitter.connected
+    ) {
+      return SOCIAL_STATUS.OK
+    }
+
+    return SOCIAL_STATUS.WARNING
+  }
+
   return (
     <div className="m-auto flex max-w-7xl flex-col gap-8 p-5 lg:flex-row lg:gap-16">
       {/* Left column: User prompt + Recent Posts */}
@@ -28,7 +46,10 @@ const Dashboard = () => {
         {/* User prompt */}
         <div>
           <h2 className="pb-4 text-2xl text-gray-800">Ready when you are.</h2>
-          <PromptInput onChange={handleUserPrompt} />
+          <PromptInput
+            onChange={handleUserPrompt}
+            socialStatus={getSocialStatus()}
+          />
           <div className="mt-4 flex w-full items-center justify-end gap-2">
             <p className="text-sm text-gray-600">Not sure where to start ? </p>
             <Button variant="brandAccent" size="sm">
