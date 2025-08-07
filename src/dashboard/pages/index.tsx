@@ -25,13 +25,13 @@ const Dashboard = () => {
   }
 
   const getSocialStatus = () => {
-    if (!userState) {
+    if (!userState || !userState.connected_channels) {
       return SOCIAL_STATUS.WARNING
     }
 
     if (
-      userState.connected_channels.linkedin.connected ||
-      userState.connected_channels.twitter.connected
+      userState.connected_channels.linkedin?.connected ||
+      userState.connected_channels.twitter?.connected
     ) {
       return SOCIAL_STATUS.OK
     }

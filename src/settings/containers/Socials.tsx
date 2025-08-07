@@ -31,8 +31,10 @@ const Socials = ({ user }: { user: IUserState }) => {
   const twitter = SOCIAL_PLATFORM.find(s => s.name === 'Twitter')!
   const linkedin = SOCIAL_PLATFORM.find(s => s.name === 'LinkedIn')!
 
-  const isLinkedinConnected = user.connected_channels.linkedin.connected
-  const isTwitterConnected = user.connected_channels.twitter.connected
+  const isLinkedinConnected =
+    user?.connected_channels?.linkedin?.connected || false
+  const isTwitterConnected =
+    user?.connected_channels?.twitter?.connected || false
 
   const handleConnect = async (platform: channelType) => {
     try {
@@ -97,7 +99,7 @@ const Socials = ({ user }: { user: IUserState }) => {
         <SocialCard
           platform={twitter}
           isAccountConnected={isTwitterConnected}
-          userChannel={user.connected_channels.twitter}
+          userChannel={user?.connected_channels?.twitter}
           isLoading={loadingStates.Twitter}
           onConnect={() => handleConnect('Twitter')}
           onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
@@ -105,7 +107,7 @@ const Socials = ({ user }: { user: IUserState }) => {
         <SocialCard
           platform={linkedin}
           isAccountConnected={isLinkedinConnected}
-          userChannel={user.connected_channels.linkedin}
+          userChannel={user?.connected_channels?.linkedin}
           isLoading={loadingStates.LinkedIn}
           onConnect={() => handleConnect('LinkedIn')}
           onDisconnect={() => handleDisconnectMutation.mutate('LinkedIn')}
@@ -155,7 +157,7 @@ const SocialCard = ({
                 <h6 className="text-base font-medium">
                   {userChannel.user_name}
                 </h6>
-                {userChannel.user_id && (
+                {userChannel.user_id && platform.name !== 'LinkedIn' && (
                   <p className="text-xs font-medium text-gray-400">
                     {userChannel.user_id}
                   </p>

@@ -7,7 +7,8 @@ import { ISocialChannel } from '../models/social.model'
  *
  * @default 'luua-user'
  */
-export const LUUA_USER_KEY = import.meta.env.LUUA_USER_KEY || 'luua-user'
+export const LUUA_USER_KEY: string =
+  import.meta.env.LUUA_USER_KEY || 'luua-user'
 
 /**
  * Suggested text that is shown inside prompt box
