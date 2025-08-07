@@ -25,12 +25,12 @@ export const useGeneratePosts = (initialPrompt: string) => {
     ? [
         {
           id: '0',
-          channel: 'Linkedin',
+          channel: 'LinkedIn',
           content: query.data.data.generated_linkedin_post.content,
         },
         {
           id: '1',
-          channel: 'X',
+          channel: 'Twitter',
           content: query.data.data.generated_twitter_post.content,
         },
       ]

@@ -13,7 +13,7 @@ import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 
 import { userApi } from './core/api/user.api'
-import { LUUA_USER_KEY } from './core/config/constant'
+import { LUUA_USER_KEY, QUERY_KEYS } from './core/config/constant'
 import { useAppDispatch } from './core/hooks/global-state.hook'
 import { ILoginResponse } from './core/models/auth.model'
 import { store } from './core/store'
@@ -40,7 +40,7 @@ export function AppContent() {
   const isLoggedIn = loginResponse && loginResponse?.access_token
 
   const { data: userData } = useQuery({
-    queryKey: ['user'],
+    queryKey: [QUERY_KEYS.user],
     queryFn: () => userApi.getUser(),
     enabled: !!isLoggedIn, // Only run query if user is logged in
     retry: (failureCount, error: AxiosError) => {

@@ -1,12 +1,17 @@
 import z from 'zod'
 
 import { toneStyles, writingStyles } from '../config/user-preferences'
+import { IUserConnectedChannel } from './social.model'
 
 export interface IUser {
   email: string
   name: string
   profile_image: string
   deactivated: boolean
+  connected_channels: {
+    linkedin: IUserConnectedChannel
+    twitter: IUserConnectedChannel
+  }
 }
 
 export interface IUserState extends IUser {
@@ -17,6 +22,7 @@ export enum UserStyleStatus {
   INITIAL = 'initial',
   IN_PROGRESS = 'in_progress',
   GENERATED = 'generated',
+  FAILED = 'failed',
 }
 
 export const UserStyleResponseSchema = z.object({

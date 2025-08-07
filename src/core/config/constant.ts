@@ -23,13 +23,17 @@ export const SUGGESTED_PROMPT_TEXT = [
  */
 export const SOCIAL_PLATFORM: ISocialChannel[] = [
   {
-    name: 'X',
+    name: 'Twitter',
     logo: IconBrandX,
     tooltip: 'Twitter / X.com',
   },
   {
-    name: 'Linkedin',
+    name: 'LinkedIn',
     logo: IconBrandLinkedin,
     tooltip: 'Linkedin',
   },
 ]
+
+export const QUERY_KEYS = {
+  user: 'user',
+}
