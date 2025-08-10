@@ -1,5 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import {
+  FolderClock,
   LucideCalendar,
   LucideHistory,
   LucideLayoutDashboard,
@@ -32,6 +33,14 @@ const platformItems: ISidebarItem[] = [
   },
 ]
 
+const creationItems: ISidebarItem[] = [
+  {
+    title: 'Drafts',
+    url: '/creation/drafts',
+    icon: <FolderClock />,
+  },
+]
+
 function SidebarLayout() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey={THEME_LOCAL_STORAGE_KEY}>
@@ -48,7 +57,7 @@ function SidebarContent() {
 
   return (
     <>
-      <AppSidebar platformItems={platformItems} creationsData={[]} />
+      <AppSidebar platformItems={platformItems} creationsData={creationItems} />
       <div className="w-full">
         <Nav handleSidebar={toggleSidebar} />
         <main>
