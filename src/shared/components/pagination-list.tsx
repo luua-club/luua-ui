@@ -6,7 +6,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/shared/ui/Pagination'
+} from '../ui/pagination'
 
 interface PaginationListProps {
   limit: number
