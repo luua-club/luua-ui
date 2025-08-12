@@ -37,4 +37,5 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
 
 export const QUERY_KEYS = {
   user: 'user',
+  drafts: 'drafts',
 }

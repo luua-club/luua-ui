@@ -1,3 +1,4 @@
+import { useRouter } from '@tanstack/react-router'
 import { LucideCirclePlus, LucideStepForward } from 'lucide-react'
 
 import { ISidebarItem } from '@/core/models/sidebar.model'
@@ -54,12 +55,17 @@ function AppSidebarCreation({ creationsData }: IAppSidebarCreationProps) {
 }
 
 const CreateNewSidebarMenuButton = () => {
+  const router = useRouter()
+
   return (
     <SidebarMenu>
       <SidebarMenuItem className="flex items-center gap-2">
         <SidebarMenuButton
           tooltip="Create New"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground w-full min-w-8 duration-200 ease-linear"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground w-full min-w-8 cursor-pointer duration-200 ease-linear"
+          onClick={() => {
+            router.navigate({ to: '/creation/create' })
+          }}
         >
           <LucideCirclePlus />
           <div className="flex w-full items-center justify-between">

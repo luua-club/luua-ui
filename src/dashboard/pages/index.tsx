@@ -75,7 +75,7 @@ const Dashboard = () => {
                   key={post.id}
                   channel={post.channel}
                   content={post.content}
-                  attachedMedia={post.attachedMedia}
+                  attached_media={post.attached_media}
                   status={post.status}
                   created_at={post.created_at}
                   updated_at={post.updated_at}
