@@ -62,9 +62,9 @@ const CreateNewSidebarMenuButton = () => {
       <SidebarMenuItem className="flex items-center gap-2">
         <SidebarMenuButton
           tooltip="Create New"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground w-full min-w-8 duration-200 ease-linear"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground w-full min-w-8 cursor-pointer duration-200 ease-linear"
           onClick={() => {
-            router.navigate({ to: '/creation' })
+            router.navigate({ to: '/creation/create' })
           }}
         >
           <LucideCirclePlus />

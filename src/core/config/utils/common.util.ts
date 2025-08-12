@@ -10,4 +10,14 @@ const logout = () => {
   window.location.href = '/login'
 }
 
-export { logout }
+/**
+ * Normalize a JS Date to 00:00 local time and return ISO string
+ */
+const toStartOfDayIso = (d?: Date): string | undefined => {
+  if (!d) return undefined
+  const copy = new Date(d)
+  copy.setHours(0, 0, 0, 0)
+  return copy.toISOString()
+}
+
+export { logout, toStartOfDayIso }

@@ -1,0 +1,32 @@
+import { IPagination } from './pagination.model'
+import { IPost } from './post.model'
+
+export type PostItem = Pick<
+  IPost,
+  'id' | 'content' | 'channel' | 'attached_media'
+>
+
+export type DraftItem = {
+  id: string
+  posts: PostItem[]
+  created_at: string
+  updated_at: string
+}
+
+export interface IDraftRequest {
+  posts: Omit<PostItem, 'id'>[]
+}
+
+export interface IDraftResponse {
+  draft: DraftItem
+}
+
+export interface IDraftListRequest extends Omit<IPagination, 'total'> {
+  sort: 'asc' | 'desc'
+  from?: string
+  to?: string
+}
+
+export interface IDraftListResponse extends IPagination {
+  posts: DraftItem[]
+}

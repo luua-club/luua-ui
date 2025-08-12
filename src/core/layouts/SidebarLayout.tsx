@@ -35,7 +35,7 @@ const platformItems: ISidebarItem[] = [
 
 const creationItems: ISidebarItem[] = [
   {
-    title: 'Drafts',
+    title: 'Saved Drafts',
     url: '/creation/drafts',
     icon: <FolderClock />,
   },

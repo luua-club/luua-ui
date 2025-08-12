@@ -57,6 +57,10 @@ const getCurrentPageTitle = (pathname: urlType) => {
       return 'Settings'
     case '/quick-share':
       return 'Quick Share'
+    case '/creation/create':
+      return 'Create'
+    case '/creation/drafts':
+      return 'Saved Drafts'
     default:
       return 'Dashboard'
   }
