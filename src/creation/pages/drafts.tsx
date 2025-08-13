@@ -83,7 +83,7 @@ const Drafts = () => {
                   <div className="mb-2 flex items-center justify-between">
                     <p
                       title={new Date(draft.updated_at).toString()}
-                      className="text-sm font-semibold"
+                      className="text-xs font-semibold sm:text-sm"
                     >
                       {format(
                         new Date(draft.updated_at),
@@ -92,8 +92,11 @@ const Drafts = () => {
                     </p>
 
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" className="!p-2">
-                        <PencilRuler size={16} />
+                      <Button
+                        variant="outline"
+                        className="!p-1.5 text-xs sm:!p-2 sm:text-sm"
+                      >
+                        <PencilRuler className="size-3 sm:size-4" />
                         Edit
                       </Button>
 
@@ -101,10 +104,10 @@ const Drafts = () => {
                         <TooltipTrigger asChild>
                           <Button
                             variant="outline"
-                            className="!px-2.5 !py-2"
+                            className="!px-2.5 !py-1.5 sm:!px-2 sm:!py-2"
                             onClick={() => handleDeleteDraft(draft.id)}
                           >
-                            <Trash size={16} />
+                            <Trash className="size-3 sm:size-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -113,7 +116,7 @@ const Drafts = () => {
                       </Tooltip>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft)}
                     {getPost(`${draft.id}-${idx + 1}`, 'Twitter', draft)}
                   </div>

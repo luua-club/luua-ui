@@ -80,7 +80,7 @@ function Post({
               <AvatarFallback>{'DL'}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col pl-2">
-              <div className="flex items-center gap-2 text-base font-medium">
+              <div className="flex items-center gap-2 text-sm font-medium sm:text-base">
                 <h6>{user.name}</h6>
                 {!channelUser.connected && (
                   <Tooltip>
@@ -94,7 +94,7 @@ function Post({
                 )}
               </div>
               {user.username && (
-                <p className="text-xs font-medium text-gray-400">
+                <p className="truncate text-xs font-medium text-gray-400">
                   {user.username}
                 </p>
               )}
