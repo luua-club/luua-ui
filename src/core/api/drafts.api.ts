@@ -26,6 +26,10 @@ class DraftsApi extends BaseApiService {
   async deleteDraft(draftId: string) {
     return this.delete(draftId)
   }
+
+  async deletePost(draftId: string, postId: string) {
+    return this.delete(`${draftId}/posts/${postId}`)
+  }
 }
 
 export const draftsApi = new DraftsApi()

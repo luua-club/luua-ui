@@ -14,5 +14,6 @@ export interface IUserConnectedChannel {
   default: boolean
   user_name: string
   user_id: string
+  user_email: string
   user_profile_picture: string
 }

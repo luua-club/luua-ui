@@ -24,13 +24,17 @@ const DraftListControls = ({
 }: DraftListControlsProps) => {
   return (
     <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
-      <DateRangePicker value={dateRange} onValueChange={onDateRangeChange} />
+      <DateRangePicker
+        value={dateRange}
+        onValueChange={onDateRangeChange}
+        className="w-full md:w-auto"
+      />
 
       <Select
         value={sort}
         onValueChange={(v: 'created_at' | 'updated_at') => onSortChange(v)}
       >
-        <SelectTrigger>
+        <SelectTrigger className="w-full md:w-auto">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>
