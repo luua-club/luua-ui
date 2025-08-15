@@ -43,14 +43,18 @@ function Post({
     image: string
   } = {
     name: userState.name,
-    username: '',
+    username: userState.email,
     image: userState.profile_image,
   }
 
   if (channelUser) {
     user = {
       name: channelUser.user_name || userState.name,
-      username: channelUser.user_id || '',
+      username: channelUser.user_id
+        ? platform?.name === 'Twitter'
+          ? `@${channelUser.user_id}`
+          : channelUser.user_email
+        : userState.email,
       image: channelUser.user_profile_picture || userState.profile_image,
     }
   }
@@ -79,9 +83,9 @@ function Post({
               <AvatarImage src={user.image} alt={user.name} />
               <AvatarFallback>{'DL'}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col pl-2">
+            <div className="flex max-w-20 flex-col pl-2 min-[375px]:max-w-full">
               <div className="flex items-center gap-2 text-sm font-medium sm:text-base">
-                <h6>{user.name}</h6>
+                <h6 className="truncate">{user.name}</h6>
                 {!channelUser.connected && (
                   <Tooltip>
                     <TooltipTrigger>
@@ -93,11 +97,9 @@ function Post({
                   </Tooltip>
                 )}
               </div>
-              {user.username && (
-                <p className="truncate text-xs font-medium text-gray-400">
-                  {user.username}
-                </p>
-              )}
+              <p className="truncate text-xs font-medium text-gray-400">
+                {user.username}
+              </p>
             </div>
           </div>
 
@@ -108,9 +110,9 @@ function Post({
         {!tileView && <hr />}
         <p
           className={cn(
-            'mt-3 px-4 text-sm text-gray-600',
-            fullView ? 'pb-4' : 'line-clamp-5',
-            tileView ? 'mt-0 line-clamp-2' : 'line-clamp-5'
+            'mt-3 line-clamp-5 px-4 text-sm text-gray-600',
+            fullView ? 'line-clamp-none pb-4' : undefined,
+            tileView ? 'mt-0 line-clamp-2' : undefined
           )}
         >
           {content}

@@ -5,6 +5,8 @@ import { type DateRange } from 'react-day-picker'
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { toStartOfDayIso } from '@/core/config/utils/common.util'
+import { type ApiResponse } from '@/core/models/api.model'
+import { type IDraftListResponse } from '@/core/models/draft.model'
 
 export function useDraftList() {
   const queryClient = useQueryClient()
@@ -23,6 +25,11 @@ export function useDraftList() {
   // ----- Deletion flow state -----
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  // Track which specific post (within a draft) is pending deletion
+  const [pendingDeletePost, setPendingDeletePost] = useState<{
+    draftId: string
+    postId: string
+  } | null>(null)
   // Track which draft IDs are currently being deleted to disable UI per-item.
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
@@ -36,7 +43,7 @@ export function useDraftList() {
   const sortDir = sort === 'created_at' ? 'asc' : 'desc'
 
   // ----- Query: fetch drafts list -----
-  const query = useQuery({
+  const query = useQuery<ApiResponse<IDraftListResponse>>({
     queryKey: [QUERY_KEYS.drafts, from, to, limit, offset, sortDir],
     queryFn: () =>
       draftsApi.getDrafts({
@@ -46,6 +53,7 @@ export function useDraftList() {
         from,
         to,
       }),
+    placeholderData: prev => prev,
   })
 
   // Fallback to empty array until data arrives.
@@ -59,14 +67,37 @@ export function useDraftList() {
     setOffset(0)
   }, [from, to, sortDir])
 
+  // When the fetched page is empty but there is total data, move to previous page.
+  useEffect(() => {
+    const list = query.data?.data?.posts ?? []
+    const totalCount: number = query.data?.data?.total ?? 0
+    if (offset > 0 && totalCount > 0 && list.length === 0) {
+      setOffset(Math.max(0, offset - limit))
+    }
+  }, [query.data, offset, limit])
+
   // ----- Mutation: delete a draft -----
   const deleteMutation = useMutation({
     mutationFn: (draftId: string) => draftsApi.deleteDraft(draftId),
   })
 
+  // ----- Mutation: delete a post within a draft -----
+  const deletePostMutation = useMutation({
+    mutationFn: ({ draftId, postId }: { draftId: string; postId: string }) =>
+      draftsApi.deletePost(draftId, postId),
+  })
+
   // Open the confirm dialog for a specific draft.
   const openDelete = (draftId: string) => {
+    setPendingDeletePost(null)
     setPendingDeleteId(draftId)
+    setConfirmOpen(true)
+  }
+
+  // Open the confirm dialog for a specific post of a draft.
+  const openDeletePost = (draftId: string, postId: string) => {
+    setPendingDeleteId(null)
+    setPendingDeletePost({ draftId, postId })
     setConfirmOpen(true)
   }
 
@@ -74,6 +105,7 @@ export function useDraftList() {
   const closeDelete = () => {
     setConfirmOpen(false)
     setPendingDeleteId(null)
+    setPendingDeletePost(null)
   }
 
   // Confirm deletion of the selected draft.
@@ -91,10 +123,34 @@ export function useDraftList() {
           next.delete(id)
           return next
         })
-        // Invalidate the list so it re-fetches with the latest data.
+        // Let the query's onSuccess handle empty-page correction; just invalidate here.
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
       },
     })
+  }
+
+  // Confirm deletion of the selected post within a draft.
+  const confirmDeletePost = () => {
+    if (!pendingDeletePost) return
+
+    const { draftId, postId } = pendingDeletePost
+    // Disable the whole draft card while we delete its post.
+    setDeletingIds(prev => new Set(prev).add(draftId))
+
+    deletePostMutation.mutate(
+      { draftId, postId },
+      {
+        onSettled: () => {
+          setDeletingIds(prev => {
+            const next = new Set(prev)
+            next.delete(draftId)
+            return next
+          })
+          // Let the query's onSuccess handle empty-page correction; just invalidate here.
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+        },
+      }
+    )
   }
 
   // ----- Exposed API -----
@@ -117,11 +173,14 @@ export function useDraftList() {
     // Deletion flow controls
     confirmOpen,
     openDelete,
+    openDeletePost,
     closeDelete,
     confirmDelete,
+    confirmDeletePost,
     pendingDeleteId,
+    pendingDeletePost,
     deletingIds,
     // Aggregate deletion pending flag
-    isDeleting: deleteMutation.isPending,
+    isDeleting: deleteMutation.isPending || deletePostMutation.isPending,
   }
 }

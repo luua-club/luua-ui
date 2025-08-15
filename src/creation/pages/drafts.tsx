@@ -1,14 +1,26 @@
 import { createLazyRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { PencilRuler, Trash } from 'lucide-react'
+import {
+  Calendar,
+  MoreHorizontal,
+  PencilRuler,
+  Send,
+  Trash,
+  X,
+} from 'lucide-react'
 
 import Post, { PostSkeleton } from '@/core/components/Post'
-import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import { Button } from '@/shared/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu'
 
 import PaginationList from '../../shared/components/pagination-list'
 import DraftListControls from '../components/DraftListControls'
@@ -29,8 +41,11 @@ const Drafts = () => {
     total,
     confirmOpen,
     openDelete,
+    openDeletePost,
     closeDelete,
     confirmDelete,
+    confirmDeletePost,
+    pendingDeletePost,
     deletingIds,
     isDeleting,
   } = useDraftList()
@@ -64,7 +79,6 @@ const Drafts = () => {
         {isLoading && (
           <div className="bg-sidebar rounded-lg border-1 p-4">
             <PostSkeleton />
-            <PostSkeleton />
           </div>
         )}
         {!isLoading && (
@@ -74,7 +88,7 @@ const Drafts = () => {
                 <p className="text-sm font-semibold">No drafts found</p>
               </div>
             )}
-            {drafts.map((draft, idx) => {
+            {drafts.map((draft: DraftItem, idx: number) => {
               return (
                 <div
                   className={`bg-sidebar rounded-lg border-1 p-4 pt-2 ${deletingIds.has(draft.id) ? 'pointer-events-none opacity-50' : ''}`}
@@ -83,7 +97,7 @@ const Drafts = () => {
                   <div className="mb-2 flex items-center justify-between">
                     <p
                       title={new Date(draft.updated_at).toString()}
-                      className="text-xs font-semibold sm:text-sm"
+                      className="text-xs font-semibold sm:text-base"
                     >
                       {format(
                         new Date(draft.updated_at),
@@ -92,33 +106,48 @@ const Drafts = () => {
                     </p>
 
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        className="!p-1.5 text-xs sm:!p-2 sm:text-sm"
-                      >
-                        <PencilRuler className="size-3 sm:size-4" />
+                      <Button variant="outline" className="!px-2">
+                        <PencilRuler className="size-4" />
                         Edit
                       </Button>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="!px-2.5 !py-1.5 sm:!px-2 sm:!py-2"
-                            onClick={() => handleDeleteDraft(draft.id)}
-                          >
-                            <Trash className="size-3 sm:size-4" />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="!px-2">
+                            <MoreHorizontal className="size-4" />
                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <span>Delete</span>
-                        </TooltipContent>
-                      </Tooltip>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Send className="size-4" />
+                            Publish
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Calendar className="size-4" />
+                            Schedule
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onSelect={() => handleDeleteDraft(draft.id)}
+                          >
+                            <Trash className="size-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft)}
-                    {getPost(`${draft.id}-${idx + 1}`, 'Twitter', draft)}
+                  <div className="mt-4 flex flex-col gap-4">
+                    {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft, postId =>
+                      openDeletePost(draft.id, postId)
+                    )}
+                    {getPost(
+                      `${draft.id}-${idx + 1}`,
+                      'Twitter',
+                      draft,
+                      postId => openDeletePost(draft.id, postId)
+                    )}
                   </div>
                 </div>
               )
@@ -141,12 +170,20 @@ const Drafts = () => {
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={open => (open ? undefined : closeDelete())}
-        title="Delete draft?"
-        description="This action cannot be undone. This will permanently delete the selected draft."
+        title={pendingDeletePost ? 'Delete post?' : 'Delete draft?'}
+        description={
+          pendingDeletePost
+            ? 'This action cannot be undone. This will permanently delete the selected post from the draft.'
+            : 'This action cannot be undone. This will permanently delete the selected draft.'
+        }
         confirmLabel="Delete"
         confirmDisabled={isDeleting}
         onConfirm={() => {
-          confirmDelete()
+          if (pendingDeletePost) {
+            confirmDeletePost()
+          } else {
+            confirmDelete()
+          }
           closeDelete()
         }}
       />
@@ -154,29 +191,40 @@ const Drafts = () => {
   )
 }
 
-const getPost = (id: string, channel: channelType, draftItem: DraftItem) => {
+const getPost = (
+  id: string,
+  channel: channelType,
+  draftItem: DraftItem,
+  onDelete: (postId: string) => void
+) => {
   const item = draftItem.posts.find(post => post.channel === channel)
-  const PlatformIcon = SOCIAL_PLATFORM.find(s => s.name === channel)?.logo
 
   if (!item) {
-    return (
-      <div className="flex items-center justify-center rounded-lg border-1 bg-white p-4">
-        <p className="flex items-center gap-4 rounded-full border-1 border-dashed p-4 text-sm font-semibold">
-          {PlatformIcon ? <PlatformIcon size={24} /> : <span>{channel}</span>}
-          Not Posted
-        </p>
-      </div>
-    )
+    return
   }
 
   return (
-    <Post
-      id={`${id}`}
-      channel={item.channel}
-      content={item.content}
-      attached_media={item.attached_media}
-      tileView
-    />
+    <>
+      <div className="relative">
+        {draftItem.posts.length > 1 && (
+          <Button
+            className="absolute -top-2 -right-2 z-10 size-6 rounded-full !p-0"
+            variant="outline"
+            size="icon"
+            onClick={() => onDelete(item.id)}
+          >
+            <X />
+          </Button>
+        )}
+        <Post
+          id={`${id}`}
+          channel={item.channel}
+          content={item.content}
+          attached_media={item.attached_media}
+          fullView
+        />
+      </div>
+    </>
   )
 }
 

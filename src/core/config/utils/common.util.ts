@@ -11,13 +11,16 @@ const logout = () => {
 }
 
 /**
- * Normalize a JS Date to 00:00 local time and return ISO string
+ * Normalize a calendar day to 00:00:00.000Z (UTC) and return ISO string
  */
 const toStartOfDayIso = (d?: Date): string | undefined => {
   if (!d) return undefined
-  const copy = new Date(d)
-  copy.setHours(0, 0, 0, 0)
-  return copy.toISOString()
+  const year = d.getFullYear()
+  const month = d.getMonth()
+  const date = d.getDate()
+  // Construct a Date at UTC midnight for the same calendar day
+  const utcMidnight = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
+  return utcMidnight.toISOString()
 }
 
 export { logout, toStartOfDayIso }
