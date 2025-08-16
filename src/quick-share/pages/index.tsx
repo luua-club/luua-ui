@@ -2,12 +2,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
 import { RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import Post, { PostSkeleton } from '@/core/components/Post'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
+import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
@@ -20,6 +22,7 @@ const QuickShare = () => {
 
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { mutation: publishDraft } = usePublishDraft()
 
   const preUserPrompt = useAppSelector(state => state.promptState.prompt)
   const {
@@ -34,6 +37,7 @@ const QuickShare = () => {
   } = useGeneratePosts(preUserPrompt || '')
 
   const isDataFetching = isLoading || isFetching
+  const isLoadingPublish = publishDraft.isPending
 
   useEffect(() => {
     // Redirect to dashboard if no prompt is available
@@ -50,9 +54,30 @@ const QuickShare = () => {
   }, [queryClient, key])
 
   const onSubmit = (postIds: string[]) => {
-    //TODO: Implement publish logic
-    console.log(posts.filter(post => postIds.includes(post.id)))
-    setIsShareModalOpen(false)
+    const selectedPosts = posts.filter(post => postIds.includes(post.id))
+    if (selectedPosts.length === 0) {
+      setIsShareModalOpen(false)
+      return
+    }
+
+    publishDraft.mutate(
+      {
+        posts: selectedPosts.map(p => ({
+          content: p.content,
+          channel: p.channel,
+          attached_media: [],
+        })),
+      },
+      {
+        onSuccess: () => {
+          setIsShareModalOpen(false)
+          toast.success('Draft published successfully')
+        },
+        onError: () => {
+          toast.error('Failed to publish draft')
+        },
+      }
+    )
   }
 
   return (
@@ -190,6 +215,7 @@ const QuickShare = () => {
       <SharePostModal
         isOpen={isShareModalOpen}
         posts={posts}
+        isLoading={isLoadingPublish}
         onOpenChange={setIsShareModalOpen}
         onSubmit={onSubmit}
       />

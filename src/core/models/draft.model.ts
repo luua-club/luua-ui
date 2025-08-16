@@ -30,3 +30,8 @@ export interface IDraftListRequest extends Omit<IPagination, 'total'> {
 export interface IDraftListResponse extends IPagination {
   posts: DraftItem[]
 }
+
+export interface IPublishDraftRequest {
+  draft_id: string
+  post_ids?: string[]
+}

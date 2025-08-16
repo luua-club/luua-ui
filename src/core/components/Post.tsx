@@ -72,39 +72,37 @@ function Post({
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center">
-            <Avatar
-              className={cn(
-                'rounded-full',
-                tileView ? 'h-10 w-10' : 'h-12 w-12'
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3">
+          <Avatar
+            className={cn(
+              'shrink-0 rounded-full',
+              tileView ? 'h-10 w-10' : 'h-12 w-12'
+            )}
+          >
+            <AvatarImage src={user.image} alt={user.name} />
+            <AvatarFallback>{'DL'}</AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-col">
+            <div className="flex min-w-0 items-center gap-2 text-sm font-medium sm:text-base">
+              <h6 className="truncate">{user.name}</h6>
+              {!channelUser.connected && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <span>{platform?.name} account not connected</span>
+                  </TooltipContent>
+                </Tooltip>
               )}
-            >
-              <AvatarImage src={user.image} alt={user.name} />
-              <AvatarFallback>{'DL'}</AvatarFallback>
-            </Avatar>
-            <div className="flex max-w-20 flex-col pl-2 min-[375px]:max-w-full">
-              <div className="flex items-center gap-2 text-sm font-medium sm:text-base">
-                <h6 className="truncate">{user.name}</h6>
-                {!channelUser.connected && (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <TriangleAlert className="size-4 animate-pulse text-yellow-600" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>{platform?.name} account not connected</span>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
-              <p className="truncate text-xs font-medium text-gray-400">
-                {user.username}
-              </p>
             </div>
+            <p className="truncate text-xs font-medium text-gray-400">
+              {user.username}
+            </p>
           </div>
 
           {platform && platform.logo && (
-            <platform.logo className="size-10 rounded-full border-1 border-dashed p-2" />
+            <platform.logo className="size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
           )}
         </div>
         {!tileView && <hr />}

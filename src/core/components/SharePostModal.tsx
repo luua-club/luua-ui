@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/shared/ui/button'
@@ -11,12 +12,14 @@ import {
 } from '@/shared/ui/dialog'
 import { cn } from '@/shared/utils'
 
+import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
 import Post from './Post'
 
 interface ISharePostModalProps {
   isOpen: boolean
   posts: Pick<IPost, 'id' | 'content' | 'channel'>[]
+  isLoading: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (postIds: string[]) => void
 }
@@ -24,14 +27,38 @@ interface ISharePostModalProps {
 export function SharePostModal({
   isOpen,
   posts,
+  isLoading,
   onOpenChange,
   onSubmit,
 }: ISharePostModalProps) {
+  const user = useUserState()
   const [selectedPosts, setSelectedPosts] = useState<string[]>([])
 
+  // A channel's post can only be selected if that social is connected for the user
+  const connections = user?.connected_channels
+  const isChannelConnected = (channel: IPost['channel']) => {
+    const key = channel.toLowerCase() as 'linkedin' | 'twitter'
+    return Boolean(connections?.[key]?.connected)
+  }
+
   useEffect(() => {
-    setSelectedPosts(posts.map(post => post.id))
-  }, [posts])
+    // Preselect only the posts for channels that are connected
+    const nextSelected = posts
+      .filter(p => isChannelConnected(p.channel))
+      .map(p => p.id)
+
+    // Avoid unnecessary state updates to prevent re-render loops
+    setSelectedPosts(prev => {
+      if (
+        prev.length === nextSelected.length &&
+        prev.every((id, i) => id === nextSelected[i])
+      ) {
+        return prev
+      }
+      return nextSelected
+    })
+    // Only depend on primitive connection flags to avoid changing on every render
+  }, [posts, connections?.linkedin?.connected, connections?.twitter?.connected])
 
   const handleCheckboxChange = (postId: string, checked: string | boolean) => {
     const isChecked = checked === true || checked === 'true'
@@ -41,6 +68,8 @@ export function SharePostModal({
       setSelectedPosts(selectedPosts.filter(id => id !== postId))
     }
   }
+
+  const visiblePosts = posts.filter(post => isChannelConnected(post.channel))
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -57,17 +86,23 @@ export function SharePostModal({
             </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {posts.map(post => (
+        <div
+          className={cn(
+            'mt-8 grid grid-cols-1 gap-4',
+            visiblePosts.length === 2 && 'md:grid-cols-2'
+          )}
+        >
+          {visiblePosts.map(post => (
             <div
               key={post.id}
               className={cn(
-                'relative cursor-pointer rounded-lg border-2 border-transparent',
-                selectedPosts.includes(post.id) && 'border-black'
+                'relative rounded-lg border-2 border-transparent',
+                selectedPosts.includes(post.id) && 'border-black',
+                'cursor-pointer'
               )}
-              onClick={() =>
+              onClick={() => {
                 handleCheckboxChange(post.id, !selectedPosts.includes(post.id))
-              }
+              }}
             >
               <Checkbox
                 className="absolute top-[-10px] right-[-8px] z-10 size-5 cursor-pointer bg-white"
@@ -98,8 +133,9 @@ export function SharePostModal({
             variant="default"
             className="flex-1"
             onClick={() => onSubmit(selectedPosts)}
-            disabled={selectedPosts.length === 0}
+            disabled={selectedPosts.length === 0 || isLoading}
           >
+            {isLoading && <Loader2 className="mr-2 animate-spin" />}
             {selectedPosts.length
               ? `Publish (${selectedPosts.length})`
               : 'Choose posts'}
