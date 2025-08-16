@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight, CloudUpload, Shredder, X } from 'lucide-react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import z from 'zod'
 
 import { Button } from '@/shared/ui/button'
@@ -24,23 +23,67 @@ import {
   FormItem,
   FormMessage,
 } from '@/shared/ui/form'
+import { cn } from '@/shared/utils'
 
-const formSchema = z.object({
-  files: z
-    .array(z.custom<File>())
-    .min(1, 'Please select at least one file')
-    .max(2, 'Please select up to 2 files')
-    .refine(files => files.every(file => file.size <= 5 * 1024 * 1024), {
-      message: 'File size must be less than 5MB',
-      path: ['files'],
-    }),
-})
+type FormValues = { files: File[] }
 
-type FormValues = z.infer<typeof formSchema>
+type StyleFileCaptureProps = {
+  accept?: string
+  maxFiles?: number
+  maxSize?: number
+  multiple?: boolean
+  description?: React.ReactNode
+  submitLabel?: string
+  onSubmit?: (files: File[]) => void
+  hideSubmit?: boolean
+  submitFullWidth?: boolean
+  submitVariant?: React.ComponentProps<typeof Button>['variant']
+  value?: File[]
+  onValueChange?: (files: File[]) => void
+  onFilesChange?: (files: File[]) => void
+}
 
-const StyleFileCapture = () => {
+const StyleFileCapture: React.FC<StyleFileCaptureProps> = ({
+  accept = 'image/*,application/pdf',
+  maxFiles = 1,
+  maxSize = 5 * 1024 * 1024,
+  multiple = true,
+  description = (
+    <span className="font-base text-gray-600">
+      Could upload up to 5 image upto 5MB each.
+    </span>
+  ),
+  submitLabel = 'Analyze file',
+  onSubmit: onSubmitProp,
+  hideSubmit = false,
+  submitFullWidth = false,
+  submitVariant = 'secondary',
+  value,
+  onValueChange,
+  onFilesChange,
+}) => {
+  const schema = React.useMemo(
+    () =>
+      z.object({
+        files: z
+          .array(z.custom<File>())
+          .min(1, 'Please select at least one file')
+          .max(
+            maxFiles,
+            `Please select up to ${maxFiles} file${maxFiles > 1 ? 's' : ''}`
+          )
+          .refine(files => files.every(file => file.size <= maxSize), {
+            message: `File size must be less than ${Math.floor(
+              maxSize / (1024 * 1024)
+            )}MB`,
+            path: ['files'],
+          }),
+      }),
+    [maxFiles, maxSize]
+  )
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       files: [],
     },
@@ -48,16 +91,10 @@ const StyleFileCapture = () => {
 
   const onSubmit = React.useCallback(
     (data: FormValues) => {
-      toast.success('Files uploaded successfully!', {
-        description: (
-          <p className="truncate text-gray-500">
-            {data.files[0].name} uploaded
-          </p>
-        ),
-      })
+      onSubmitProp?.(data.files)
       form.reset()
     },
-    [form]
+    [form, onSubmitProp]
   )
 
   return (
@@ -73,20 +110,24 @@ const StyleFileCapture = () => {
             <FormItem>
               <FormControl>
                 <FileUpload
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  accept="image/*,application/pdf"
-                  maxFiles={1}
-                  maxSize={5 * 1024 * 1024}
+                  value={value ?? field.value}
+                  onValueChange={files => {
+                    field.onChange(files)
+                    onValueChange?.(files)
+                    onFilesChange?.(files)
+                  }}
+                  accept={accept}
+                  maxFiles={maxFiles}
+                  maxSize={maxSize}
                   onFileReject={(_, message) => {
                     form.setError('files', {
                       message,
                     })
                   }}
-                  multiple
+                  multiple={multiple}
                 >
                   <FormDescription className="font-base text-gray-600">
-                    Could upload up to 5 image upto 5MB each.
+                    {description}
                   </FormDescription>
                   <FileUploadDropzone className="min-h-20 flex-row flex-wrap border-dotted text-center">
                     <CloudUpload className="size-4" />
@@ -122,11 +163,17 @@ const StyleFileCapture = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" variant="secondary" className="mt-4 w-fit">
-          <Shredder />
-          Analyze file
-          <ChevronRight />
-        </Button>
+        {!hideSubmit && (
+          <Button
+            type="submit"
+            variant={submitVariant}
+            className={cn('mt-4', submitFullWidth ? 'w-full' : 'w-fit')}
+          >
+            <Shredder />
+            {submitLabel}
+            <ChevronRight />
+          </Button>
+        )}
       </form>
     </Form>
   )

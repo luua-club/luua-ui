@@ -11,7 +11,7 @@ import {
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
-import StyleFileCapture from '../components/StyleFileCapture'
+import StyleFileCapture from '../../core/components/StyleFileCapture'
 import StyleTextCapture from '../components/StyleTextCapture'
 import { queryKeys } from '../utils'
 
