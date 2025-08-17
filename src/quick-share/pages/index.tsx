@@ -123,7 +123,7 @@ const QuickShare = () => {
                   <div key={link_data.url} className="flex-1">
                     <ExternalResourceChip
                       url={link_data.url}
-                      title={link_data.title}
+                      title={link_data.content}
                     />
                   </div>
                 ))}
@@ -176,7 +176,7 @@ const QuickShare = () => {
                   <div key={link_data.url}>
                     <ExternalResourceChip
                       url={link_data.url}
-                      title={link_data.title}
+                      title={link_data.content}
                       showIcon
                     />
                   </div>
