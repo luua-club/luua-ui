@@ -26,11 +26,13 @@ import PostImagePreview from './PostImagePreview'
 interface LinkedInPostProps {
   onContentChange?: (content: string) => void
   initialContent?: string
+  loading?: boolean
 }
 
 const LinkedInPost = ({
   onContentChange,
   initialContent,
+  loading = false,
 }: LinkedInPostProps) => {
   const user = useUserState()
 
@@ -53,9 +55,9 @@ const LinkedInPost = ({
     if (typeof initialContent === 'string') {
       setContent(initialContent)
     }
-  }, [])
+  }, [initialContent])
 
-  if (!user) {
+  if (!user || loading) {
     return <PostSkeleton />
   }
 
@@ -82,6 +84,7 @@ const LinkedInPost = ({
           placeholder="What's on your mind?"
           ref={textareaRef}
           value={content}
+          maxLength={3000}
           onChange={e => {
             const val = e.target.value
             setContent(val)
@@ -115,7 +118,10 @@ const LinkedInPost = ({
             setAttachedFiles(files)
           }}
           onEmojiSelect={addEmoji}
-          onDelete={onDelete}
+          onDelete={() => {
+            onDelete()
+            onContentChange?.('')
+          }}
         />
       </div>
     </>

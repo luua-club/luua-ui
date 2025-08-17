@@ -21,6 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import { Switch } from '@/shared/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
@@ -32,6 +33,7 @@ const Create = () => {
   const socials = SOCIAL_PLATFORM.map(p => p.name)
   const [selectedSocials, setSelectedSocials] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<string>('')
+  const [isSyncing, setIsSyncing] = useState<boolean>(false)
 
   const [postDrafts, setPostDrafts] = useState<
     Record<channelType, { content: string }>
@@ -75,7 +77,16 @@ const Create = () => {
     if (name === 'LinkedIn')
       return user?.connected_channels?.linkedin?.connected
     if (name === 'Twitter') return user?.connected_channels?.twitter?.connected
+
     return false
+  }
+
+  const isMoreThanOneSocialIsConnected = () => {
+    const connected = SOCIAL_PLATFORM.filter(sp => {
+      return isSocialConnected(sp.name)
+    }).map(sp => sp.name)
+
+    return connected.length > 1
   }
 
   useEffect(() => {
@@ -97,6 +108,16 @@ const Create = () => {
   }
 
   const handleContentChange = (val: string, name: channelType) => {
+    // When syncing, mirror the content to all supported channels
+    if (isSyncing) {
+      setPostDrafts(prev => ({
+        ...prev,
+        LinkedIn: { content: val },
+        Twitter: { content: val },
+      }))
+      return
+    }
+
     setPostDrafts(prev => ({
       ...prev,
       [name]: {
@@ -104,6 +125,37 @@ const Create = () => {
       },
     }))
   }
+
+  // When syncing is enabled or active tab changes, copy active tab's content
+  // to the other post so the active tab acts as source of truth.
+  useEffect(() => {
+    if (!isSyncing) return
+    if (!activeTab) return
+
+    const src = activeTab as channelType
+    const supported: channelType[] = ['LinkedIn', 'Twitter']
+    if (!supported.includes(src)) return
+
+    const srcContent = postDrafts[src]?.content ?? ''
+    const targets = supported.filter(n => n !== src)
+
+    let needsUpdate = false
+    const next: Record<channelType, { content: string }> = {
+      ...postDrafts,
+    } as Record<channelType, { content: string }>
+
+    targets.forEach(t => {
+      const current = postDrafts[t]?.content ?? ''
+      if (current !== srcContent) {
+        next[t] = { content: srcContent }
+        needsUpdate = true
+      }
+    })
+
+    if (needsUpdate) {
+      setPostDrafts(next)
+    }
+  }, [isSyncing, activeTab])
 
   const getPostComponent = (name: channelType) => {
     switch (name) {
@@ -115,7 +167,12 @@ const Create = () => {
           />
         )
       case 'Twitter':
-        return <TwitterPost />
+        return (
+          <TwitterPost
+            onContentChange={val => handleContentChange(val, name)}
+            initialContent={postDrafts[name]?.content}
+          />
+        )
       default:
         return null
     }
@@ -209,6 +266,18 @@ const Create = () => {
               >
                 {isSocialConnected(sp.name) ? (
                   <div className="mx-auto mt-2 max-w-2xl">
+                    {isMoreThanOneSocialIsConnected() && (
+                      <div className="flex items-center justify-end pb-2">
+                        <p className="text-xs font-medium text-gray-500">
+                          Sync content
+                        </p>
+                        <Switch
+                          className="shrink-0 scale-70 cursor-pointer"
+                          checked={isSyncing}
+                          onCheckedChange={() => setIsSyncing(!isSyncing)}
+                        />
+                      </div>
+                    )}
                     {getPostComponent(sp.name)}
                   </div>
                 ) : (
