@@ -67,7 +67,7 @@ const TwitterPost = ({
   return (
     <>
       <div className="flex gap-2 rounded-lg border-1 p-4">
-        <Avatar className="!h-12 !w-12">
+        <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
           <AvatarImage
             src={user_social.user_profile_picture}
             alt={user_social.user_name}
@@ -144,15 +144,15 @@ const TwitterPost = ({
 const TwitterPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
   return (
     <div className="flex w-full items-center justify-between">
-      <div className="flex items-center gap-2">
-        <p className="font-semibold">{user.user_name}</p>
-        <p className="flex items-center text-gray-500">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+        <p className="truncate font-semibold">{user.user_name}</p>
+        <p className="flex items-center truncate text-gray-500">
           @{user.user_id} <Dot className="size-3" />
           {format(new Date(), 'MMM d')}
         </p>
       </div>
       <div className="flex items-center gap-2 text-gray-500">
-        <CircleOff className="size-4" />
+        <CircleOff className="hidden size-4 sm:block" />
         <Ellipsis className="size-4" />
       </div>
     </div>

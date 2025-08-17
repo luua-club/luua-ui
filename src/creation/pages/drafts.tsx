@@ -1,4 +1,4 @@
-import { createLazyRoute } from '@tanstack/react-router'
+import { createLazyRoute, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
   Calendar,
@@ -49,6 +49,7 @@ const Drafts = () => {
     deletingIds,
     isDeleting,
   } = useDraftList()
+  const navigate = useNavigate()
 
   const handleDeleteDraft = (draftId: string) => openDelete(draftId)
 
@@ -106,7 +107,15 @@ const Drafts = () => {
                     </p>
 
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" className="!px-2">
+                      <Button
+                        variant="outline"
+                        className="!px-2"
+                        onClick={() =>
+                          navigate({
+                            to: `/creation/create?draftId=${draft.id}`,
+                          })
+                        }
+                      >
                         <PencilRuler className="size-4" />
                         Edit
                       </Button>

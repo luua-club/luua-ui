@@ -1,5 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
-import { createLazyRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
+import { createLazyRoute, useLocation } from '@tanstack/react-router'
 import { useNavigate } from '@tanstack/react-router'
 import { Loader2, MoreHorizontal, TriangleAlert } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -9,7 +11,7 @@ import { draftsApi } from '@/core/api/drafts.api'
 import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
 import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
-import { SOCIAL_PLATFORM } from '@/core/config/constant'
+import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { PostItem } from '@/core/models/draft.model'
@@ -40,17 +42,33 @@ const Create = () => {
   >({} as Record<channelType, { content: string }>)
 
   const navigate = useNavigate()
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const draftId = searchParams.get('draftId')
+  const draftEnabled = Boolean(draftId)
+  const queryClient = useQueryClient()
 
-  const saveDraftMutation = useMutation({
-    mutationFn: (payload: { posts: Omit<PostItem, 'id'>[] }) =>
-      draftsApi.postDraft(payload),
-    onSuccess: () => {
-      toast.success('Draft saved successfully')
+  // Load draft if draftId is present in the URL
+  const draftQuery = useQuery({
+    queryKey: [QUERY_KEYS.draft, draftId],
+    queryFn: async () => {
+      const res = await draftsApi.getDraft(draftId as string)
+      return res.data
     },
-    onError: () => {
-      toast.error('Failed to save draft')
-    },
+    enabled: draftEnabled,
   })
+
+  // When draft loads, populate LinkedIn and Twitter content
+  useEffect(() => {
+    if (!draftQuery.data) return
+    const next = {} as Record<channelType, { content: string }>
+    draftQuery.data.posts.forEach((p: PostItem) => {
+      if (p.channel === 'LinkedIn' || p.channel === 'Twitter') {
+        next[p.channel] = { content: p.content ?? '' }
+      }
+    })
+    setPostDrafts(next)
+  }, [draftQuery.data])
 
   const { mutation: publishDraft } = usePublishDraft()
 
@@ -164,6 +182,7 @@ const Create = () => {
           <LinkedInPost
             onContentChange={val => handleContentChange(val, name)}
             initialContent={postDrafts[name]?.content}
+            loading={draftEnabled && draftQuery.isPending}
           />
         )
       case 'Twitter':
@@ -171,6 +190,7 @@ const Create = () => {
           <TwitterPost
             onContentChange={val => handleContentChange(val, name)}
             initialContent={postDrafts[name]?.content}
+            loading={draftEnabled && draftQuery.isPending}
           />
         )
       default:
@@ -203,6 +223,20 @@ const Create = () => {
     return postPayload
   }
 
+  //TODO: UPDATE DRAFT USING THE SAME ID
+  const saveDraftMutation = useMutation({
+    mutationFn: (payload: { posts: Omit<PostItem, 'id'>[] }) =>
+      draftsApi.postDraft(payload),
+    onSuccess: response => {
+      toast.success('Draft saved successfully')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+      navigate({ to: '/creation/create?draftId=' + response.data.draft.id })
+    },
+    onError: () => {
+      toast.error('Failed to save draft')
+    },
+  })
+
   const handleSaveDraft = () => {
     const postPayload = getPostPayload()
 
@@ -219,6 +253,8 @@ const Create = () => {
       {
         onSuccess: () => {
           toast.success('Post are published successfully')
+          // Publishing affects drafts; ensure drafts list is refreshed
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
           navigate({ to: '/dashboard' })
         },
         onError: () => {
@@ -229,7 +265,11 @@ const Create = () => {
   }
 
   const isActionDisabled = () => {
-    if (saveDraftMutation.isPending) {
+    if (
+      saveDraftMutation.isPending ||
+      (draftEnabled && draftQuery.isPending) ||
+      publishDraft.isPending
+    ) {
       return true
     }
 

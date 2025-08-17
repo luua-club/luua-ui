@@ -1,4 +1,5 @@
 import {
+  DraftItem,
   IDraftListRequest,
   IDraftListResponse,
   IDraftRequest,
@@ -21,6 +22,10 @@ class DraftsApi extends BaseApiService {
     return this.get<IDraftListResponse>(undefined, {
       params: { from, to, sort, limit, offset },
     })
+  }
+
+  async getDraft(draftId: string) {
+    return this.get<DraftItem>(draftId)
   }
 
   async deleteDraft(draftId: string) {
