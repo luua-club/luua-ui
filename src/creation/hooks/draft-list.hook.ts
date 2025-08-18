@@ -54,6 +54,7 @@ export function useDraftList() {
         to,
       }),
     placeholderData: prev => prev,
+    refetchOnMount: 'always',
   })
 
   // Fallback to empty array until data arrives.

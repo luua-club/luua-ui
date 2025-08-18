@@ -112,7 +112,10 @@ const Drafts = () => {
                         className="!px-2"
                         onClick={() =>
                           navigate({
-                            to: `/creation/create?draftId=${draft.id}`,
+                            to: `/creation/create`,
+                            search: {
+                              draftId: draft.id,
+                            },
                           })
                         }
                       >

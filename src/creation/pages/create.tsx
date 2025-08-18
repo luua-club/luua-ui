@@ -1,118 +1,118 @@
-import { useMutation } from '@tanstack/react-query'
-import { useQuery } from '@tanstack/react-query'
-import { useQueryClient } from '@tanstack/react-query'
-import { createLazyRoute, useLocation } from '@tanstack/react-router'
-import { useNavigate } from '@tanstack/react-router'
-import { Loader2, MoreHorizontal, TriangleAlert } from 'lucide-react'
+import { createLazyRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 
-import { draftsApi } from '@/core/api/drafts.api'
+import { PostSkeleton } from '@/core/components/Post'
 import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
 import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
-import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
-import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
+import { SOCIAL_PLATFORM } from '@/core/config/constant'
+import { isSocialConnected } from '@/core/config/utils/social.utils'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import { PostItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
-import { Button } from '@/shared/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu'
-import { Switch } from '@/shared/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
+import { Tabs } from '@/shared/ui/tabs'
 
+import CreateDraftTabContent from '../components/CreateDraftTabContent'
+import CreateDraftTabList from '../components/CreateDraftTabList'
 import DraftActions from '../components/DraftActions'
-import SocialNotConnected from '../components/SocialNotConnected'
+import { PostDraftsType, useCreateDraft } from '../hooks/create-draft.hook'
 
 const Create = () => {
-  const user = useUserState()
-  const socials = SOCIAL_PLATFORM.map(p => p.name)
+  // States
   const [selectedSocials, setSelectedSocials] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<string>('')
-  const [isSyncing, setIsSyncing] = useState<boolean>(false)
 
-  const [postDrafts, setPostDrafts] = useState<
-    Record<channelType, { content: string }>
-  >({} as Record<channelType, { content: string }>)
+  // Hooks
+  const user = useUserState()
+  const {
+    postDrafts,
+    setPostDrafts,
+    draftEnabled,
+    draftQuery,
+    saveDraftMutation,
+    deletePostMutation,
+    isSyncing,
+    setIsSyncing,
+    handleContentChange,
+    handleSaveDraft,
+    handlePublishDraft,
+    isDraftActionsDisabled,
+    handleDeletePost,
+  } = useCreateDraft()
 
-  const navigate = useNavigate()
-  const location = useLocation()
-  const searchParams = new URLSearchParams(location.search)
-  const draftId = searchParams.get('draftId')
-  const draftEnabled = Boolean(draftId)
-  const queryClient = useQueryClient()
+  // Constants
+  const socials = SOCIAL_PLATFORM.map(p => p.name)
 
-  // Load draft if draftId is present in the URL
-  const draftQuery = useQuery({
-    queryKey: [QUERY_KEYS.draft, draftId],
-    queryFn: async () => {
-      const res = await draftsApi.getDraft(draftId as string)
-      return res.data
-    },
-    enabled: draftEnabled,
-  })
-
-  // When draft loads, populate LinkedIn and Twitter content
-  useEffect(() => {
-    if (!draftQuery.data) return
-    const next = {} as Record<channelType, { content: string }>
-    draftQuery.data.posts.forEach((p: PostItem) => {
-      if (p.channel === 'LinkedIn' || p.channel === 'Twitter') {
-        next[p.channel] = { content: p.content ?? '' }
-      }
-    })
-    setPostDrafts(next)
-  }, [draftQuery.data])
-
-  const { mutation: publishDraft } = usePublishDraft()
-
-  // Initialize selected socials from user's connected channels when user loads/changes
+  /**
+   * Initialize selected socials from user's connected channels when user loads/changes
+   */
   useEffect(() => {
     if (!user) {
-      // No user yet, keep empty; fallback below will handle activeTab
       return
     }
 
     const connected = SOCIAL_PLATFORM.filter(sp => {
-      return isSocialConnected(sp.name)
+      return isSocialConnected(sp.name, user)
     }).map(sp => sp.name)
 
-    // If none connected, default to showing all socials as a fallback
     const nextSelected = connected.length > 0 ? connected : socials
     setSelectedSocials(prev => (prev.length === 0 ? nextSelected : prev))
 
-    // Ensure active tab is set appropriately on first load
     setActiveTab(prev => (prev ? prev : (nextSelected[0] ?? '')))
   }, [user])
 
-  const isSocialConnected = (name: string) => {
-    if (name === 'LinkedIn')
-      return user?.connected_channels?.linkedin?.connected
-    if (name === 'Twitter') return user?.connected_channels?.twitter?.connected
-
-    return false
-  }
-
-  const isMoreThanOneSocialIsConnected = () => {
-    const connected = SOCIAL_PLATFORM.filter(sp => {
-      return isSocialConnected(sp.name)
-    }).map(sp => sp.name)
-
-    return connected.length > 1
-  }
-
+  /**
+   * Ensure active tab is set appropriately on first load
+   */
   useEffect(() => {
     if (!selectedSocials.includes(activeTab)) {
       setActiveTab(selectedSocials[0] ?? '')
     }
   }, [selectedSocials, activeTab])
 
+  /**
+   * When syncing is enabled or active tab changes, copy active tab's content
+   * to the other post so the active tab acts as source of truth.
+   */
+  useEffect(() => {
+    if (!isSyncing) return
+    if (!activeTab) return
+
+    const activeTabContent = postDrafts[activeTab as channelType]?.content ?? ''
+    const targetSocials = selectedSocials.filter(n => n !== activeTab)
+
+    const next: PostDraftsType = {
+      ...postDrafts,
+    }
+
+    let needsUpdate = false
+
+    targetSocials.forEach((target: string) => {
+      const social = target as channelType
+
+      const current = postDrafts[social]?.content ?? ''
+      if (current !== activeTabContent) {
+        next[social] = {
+          ...(postDrafts[social] ?? { channel: social }),
+          content: activeTabContent,
+        }
+        needsUpdate = true
+      }
+    })
+
+    if (needsUpdate) {
+      setPostDrafts(next)
+    }
+  }, [isSyncing, activeTab])
+
+  /**
+   * It toggles the social in the selected socials list
+   * If the social is checked, it adds the social to the list
+   * If the social is unchecked, it removes the social from the list
+   * If the list has only one social, it does nothing
+   *
+   * @param name - Social name
+   * @param checked - Whether the social is checked
+   */
   const toggleSocial = (name: string, checked: boolean) => {
     setSelectedSocials(prev => {
       if (checked) {
@@ -125,56 +125,12 @@ const Create = () => {
     })
   }
 
-  const handleContentChange = (val: string, name: channelType) => {
-    // When syncing, mirror the content to all supported channels
-    if (isSyncing) {
-      setPostDrafts(prev => ({
-        ...prev,
-        LinkedIn: { content: val },
-        Twitter: { content: val },
-      }))
-      return
-    }
-
-    setPostDrafts(prev => ({
-      ...prev,
-      [name]: {
-        content: val,
-      },
-    }))
-  }
-
-  // When syncing is enabled or active tab changes, copy active tab's content
-  // to the other post so the active tab acts as source of truth.
-  useEffect(() => {
-    if (!isSyncing) return
-    if (!activeTab) return
-
-    const src = activeTab as channelType
-    const supported: channelType[] = ['LinkedIn', 'Twitter']
-    if (!supported.includes(src)) return
-
-    const srcContent = postDrafts[src]?.content ?? ''
-    const targets = supported.filter(n => n !== src)
-
-    let needsUpdate = false
-    const next: Record<channelType, { content: string }> = {
-      ...postDrafts,
-    } as Record<channelType, { content: string }>
-
-    targets.forEach(t => {
-      const current = postDrafts[t]?.content ?? ''
-      if (current !== srcContent) {
-        next[t] = { content: srcContent }
-        needsUpdate = true
-      }
-    })
-
-    if (needsUpdate) {
-      setPostDrafts(next)
-    }
-  }, [isSyncing, activeTab])
-
+  /**
+   * Get post component based on social
+   *
+   * @param name - Social name
+   * @returns Post component
+   */
   const getPostComponent = (name: channelType) => {
     switch (name) {
       case 'LinkedIn':
@@ -183,6 +139,8 @@ const Create = () => {
             onContentChange={val => handleContentChange(val, name)}
             initialContent={postDrafts[name]?.content}
             loading={draftEnabled && draftQuery.isPending}
+            isActionLoading={deletePostMutation.isPending}
+            handlePostDelete={() => handleDeletePost(postDrafts[name]?.id)}
           />
         )
       case 'Twitter':
@@ -191,93 +149,13 @@ const Create = () => {
             onContentChange={val => handleContentChange(val, name)}
             initialContent={postDrafts[name]?.content}
             loading={draftEnabled && draftQuery.isPending}
+            isActionLoading={deletePostMutation.isPending}
+            handlePostDelete={() => handleDeletePost(postDrafts[name]?.id)}
           />
         )
       default:
         return null
     }
-  }
-
-  const getPostPayload = () => {
-    const linkedinContent = postDrafts['LinkedIn']?.content ?? ''
-    const twitterContent = postDrafts['Twitter']?.content ?? ''
-
-    const postPayload: Omit<PostItem, 'id'>[] = []
-
-    if (linkedinContent) {
-      postPayload.push({
-        channel: 'LinkedIn',
-        content: linkedinContent,
-        // attachments ignored intentionally for drafts save per request
-      })
-    }
-
-    if (twitterContent) {
-      postPayload.push({
-        channel: 'Twitter',
-        content: twitterContent,
-        // attachments ignored intentionally for drafts save per request
-      })
-    }
-
-    return postPayload
-  }
-
-  //TODO: UPDATE DRAFT USING THE SAME ID
-  const saveDraftMutation = useMutation({
-    mutationFn: (payload: { posts: Omit<PostItem, 'id'>[] }) =>
-      draftsApi.postDraft(payload),
-    onSuccess: response => {
-      toast.success('Draft saved successfully')
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-      navigate({ to: '/creation/create?draftId=' + response.data.draft.id })
-    },
-    onError: () => {
-      toast.error('Failed to save draft')
-    },
-  })
-
-  const handleSaveDraft = () => {
-    const postPayload = getPostPayload()
-
-    if (postPayload.length === 0) return
-    saveDraftMutation.mutate({ posts: postPayload })
-  }
-
-  const handlePublishDraft = () => {
-    const postPayload = getPostPayload()
-
-    if (postPayload.length === 0) return
-    publishDraft.mutate(
-      { posts: postPayload },
-      {
-        onSuccess: () => {
-          toast.success('Post are published successfully')
-          // Publishing affects drafts; ensure drafts list is refreshed
-          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-          navigate({ to: '/dashboard' })
-        },
-        onError: () => {
-          toast.error('Failed to publish posts')
-        },
-      }
-    )
-  }
-
-  const isActionDisabled = () => {
-    if (
-      saveDraftMutation.isPending ||
-      (draftEnabled && draftQuery.isPending) ||
-      publishDraft.isPending
-    ) {
-      return true
-    }
-
-    if (!postDrafts['LinkedIn']?.content && !postDrafts['Twitter']?.content) {
-      return true
-    }
-
-    return false
   }
 
   return (
@@ -287,124 +165,51 @@ const Create = () => {
           <DraftActions
             handleSaveDraft={handleSaveDraft}
             handlePublishDraft={handlePublishDraft}
-            isActionDisabled={isActionDisabled}
+            isActionDisabled={isDraftActionsDisabled || !user}
             isLoading={saveDraftMutation.isPending}
           />
         </div>
         <Tabs className="w-full" value={activeTab} onValueChange={setActiveTab}>
           {/** Tabs List */}
-          {TabList(selectedSocials, isSocialConnected, toggleSocial)}
+          <CreateDraftTabList
+            selectedSocials={selectedSocials}
+            toggleSocial={toggleSocial}
+          />
+
+          {selectedSocials.length === 0 && (
+            <div className="mx-auto mt-2 w-full md:w-fit md:min-w-2xl">
+              <PostSkeleton />
+            </div>
+          )}
 
           {/** Tabs Content */}
-          {SOCIAL_PLATFORM.filter(sp => selectedSocials.includes(sp.name)).map(
-            sp => (
-              <TabsContent
-                key={sp.name}
-                value={sp.name}
-                forceMount
-                className="data-[state=inactive]:hidden"
-              >
-                {isSocialConnected(sp.name) ? (
-                  <div className="mx-auto mt-2 max-w-2xl">
-                    {isMoreThanOneSocialIsConnected() && (
-                      <div className="flex items-center justify-end pb-2">
-                        <p className="text-xs font-medium text-gray-500">
-                          Sync content
-                        </p>
-                        <Switch
-                          className="shrink-0 scale-70 cursor-pointer"
-                          checked={isSyncing}
-                          onCheckedChange={() => setIsSyncing(!isSyncing)}
-                        />
-                      </div>
-                    )}
-                    {getPostComponent(sp.name)}
-                  </div>
-                ) : (
-                  <SocialNotConnected social={sp.name} />
-                )}
-              </TabsContent>
-            )
-          )}
+          {SOCIAL_PLATFORM.filter(social =>
+            selectedSocials.includes(social.name)
+          ).map(social => (
+            <CreateDraftTabContent
+              key={social.name}
+              tabName={social.name}
+              isSyncing={isSyncing}
+              onToggleSync={() => setIsSyncing(!isSyncing)}
+              getPostComponent={getPostComponent}
+            />
+          ))}
         </Tabs>
       </div>
 
-      {isSocialConnected(activeTab) && (
+      {user && isSocialConnected(activeTab, user) && (
         <FloatingPromptInput onChange={() => {}} expandable>
           <div className="flex justify-center gap-2 lg:hidden">
             <DraftActions
               handleSaveDraft={handleSaveDraft}
               handlePublishDraft={handlePublishDraft}
-              isActionDisabled={isActionDisabled}
+              isActionDisabled={isDraftActionsDisabled || !user}
               isLoading={saveDraftMutation.isPending}
             />
           </div>
         </FloatingPromptInput>
       )}
     </>
-  )
-}
-
-const TabList = (
-  selectedSocials: string[],
-  isSocialConnected: (name: string) => boolean | undefined,
-  toggleSocial: (name: string, checked: boolean) => void
-) => {
-  return (
-    <TabsList className="w-full px-2 py-6 lg:w-fit">
-      {selectedSocials.map(name => (
-        <TabsTrigger key={name} value={name} className="px-2 py-4 text-xs">
-          {(() => {
-            const sp = SOCIAL_PLATFORM.find(s => s.name === name)
-            if (!sp) return name
-            const Icon = sp.logo
-            return (
-              <>
-                <Icon className="size-3" />
-                {name}
-                {!isSocialConnected(name) && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span>
-                        <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>{name} account not connected</span>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </>
-            )
-          })()}
-        </TabsTrigger>
-      ))}
-
-      {selectedSocials.length === 0 && (
-        <Loader2 className="size-5 animate-spin" />
-      )}
-
-      <div className="ml-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={selectedSocials.length === 0}>
-            <Button variant="outline" className="!px-2">
-              <MoreHorizontal className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            {SOCIAL_PLATFORM.map(sp => (
-              <DropdownMenuCheckboxItem
-                key={sp.name}
-                checked={selectedSocials.includes(sp.name)}
-                onCheckedChange={val => toggleSocial(sp.name, Boolean(val))}
-              >
-                {sp.name}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </TabsList>
   )
 }
 

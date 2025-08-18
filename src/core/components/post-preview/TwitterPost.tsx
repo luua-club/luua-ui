@@ -28,12 +28,16 @@ interface TwitterPostProps {
   onContentChange?: (content: string) => void
   initialContent?: string
   loading?: boolean
+  handlePostDelete?: () => void
+  isActionLoading?: boolean
 }
 
 const TwitterPost = ({
   onContentChange,
   initialContent,
   loading = false,
+  handlePostDelete,
+  isActionLoading = false,
 }: TwitterPostProps) => {
   const user = useUserState()
 
@@ -66,7 +70,12 @@ const TwitterPost = ({
 
   return (
     <>
-      <div className="flex gap-2 rounded-lg border-1 p-4">
+      <div
+        className={cn(
+          'flex gap-2 rounded-lg border-1 p-4',
+          isActionLoading && 'opacity-50'
+        )}
+      >
         <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
           <AvatarImage
             src={user_social.user_profile_picture}
@@ -103,20 +112,21 @@ const TwitterPost = ({
             onSelect={updateSelectionRef}
             onKeyUp={updateSelectionRef}
             onClick={updateSelectionRef}
+            disabled={isActionLoading}
           />
 
           {/* Image Preview */}
           <div className="overflow-hidden rounded-lg">
             <PostImagePreview
               imagePreviews={imagePreviews}
-              onRemove={removeImageAt}
+              onRemove={isActionLoading ? undefined : removeImageAt}
             />
           </div>
 
           {/* Attachments */}
           <PostAttachmentPreview
             attachedFiles={attachedFiles}
-            onRemove={removeAttachmentAt}
+            onRemove={isActionLoading ? undefined : removeAttachmentAt}
           />
 
           {/* Footer */}
@@ -124,18 +134,21 @@ const TwitterPost = ({
         </div>
       </div>
       <div className="mt-2 flex justify-end">
-        <PostActions
-          maxFiles={4}
-          attachedFiles={attachedFiles}
-          onFilesChange={files => {
-            setAttachedFiles(files)
-          }}
-          onEmojiSelect={addEmoji}
-          onDelete={() => {
-            onDelete()
-            onContentChange?.('')
-          }}
-        />
+        {!isActionLoading && (
+          <PostActions
+            maxFiles={4}
+            attachedFiles={attachedFiles}
+            onFilesChange={files => {
+              setAttachedFiles(files)
+            }}
+            onEmojiSelect={addEmoji}
+            onDelete={() => {
+              onDelete()
+              onContentChange?.('')
+              handlePostDelete?.()
+            }}
+          />
+        )}
       </div>
     </>
   )

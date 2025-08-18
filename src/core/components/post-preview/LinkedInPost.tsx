@@ -27,12 +27,16 @@ interface LinkedInPostProps {
   onContentChange?: (content: string) => void
   initialContent?: string
   loading?: boolean
+  handlePostDelete?: () => void
+  isActionLoading?: boolean
 }
 
 const LinkedInPost = ({
   onContentChange,
   initialContent,
   loading = false,
+  handlePostDelete,
+  isActionLoading = false,
 }: LinkedInPostProps) => {
   const user = useUserState()
 
@@ -63,7 +67,12 @@ const LinkedInPost = ({
 
   return (
     <>
-      <div className="rounded-lg border-1 bg-white">
+      <div
+        className={cn(
+          'rounded-lg border-1 bg-white',
+          isActionLoading && 'opacity-50'
+        )}
+      >
         {/* Header */}
         <LinkedInPostHeader user={user.connected_channels.linkedin} />
 
@@ -93,36 +102,40 @@ const LinkedInPost = ({
           onSelect={updateSelectionRef}
           onKeyUp={updateSelectionRef}
           onClick={updateSelectionRef}
+          disabled={isActionLoading}
         />
 
         {/* Image Preview */}
         <PostImagePreview
           imagePreviews={imagePreviews}
-          onRemove={removeImageAt}
+          onRemove={isActionLoading ? undefined : removeImageAt}
         />
 
         {/* Attachments */}
         <PostAttachmentPreview
           attachedFiles={attachedFiles}
-          onRemove={removeAttachmentAt}
+          onRemove={isActionLoading ? undefined : removeAttachmentAt}
         />
 
         {/* Footer */}
         <LinkedInPostFooter />
       </div>
       <div className="mt-2 flex justify-end">
-        <PostActions
-          maxFiles={8}
-          attachedFiles={attachedFiles}
-          onFilesChange={files => {
-            setAttachedFiles(files)
-          }}
-          onEmojiSelect={addEmoji}
-          onDelete={() => {
-            onDelete()
-            onContentChange?.('')
-          }}
-        />
+        {!isActionLoading && (
+          <PostActions
+            maxFiles={8}
+            attachedFiles={attachedFiles}
+            onFilesChange={files => {
+              setAttachedFiles(files)
+            }}
+            onEmojiSelect={addEmoji}
+            onDelete={() => {
+              onDelete()
+              onContentChange?.('')
+              handlePostDelete?.()
+            }}
+          />
+        )}
       </div>
     </>
   )
