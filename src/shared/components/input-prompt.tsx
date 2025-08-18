@@ -123,9 +123,16 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
                 Start with a prompt
               </p>
             </div>
-            <Button variant={'outline'} size={'sm'} className={cn('text-xs')}>
+            <Button
+              variant={'outline'}
+              size={'sm'}
+              className={cn(
+                'text-xs',
+                loading ? 'bg-accent !cursor-default' : ''
+              )}
+            >
               {btnText}
-              {btnIcon}
+              {loading ? <Loader2 className="size-3 animate-spin" /> : btnIcon}
             </Button>
           </motion.div>
         ) : (

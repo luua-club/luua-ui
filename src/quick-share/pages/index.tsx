@@ -1,15 +1,19 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
 import { RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { draftsApi } from '@/core/api/drafts.api'
 import Post, { PostSkeleton } from '@/core/components/Post'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
+import { QUERY_KEYS } from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
+import { useUserState } from '@/core/hooks/user-state.hook'
+import { IDraftRequest } from '@/core/models/draft.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
@@ -23,6 +27,22 @@ const QuickShare = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { mutation: publishDraft } = usePublishDraft()
+  const user = useUserState()
+
+  const saveDraftMutation = useMutation({
+    mutationFn: (payload: IDraftRequest) => draftsApi.postDraft(payload),
+    onSuccess: response => {
+      toast.success('Draft saved successfully')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+      navigate({
+        to: '/creation/create',
+        search: { draftId: response.data.draft.id },
+      })
+    },
+    onError: () => {
+      toast.error('Failed to save draft')
+    },
+  })
 
   const preUserPrompt = useAppSelector(state => state.promptState.prompt)
   const {
@@ -80,6 +100,32 @@ const QuickShare = () => {
     )
   }
 
+  const handleEdit = () => {
+    if (!user) {
+      return
+    }
+
+    const payload = posts
+      .filter(
+        p =>
+          user.connected_channels[
+            p.channel.toLowerCase() as keyof typeof user.connected_channels
+          ].connected
+      )
+      .map(p => ({
+        content: p.content,
+        channel: p.channel,
+        attached_media: [],
+      }))
+
+    saveDraftMutation.mutate({
+      posts: payload,
+    })
+  }
+
+  const loading =
+    isDataFetching || saveDraftMutation.isPending || publishDraft.isPending
+
   return (
     <>
       <div className="m-auto flex max-w-4xl flex-col p-5">
@@ -99,7 +145,7 @@ const QuickShare = () => {
             <TabsTrigger
               value="sources"
               className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-              disabled={isDataFetching}
+              disabled={loading}
             >
               Sources
             </TabsTrigger>
@@ -107,17 +153,18 @@ const QuickShare = () => {
           <TabsContent value="created-post" className="flex flex-col">
             {/** Generated Post Controls */}
             {(!error || posts.length > 0) && (
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <GeneratedPostControls
-                  isLoading={isDataFetching}
+                  isLoading={loading}
                   onRetry={refetch}
+                  onEdit={handleEdit}
                   onPublish={() => setIsShareModalOpen(true)}
                 />
               </div>
             )}
 
             {/** External Resources */}
-            {extractedLinks.length > 0 && !isDataFetching && (
+            {extractedLinks.length > 0 && !loading && (
               <div className="mt-4 hidden w-full gap-2 lg:flex">
                 {extractedLinks.slice(0, 5).map(link_data => (
                   <div key={link_data.url} className="flex-1">
@@ -197,13 +244,14 @@ const QuickShare = () => {
           setUserPrompt(prompt)
           setActiveTab('created-post')
         }}
-        loading={isDataFetching}
+        loading={loading}
       >
         {(!error || posts.length > 0) && (
-          <div className="block md:hidden">
+          <div className="block lg:hidden">
             <GeneratedPostControls
-              isLoading={isDataFetching}
+              isLoading={loading}
               onlyControls
+              onEdit={handleEdit}
               onRetry={refetch}
               onPublish={() => setIsShareModalOpen(true)}
             />

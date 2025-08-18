@@ -30,6 +30,7 @@ interface TwitterPostProps {
   loading?: boolean
   handlePostDelete?: () => void
   isActionLoading?: boolean
+  notEditable?: boolean
 }
 
 const TwitterPost = ({
@@ -38,6 +39,7 @@ const TwitterPost = ({
   loading = false,
   handlePostDelete,
   isActionLoading = false,
+  notEditable = false,
 }: TwitterPostProps) => {
   const user = useUserState()
 
@@ -112,7 +114,7 @@ const TwitterPost = ({
             onSelect={updateSelectionRef}
             onKeyUp={updateSelectionRef}
             onClick={updateSelectionRef}
-            disabled={isActionLoading}
+            disabled={isActionLoading || notEditable}
           />
 
           {/* Image Preview */}
@@ -134,7 +136,7 @@ const TwitterPost = ({
         </div>
       </div>
       <div className="mt-2 flex justify-end">
-        {!isActionLoading && (
+        {!isActionLoading && !notEditable && (
           <PostActions
             maxFiles={4}
             attachedFiles={attachedFiles}

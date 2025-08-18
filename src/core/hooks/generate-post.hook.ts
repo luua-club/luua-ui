@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
 import { generateApi } from '../api/generate-post.api'
+import { QUERY_KEYS } from '../config/constant'
 import { extractedLinksType } from '../models/generate-post.model'
 import { IPost } from '../models/post.model'
 
@@ -10,7 +11,7 @@ export const useGeneratePosts = (initialPrompt: string) => {
   const [sessionId, setSessionId] = useState<string | null>(null)
 
   const activePrompt = userPrompt || initialPrompt || ''
-  const key = 'generate-ai-post'
+  const key = QUERY_KEYS.generateAIPost
 
   const query = useQuery({
     queryKey: [key, activePrompt],

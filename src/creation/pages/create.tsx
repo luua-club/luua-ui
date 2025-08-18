@@ -1,5 +1,6 @@
 import { createLazyRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { PostSkeleton } from '@/core/components/Post'
 import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
@@ -7,6 +8,7 @@ import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { isSocialConnected } from '@/core/config/utils/social.utils'
+import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { channelType } from '@/core/models/social.model'
 import { Tabs } from '@/shared/ui/tabs'
@@ -38,9 +40,17 @@ const Create = () => {
     isDraftActionsDisabled,
     handleDeletePost,
   } = useCreateDraft()
+  const {
+    posts: generatedPostContent,
+    isLoading: isGenerationLoading,
+    isFetching: isGenerationFetching,
+    error: generationError,
+    setUserPrompt,
+  } = useGeneratePosts('')
 
   // Constants
   const socials = SOCIAL_PLATFORM.map(p => p.name)
+  const isGenerationDataFetching = isGenerationLoading || isGenerationFetching
 
   /**
    * Initialize selected socials from user's connected channels when user loads/changes
@@ -103,6 +113,32 @@ const Create = () => {
       setPostDrafts(next)
     }
   }, [isSyncing, activeTab])
+
+  /**
+   * Ran when genAI API error
+   */
+  useEffect(() => {
+    if (generationError) {
+      toast.error('Something went wrong')
+    }
+  }, [generationError])
+
+  /**
+   * Ran when genAI creates Posts
+   */
+  useEffect(() => {
+    if (generatedPostContent.length === 0) {
+      return
+    }
+
+    const post = generatedPostContent.find(p => p.channel === activeTab)
+    if (
+      post &&
+      post.content !== postDrafts[activeTab as channelType]?.content
+    ) {
+      handleContentChange(post.content, activeTab as channelType)
+    }
+  }, [generatedPostContent])
 
   /**
    * It toggles the social in the selected socials list
@@ -198,7 +234,13 @@ const Create = () => {
       </div>
 
       {user && isSocialConnected(activeTab, user) && (
-        <FloatingPromptInput onChange={() => {}} expandable>
+        <FloatingPromptInput
+          onChange={prompt => {
+            setUserPrompt(prompt)
+          }}
+          loading={isGenerationDataFetching || saveDraftMutation.isPending}
+          expandable
+        >
           <div className="flex justify-center gap-2 lg:hidden">
             <DraftActions
               handleSaveDraft={handleSaveDraft}

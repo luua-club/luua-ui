@@ -29,6 +29,7 @@ interface LinkedInPostProps {
   loading?: boolean
   handlePostDelete?: () => void
   isActionLoading?: boolean
+  notEditable?: boolean
 }
 
 const LinkedInPost = ({
@@ -37,6 +38,7 @@ const LinkedInPost = ({
   loading = false,
   handlePostDelete,
   isActionLoading = false,
+  notEditable = false,
 }: LinkedInPostProps) => {
   const user = useUserState()
 
@@ -102,7 +104,7 @@ const LinkedInPost = ({
           onSelect={updateSelectionRef}
           onKeyUp={updateSelectionRef}
           onClick={updateSelectionRef}
-          disabled={isActionLoading}
+          disabled={isActionLoading || notEditable}
         />
 
         {/* Image Preview */}
@@ -121,7 +123,7 @@ const LinkedInPost = ({
         <LinkedInPostFooter />
       </div>
       <div className="mt-2 flex justify-end">
-        {!isActionLoading && (
+        {!isActionLoading && !notEditable && (
           <PostActions
             maxFiles={8}
             attachedFiles={attachedFiles}
