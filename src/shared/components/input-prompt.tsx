@@ -1,11 +1,12 @@
 import { Icon, IconProps } from '@tabler/icons-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   CircleCheckBig,
   Loader2,
   SendHorizontal,
   TriangleAlert,
 } from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { SOCIAL_STATUS } from '../constant'
 import { Button } from '../ui/button'
@@ -25,6 +26,7 @@ interface InputPromptProps {
   btnIcon?: React.ReactNode
   backdrop?: boolean
   onChange: (value: string) => void
+  expandable?: boolean
 }
 
 export const InputPrompt: React.FC<InputPromptProps> = ({
@@ -36,9 +38,29 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   btnIcon = <SendHorizontal className="size-3" />,
   backdrop = false,
   onChange,
+  expandable = false,
 }) => {
   const [value, setValue] = useState('')
   const divRef = useRef<HTMLDivElement>(null)
+  const [expanded, setExpanded] = useState<boolean>(!expandable)
+  const fullContainerRef = useRef<HTMLDivElement>(null)
+
+  // Autofocus the editable div when expanded
+  useEffect(() => {
+    if (expandable && expanded && divRef.current) {
+      const t = setTimeout(() => divRef.current?.focus(), 0)
+      return () => clearTimeout(t)
+    }
+  }, [expandable, expanded])
+
+  // Collapse back to preview if focus moves outside the full container
+  const handleContainerBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (!expandable) return
+    const next = e.relatedTarget as Node | null
+    const container = fullContainerRef.current
+    if (container && next && container.contains(next)) return
+    setExpanded(false)
+  }
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const text = e.currentTarget.textContent || ''
@@ -75,38 +97,94 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
           'rounded-lg border border-gray-200/50 bg-white/80 shadow-lg shadow-black/5 backdrop-blur-md'
       )}
     >
-      <div className="relative">
-        <div
-          ref={divRef}
-          contentEditable={true}
-          role="textbox"
-          aria-multiline="true"
-          spellCheck={true}
-          tabIndex={0}
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
-          className={cn(
-            'max-h-70 min-h-24 min-w-72 overflow-y-auto px-3 py-4 text-sm text-gray-600 outline-none'
-          )}
-          suppressContentEditableWarning
-        />
-        {!value && (
-          <WordRotate
-            words={placeholder}
-            duration={3000}
-            className="pointer-events-none absolute top-4 left-3 text-sm font-light text-gray-400 select-none"
-          />
+      <AnimatePresence initial={false} mode="wait">
+        {expandable && !expanded ? (
+          <motion.div
+            key="preview"
+            tabIndex={0}
+            role="textbox"
+            aria-label="Open prompt input"
+            onClick={() => setExpanded(true)}
+            className="flex cursor-pointer items-center justify-between rounded-sm px-0 py-2 pr-2 text-gray-600 md:px-3 md:pr-3"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.09, ease: 'easeOut', type: 'tween' }}
+            style={{ willChange: 'opacity, transform' }}
+          >
+            <div className="flex items-center gap-2">
+              {/* <BrainCircuit className="size-5" /> */}
+              <WordRotate
+                words={placeholder}
+                duration={3000}
+                className="pointer-events-none hidden text-xs font-light select-none md:block"
+              />
+              <p className="text-xs font-light select-none md:hidden">
+                Start with a prompt
+              </p>
+            </div>
+            <Button
+              variant={'outline'}
+              size={'sm'}
+              className={cn(
+                'text-xs',
+                loading ? 'bg-accent !cursor-default' : ''
+              )}
+            >
+              {btnText}
+              {loading ? <Loader2 className="size-3 animate-spin" /> : btnIcon}
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="full"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.11, ease: 'easeOut', type: 'tween' }}
+            style={{ willChange: 'opacity, transform' }}
+            ref={fullContainerRef}
+            onBlurCapture={handleContainerBlur}
+            onAnimationComplete={() => {
+              // Focus after the enter animation completes to ensure node is mounted
+              if (expandable && expanded) divRef.current?.focus()
+            }}
+          >
+            <div className="relative">
+              <div
+                ref={divRef}
+                contentEditable={true}
+                role="textbox"
+                aria-multiline={true}
+                spellCheck={true}
+                tabIndex={0}
+                onInput={handleInput}
+                onKeyDown={handleKeyDown}
+                className={cn(
+                  'max-h-70 min-h-24 min-w-72 overflow-y-auto px-3 py-4 text-sm text-gray-600 outline-none'
+                )}
+                suppressContentEditableWarning
+              />
+              {!value && (
+                <WordRotate
+                  words={placeholder}
+                  duration={3000}
+                  className="pointer-events-none absolute top-4 left-3 text-sm font-light text-gray-400 select-none"
+                />
+              )}
+            </div>
+            <hr />
+            <PromptControls
+              loading={loading}
+              socialStatus={socialStatus}
+              socials={socials}
+              handleGeneratePost={handleGeneratePost}
+              btnText={btnText}
+              btnIcon={btnIcon}
+            />
+          </motion.div>
         )}
-      </div>
-      <hr />
-      <PromptControls
-        loading={loading}
-        socialStatus={socialStatus}
-        socials={socials}
-        handleGeneratePost={handleGeneratePost}
-        btnText={btnText}
-        btnIcon={btnIcon}
-      ></PromptControls>
+      </AnimatePresence>
     </div>
   )
 }

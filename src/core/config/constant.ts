@@ -38,4 +38,6 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
 export const QUERY_KEYS = {
   user: 'user',
   drafts: 'drafts',
+  draft: 'draft',
+  generateAIPost: 'generate-ai-post',
 }

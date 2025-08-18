@@ -1,3 +1,4 @@
+import { WithOptional } from '../models/common.model'
 import { IPagination } from './pagination.model'
 import { IPost } from './post.model'
 
@@ -14,7 +15,8 @@ export type DraftItem = {
 }
 
 export interface IDraftRequest {
-  posts: Omit<PostItem, 'id'>[]
+  id?: string
+  posts: WithOptional<PostItem, 'id'>[]
 }
 
 export interface IDraftResponse {
@@ -33,5 +35,5 @@ export interface IDraftListResponse extends IPagination {
 
 export interface IPublishDraftRequest {
   draft_id: string
-  post_ids?: string[]
+  post_ids: string[]
 }
