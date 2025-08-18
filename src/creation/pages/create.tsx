@@ -175,7 +175,9 @@ const Create = () => {
             onContentChange={val => handleContentChange(val, name)}
             initialContent={postDrafts[name]?.content}
             loading={draftEnabled && draftQuery.isPending}
-            isActionLoading={deletePostMutation.isPending}
+            isActionLoading={
+              deletePostMutation.isPending || isGenerationDataFetching
+            }
             handlePostDelete={() => handleDeletePost(postDrafts[name]?.id)}
           />
         )
@@ -185,7 +187,9 @@ const Create = () => {
             onContentChange={val => handleContentChange(val, name)}
             initialContent={postDrafts[name]?.content}
             loading={draftEnabled && draftQuery.isPending}
-            isActionLoading={deletePostMutation.isPending}
+            isActionLoading={
+              deletePostMutation.isPending || isGenerationDataFetching
+            }
             handlePostDelete={() => handleDeletePost(postDrafts[name]?.id)}
           />
         )
