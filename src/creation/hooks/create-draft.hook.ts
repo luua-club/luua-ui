@@ -5,8 +5,13 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
+import {
+  ShareModalOpenState,
+  SharePostType,
+} from '@/core/components/SharePostModal'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
+import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { WithOptional } from '@/core/models/common.model'
 import {
   type DraftItem,
@@ -25,10 +30,17 @@ export const useCreateDraft = () => {
     {} as PostDraftsType
   )
   const [isSyncing, setIsSyncing] = useState<boolean>(false)
+  const [isShareModalOpen, setIsShareModalOpen] = useState<ShareModalOpenState>(
+    {
+      open: false,
+      schedule: false,
+    }
+  )
 
   // ----- Hooks -----
   const location = useLocation()
   const { mutation: publishDraft } = usePublishDraft()
+  const { mutation: scheduleDraft } = useScheduleDraft()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -199,16 +211,54 @@ export const useCreateDraft = () => {
   }
 
   /**
-   * TODO: OPEN MODAL AND THEN PUBLISH BASES ON USER SELECTION
    * Publish drafts
    */
-  const handlePublishDraft = () => {
+  const handleSubmitDraft = (
+    postIds: string[],
+    schedule: boolean,
+    scheduleDate?: string
+  ) => {
     const postPayload = getDraftRequestPayload()
     if (postPayload.posts.length === 0) return
 
+    const filteredPosts = postPayload.posts.filter(p => {
+      if (p.id) {
+        return postIds.includes(p.id)
+      }
+
+      return postIds.includes(p.channel)
+    })
+
+    const finalPayload = {
+      ...postPayload,
+      posts: filteredPosts,
+    }
+
+    if (schedule && scheduleDate) {
+      scheduleDraft.mutate(
+        {
+          draftRequest: finalPayload,
+          scheduleDate,
+        },
+        {
+          onSuccess: () => {
+            setIsShareModalOpen({ open: false, schedule: false })
+            toast.success('Draft scheduled successfully')
+            queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+            navigate({ to: '/schedule' })
+          },
+          onError: () => {
+            toast.error('Failed to schedule draft')
+          },
+        }
+      )
+      return
+    }
+
     // Call api
-    publishDraft.mutate(postPayload, {
+    publishDraft.mutate(finalPayload, {
       onSuccess: () => {
+        setIsShareModalOpen({ open: false, schedule: false })
         toast.success('Post are published successfully')
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
         navigate({ to: '/dashboard' })
@@ -229,6 +279,7 @@ export const useCreateDraft = () => {
       saveDraftMutation.isPending ||
       (draftEnabled && draftQuery.isPending) ||
       publishDraft.isPending ||
+      scheduleDraft.isPending ||
       deletePostMutation.isPending
     ) {
       return true
@@ -252,6 +303,28 @@ export const useCreateDraft = () => {
     deletePostMutation.mutate({ draftId, postId })
   }
 
+  const getSharePosts = () => {
+    const posts: SharePostType = []
+
+    if (postDrafts['LinkedIn']) {
+      posts.push({
+        id: postDrafts['LinkedIn']?.id || postDrafts['LinkedIn'].channel,
+        content: postDrafts['LinkedIn'].content,
+        channel: postDrafts['LinkedIn'].channel,
+      })
+    }
+
+    if (postDrafts['Twitter']) {
+      posts.push({
+        id: postDrafts['Twitter']?.id || postDrafts['Twitter'].channel,
+        content: postDrafts['Twitter'].content,
+        channel: postDrafts['Twitter'].channel,
+      })
+    }
+
+    return posts
+  }
+
   return {
     postDrafts,
     setPostDrafts,
@@ -264,9 +337,13 @@ export const useCreateDraft = () => {
     setIsSyncing,
     handleContentChange,
     handleSaveDraft,
-    handlePublishDraft,
+    handleSubmitDraft,
     isDraftActionsDisabled,
     handleDeletePost,
     draftId,
+    isShareModalOpen,
+    setIsShareModalOpen,
+    scheduleDraft,
+    getSharePosts,
   }
 }

@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/button'
 interface IDraftActionsProps {
   handleSaveDraft: () => void
   handlePublishDraft: () => void
+  handleScheduleDraft: () => void
   isActionDisabled: () => boolean
   isLoading: boolean
 }
@@ -12,6 +13,7 @@ interface IDraftActionsProps {
 const DraftActions = ({
   handleSaveDraft,
   handlePublishDraft,
+  handleScheduleDraft,
   isActionDisabled,
   isLoading,
 }: IDraftActionsProps) => {
@@ -35,6 +37,7 @@ const DraftActions = ({
         variant="outline"
         className="text-xs"
         disabled={isActionDisabled()}
+        onClick={handleScheduleDraft}
       >
         <Calendar className="size-3" />
         Schedule

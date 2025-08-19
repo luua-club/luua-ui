@@ -112,19 +112,18 @@ const QuickShare = () => {
     }))
 
     if (schedule && scheduleDate) {
-      //todo
       scheduleDraft.mutate(
         {
-          posts: payload,
+          draftRequest: {
+            posts: payload,
+          },
           scheduleDate,
         },
         {
           onSuccess: () => {
             setIsShareModalOpen({ open: false, schedule: false })
             toast.success('Draft scheduled successfully')
-
-            // todo navigate to schedule page
-            navigate({ to: '/dashboard' })
+            navigate({ to: '/schedule' })
           },
           onError: () => {
             toast.error('Failed to schedule draft')
