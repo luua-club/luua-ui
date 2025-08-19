@@ -45,7 +45,7 @@ const PostActions = ({
             </span>
           </Button>
         </DialogTrigger>
-        <DialogContent className="p-6">
+        <DialogContent className="w-full p-6 md:w-fit">
           <DialogClose />
           <DialogHeader className="mb-4">
             <DialogTitle>Upload files</DialogTitle>

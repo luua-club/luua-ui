@@ -267,5 +267,6 @@ export const useCreateDraft = () => {
     handlePublishDraft,
     isDraftActionsDisabled,
     handleDeletePost,
+    draftId,
   }
 }

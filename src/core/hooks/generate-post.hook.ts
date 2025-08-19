@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { generateApi } from '../api/generate-post.api'
 import { QUERY_KEYS } from '../config/constant'
@@ -36,20 +36,24 @@ export const useGeneratePosts = (initialPrompt: string) => {
     }
   }, [query.data?.data.session_id])
 
-  const posts: Pick<IPost, 'id' | 'channel' | 'content'>[] = query.data?.data
-    ? [
-        {
-          id: '0',
-          channel: 'LinkedIn',
-          content: query.data.data.generated_linkedin_post.content,
-        },
-        {
-          id: '1',
-          channel: 'Twitter',
-          content: query.data.data.generated_twitter_post.content,
-        },
-      ]
-    : []
+  const posts: Pick<IPost, 'id' | 'channel' | 'content'>[] = useMemo(
+    () =>
+      query.data?.data
+        ? [
+            {
+              id: '0',
+              channel: 'LinkedIn',
+              content: query.data.data.generated_linkedin_post.content,
+            },
+            {
+              id: '1',
+              channel: 'Twitter',
+              content: query.data.data.generated_twitter_post.content,
+            },
+          ]
+        : [],
+    [query.data?.data]
+  )
 
   const extractedLinks: extractedLinksType[] =
     query.data?.data.external_sources ?? []
@@ -60,6 +64,7 @@ export const useGeneratePosts = (initialPrompt: string) => {
     extractedLinks,
     activePrompt,
     key,
+    setSessionId,
     setUserPrompt,
   }
 }

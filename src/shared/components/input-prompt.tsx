@@ -113,14 +113,17 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
             style={{ willChange: 'opacity, transform' }}
           >
             <div className="flex items-center gap-2">
-              {/* <BrainCircuit className="size-5" /> */}
               <WordRotate
-                words={placeholder}
+                words={
+                  loading
+                    ? ['Generating AI post...', 'Hold still...']
+                    : placeholder
+                }
                 duration={3000}
                 className="pointer-events-none hidden text-xs font-light select-none md:block"
               />
               <p className="text-xs font-light select-none md:hidden">
-                Start with a prompt
+                {loading ? 'Hold still...' : 'Start with a prompt'}
               </p>
             </div>
             <Button
@@ -167,7 +170,11 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
               />
               {!value && (
                 <WordRotate
-                  words={placeholder}
+                  words={
+                    loading
+                      ? ['Generating AI post...', 'Hold still...']
+                      : placeholder
+                  }
                   duration={3000}
                   className="pointer-events-none absolute top-4 left-3 text-sm font-light text-gray-400 select-none"
                 />
