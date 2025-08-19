@@ -7,14 +7,17 @@ import {
   Send,
   Smile,
   ThumbsUp,
+  TriangleAlert,
   X,
 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { IUserConnectedChannel } from '@/core/models/social.model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { Button } from '@/shared/ui/button'
 import { Textarea } from '@/shared/ui/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { useUserState } from '../../hooks/user-state.hook'
@@ -56,6 +59,9 @@ const LinkedInPost = ({
     removeAttachmentAt,
   } = usePostComposer()
 
+  // Read-more toggle for not-editable view
+  const [expanded, setExpanded] = useState(false)
+
   // Initialize from parent if provided
   useEffect(() => {
     if (typeof initialContent === 'string') {
@@ -67,45 +73,86 @@ const LinkedInPost = ({
     return <PostSkeleton />
   }
 
+  const user_social = { ...user.connected_channels.linkedin }
+
+  user_social.user_name = user_social.user_name || user.name
+  user_social.user_id = user_social.user_id || user.email
+  user_social.user_profile_picture =
+    user_social.user_profile_picture || user.profile_image
+
+  // Prepare truncated display text (300 words)
+  const words = (content || '').trim().split(/\s+/)
+  const isLong = words.length > 300
+  const displayText =
+    expanded || !isLong ? content : words.slice(0, 300).join(' ') + '...'
+
   return (
     <>
       <div
         className={cn(
-          'rounded-lg border-1 bg-white',
+          'relative rounded-lg border-1 bg-white',
           isActionLoading && 'opacity-50'
         )}
       >
+        {!user_social.connected && (
+          <div className="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border-1 border-dashed bg-white">
+            <Tooltip>
+              <TooltipTrigger>
+                <TriangleAlert className="size-4 animate-pulse text-yellow-600" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <span>LinkedIn account not connected</span>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        )}
+
         {/* Header */}
-        <LinkedInPostHeader user={user.connected_channels.linkedin} />
+        <LinkedInPostHeader user={user_social} />
 
         {/* Content */}
-        <Textarea
-          className={cn(
-            'min-h-20',
-            // Base visuals and typography
-            'resize-none border-0 p-4 pt-1 shadow-none',
-            // Caret, placeholder and selection for a premium feel
-            'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
-            // Smooth color transitions
-            'transition-colors duration-200',
-            // Remove focus visuals completely (Textarea base adds focus-visible ring + border)
-            'focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none',
-            'focus-visible:border-transparent focus-visible:shadow-none focus-visible:ring-0'
-          )}
-          placeholder="What's on your mind?"
-          ref={textareaRef}
-          value={content}
-          maxLength={3000}
-          onChange={e => {
-            const val = e.target.value
-            setContent(val)
-            onContentChange?.(val)
-          }}
-          onSelect={updateSelectionRef}
-          onKeyUp={updateSelectionRef}
-          onClick={updateSelectionRef}
-          disabled={isActionLoading || notEditable}
-        />
+        {notEditable ? (
+          <div className="p-4 pt-1 text-sm">
+            <p className="inline">{displayText}</p>
+            {isLong && !expanded && (
+              <Button
+                variant="link"
+                className="!p-0 text-xs text-blue-600"
+                onClick={() => setExpanded(true)}
+              >
+                more
+              </Button>
+            )}
+          </div>
+        ) : (
+          <Textarea
+            className={cn(
+              'min-h-20',
+              // Base visuals and typography
+              'resize-none border-0 p-4 pt-1 shadow-none',
+              // Caret, placeholder and selection for a premium feel
+              'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
+              // Smooth color transitions
+              'transition-colors duration-200',
+              // Remove focus visuals completely (Textarea base adds focus-visible ring + border)
+              'focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none',
+              'focus-visible:border-transparent focus-visible:shadow-none focus-visible:ring-0'
+            )}
+            placeholder="What's on your mind?"
+            ref={textareaRef}
+            value={content}
+            maxLength={3000}
+            onChange={e => {
+              const val = e.target.value
+              setContent(val)
+              onContentChange?.(val)
+            }}
+            onSelect={updateSelectionRef}
+            onKeyUp={updateSelectionRef}
+            onClick={updateSelectionRef}
+            disabled={isActionLoading}
+          />
+        )}
 
         {/* Image Preview */}
         <PostImagePreview
@@ -122,23 +169,25 @@ const LinkedInPost = ({
         {/* Footer */}
         <LinkedInPostFooter />
       </div>
-      <div className="mt-2 flex justify-end">
-        {!isActionLoading && !notEditable && (
-          <PostActions
-            maxFiles={8}
-            attachedFiles={attachedFiles}
-            onFilesChange={files => {
-              setAttachedFiles(files)
-            }}
-            onEmojiSelect={addEmoji}
-            onDelete={() => {
-              onDelete()
-              onContentChange?.('')
-              handlePostDelete?.()
-            }}
-          />
-        )}
-      </div>
+      {!notEditable && (
+        <div className="mt-2 flex justify-end">
+          {!isActionLoading && (
+            <PostActions
+              maxFiles={8}
+              attachedFiles={attachedFiles}
+              onFilesChange={files => {
+                setAttachedFiles(files)
+              }}
+              onEmojiSelect={addEmoji}
+              onDelete={() => {
+                onDelete()
+                onContentChange?.('')
+                handlePostDelete?.()
+              }}
+            />
+          )}
+        </div>
+      )}
     </>
   )
 }
@@ -152,7 +201,7 @@ const LinkedInPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
           <AvatarFallback>{'DL'}</AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-col">
-          <h6 className="flex min-w-0 truncate text-sm font-medium sm:text-base">
+          <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">
             {user.user_name}
           </h6>
           <p className="truncate text-xs font-medium text-gray-400">
