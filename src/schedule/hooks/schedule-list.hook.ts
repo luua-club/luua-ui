@@ -18,25 +18,26 @@ const useScheduleList = () => {
     from: today,
     to: defaultTo,
   })
-  const [sort, setSort] = useState<'asc' | 'desc'>('desc')
+  const [sort, setSort] = useState<'created_at' | 'updated_at'>('updated_at')
 
   // ----- Pagination -----
-  const [limit, setLimit] = useState<number>(10)
+  const [limit, setLimit] = useState<number>(4)
   const [offset, setOffset] = useState<number>(0)
 
   // ----- Derived date filters -----
   // For schedule list, compute from/to based on selected date range
   const from = toStartOfDayIso(selectedRange?.from)
   const to = toStartOfDayIso(selectedRange?.to ?? selectedRange?.from)
+  const sortDir = sort === 'created_at' ? 'asc' : 'desc'
 
   // ----- Query: fetch scheduled posts -----
   const query = useQuery<ApiResponse<IScheduledPostResponse>>({
-    queryKey: [QUERY_KEYS.scheduleList, from, to, sort, limit, offset],
+    queryKey: [QUERY_KEYS.scheduleList, from, to, sortDir, limit, offset],
     queryFn: () =>
       postsApi.getScheduledPosts({
         from,
         to,
-        sort,
+        sort: sortDir,
         limit,
         offset,
       }),

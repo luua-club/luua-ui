@@ -22,8 +22,8 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 
+import ListControls from '../../core/components/ListControls'
 import PaginationList from '../../shared/components/pagination-list'
-import DraftListControls from '../components/DraftListControls'
 import { useDraftList } from '../hooks/draft-list.hook'
 
 const Drafts = () => {
@@ -68,7 +68,7 @@ const Drafts = () => {
       <h1 className="text-xl font-semibold">Your Saved Drafts</h1>
 
       <div className="mt-8">
-        <DraftListControls
+        <ListControls
           dateRange={dateRange}
           onDateRangeChange={setDateRange}
           sort={sort}
