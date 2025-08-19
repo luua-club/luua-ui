@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
-import Post, { PostSkeleton } from '@/core/components/Post'
+import { PostSkeleton } from '@/core/components/Post'
+import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
+import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
 import { QUERY_KEYS } from '@/core/config/constant'
@@ -73,6 +75,15 @@ const QuickShare = () => {
     }
   }, [queryClient, key])
 
+  /**
+   * Ran when genAI API error
+   */
+  useEffect(() => {
+    if (error) {
+      toast.error('Something went wrong while generating posts')
+    }
+  }, [error])
+
   const onSubmit = (postIds: string[]) => {
     const selectedPosts = posts.filter(post => postIds.includes(post.id))
     if (selectedPosts.length === 0) {
@@ -92,6 +103,7 @@ const QuickShare = () => {
         onSuccess: () => {
           setIsShareModalOpen(false)
           toast.success('Draft published successfully')
+          navigate({ to: '/dashboard' })
         },
         onError: () => {
           toast.error('Failed to publish draft')
@@ -178,27 +190,38 @@ const QuickShare = () => {
             )}
 
             {/** Generated Posts */}
-            <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
               {isDataFetching ? (
                 <>
                   <PostSkeleton />
                   <PostSkeleton />
                 </>
               ) : (
-                //TODO: Replace with post preview
-                posts.map(post => (
-                  <Post
-                    id={post.id}
-                    key={post.id}
-                    channel={post.channel}
-                    content={post.content}
-                  />
-                ))
+                posts.map(post => {
+                  if (post.channel === 'LinkedIn') {
+                    return (
+                      <LinkedInPost
+                        key={post.id}
+                        initialContent={post.content}
+                        loading={isDataFetching}
+                        notEditable
+                      />
+                    )
+                  }
+                  return (
+                    <TwitterPost
+                      key={post.id}
+                      initialContent={post.content}
+                      loading={isDataFetching}
+                      notEditable
+                    />
+                  )
+                })
               )}
             </div>
 
             {error && posts.length === 0 && (
-              <div className="mt-4 mb-48 flex w-full items-center justify-center rounded-lg border border-dashed p-5">
+              <div className="flex w-full items-center justify-center rounded-lg border border-dashed p-5">
                 <p className="pr-2 text-center text-sm text-gray-500">
                   Something went wrong please
                   <span>
@@ -245,6 +268,7 @@ const QuickShare = () => {
           setActiveTab('created-post')
         }}
         loading={loading}
+        expandable
       >
         {(!error || posts.length > 0) && (
           <div className="block lg:hidden">
@@ -252,7 +276,9 @@ const QuickShare = () => {
               isLoading={loading}
               onlyControls
               onEdit={handleEdit}
-              onRetry={refetch}
+              onRetry={() => {
+                refetch()
+              }}
               onPublish={() => setIsShareModalOpen(true)}
             />
           </div>
