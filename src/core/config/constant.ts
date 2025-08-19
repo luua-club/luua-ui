@@ -40,4 +40,5 @@ export const QUERY_KEYS = {
   drafts: 'drafts',
   draft: 'draft',
   generateAIPost: 'generate-ai-post',
+  scheduleList: 'schedule-list',
 }

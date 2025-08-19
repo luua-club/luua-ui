@@ -9,19 +9,21 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 
-type DraftListControlsProps = {
+type ListControlsProps = {
   dateRange: DateRange | undefined
   onDateRangeChange: (range: DateRange | undefined) => void
   sort?: 'created_at' | 'updated_at'
   onSortChange: (value: 'created_at' | 'updated_at') => void
+  hideSort?: boolean
 }
 
-const DraftListControls = ({
+const ListControls = ({
   dateRange,
   onDateRangeChange,
   sort,
   onSortChange,
-}: DraftListControlsProps) => {
+  hideSort = false,
+}: ListControlsProps) => {
   return (
     <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
       <DateRangePicker
@@ -30,20 +32,22 @@ const DraftListControls = ({
         className="w-full md:w-auto"
       />
 
-      <Select
-        value={sort}
-        onValueChange={(v: 'created_at' | 'updated_at') => onSortChange(v)}
-      >
-        <SelectTrigger className="w-full md:w-auto">
-          <SelectValue placeholder="Sort by" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="created_at">Oldest</SelectItem>
-          <SelectItem value="updated_at">Latest</SelectItem>
-        </SelectContent>
-      </Select>
+      {!hideSort && (
+        <Select
+          value={sort}
+          onValueChange={(v: 'created_at' | 'updated_at') => onSortChange(v)}
+        >
+          <SelectTrigger className="w-full md:w-auto">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="created_at">Oldest</SelectItem>
+            <SelectItem value="updated_at">Latest</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
     </div>
   )
 }
 
-export default DraftListControls
+export default ListControls
