@@ -80,11 +80,12 @@ const LinkedInPost = ({
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
 
-  // Prepare truncated display text (300 words)
-  const words = (content || '').trim().split(/\s+/)
-  const isLong = words.length > 300
+  // Prepare truncated display text (300 characters)
+  const MAX_CHARS = 300
+  const raw = content || ''
+  const isLong = raw.length > MAX_CHARS
   const displayText =
-    expanded || !isLong ? content : words.slice(0, 300).join(' ') + '...'
+    expanded || !isLong ? raw : raw.slice(0, MAX_CHARS).trimEnd() + '...'
 
   return (
     <>
@@ -113,14 +114,14 @@ const LinkedInPost = ({
         {/* Content */}
         {notEditable ? (
           <div className="p-4 pt-1 text-sm">
-            <p className="inline">{displayText}</p>
-            {isLong && !expanded && (
+            <p className="break-words whitespace-pre-wrap">{displayText}</p>
+            {isLong && (
               <Button
                 variant="link"
                 className="!p-0 text-xs text-blue-600"
-                onClick={() => setExpanded(true)}
+                onClick={() => setExpanded(prev => !prev)}
               >
-                more
+                {expanded ? 'See less' : 'See more'}
               </Button>
             )}
           </div>

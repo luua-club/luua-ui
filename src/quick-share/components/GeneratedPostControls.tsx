@@ -9,7 +9,8 @@ interface GeneratedPostControlsProps {
   onlyControls?: boolean
   onRetry: () => void
   onPublish: () => void
-  onEdit?: () => void
+  onEdit: () => void
+  onSchedule?: () => void
 }
 
 const GeneratedPostControls = ({
@@ -18,6 +19,7 @@ const GeneratedPostControls = ({
   onRetry,
   onPublish,
   onEdit,
+  onSchedule,
 }: GeneratedPostControlsProps) => {
   return (
     <>
@@ -38,7 +40,11 @@ const GeneratedPostControls = ({
         >
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" disabled={isLoading}>
+              <Button
+                variant="outline"
+                disabled={isLoading}
+                onClick={onSchedule}
+              >
                 <Calendar />
               </Button>
             </TooltipTrigger>

@@ -111,7 +111,9 @@ const TwitterPost = ({
 
           {/* Content */}
           {notEditable ? (
-            <p className="p-0 pt-1 text-sm">{content}</p>
+            <p className="p-0 pt-1 text-sm break-words whitespace-pre-wrap">
+              {content}
+            </p>
           ) : (
             <Textarea
               className={cn(
