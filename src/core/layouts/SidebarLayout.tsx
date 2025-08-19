@@ -22,7 +22,7 @@ const platformItems: ISidebarItem[] = [
   },
   {
     title: 'Schedule',
-    url: undefined,
+    url: '/schedule',
     icon: <LucideCalendar />,
   },
 ]

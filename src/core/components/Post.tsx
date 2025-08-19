@@ -28,8 +28,8 @@ function Post({
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
   const userState = useUserState()
 
-  if (!userState) {
-    return null
+  if (!userState || isLoading) {
+    return <PostSkeleton tileView={tileView} />
   }
 
   const channelUser: IUserConnectedChannel | undefined =
@@ -57,10 +57,6 @@ function Post({
         : userState.email,
       image: channelUser.user_profile_picture || userState.profile_image,
     }
-  }
-
-  if (isLoading) {
-    return <PostSkeleton />
   }
 
   return (
@@ -128,9 +124,14 @@ function Post({
   )
 }
 
-export const PostSkeleton = () => {
+export const PostSkeleton = ({ tileView = false }: { tileView?: boolean }) => {
   return (
-    <Card className="relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none">
+    <Card
+      className={cn(
+        'relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none',
+        tileView ? 'min-h-36' : 'h-fit'
+      )}
+    >
       <CardContent className="flex flex-1 flex-col p-0">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center">
@@ -142,11 +143,10 @@ export const PostSkeleton = () => {
           </div>
           <Skeleton className="h-10 w-10 rounded-full" />
         </div>
-        <hr />
+        {!tileView && <hr />}
         <div className="mt-3 space-y-2 px-4">
           <Skeleton className="h-3 w-full" />
           <Skeleton className="h-3 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
         </div>
       </CardContent>
     </Card>
