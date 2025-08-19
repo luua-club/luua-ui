@@ -22,9 +22,11 @@ export type ShareModalOpenState = {
   schedule: boolean
 }
 
+export type SharePostType = Pick<IPost, 'id' | 'content' | 'channel'>[]
+
 interface ISharePostModalProps {
   isOpen: ShareModalOpenState
-  posts: Pick<IPost, 'id' | 'content' | 'channel'>[]
+  posts: SharePostType
   isLoading: boolean
   onOpenChange: (state: ShareModalOpenState) => void
   onSubmit: (

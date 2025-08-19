@@ -6,6 +6,7 @@ import { PostSkeleton } from '@/core/components/Post'
 import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
 import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
+import { SharePostModal } from '@/core/components/SharePostModal'
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { isSocialConnected } from '@/core/config/utils/social.utils'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
@@ -36,9 +37,12 @@ const Create = () => {
     setIsSyncing,
     handleContentChange,
     handleSaveDraft,
-    handlePublishDraft,
     isDraftActionsDisabled,
     handleDeletePost,
+    isShareModalOpen,
+    setIsShareModalOpen,
+    getSharePosts,
+    handleSubmitDraft,
   } = useCreateDraft()
   const {
     posts: generatedPostContent,
@@ -204,7 +208,12 @@ const Create = () => {
         <div className="hidden gap-2 py-1 lg:absolute lg:top-2 lg:right-2 lg:flex">
           <DraftActions
             handleSaveDraft={handleSaveDraft}
-            handlePublishDraft={handlePublishDraft}
+            handlePublishDraft={() =>
+              setIsShareModalOpen({ open: true, schedule: false })
+            }
+            handleScheduleDraft={() =>
+              setIsShareModalOpen({ open: true, schedule: true })
+            }
             isActionDisabled={isDraftActionsDisabled || !user}
             isLoading={saveDraftMutation.isPending}
           />
@@ -248,13 +257,27 @@ const Create = () => {
           <div className="flex justify-center gap-2 lg:hidden">
             <DraftActions
               handleSaveDraft={handleSaveDraft}
-              handlePublishDraft={handlePublishDraft}
+              handlePublishDraft={() =>
+                setIsShareModalOpen({ open: true, schedule: false })
+              }
+              handleScheduleDraft={() =>
+                setIsShareModalOpen({ open: true, schedule: true })
+              }
               isActionDisabled={isDraftActionsDisabled || !user}
               isLoading={saveDraftMutation.isPending}
             />
           </div>
         </FloatingPromptInput>
       )}
+
+      {/* Share Post Modal */}
+      <SharePostModal
+        isOpen={isShareModalOpen}
+        posts={getSharePosts()}
+        isLoading={isDraftActionsDisabled()}
+        onOpenChange={setIsShareModalOpen}
+        onSubmit={handleSubmitDraft}
+      />
     </>
   )
 }

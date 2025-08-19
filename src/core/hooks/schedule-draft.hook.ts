@@ -13,21 +13,27 @@ import { type IDraftRequest } from '../models/draft.model'
  *
  * Usage:
  * const scheduleDraft = useScheduleDraft()
- * scheduleDraft.mutate({ posts: [...], scheduleDate: '2025-08-19T12:00:00Z' })
+ * scheduleDraft.mutate({ draftRequest: {...}, scheduleDate: '2025-08-19T12:00:00Z' })
  */
 export function useScheduleDraft() {
   type Params = {
-    posts: IDraftRequest['posts']
+    draftRequest: IDraftRequest
     /** ISO string date to apply to all created posts */
     scheduleDate: string
   }
 
   const mutation = useMutation({
     mutationFn: async (params: Params) => {
+      const draftPayload: IDraftRequest = {
+        posts: params.draftRequest.posts,
+      }
+
+      if (params.draftRequest.id) {
+        draftPayload.id = params.draftRequest.id
+      }
+
       // Step 1: Create draft
-      const draftRes = await draftsApi.postDraft({
-        posts: params.posts,
-      })
+      const draftRes = await draftsApi.postDraft(draftPayload)
 
       const draftId = draftRes.data.draft.id
       const postIds = draftRes.data.draft.posts.map(post => post.id)

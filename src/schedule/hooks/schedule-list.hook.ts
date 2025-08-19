@@ -7,9 +7,12 @@ import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { toStartOfDayIso } from '@/core/config/utils/common.util'
 import { type ApiResponse } from '@/core/models/api.model'
+import { IPost } from '@/core/models/post.model'
 import { type IScheduledPostResponse } from '@/core/models/schedule.model'
 
 const useScheduleList = () => {
+  const [selectedPost, setSelectedPost] = useState<IPost | null>(null)
+
   // ----- Filters -----
   const today = new Date()
   const defaultTo = new Date(today)
@@ -60,6 +63,7 @@ const useScheduleList = () => {
     if (offset > 0 && totalCount > 0 && list.length === 0) {
       setOffset(Math.max(0, offset - limit))
     }
+    setSelectedPost(null)
   }, [query.data, offset, limit])
 
   // ----- Derived: Time buckets and formatting -----
@@ -136,6 +140,9 @@ const useScheduleList = () => {
     orderedHours,
     formatHour,
     formatSelectedRange,
+    // Selected post
+    selectedPost,
+    setSelectedPost,
   }
 }
 

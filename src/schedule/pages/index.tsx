@@ -1,18 +1,15 @@
 import { createLazyRoute } from '@tanstack/react-router'
 import { MonitorSmartphone } from 'lucide-react'
-import { useState } from 'react'
 
 import ListControls from '@/core/components/ListControls'
 import Post, { PostSkeleton } from '@/core/components/Post'
 import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
 import TwitterPost from '@/core/components/post-preview/TwitterPost'
-import { IPost } from '@/core/models/post.model'
 import PaginationList from '@/shared/components/pagination-list'
 
 import useScheduleList from '../hooks/schedule-list.hook'
 
 const Schedule = () => {
-  const [selectedPost, setSelectedPost] = useState<IPost | null>(null)
   const {
     isPending,
     selectedRange,
@@ -27,6 +24,8 @@ const Schedule = () => {
     setSort,
     total,
     setOffset,
+    selectedPost,
+    setSelectedPost,
   } = useScheduleList()
 
   return (
@@ -68,7 +67,7 @@ const Schedule = () => {
                       <div
                         key={post.id}
                         role="button"
-                        className={`cursor-pointer rounded-lg border-2 ${
+                        className={`flex cursor-pointer flex-col gap-2 rounded-lg border-2 ${
                           selectedPost?.id === post.id
                             ? 'border-black'
                             : 'border-transparent'
@@ -90,6 +89,12 @@ const Schedule = () => {
                     total={total}
                     onOffsetChange={setOffset}
                   />
+                </div>
+              )}
+
+              {orderedHours.length === 0 && (
+                <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-gray-500">
+                  No scheduled posts found
                 </div>
               )}
             </>
