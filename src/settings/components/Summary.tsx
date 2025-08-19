@@ -31,12 +31,12 @@ const Summary = ({ data, isLoading }: ISummaryProps) => {
   const status = data.style_gen_state
 
   if (
-    (sources === 0 && characters === 0 && styles.length === 0) ||
-    status === UserStyleStatus.INITIAL
+    status === UserStyleStatus.INITIAL ||
+    status === UserStyleStatus.IN_PROGRESS
   )
     return (
-      <div className="flex min-h-16 items-center justify-center rounded-lg border-1 border-dashed p-4">
-        <p className="flex items-center gap-1 text-center text-base font-medium">
+      <div className="bg-sidebar mt-2 flex min-h-24 items-center justify-center rounded-lg border-1 border-dashed p-4">
+        <p className="flex items-center gap-1 text-center text-sm font-medium">
           {status === UserStyleStatus.IN_PROGRESS ? (
             <>
               <Clock className="size-4" />

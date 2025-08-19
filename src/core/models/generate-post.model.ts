@@ -6,12 +6,14 @@ export interface IGeneratePostRequest {
   user_prompt: string
   input_text?: string
   channel?: channelType
+  is_search_enabled: boolean
+  session_id?: string
 }
 
 // Zod schema for extracted links
 export const ExtractedLinksSchema = z.object({
   url: z.url('Must be a valid URL'),
-  title: z.string(),
+  content: z.string(),
 })
 
 export type extractedLinksType = z.infer<typeof ExtractedLinksSchema>
@@ -19,14 +21,14 @@ export type extractedLinksType = z.infer<typeof ExtractedLinksSchema>
 // Zod schema for generate post response
 export const GeneratePostResponseSchema = z.object({
   original_prompt: z.string(),
-  base_text: z.string(),
-  extracted_links: z.array(ExtractedLinksSchema),
+  external_sources: z.array(ExtractedLinksSchema),
   generated_twitter_post: z.object({
     content: z.string(),
   }),
   generated_linkedin_post: z.object({
     content: z.string(),
   }),
+  session_id: z.string(),
 })
 
 export type generatePostResponseType = z.infer<

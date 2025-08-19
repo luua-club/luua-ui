@@ -1,3 +1,4 @@
+import { channelType } from '../models/social.model'
 import {
   IUser,
   IUserStyleRequest,
@@ -36,6 +37,16 @@ class UserApi extends BaseApiService {
    */
   async setUserStyle(data: IUserStyleRequest) {
     return this.post<userStyleResponseType>(data, '/user_style_prefs')
+  }
+
+  /**
+   * Disconnect the user from a social platform
+   *
+   * @param platform - The social platform to disconnect from
+   * @returns Promise<ApiResponse<void>> The response from the server
+   */
+  async disconnectSocial(platform: channelType) {
+    return this.patch({ channel: platform }, '/disconnect-social')
   }
 }
 

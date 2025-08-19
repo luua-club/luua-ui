@@ -1,16 +1,25 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { CloudAlert } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
-import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
+import {
+  IUserAdvancedStyleRequest,
+  userStyleResponseType,
+  UserStyleStatus,
+} from '@/core/models/user.model'
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
-import StyleFileCapture from '../components/StyleFileCapture'
+import StyleFileCapture from '../../core/components/StyleFileCapture'
 import StyleTextCapture from '../components/StyleTextCapture'
 import { queryKeys } from '../utils'
 
-const Advanced = () => {
+interface IAdvancedProps {
+  data?: userStyleResponseType
+}
+
+const Advanced = ({ data }: IAdvancedProps) => {
   const queryClient = useQueryClient()
 
   const setAdvancedUserStyleMutation = useMutation({
@@ -42,6 +51,13 @@ const Advanced = () => {
         <p className="text-base font-medium">
           Please provide your writing samples.
         </p>
+        {data?.style_gen_state === UserStyleStatus.FAILED && (
+          <p className="mt-1 flex items-center text-sm text-red-400">
+            <CloudAlert className="mr-1 size-4" />
+            Luua was not able to process your last uploaded style. Please try
+            again.
+          </p>
+        )}
         <div className="lg:w-2/3">
           <Tabs className="mt-4 w-full flex-1" defaultValue="textSample">
             <TabsList className="w-full lg:w-fit">

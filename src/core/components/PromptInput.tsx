@@ -1,4 +1,7 @@
+import React from 'react'
+
 import { InputPrompt } from '@/shared/components/input-prompt'
+import { SOCIAL_STATUS } from '@/shared/constant'
 
 import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
 
@@ -7,7 +10,9 @@ interface PromptInputProps {
   btnIcon?: React.ReactNode
   backdrop?: boolean
   loading?: boolean
+  socialStatus?: SOCIAL_STATUS
   onChange: (value: string) => void
+  expandable?: boolean
 }
 
 export const PromptInput = ({
@@ -15,15 +20,15 @@ export const PromptInput = ({
   btnIcon,
   backdrop,
   loading,
+  socialStatus,
   onChange,
 }: PromptInputProps) => {
   const connectedSocials = SOCIAL_PLATFORM
-
   return (
     <InputPrompt
       onChange={onChange}
       placeholder={[...SUGGESTED_PROMPT_TEXT]}
-      socialStatus={'OK'}
+      socialStatus={socialStatus || SOCIAL_STATUS.OK}
       socials={[
         ...connectedSocials.map(social => ({
           icon: social.logo,
@@ -46,12 +51,32 @@ export const FloatingPromptInput = ({
   children,
   ...props
 }: FloatingPromptInputProps) => {
+  const connectedSocials = SOCIAL_PLATFORM
+
   return (
-    <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center bg-white/60 px-5 backdrop-blur-md lg:px-0">
-      <div className="w-full max-w-2xl pt-4 pb-8">
-        {children}
-        <PromptInput {...props} backdrop />
+    <>
+      <div className="h-56 w-full bg-transparent md:h-44" />
+      <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center bg-white/60 px-5 backdrop-blur-md lg:px-0">
+        <div className="flex w-full max-w-2xl flex-col gap-2 pb-8">
+          {children}
+          <InputPrompt
+            onChange={props.onChange}
+            placeholder={[...SUGGESTED_PROMPT_TEXT]}
+            socialStatus={props.socialStatus || SOCIAL_STATUS.OK}
+            socials={[
+              ...connectedSocials.map(social => ({
+                icon: social.logo,
+                tooltip: social.tooltip,
+              })),
+            ]}
+            btnText={props.btnText}
+            btnIcon={props.btnIcon}
+            backdrop
+            loading={props.loading}
+            expandable={props.expandable}
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }

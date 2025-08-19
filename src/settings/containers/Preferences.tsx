@@ -20,6 +20,7 @@ import {
 import {
   IUserStyleRequest,
   UserStyleResponseSchema,
+  UserStyleStatus,
 } from '@/core/models/user.model'
 import SelectionChip from '@/shared/components/selection-chip'
 import { Separator } from '@/shared/ui/separator'
@@ -95,9 +96,11 @@ const Preferences = () => {
   return (
     <>
       <Summary data={data?.data} isLoading={isLoading} />
-      <div className="mt-4">
-        <Advanced />
-      </div>
+      {data?.data.style_gen_state !== UserStyleStatus.IN_PROGRESS && (
+        <div className="mt-4">
+          <Advanced data={data?.data} />
+        </div>
+      )}
       <div className="mt-4 py-4">
         <h1 className="text-lg font-medium">User Styles</h1>
       </div>

@@ -1,29 +1,62 @@
-import { Paperclip } from 'lucide-react'
+import { Paperclip, TriangleAlert } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
+import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
+import { IUserConnectedChannel } from '../models/social.model'
 
-type PostProps = IPost & { isLoading?: boolean; fullView?: boolean }
+type PostProps = IPost & {
+  isLoading?: boolean
+  fullView?: boolean
+  tileView?: boolean
+}
 
 function Post({
   channel,
   content,
-  attachedMedia,
+  attached_media,
   isLoading = false,
   fullView = false,
+  tileView = false,
 }: PostProps) {
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
+  const userState = useUserState()
 
-  //TODO: get user from context
-  const user = {
-    name: 'shadcn',
-    username: '@shadcn',
-    image: 'https://github.com/shadcn.png',
+  if (!userState) {
+    return null
+  }
+
+  const channelUser: IUserConnectedChannel | undefined =
+    platform?.name === 'LinkedIn'
+      ? userState?.connected_channels?.linkedin
+      : userState?.connected_channels?.twitter
+
+  let user: {
+    name: string
+    username: string
+    image: string
+  } = {
+    name: userState.name,
+    username: userState.email,
+    image: userState.profile_image,
+  }
+
+  if (channelUser) {
+    user = {
+      name: channelUser.user_name || userState.name,
+      username: channelUser.user_id
+        ? platform?.name === 'Twitter'
+          ? `@${channelUser.user_id}`
+          : channelUser.user_email
+        : userState.email,
+      image: channelUser.user_profile_picture || userState.profile_image,
+    }
   }
 
   if (isLoading) {
@@ -34,43 +67,59 @@ function Post({
     <Card
       className={cn(
         'relative flex flex-col rounded-md p-0 shadow-none',
-        fullView ? 'h-fit' : 'min-h-52 overflow-hidden'
+        fullView ? 'h-fit' : 'min-h-52 overflow-hidden',
+        tileView ? 'min-h-30' : 'h-fit'
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center">
-            <Avatar className="bg-accent h-12 w-12 rounded-full">
-              <AvatarImage src={user.image} alt={user.name} />
-              <AvatarFallback>{'DL'}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col pl-2">
-              <h6 className="text-base font-medium">{user.name}</h6>
-              {user.username && (
-                <p className="text-xs font-medium text-gray-400">
-                  {user.username}
-                </p>
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3">
+          <Avatar
+            className={cn(
+              'shrink-0 rounded-full',
+              tileView ? 'h-10 w-10' : 'h-12 w-12'
+            )}
+          >
+            <AvatarImage src={user.image} alt={user.name} />
+            <AvatarFallback>{'DL'}</AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-col">
+            <div className="flex min-w-0 items-center gap-2 text-sm font-medium sm:text-base">
+              <h6 className="truncate">{user.name}</h6>
+              {!channelUser.connected && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <span>{platform?.name} account not connected</span>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
+            <p className="truncate text-xs font-medium text-gray-400">
+              {user.username}
+            </p>
           </div>
+
           {platform && platform.logo && (
-            <platform.logo className="size-10 rounded-full border-1 border-dashed p-2" />
+            <platform.logo className="size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
           )}
         </div>
-        <hr />
+        {!tileView && <hr />}
         <p
           className={cn(
-            'mt-3 px-4 text-sm text-gray-600',
-            fullView ? 'pb-4' : 'line-clamp-5'
+            'mt-3 line-clamp-5 px-4 text-sm text-gray-600',
+            fullView ? 'line-clamp-none pb-4' : undefined,
+            tileView ? 'mt-0 line-clamp-2' : undefined
           )}
         >
           {content}
         </p>
 
-        {attachedMedia && attachedMedia.length !== 0 && (
+        {attached_media && attached_media.length !== 0 && !tileView && (
           <>
             <span className="absolute right-1 bottom-0 flex items-center justify-center p-2 text-[10px] text-gray-400">
-              <Paperclip className="size-3" />+{attachedMedia.length}
+              <Paperclip className="size-3" />+{attached_media.length}
             </span>
           </>
         )}

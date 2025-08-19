@@ -1,21 +1,50 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
+import { RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
-import Post, { PostSkeleton } from '@/core/components/Post'
+import { draftsApi } from '@/core/api/drafts.api'
+import { PostSkeleton } from '@/core/components/Post'
+import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
+import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
+import { SharePostModal } from '@/core/components/SharePostModal'
+import { QUERY_KEYS } from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
+import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
+import { useUserState } from '@/core/hooks/user-state.hook'
+import { IDraftRequest } from '@/core/models/draft.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
+import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import GeneratedPostControls from '../components/GeneratedPostControls'
 
 const QuickShare = () => {
   const [activeTab, setActiveTab] = useState<string>('created-post')
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { mutation: publishDraft } = usePublishDraft()
+  const user = useUserState()
+
+  const saveDraftMutation = useMutation({
+    mutationFn: (payload: IDraftRequest) => draftsApi.postDraft(payload),
+    onSuccess: response => {
+      toast.success('Draft saved successfully')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+      navigate({
+        to: '/creation/create',
+        search: { draftId: response.data.draft.id },
+      })
+    },
+    onError: () => {
+      toast.error('Failed to save draft')
+    },
+  })
 
   const preUserPrompt = useAppSelector(state => state.promptState.prompt)
   const {
@@ -23,12 +52,14 @@ const QuickShare = () => {
     extractedLinks,
     isLoading,
     isFetching,
+    error,
     setUserPrompt,
     key,
     refetch,
   } = useGeneratePosts(preUserPrompt || '')
 
   const isDataFetching = isLoading || isFetching
+  const isLoadingPublish = publishDraft.isPending
 
   useEffect(() => {
     // Redirect to dashboard if no prompt is available
@@ -43,6 +74,69 @@ const QuickShare = () => {
       queryClient.cancelQueries({ queryKey: [key] })
     }
   }, [queryClient, key])
+
+  /**
+   * Ran when genAI API error
+   */
+  useEffect(() => {
+    if (error) {
+      toast.error('Something went wrong while generating posts')
+    }
+  }, [error])
+
+  const onSubmit = (postIds: string[]) => {
+    const selectedPosts = posts.filter(post => postIds.includes(post.id))
+    if (selectedPosts.length === 0) {
+      setIsShareModalOpen(false)
+      return
+    }
+
+    publishDraft.mutate(
+      {
+        posts: selectedPosts.map(p => ({
+          content: p.content,
+          channel: p.channel,
+          attached_media: [],
+        })),
+      },
+      {
+        onSuccess: () => {
+          setIsShareModalOpen(false)
+          toast.success('Draft published successfully')
+          navigate({ to: '/dashboard' })
+        },
+        onError: () => {
+          toast.error('Failed to publish draft')
+        },
+      }
+    )
+  }
+
+  const handleEdit = () => {
+    if (!user) {
+      return
+    }
+
+    const payload = posts
+      .filter(
+        p =>
+          user.connected_channels[
+            p.channel.toLowerCase() as keyof typeof user.connected_channels
+          ].connected
+      )
+      .map(p => ({
+        content: p.content,
+        channel: p.channel,
+        attached_media: [],
+      }))
+
+    saveDraftMutation.mutate({
+      posts: payload,
+    })
+  }
+
+  const loading =
+    isDataFetching || saveDraftMutation.isPending || publishDraft.isPending
 
   return (
     <>
@@ -63,26 +157,32 @@ const QuickShare = () => {
             <TabsTrigger
               value="sources"
               className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-              disabled={isDataFetching}
+              disabled={loading}
             >
               Sources
             </TabsTrigger>
           </TabsList>
           <TabsContent value="created-post" className="flex flex-col">
             {/** Generated Post Controls */}
-            <GeneratedPostControls
-              isLoading={isDataFetching}
-              onRetry={refetch}
-            />
+            {(!error || posts.length > 0) && (
+              <div className="hidden lg:block">
+                <GeneratedPostControls
+                  isLoading={loading}
+                  onRetry={refetch}
+                  onEdit={handleEdit}
+                  onPublish={() => setIsShareModalOpen(true)}
+                />
+              </div>
+            )}
 
             {/** External Resources */}
-            {extractedLinks.length > 0 && !isDataFetching && (
+            {extractedLinks.length > 0 && !loading && (
               <div className="mt-4 hidden w-full gap-2 lg:flex">
                 {extractedLinks.slice(0, 5).map(link_data => (
                   <div key={link_data.url} className="flex-1">
                     <ExternalResourceChip
                       url={link_data.url}
-                      title={link_data.title}
+                      title={link_data.content}
                     />
                   </div>
                 ))}
@@ -90,34 +190,63 @@ const QuickShare = () => {
             )}
 
             {/** Generated Posts */}
-            <div className="mt-4 grid grid-cols-1 gap-6 pb-48 lg:grid-cols-2">
+            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
               {isDataFetching ? (
                 <>
                   <PostSkeleton />
                   <PostSkeleton />
                 </>
               ) : (
-                //TODO: Replace with post preview
-                posts.map(post => (
-                  <Post
-                    id={post.id}
-                    key={post.id}
-                    channel={post.channel}
-                    content={post.content}
-                  />
-                ))
+                posts.map(post => {
+                  if (post.channel === 'LinkedIn') {
+                    return (
+                      <LinkedInPost
+                        key={post.id}
+                        initialContent={post.content}
+                        loading={isDataFetching}
+                        notEditable
+                      />
+                    )
+                  }
+                  return (
+                    <TwitterPost
+                      key={post.id}
+                      initialContent={post.content}
+                      loading={isDataFetching}
+                      notEditable
+                    />
+                  )
+                })
               )}
             </div>
+
+            {error && posts.length === 0 && (
+              <div className="flex w-full items-center justify-center rounded-lg border border-dashed p-5">
+                <p className="pr-2 text-center text-sm text-gray-500">
+                  Something went wrong please
+                  <span>
+                    <Button
+                      variant="outline"
+                      onClick={() => refetch()}
+                      className="mt-2 ml-2 px-2 py-1 text-sm sm:mt-0"
+                    >
+                      <RotateCcw className="size-3" />
+                      Retry
+                    </Button>
+                  </span>
+                </p>
+              </div>
+            )}
           </TabsContent>
           <TabsContent value="sources">
             <h2 className="mt-2 text-2xl font-semibold">All sources used</h2>
             {extractedLinks.length > 0 && !isDataFetching ? (
-              <div className="mt-4 grid grid-cols-1 gap-4 pb-48 lg:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
                 {extractedLinks.map(link_data => (
                   <div key={link_data.url}>
                     <ExternalResourceChip
                       url={link_data.url}
-                      title={link_data.title}
+                      title={link_data.content}
                       showIcon
                     />
                   </div>
@@ -138,8 +267,32 @@ const QuickShare = () => {
           setUserPrompt(prompt)
           setActiveTab('created-post')
         }}
-        loading={isDataFetching}
-      ></FloatingPromptInput>
+        loading={loading}
+        expandable
+      >
+        {(!error || posts.length > 0) && (
+          <div className="block lg:hidden">
+            <GeneratedPostControls
+              isLoading={loading}
+              onlyControls
+              onEdit={handleEdit}
+              onRetry={() => {
+                refetch()
+              }}
+              onPublish={() => setIsShareModalOpen(true)}
+            />
+          </div>
+        )}
+      </FloatingPromptInput>
+
+      {/* Share Post Modal */}
+      <SharePostModal
+        isOpen={isShareModalOpen}
+        posts={posts}
+        isLoading={isLoadingPublish}
+        onOpenChange={setIsShareModalOpen}
+        onSubmit={onSubmit}
+      />
     </>
   )
 }

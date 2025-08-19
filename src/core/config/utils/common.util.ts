@@ -10,4 +10,17 @@ const logout = () => {
   window.location.href = '/login'
 }
 
-export { logout }
+/**
+ * Normalize a calendar day to 00:00:00.000Z (UTC) and return ISO string
+ */
+const toStartOfDayIso = (d?: Date): string | undefined => {
+  if (!d) return undefined
+  const year = d.getFullYear()
+  const month = d.getMonth()
+  const date = d.getDate()
+  // Construct a Date at UTC midnight for the same calendar day
+  const utcMidnight = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
+  return utcMidnight.toISOString()
+}
+
+export { logout, toStartOfDayIso }

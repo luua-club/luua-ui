@@ -8,12 +8,12 @@ import {
 } from '@tanstack/react-query'
 import { Outlet, RouterProvider } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { AxiosError } from 'axios'
+import { AxiosError, CanceledError } from 'axios'
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 
 import { userApi } from './core/api/user.api'
-import { LUUA_USER_KEY } from './core/config/constant'
+import { LUUA_USER_KEY, QUERY_KEYS } from './core/config/constant'
 import { useAppDispatch } from './core/hooks/global-state.hook'
 import { ILoginResponse } from './core/models/auth.model'
 import { store } from './core/store'
@@ -40,13 +40,21 @@ export function AppContent() {
   const isLoggedIn = loginResponse && loginResponse?.access_token
 
   const { data: userData } = useQuery({
-    queryKey: ['user'],
+    queryKey: [QUERY_KEYS.user],
     queryFn: () => userApi.getUser(),
     enabled: !!isLoggedIn, // Only run query if user is logged in
     retry: (failureCount, error: AxiosError) => {
       // Don't retry on authentication errors at all
       if (error.response?.status === 401 || error.response?.status === 403) {
         return false
+      }
+      // Retry canceled requests (e.g., navigation/abort) up to 3 times
+      if (
+        (error.code === AxiosError.ERR_CANCELED ||
+          error instanceof CanceledError) &&
+        failureCount < 3
+      ) {
+        return true
       }
       // Only retry on server errors (5xx) up to 3 times
       if (
