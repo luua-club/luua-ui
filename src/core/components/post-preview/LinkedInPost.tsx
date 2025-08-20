@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { extractUserInitial } from '@/core/config/utils/common.util'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { IUserConnectedChannel } from '@/core/models/social.model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
@@ -199,7 +200,7 @@ const LinkedInPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <Avatar className={cn('shrink-0 rounded-full', 'h-12 w-12')}>
           <AvatarImage src={user.user_profile_picture} alt={user.user_name} />
-          <AvatarFallback>{'DL'}</AvatarFallback>
+          <AvatarFallback>{extractUserInitial(user.user_name)}</AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-col">
           <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">

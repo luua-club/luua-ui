@@ -1,73 +1,72 @@
 import { createLazyRoute } from '@tanstack/react-router'
-import { MonitorSmartphone } from 'lucide-react'
+import { format } from 'date-fns'
+import { RotateCcw, SearchSlash, Trash2, TriangleAlert } from 'lucide-react'
 
-import ListControls from '@/core/components/ListControls'
 import Post, { PostSkeleton } from '@/core/components/Post'
-import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
-import TwitterPost from '@/core/components/post-preview/TwitterPost'
+import PostListViewLayout from '@/core/layouts/PostListViewLayout'
+import ConfirmDialog from '@/shared/components/confirm-dialog'
 import PaginationList from '@/shared/components/pagination-list'
+import { Button } from '@/shared/ui/button'
+import { cn } from '@/shared/utils'
 
 import useScheduleList from '../hooks/schedule-list.hook'
 
 const Schedule = () => {
   const {
+    posts,
     isPending,
     selectedRange,
     setSelectedRange,
-    groupedByHour,
-    orderedHours,
-    formatHour,
+    groupedBySlot,
+    orderedSlots,
+    formatSlotRange,
     formatSelectedRange,
     limit,
     offset,
-    sort,
-    setSort,
     total,
     setOffset,
     selectedPost,
     setSelectedPost,
+    // delete controls
+    confirmOpen,
+    openDelete,
+    closeDelete,
+    confirmDelete,
+    deletingIds,
+    isDeleting,
   } = useScheduleList()
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-5">
-      {/** Controls */}
-      <ListControls
-        dateRange={selectedRange}
-        onDateRangeChange={setSelectedRange}
-        sort={sort}
-        onSortChange={setSort}
-        hideSort
-      />
-
-      {/** Header */}
-      <div className="flex flex-col items-end justify-between sm:flex-row">
-        <h1 className="text-xl font-medium">Scheduled Posts</h1>
-        <p className="text-base font-semibold text-gray-500">
-          {formatSelectedRange()}
-        </p>
-      </div>
-
-      <div className="flex gap-4">
-        {/** Post List */}
-        <div className="w-full space-y-6 lg:basis-3/4">
-          {isPending ? (
-            <PostSkeleton tileView />
-          ) : (
-            <>
-              {orderedHours.map(h => (
-                <div
-                  key={h}
-                  className="space-y-3 rounded-lg border-2 border-dashed p-2"
-                >
-                  <h3 className="text-base font-semibold text-gray-500">
-                    {formatHour(h)}
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {groupedByHour[h].map(post => (
+    <PostListViewLayout
+      title="Scheduled Posts"
+      dateRange={selectedRange}
+      onDateRangeChange={setSelectedRange}
+      hideSort
+      dateRangeLabel={formatSelectedRange()}
+      selectedPost={selectedPost}
+      isPending={isPending}
+    >
+      {isPending ? (
+        <PostSkeleton tileView />
+      ) : (
+        <>
+          {orderedSlots.map(slot =>
+            groupedBySlot[slot].length > 0 ? (
+              <div
+                key={slot}
+                className="space-y-3 rounded-lg border-2 border-dashed p-2"
+              >
+                <h3 className="text-base font-semibold text-gray-500">
+                  {formatSlotRange(slot)}
+                </h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {groupedBySlot[slot].map(post => (
+                    <div
+                      key={post.id}
+                      className={`flex flex-col gap-2 ${deletingIds.has(post.id) ? 'pointer-events-none opacity-50' : ''}`}
+                    >
                       <div
-                        key={post.id}
-                        role="button"
-                        className={`flex cursor-pointer flex-col gap-2 rounded-lg border-2 ${
+                        className={`relative cursor-pointer rounded-lg border-2 ${
                           selectedPost?.id === post.id
                             ? 'border-black'
                             : 'border-transparent'
@@ -75,48 +74,88 @@ const Schedule = () => {
                         onClick={() => setSelectedPost(post)}
                       >
                         <Post tileView {...post} />
+                        {post.status === 'Failed' && (
+                          <div
+                            className={cn(
+                              'absolute -top-2 -right-2 rounded-full border-1 border-dashed bg-white p-1 text-yellow-600',
+                              selectedPost?.id === post.id && 'border-black'
+                            )}
+                          >
+                            <TriangleAlert className="size-4" />
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                      <div className="flex items-center justify-between gap-2 px-2 pb-2 text-sm text-gray-500">
+                        {format(
+                          new Date(post.scheduled_at as string),
+                          'MMM d, h:mm a'
+                        )}
+                        <div className="flex items-center gap-2">
+                          {post.status === 'Failed' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-6 text-xs"
+                              onClick={e => {
+                                e.stopPropagation()
+                              }}
+                            >
+                              Failed please retry
+                              <RotateCcw className="size-3" />
+                            </Button>
+                          )}
 
-              {orderedHours.length > 0 && total > limit && (
-                <div className="mt-8 mb-8">
-                  <PaginationList
-                    limit={limit}
-                    offset={offset}
-                    total={total}
-                    onOffsetChange={setOffset}
-                  />
+                          <Button
+                            variant="destructive"
+                            className="size-6"
+                            onClick={e => {
+                              e.stopPropagation()
+                              openDelete(post.id)
+                            }}
+                          >
+                            <Trash2 className="size-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              {orderedHours.length === 0 && (
-                <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-gray-500">
-                  No scheduled posts found
-                </div>
-              )}
-            </>
+              </div>
+            ) : null
           )}
-        </div>
 
-        <div className="hidden lg:block lg:min-w-96 lg:basis-1/2">
-          {selectedPost ? (
-            selectedPost.channel === 'Twitter' ? (
-              <TwitterPost notEditable initialContent={selectedPost.content} />
-            ) : (
-              <LinkedInPost notEditable initialContent={selectedPost.content} />
-            )
-          ) : (
-            <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-gray-500">
-              <MonitorSmartphone size={48} />
-              <p className="font-semibold">Click a post to preview</p>
+          {total > limit && (
+            <div className="mt-8 mb-8">
+              <PaginationList
+                limit={limit}
+                offset={offset}
+                total={total}
+                onOffsetChange={setOffset}
+              />
             </div>
           )}
-        </div>
-      </div>
-    </div>
+
+          {posts.length === 0 && (
+            <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-gray-500">
+              <SearchSlash className="size-12" />
+              <p className="font-semibold">No scheduled posts found</p>
+            </div>
+          )}
+        </>
+      )}
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={open => (open ? undefined : closeDelete())}
+        title="Delete scheduled post?"
+        description="This action cannot be undone. This will permanently delete the selected scheduled post."
+        confirmLabel="Delete"
+        confirmDisabled={isDeleting}
+        onConfirm={() => {
+          confirmDelete()
+          closeDelete()
+        }}
+      />
+    </PostListViewLayout>
   )
 }
 

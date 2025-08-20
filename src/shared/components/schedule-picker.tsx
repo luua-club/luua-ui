@@ -12,6 +12,7 @@ import * as React from 'react'
 import { Button } from '../ui/button'
 import { Calendar } from '../ui/calendar'
 import { Card, CardContent, CardFooter } from '../ui/card'
+import { getTimeSlots } from '../utils/time'
 
 export function SchedulePicker({
   onChange,
@@ -25,19 +26,8 @@ export function SchedulePicker({
   const [date, setDate] = React.useState<Date | undefined>(new Date())
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null)
 
-  // 00:00 -> 23:00 in 1-hour increments
-  const timeSlots = React.useMemo(() => {
-    const slots: string[] = []
-    for (let hour = 0; hour <= 23; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`)
-    }
-    return slots
-  }, [])
-
-  const bookedDates = Array.from(
-    { length: 3 },
-    (_, i) => new Date(2025, 5, 17 + i)
-  )
+  // Use shared utility to generate time slots (interval configurable via DEFAULT_TIME_SLOT_INTERVAL)
+  const timeSlots = React.useMemo(() => getTimeSlots(), [])
 
   const today = startOfToday()
   const fromMonth = today
@@ -94,14 +84,8 @@ export function SchedulePicker({
             captionLayout="dropdown"
             startMonth={fromMonth}
             endMonth={toMonth}
-            disabled={[...bookedDates, { before: startOfToday() }]}
+            disabled={[{ before: startOfToday() }]}
             showOutsideDays={false}
-            modifiers={{
-              booked: bookedDates,
-            }}
-            modifiersClassNames={{
-              booked: '[&>button]:line-through opacity-100',
-            }}
             className="bg-transparent p-0 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(12)]"
             formatters={{
               formatWeekdayName: date => {
@@ -130,8 +114,8 @@ export function SchedulePicker({
         <div className="text-sm">
           {date && selectedTime ? (
             <>
-              Your meeting is booked for{' '}
-              <span className="font-medium">
+              Post will be scheduled on
+              <span className="font-semibold">
                 {' '}
                 {date?.toLocaleDateString('en-US', {
                   weekday: 'long',
@@ -140,7 +124,7 @@ export function SchedulePicker({
                 })}{' '}
               </span>
               at{' '}
-              <span className="font-medium">
+              <span className="font-semibold">
                 {selectedTime
                   ? selectedTime
                   : date

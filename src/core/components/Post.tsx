@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
+import { extractUserInitial } from '../config/utils/common.util'
 import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
 import { IUserConnectedChannel } from '../models/social.model'
@@ -76,7 +77,7 @@ function Post({
             )}
           >
             <AvatarImage src={user.image} alt={user.name} />
-            <AvatarFallback>{'DL'}</AvatarFallback>
+            <AvatarFallback>{extractUserInitial(user.name)}</AvatarFallback>
           </Avatar>
           <div className="flex min-w-0 flex-col">
             <div className="flex min-w-0 items-center gap-2 text-sm font-medium sm:text-base">

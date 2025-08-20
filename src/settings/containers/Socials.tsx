@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import { extractUserInitial } from '@/core/config/utils/common.util'
 import {
   channelType,
   ISocialChannel,
@@ -151,7 +152,9 @@ const SocialCard = ({
                   src={userChannel.user_profile_picture}
                   alt={userChannel.user_name}
                 />
-                <AvatarFallback>{'DL'}</AvatarFallback>
+                <AvatarFallback>
+                  {extractUserInitial(userChannel.user_name)}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col pl-2">
                 <h6 className="text-base font-medium">

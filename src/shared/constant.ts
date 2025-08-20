@@ -1,3 +1,5 @@
+import { TimeSlotInterval } from './utils/time'
+
 /**
  * Sidebar constants
  */
@@ -21,3 +23,5 @@ export enum SOCIAL_STATUS {
   OK,
   WARNING,
 }
+
+export const DEFAULT_TIME_SLOT_INTERVAL = TimeSlotInterval.Sixty

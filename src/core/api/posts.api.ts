@@ -26,6 +26,10 @@ class PostsApi extends BaseApiService {
       params: { from, to, sort, limit, offset },
     })
   }
+
+  async deleteScheduledPost(id: string) {
+    return this.delete(`/scheduled/${id}`)
+  }
 }
 
 export const postsApi = new PostsApi()
