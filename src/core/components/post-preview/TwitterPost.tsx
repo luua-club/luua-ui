@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 
+import { extractUserInitial } from '@/core/config/utils/common.util'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { IUserConnectedChannel } from '@/core/models/social.model'
@@ -103,7 +104,9 @@ const TwitterPost = ({
             src={user_social.user_profile_picture}
             alt={user_social.user_name}
           />
-          <AvatarFallback>{'DL'}</AvatarFallback>
+          <AvatarFallback>
+            {extractUserInitial(user_social.user_name)}
+          </AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
@@ -186,22 +189,20 @@ const TwitterPost = ({
 
 const TwitterPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
   return (
-    <div className="grid w-full grid-cols-[1fr_auto] items-center gap-2">
-      <div className="min-w-0">
-        <div className="flex min-w-0 items-center gap-2 text-sm sm:text-base">
-          <span className="w-0 min-w-0 flex-1 truncate font-semibold whitespace-nowrap">
-            {user.user_name}
-          </span>
-          <span className="w-0 min-w-0 flex-1 truncate whitespace-nowrap text-gray-500">
-            @{user.user_id}
-          </span>
-          <Dot className="size-3 shrink-0" />
-          <span className="shrink-0 whitespace-nowrap text-gray-500">
-            {format(new Date(), 'MMM d')}
-          </span>
-        </div>
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex w-fit min-w-0 items-center text-sm sm:text-base">
+        <span className="max-w-[120px] truncate font-semibold sm:max-w-[160px]">
+          {user.user_name}
+        </span>
+        <span className="max-w-[140px] truncate pl-2 text-gray-500 sm:max-w-[200px]">
+          @{user.user_id}
+        </span>
+        <Dot className="size-5 flex-shrink-0" />
+        <span className="flex-shrink-0 text-gray-500">
+          {format(new Date(), 'MMM d')}
+        </span>
       </div>
-      <div className="flex shrink-0 items-center gap-2 text-gray-500">
+      <div className="flex items-center gap-2 text-gray-500">
         <CircleOff className="hidden size-4 sm:block" />
         <Ellipsis className="size-4" />
       </div>

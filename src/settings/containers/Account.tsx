@@ -1,5 +1,6 @@
 import { LogOut, Trash2 } from 'lucide-react'
 
+import { extractUserInitial } from '@/core/config/utils/common.util'
 import { IUserState } from '@/core/models/user.model'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
@@ -25,7 +26,7 @@ const Account = ({ user }: { user: IUserState }) => {
           <Avatar className="size-12">
             <AvatarImage src={user.profile_image} alt={user.name} />
             <AvatarFallback className="bg-muted text-base font-medium">
-              {user.name.charAt(0)}
+              {extractUserInitial(user.name)}
             </AvatarFallback>
           </Avatar>
           <div className="space-y-1">

@@ -75,6 +75,11 @@ export function useDraftList() {
     if (offset > 0 && totalCount > 0 && list.length === 0) {
       setOffset(Math.max(0, offset - limit))
     }
+
+    // If there is no data at all, ensure we are on the first page
+    if (totalCount === 0 && offset !== 0) {
+      setOffset(0)
+    }
   }, [query.data, offset, limit])
 
   // ----- Mutation: delete a draft -----

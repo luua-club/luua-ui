@@ -13,7 +13,7 @@ type ListControlsProps = {
   dateRange: DateRange | undefined
   onDateRangeChange: (range: DateRange | undefined) => void
   sort?: 'created_at' | 'updated_at'
-  onSortChange: (value: 'created_at' | 'updated_at') => void
+  onSortChange?: (value: 'created_at' | 'updated_at') => void
   hideSort?: boolean
 }
 
@@ -32,7 +32,7 @@ const ListControls = ({
         className="w-full md:w-auto"
       />
 
-      {!hideSort && (
+      {!hideSort && onSortChange && (
         <Select
           value={sort}
           onValueChange={(v: 'created_at' | 'updated_at') => onSortChange(v)}

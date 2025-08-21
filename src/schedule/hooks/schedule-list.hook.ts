@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useEffect, useMemo, useState } from 'react'
 import { type DateRange } from 'react-day-picker'
@@ -9,8 +9,11 @@ import { toStartOfDayIso } from '@/core/config/utils/common.util'
 import { type ApiResponse } from '@/core/models/api.model'
 import { IPost } from '@/core/models/post.model'
 import { type IScheduledPostResponse } from '@/core/models/schedule.model'
+import { DEFAULT_TIME_SLOT_INTERVAL } from '@/shared/constant'
+import { getTimeSlots } from '@/shared/utils/time'
 
 const useScheduleList = () => {
+  const queryClient = useQueryClient()
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null)
 
   // ----- Filters -----
@@ -21,26 +24,29 @@ const useScheduleList = () => {
     from: today,
     to: defaultTo,
   })
-  const [sort, setSort] = useState<'created_at' | 'updated_at'>('updated_at')
 
   // ----- Pagination -----
   const [limit, setLimit] = useState<number>(4)
   const [offset, setOffset] = useState<number>(0)
 
+  // ----- Deletion flow state -----
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
+
   // ----- Derived date filters -----
   // For schedule list, compute from/to based on selected date range
   const from = toStartOfDayIso(selectedRange?.from)
   const to = toStartOfDayIso(selectedRange?.to ?? selectedRange?.from)
-  const sortDir = sort === 'created_at' ? 'asc' : 'desc'
 
   // ----- Query: fetch scheduled posts -----
   const query = useQuery<ApiResponse<IScheduledPostResponse>>({
-    queryKey: [QUERY_KEYS.scheduleList, from, to, sortDir, limit, offset],
+    queryKey: [QUERY_KEYS.scheduleList, from, to, limit, offset],
     queryFn: () =>
       postsApi.getScheduledPosts({
         from,
         to,
-        sort: sortDir,
+        sort: 'desc',
         limit,
         offset,
       }),
@@ -54,7 +60,7 @@ const useScheduleList = () => {
   // Reset pagination when filters change
   useEffect(() => {
     setOffset(0)
-  }, [from, to, sort])
+  }, [from, to])
 
   // If current page becomes empty but there is data overall, go back a page
   useEffect(() => {
@@ -63,34 +69,86 @@ const useScheduleList = () => {
     if (offset > 0 && totalCount > 0 && list.length === 0) {
       setOffset(Math.max(0, offset - limit))
     }
+    // If there is no data at all, ensure we are on the first page
+    if (totalCount === 0 && offset !== 0) {
+      setOffset(0)
+    }
     setSelectedPost(null)
   }, [query.data, offset, limit])
 
-  // ----- Derived: Time buckets and formatting -----
-  const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i), [])
+  // ----- Mutation: delete a scheduled post -----
+  const deleteMutation = useMutation({
+    mutationFn: (postId: string) => postsApi.deleteScheduledPost(postId),
+  })
 
-  const groupedByHour: Record<number, typeof posts> = useMemo(() => {
-    const buckets: Record<number, typeof posts> = hours.reduce(
-      (acc, h) => {
-        acc[h] = []
+  // Open the confirm dialog for a specific scheduled post.
+  const openDelete = (postId: string) => {
+    setPendingDeleteId(postId)
+    setConfirmOpen(true)
+  }
+
+  // Close the confirm dialog and clear selection.
+  const closeDelete = () => {
+    setConfirmOpen(false)
+    setPendingDeleteId(null)
+  }
+
+  // Confirm deletion of the selected scheduled post.
+  const confirmDelete = () => {
+    if (!pendingDeleteId) return
+
+    const id = pendingDeleteId
+    setDeletingIds(prev => new Set(prev).add(id))
+
+    deleteMutation.mutate(id, {
+      onSettled: () => {
+        setDeletingIds(prev => {
+          const next = new Set(prev)
+          next.delete(id)
+          return next
+        })
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.scheduleList] })
+      },
+    })
+  }
+
+  // ----- Derived: Time slots and grouping -----
+  const timeSlots = useMemo(() => getTimeSlots(), [])
+
+  const groupedBySlot: Record<string, typeof posts> = useMemo(() => {
+    // Initialize buckets for all available slots
+    const buckets = timeSlots.reduce(
+      (acc, slot) => {
+        acc[slot] = [] as typeof posts
         return acc
       },
-      {} as Record<number, typeof posts>
+      {} as Record<string, typeof posts>
     )
+
+    const interval = DEFAULT_TIME_SLOT_INTERVAL as number
+
+    const toMinutes = (d: Date) => d.getHours() * 60 + d.getMinutes()
 
     posts
       .filter(p => Boolean(p.scheduled_at))
       .forEach(p => {
         const d = new Date(p.scheduled_at as string)
-        const hour = d.getHours()
-        const minute = d.getMinutes()
-        const nearestHour = (minute >= 30 ? hour + 1 : hour) % 24
-        buckets[nearestHour].push(p)
+        const mins = toMinutes(d)
+        // Floor to the start of the slot interval (e.g., 12:30 -> 12:00 for 60m interval)
+        let rounded = Math.floor(mins / interval) * interval
+        const total = 24 * 60
+        if (rounded >= total) rounded = total - interval // safety, though floor shouldn't exceed total
+        const hour = Math.floor(rounded / 60)
+        const minute = rounded % 60
+        const key = `${hour.toString().padStart(2, '0')}:${minute
+          .toString()
+          .padStart(2, '0')}`
+        if (buckets[key]) buckets[key].push(p)
       })
 
     // Sort each bucket by actual scheduled time ascending for readability
-    hours.forEach(h => {
-      buckets[h].sort((a, b) => {
+    Object.keys(buckets).forEach(k => {
+      buckets[k].sort((a, b) => {
         const ta = new Date(a.scheduled_at as string).getTime()
         const tb = new Date(b.scheduled_at as string).getTime()
         return ta - tb
@@ -98,17 +156,25 @@ const useScheduleList = () => {
     })
 
     return buckets
-  }, [posts, hours])
+  }, [posts, timeSlots])
 
   const formatHour = (h: number) => format(new Date(2000, 0, 1, h), 'h a')
 
-  const orderedHours = useMemo(() => {
-    const hoursWithPosts = hours.filter(h => groupedByHour[h].length > 0)
-    const currentHour = new Date().getHours()
-    return [...hoursWithPosts].sort(
-      (a, b) => ((a - currentHour + 24) % 24) - ((b - currentHour + 24) % 24)
-    )
-  }, [groupedByHour, hours])
+  const formatSlotRange = (slot: string) => {
+    const [h, m] = slot.split(':').map(Number)
+    const start = new Date(2000, 0, 1, h, m)
+    const end = new Date(start)
+    end.setMinutes(end.getMinutes() + (DEFAULT_TIME_SLOT_INTERVAL as number))
+    const startStr = format(start, 'h a')
+    const endStr = format(end, 'h a')
+    return `${startStr} - ${endStr}`
+  }
+
+  const orderedSlots = useMemo(() => {
+    // Render all slots exactly as returned by getTimeSlots(),
+    // and rely on groupedBySlot[slot] to contain posts (or empty array).
+    return timeSlots
+  }, [timeSlots])
 
   const formatSelectedRange = () => {
     if (!selectedRange?.from) return ''
@@ -123,8 +189,6 @@ const useScheduleList = () => {
     // Filters
     selectedRange,
     setSelectedRange,
-    sort,
-    setSort,
     // Pagination
     limit,
     setLimit,
@@ -136,13 +200,22 @@ const useScheduleList = () => {
     posts,
     total,
     // Derived helpers
-    groupedByHour,
-    orderedHours,
+    groupedBySlot,
+    orderedSlots,
     formatHour,
+    formatSlotRange,
     formatSelectedRange,
     // Selected post
     selectedPost,
     setSelectedPost,
+    // Deletion controls
+    confirmOpen,
+    openDelete,
+    closeDelete,
+    confirmDelete,
+    pendingDeleteId,
+    deletingIds,
+    isDeleting: deleteMutation.isPending,
   }
 }
 

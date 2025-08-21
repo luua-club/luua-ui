@@ -41,4 +41,5 @@ export const QUERY_KEYS = {
   draft: 'draft',
   generateAIPost: 'generate-ai-post',
   scheduleList: 'schedule-list',
+  publishList: 'publish-list',
 }

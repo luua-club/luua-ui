@@ -2,6 +2,7 @@ import { Outlet } from '@tanstack/react-router'
 import {
   FolderClock,
   LucideCalendar,
+  LucideFileText,
   LucideLayoutDashboard,
 } from 'lucide-react'
 
@@ -24,6 +25,11 @@ const platformItems: ISidebarItem[] = [
     title: 'Schedule',
     url: '/schedule',
     icon: <LucideCalendar />,
+  },
+  {
+    title: 'Published',
+    url: '/published',
+    icon: <LucideFileText />,
   },
 ]
 
