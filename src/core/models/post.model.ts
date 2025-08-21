@@ -1,6 +1,6 @@
 import { channelType } from './social.model'
 
-export type postStatusType = 'Scheduled' | 'Published' | 'Failed'
+export type postStatusType = 'Scheduled' | 'Published' | 'Failed' | 'Queued'
 
 export interface IPost {
   id: string

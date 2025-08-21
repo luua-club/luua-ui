@@ -1,10 +1,20 @@
 import { createLazyRoute } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { SearchSlash, TriangleAlert } from 'lucide-react'
+import {
+  CircleCheck,
+  CircleX,
+  ClipboardCheck,
+  RotateCcw,
+  SearchSlash,
+  TriangleAlert,
+} from 'lucide-react'
 
 import Post from '@/core/components/Post'
 import PostListViewLayout from '@/core/layouts/PostListViewLayout'
+import { postStatusType } from '@/core/models/post.model'
 import PaginationList from '@/shared/components/pagination-list'
+import { Button } from '@/shared/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import usePublishList from '../hooks/publish-list.hook'
@@ -24,6 +34,35 @@ const Published = () => {
     offset,
     setOffset,
   } = usePublishList()
+
+  const getPostStatus = (status: postStatusType | undefined) => {
+    switch (status) {
+      case 'Failed':
+        return (
+          <>
+            <CircleX className="size-3" />
+            Publishing Failed
+          </>
+        )
+      case 'Published':
+        return (
+          <>
+            <CircleCheck className="size-3" />
+            Published
+          </>
+        )
+      case 'Queued':
+        return (
+          <>
+            <ClipboardCheck className="size-3" />
+            Queued
+          </>
+        )
+      default:
+        return 'Scheduled'
+    }
+  }
+
   return (
     <PostListViewLayout
       title="Published Posts"
@@ -47,19 +86,52 @@ const Published = () => {
             >
               <Post tileView {...post} />
               {post.status === 'Failed' && (
-                <div
-                  className={cn(
-                    'absolute -top-2 -right-2 rounded-full border-1 border-dashed bg-white p-1 text-yellow-600',
-                    selectedPost?.id === post.id && 'border-black'
-                  )}
-                >
-                  <TriangleAlert className="size-4" />
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      className={cn(
+                        'absolute -top-2 -right-2 rounded-full border-1 border-dashed bg-white p-1 text-yellow-600',
+                        selectedPost?.id === post.id && 'border-black'
+                      )}
+                    >
+                      <TriangleAlert className="size-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Publishing failed</TooltipContent>
+                </Tooltip>
               )}
             </div>
-            <div className="absolute right-3 bottom-2 flex w-fit items-center justify-end rounded-full bg-white px-2 py-1 text-xs text-gray-500">
-              {post.published_at &&
-                format(new Date(post.published_at as string), 'MMM d, h:mm a')}
+            <div className="mx-1 -mt-1 flex items-center justify-between gap-2">
+              <p className="flex items-center gap-2 text-xs font-medium">
+                <span
+                  className={cn(
+                    'flex items-center gap-1 text-gray-500',
+                    post.status === 'Failed' && 'text-red-600',
+                    post.status === 'Queued' && 'text-yellow-600',
+                    post.status === 'Published' && 'text-green-600'
+                  )}
+                >
+                  {getPostStatus(post.status)}
+                </span>
+                {post.status === 'Failed' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-fit !p-1 text-xs"
+                  >
+                    <RotateCcw className="size-3" />
+                    Retry
+                  </Button>
+                )}
+              </p>
+
+              <p className="text-xs text-gray-500">
+                {post.published_at &&
+                  format(
+                    new Date(post.published_at as string),
+                    'MMM d, h:mm a'
+                  )}
+              </p>
             </div>
           </div>
         ))}
