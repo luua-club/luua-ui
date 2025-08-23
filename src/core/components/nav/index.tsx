@@ -65,6 +65,8 @@ const getCurrentPageTitle = (pathname: urlType) => {
       return 'Schedule'
     case '/published':
       return 'Published'
+    case '/preferences':
+      return 'Preferences'
     default:
       return 'Dashboard'
   }

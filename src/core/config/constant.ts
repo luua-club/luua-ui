@@ -42,4 +42,5 @@ export const QUERY_KEYS = {
   generateAIPost: 'generate-ai-post',
   scheduleList: 'schedule-list',
   publishList: 'publish-list',
+  userStyle: 'user-style',
 }

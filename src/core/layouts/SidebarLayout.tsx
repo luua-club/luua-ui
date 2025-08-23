@@ -1,5 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import {
+  Eclipse,
   FolderClock,
   LucideCalendar,
   LucideFileText,
@@ -38,6 +39,11 @@ const creationItems: ISidebarItem[] = [
     title: 'Saved Drafts',
     url: '/creation/drafts',
     icon: <FolderClock />,
+  },
+  {
+    title: 'Preferences',
+    url: '/preferences',
+    icon: <Eclipse />,
   },
 ]
 

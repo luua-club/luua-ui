@@ -9,6 +9,7 @@ import authRoute from '@/auth/router'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
 import creationRouteTree from '@/creation/router'
 import dashboardRoute from '@/dashboard/router'
+import preferencesRoute from '@/preferences/router'
 import publishedRoute from '@/published/router'
 import quickShareRoute from '@/quick-share/router'
 import scheduleRoute from '@/schedule/router'
@@ -36,6 +37,7 @@ const routeTree = rootRoute.addChildren([
     quickShareRoute,
     creationRouteTree,
     publishedRoute,
+    preferencesRoute,
   ]),
 ])
 
