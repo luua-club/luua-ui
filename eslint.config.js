@@ -8,6 +8,8 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import globals from 'globals'
 import jsoncParser from 'jsonc-eslint-parser'
 import tseslint from 'typescript-eslint'
+import tanstackQuery from '@tanstack/eslint-plugin-query'
+import reactHooks from 'eslint-plugin-react-hooks'
 
 export default defineConfig([
   // ✅ Base JS/TS config
@@ -36,6 +38,9 @@ export default defineConfig([
     },
   },
 
+  // 📝 REACT HOOKS RECOMMENDED
+  reactHooks.configs['recommended-latest'],
+
   // 🧹 Disable ESLint formatting that conflicts with Prettier
   prettierConfig,
 
@@ -44,6 +49,7 @@ export default defineConfig([
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     plugins: {
       'simple-import-sort': simpleImportSort,
+      '@tanstack/query': tanstackQuery,
     },
     rules: {
       // ⚛️ REACT RULES
@@ -85,6 +91,9 @@ export default defineConfig([
       'no-param-reassign': ['warn', { props: false }],
       // Allow named exports even if only one export is present
       'import/prefer-default-export': 'off',
+
+      // TANSTACK QUERY RULES
+      '@tanstack/query/exhaustive-deps': 'warn',
     },
   },
 
