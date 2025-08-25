@@ -1,5 +1,5 @@
-import { logout as logoutUtil } from '../config/utils/common.util'
 import { IUserState } from '../models/user.model'
+import { logout as logoutUtil } from '../utils/common.util'
 import { useAppSelector } from './global-state.hook'
 
 export const useUserState = () => {
