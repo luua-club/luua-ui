@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { LucideDessert } from 'lucide-react'
 
+import LogoIconOnly from '@/assets/images/luua-black-icon.svg?react'
+import LogoTextOnly from '@/assets/images/luua-black-text.svg?react'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -17,9 +18,9 @@ function AppSidebarHeader() {
           className="data-[slot=sidebar-menu-button]:!p-1.5"
         >
           <Link to="/dashboard">
-            <LucideDessert className="!size-5" />
+            <LogoIconOnly aria-label="Icon" className="!size-5" />
             <div className="flex w-full items-center justify-between">
-              <span className="truncate text-base font-semibold">Luua AI.</span>
+              <LogoTextOnly aria-label="Text" className="!size-12" />
               <span
                 className={cn(
                   'truncate rounded-sm border-1 border-gray-200 bg-white px-3 py-0.5 text-xs',
