@@ -1,11 +1,21 @@
-import { IUser } from './user.model'
+import z from 'zod'
 
-export interface ILoginResponse {
-  access_token: string
-  token_type: string
-  user: IUser
-}
+import { UserSchema } from './user.model'
 
-export interface ILoginRequest {
-  token: string
-}
+/**
+ * Login request schema
+ */
+export const LoginRequestSchema = z.object({
+  token: z.string(),
+})
+export type LoginRequest = z.infer<typeof LoginRequestSchema>
+
+/**
+ * Login response schema
+ */
+export const LoginResponseSchema = z.object({
+  access_token: z.string(),
+  token_type: z.string(),
+  user: UserSchema,
+})
+export type LoginResponse = z.infer<typeof LoginResponseSchema>

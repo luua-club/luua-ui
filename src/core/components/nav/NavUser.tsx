@@ -7,8 +7,8 @@ import {
   LucideSparkles,
 } from 'lucide-react'
 
-import { extractUserInitial } from '@/core/config/utils/common.util'
-import { IUserState } from '@/core/models/user.model'
+import { UserState } from '@/core/models/user.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import {
@@ -22,7 +22,7 @@ import {
 import { Skeleton } from '@/shared/ui/skeleton'
 
 interface INavUserProps {
-  user: IUserState | null
+  user: UserState | null
 }
 
 export function NavUser({ user }: INavUserProps) {

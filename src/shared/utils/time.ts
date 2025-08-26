@@ -1,11 +1,14 @@
-import { DEFAULT_TIME_SLOT_INTERVAL } from '../constant'
+import {
+  DEFAULT_TIME_SLOT_INTERVAL,
+  TimeSlotInterval,
+} from '../config/constant'
 
-export enum TimeSlotInterval {
-  Fifteen = 15,
-  Thirty = 30,
-  Sixty = 60,
-}
-
+/**
+ * Get time slots
+ *
+ * @param interval - The interval between time slots
+ * @returns An array of time slots
+ */
 export const getTimeSlots = (
   interval: TimeSlotInterval = DEFAULT_TIME_SLOT_INTERVAL
 ): string[] => {

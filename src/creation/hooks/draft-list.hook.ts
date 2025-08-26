@@ -4,9 +4,9 @@ import { type DateRange } from 'react-day-picker'
 
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { toStartOfDayIso } from '@/core/config/utils/common.util'
 import { type ApiResponse } from '@/core/models/api.model'
 import { type IDraftListResponse } from '@/core/models/draft.model'
+import { toStartOfDayIso } from '@/core/utils/common.util'
 
 export function useDraftList() {
   const queryClient = useQueryClient()

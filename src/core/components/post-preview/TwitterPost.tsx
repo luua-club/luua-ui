@@ -13,10 +13,10 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 
-import { extractUserInitial } from '@/core/config/utils/common.util'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import { IUserConnectedChannel } from '@/core/models/social.model'
+import { UserSocial } from '@/core/models/social.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
@@ -187,7 +187,7 @@ const TwitterPost = ({
   )
 }
 
-const TwitterPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
+const TwitterPostHeader = ({ user }: { user: UserSocial }) => {
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="flex w-fit min-w-0 items-center text-sm sm:text-base">

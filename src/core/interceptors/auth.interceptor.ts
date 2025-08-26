@@ -4,7 +4,7 @@ import { capitalize } from '@/shared/utils'
 
 import { getLocalStorageItem } from '../../shared/utils/localstorage.util'
 import { LUUA_USER_KEY } from '../config/constant'
-import { ILoginResponse } from '../models/auth.model'
+import { LoginResponse } from '../models/auth.model'
 
 /**
  * Interceptor to add the JWT token to the request headers
@@ -13,7 +13,7 @@ import { ILoginResponse } from '../models/auth.model'
  * @returns The request config with the JWT token
  */
 export const authInterceptor = (config: AxiosRequestConfig) => {
-  const token = getLocalStorageItem<ILoginResponse>(LUUA_USER_KEY)
+  const token = getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
 
   if (token) {
     config.headers = {

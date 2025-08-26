@@ -12,9 +12,9 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { extractUserInitial } from '@/core/config/utils/common.util'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
-import { IUserConnectedChannel } from '@/core/models/social.model'
+import { UserSocial } from '@/core/models/social.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Textarea } from '@/shared/ui/textarea'
@@ -194,7 +194,7 @@ const LinkedInPost = ({
   )
 }
 
-const LinkedInPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
+const LinkedInPostHeader = ({ user }: { user: UserSocial }) => {
   return (
     <div className="flex items-start justify-between px-4 py-2">
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { THEME_LOCAL_STORAGE_KEY } from '../constant'
+import { THEME_LOCAL_STORAGE_KEY } from '../config/constant'
 
 type Theme = 'dark' | 'light' | 'system'
 

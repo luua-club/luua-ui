@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { IUser } from '@/core/models/user.model'
+import { User } from '@/core/models/user.model'
 
 interface IAuthState {
-  user: IUser | null
+  user: User | null
 }
 
 const initialState: IAuthState = {
@@ -14,7 +14,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<IUser>) => {
+    setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload
     },
     clearUser: state => {

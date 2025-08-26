@@ -1,9 +1,7 @@
 import { Clock, Lightbulb } from 'lucide-react'
 
-import {
-  userStyleResponseType,
-  UserStyleStatus,
-} from '@/core/models/user.model'
+import { UserStyleStatus } from '@/core/config/constant'
+import { userStyleResponseType } from '@/core/models/user.model'
 import { Skeleton } from '@/shared/ui/skeleton'
 
 interface ISummaryProps {

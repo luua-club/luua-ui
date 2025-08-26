@@ -9,7 +9,7 @@ import { useUserState } from '@/core/hooks/user-state.hook'
 import mockRecentPost from '@/core/mocks/recent-post.json'
 import { IPost } from '@/core/models/post.model'
 import { setPrompt } from '@/core/store/prompt-slice'
-import { SOCIAL_STATUS } from '@/shared/constant'
+import { SOCIAL_STATUS } from '@/shared/config/constant'
 import { Button } from '@/shared/ui/button'
 
 const Dashboard = () => {
