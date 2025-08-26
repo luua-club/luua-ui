@@ -1,5 +1,5 @@
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
-import { IUserState } from '@/core/models/user.model'
+import { UserState } from '@/core/models/user.model'
 
 /**
  * Checks if a specific social platform is connected for a user.
@@ -8,7 +8,7 @@ import { IUserState } from '@/core/models/user.model'
  * @param user - The user object containing connection status
  * @returns True if the platform is connected, false otherwise
  */
-const isSocialConnected = (name: string, user: IUserState) => {
+const isSocialConnected = (name: string, user: UserState) => {
   if (name === 'LinkedIn') return user?.connected_channels?.linkedin?.connected
   if (name === 'Twitter') return user?.connected_channels?.twitter?.connected
   return false
@@ -20,7 +20,7 @@ const isSocialConnected = (name: string, user: IUserState) => {
  * @param user - The user object containing connection status
  * @returns True if more than one platform is connected, false otherwise
  */
-const isMoreThanOneSocialIsConnected = (user: IUserState) => {
+const isMoreThanOneSocialIsConnected = (user: UserState) => {
   const connectedPlatforms = SOCIAL_PLATFORM.filter(sp =>
     isSocialConnected(sp.name, user)
   )

@@ -1,5 +1,6 @@
 import z from 'zod'
 
+import { UserStyleStatus } from '../config/constant'
 import { toneStyles, writingStyles } from '../config/user-preferences.config'
 import { UserSocialSchema } from './social.model'
 
@@ -18,17 +19,16 @@ export const UserSchema = z.object({
 })
 export type User = z.infer<typeof UserSchema>
 
-export interface IUserState extends User {
+/**
+ * User state interface
+ */
+export interface UserState extends User {
   logout: () => void
 }
 
-export enum UserStyleStatus {
-  INITIAL = 'initial',
-  IN_PROGRESS = 'in_progress',
-  GENERATED = 'generated',
-  FAILED = 'failed',
-}
-
+/**
+ * User style response schema
+ */
 export const UserStyleResponseSchema = z.object({
   source_length: z.number(),
   source_count: z.number(),
@@ -53,11 +53,17 @@ export const UserStyleResponseSchema = z.object({
 })
 export type userStyleResponseType = z.infer<typeof UserStyleResponseSchema>
 
+/**
+ * User advanced style request interface
+ */
 export interface IUserAdvancedStyleRequest {
   style_text?: string
   gcp_storage_doc_ids?: string[]
 }
 
+/**
+ * User style request interface
+ */
 export interface IUserStyleRequest {
   writing_style?: string[]
   tone?: string[]

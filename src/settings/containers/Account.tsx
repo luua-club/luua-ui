@@ -1,12 +1,12 @@
 import { LogOut, Trash2 } from 'lucide-react'
 
-import { IUserState } from '@/core/models/user.model'
+import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 
-const Account = ({ user }: { user: IUserState }) => {
+const Account = ({ user }: { user: UserState }) => {
   const handleDeleteAccount = () => {
     // TODO:Implement delete account logic here
     // Add confirmation dialog and deletion logic

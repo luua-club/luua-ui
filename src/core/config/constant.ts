@@ -75,3 +75,13 @@ export const API_CONSTANTS = {
     internalServerError: 500,
   },
 }
+
+/**
+ * User style status enum
+ */
+export enum UserStyleStatus {
+  INITIAL = 'initial',
+  IN_PROGRESS = 'in_progress',
+  GENERATED = 'generated',
+  FAILED = 'failed',
+}

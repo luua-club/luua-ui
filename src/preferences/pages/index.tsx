@@ -12,7 +12,7 @@ import {
 import { toast } from 'sonner'
 
 import { userApi } from '@/core/api/user.api'
-import { QUERY_KEYS } from '@/core/config/constant'
+import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
 import {
   toneStyles,
   ToneStyleType,
@@ -22,7 +22,6 @@ import {
 import {
   IUserStyleRequest,
   UserStyleResponseSchema,
-  UserStyleStatus,
 } from '@/core/models/user.model'
 import Summary from '@/preferences/container/Summary'
 import SelectionChip from '@/shared/components/selection-chip'

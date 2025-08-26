@@ -3,11 +3,10 @@ import { CloudAlert } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
-import { QUERY_KEYS } from '@/core/config/constant'
+import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
 import {
   IUserAdvancedStyleRequest,
   userStyleResponseType,
-  UserStyleStatus,
 } from '@/core/models/user.model'
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
