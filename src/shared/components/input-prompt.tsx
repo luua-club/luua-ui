@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { SOCIAL_STATUS } from '../constant'
+import { SOCIAL_STATUS } from '../config/constant'
 import { Button } from '../ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { WordRotate } from '../ui/word-rotate'

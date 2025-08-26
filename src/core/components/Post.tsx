@@ -9,7 +9,7 @@ import { cn } from '@/shared/utils'
 import { SOCIAL_PLATFORM } from '../config/constant'
 import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
-import { IUserConnectedChannel } from '../models/social.model'
+import { UserSocial } from '../models/social.model'
 import { extractUserInitial } from '../utils/common.util'
 
 type PostProps = IPost & {
@@ -33,7 +33,7 @@ function Post({
     return <PostSkeleton tileView={tileView} />
   }
 
-  const channelUser: IUserConnectedChannel | undefined =
+  const channelUser: UserSocial | undefined =
     platform?.name === 'LinkedIn'
       ? userState?.connected_channels?.linkedin
       : userState?.connected_channels?.twitter

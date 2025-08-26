@@ -1,20 +1,24 @@
 import z from 'zod'
 
-import { toneStyles, writingStyles } from '../config/user-preferences'
-import { IUserConnectedChannel } from './social.model'
+import { toneStyles, writingStyles } from '../config/user-preferences.config'
+import { UserSocialSchema } from './social.model'
 
-export interface IUser {
-  email: string
-  name: string
-  profile_image: string
-  deactivated: boolean
-  connected_channels: {
-    linkedin: IUserConnectedChannel
-    twitter: IUserConnectedChannel
-  }
-}
+/**
+ * User schema
+ */
+export const UserSchema = z.object({
+  email: z.string(),
+  name: z.string(),
+  profile_image: z.string(),
+  deactivated: z.boolean(),
+  connected_channels: z.object({
+    linkedin: UserSocialSchema,
+    twitter: UserSocialSchema,
+  }),
+})
+export type User = z.infer<typeof UserSchema>
 
-export interface IUserState extends IUser {
+export interface IUserState extends User {
   logout: () => void
 }
 

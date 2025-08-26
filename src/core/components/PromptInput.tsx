@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { InputPrompt } from '@/shared/components/input-prompt'
-import { SOCIAL_STATUS } from '@/shared/constant'
+import { SOCIAL_STATUS } from '@/shared/config/constant'
 
 import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
 

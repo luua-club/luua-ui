@@ -6,13 +6,13 @@ import { toast } from 'sonner'
 import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
-import { extractUserInitial } from '@/core/config/utils/common.util'
 import {
   channelType,
   ISocialChannel,
-  IUserConnectedChannel,
+  UserSocial,
 } from '@/core/models/social.model'
 import { IUserState } from '@/core/models/user.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { BorderBeam } from '@/shared/ui/border-beam'
 import { Button } from '@/shared/ui/button'
@@ -127,7 +127,7 @@ const SocialCard = ({
   onDisconnect,
 }: {
   platform: ISocialChannel
-  userChannel: IUserConnectedChannel
+  userChannel: UserSocial
   isAccountConnected?: boolean
   isLoading?: boolean
   onConnect?: () => void

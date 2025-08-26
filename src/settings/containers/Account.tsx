@@ -1,7 +1,7 @@
 import { LogOut, Trash2 } from 'lucide-react'
 
-import { extractUserInitial } from '@/core/config/utils/common.util'
 import { IUserState } from '@/core/models/user.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'

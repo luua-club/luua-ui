@@ -1,12 +1,12 @@
 import type React from 'react'
 
 import { PostSkeleton } from '@/core/components/Post'
+import { useUserState } from '@/core/hooks/user-state.hook'
+import { channelType } from '@/core/models/social.model'
 import {
   isMoreThanOneSocialIsConnected,
   isSocialConnected,
-} from '@/core/config/utils/social.utils'
-import { useUserState } from '@/core/hooks/user-state.hook'
-import { channelType } from '@/core/models/social.model'
+} from '@/core/utils/social.utils'
 import { Switch } from '@/shared/ui/switch'
 import { TabsContent } from '@/shared/ui/tabs'
 

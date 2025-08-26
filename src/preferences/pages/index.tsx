@@ -18,7 +18,7 @@ import {
   ToneStyleType,
   writingStyles,
   WritingStyleType,
-} from '@/core/config/user-preferences'
+} from '@/core/config/user-preferences.config'
 import {
   IUserStyleRequest,
   UserStyleResponseSchema,

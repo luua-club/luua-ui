@@ -8,7 +8,7 @@ import { authApi } from '@/core/api/auth.api'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY, QUERY_KEYS } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
-import { ILoginResponse } from '@/core/models/auth.model'
+import { LoginResponse } from '@/core/models/auth.model'
 import { cn } from '@/shared/utils'
 import {
   getLocalStorageItem,
@@ -70,7 +70,7 @@ function Login() {
    *
    * @param res - The login response
    */
-  const updateDataAndRedirect = async (res: ILoginResponse) => {
+  const updateDataAndRedirect = async (res: LoginResponse) => {
     dispatch(setUser(res.user))
     setLocalStorageItem(key, res)
 
@@ -83,7 +83,7 @@ function Login() {
 
       dispatch(setUser(response.data))
       setLocalStorageItem(key, {
-        ...getLocalStorageItem<ILoginResponse>(key),
+        ...getLocalStorageItem<LoginResponse>(key),
         user: response.data,
       })
 

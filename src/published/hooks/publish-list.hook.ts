@@ -4,10 +4,10 @@ import { DateRange } from 'react-day-picker'
 
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { toStartOfDayIso } from '@/core/config/utils/common.util'
 import { ApiResponse } from '@/core/models/api.model'
 import { IPost } from '@/core/models/post.model'
 import { IPublishedPostListResponse } from '@/core/models/published-post.model'
+import { toStartOfDayIso } from '@/core/utils/common.util'
 
 const usePublishList = () => {
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null)

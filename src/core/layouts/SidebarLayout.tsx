@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 
 import AppSidebar from '@/core/components/app-sidebar'
-import { THEME_LOCAL_STORAGE_KEY } from '@/shared/constant'
+import { THEME_LOCAL_STORAGE_KEY } from '@/shared/config/constant'
 import { ThemeProvider } from '@/shared/provider/theme-provider'
 import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
 import { Toaster } from '@/shared/ui/sonner'

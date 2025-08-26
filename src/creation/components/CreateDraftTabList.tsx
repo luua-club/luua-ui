@@ -1,8 +1,8 @@
 import { Loader2, MoreHorizontal, TriangleAlert } from 'lucide-react'
 
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
-import { isSocialConnected } from '@/core/config/utils/social.utils'
 import { useUserState } from '@/core/hooks/user-state.hook'
+import { isSocialConnected } from '@/core/utils/social.utils'
 import { Button } from '@/shared/ui/button'
 import {
   DropdownMenu,

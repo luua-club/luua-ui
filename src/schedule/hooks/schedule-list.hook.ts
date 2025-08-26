@@ -5,11 +5,11 @@ import { type DateRange } from 'react-day-picker'
 
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { toStartOfDayIso } from '@/core/config/utils/common.util'
 import { type ApiResponse } from '@/core/models/api.model'
 import { IPost } from '@/core/models/post.model'
 import { type IScheduledPostResponse } from '@/core/models/schedule.model'
-import { DEFAULT_TIME_SLOT_INTERVAL } from '@/shared/constant'
+import { toStartOfDayIso } from '@/core/utils/common.util'
+import { DEFAULT_TIME_SLOT_INTERVAL } from '@/shared/config/constant'
 import { getTimeSlots } from '@/shared/utils/time'
 
 const useScheduleList = () => {
