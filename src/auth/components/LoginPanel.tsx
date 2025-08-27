@@ -18,7 +18,7 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
 
       {/** Tagline */}
       <Highlighter action="underline" color="var(--brand-accent-yellow)">
-        <p className="text-base font-bold lg:text-xl">
+        <p className="text-base font-bold text-black lg:text-xl">
           For strategically lazy people.
         </p>
       </Highlighter>
@@ -33,7 +33,7 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
 
         {/** Login Button */}
         {isLoading ? (
-          <Loader2 className="h-10 w-10 animate-spin" />
+          <Loader2 className="h-10 w-10 animate-spin" color="black" />
         ) : (
           <GoogleLogin
             onSuccess={onLogin}

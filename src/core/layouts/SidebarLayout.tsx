@@ -8,8 +8,6 @@ import {
 } from 'lucide-react'
 
 import AppSidebar from '@/core/components/app-sidebar'
-import { THEME_LOCAL_STORAGE_KEY } from '@/shared/config/constant'
-import { ThemeProvider } from '@/shared/provider/theme-provider'
 import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
 
 import Nav from '../components/nav'
@@ -48,11 +46,9 @@ const creationItems: ISidebarItem[] = [
 
 function SidebarLayout() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey={THEME_LOCAL_STORAGE_KEY}>
-      <SidebarProvider>
-        <SidebarContent />
-      </SidebarProvider>
-    </ThemeProvider>
+    <SidebarProvider>
+      <SidebarContent />
+    </SidebarProvider>
   )
 }
 
