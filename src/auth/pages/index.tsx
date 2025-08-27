@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { authApi } from '@/core/api/auth.api'
@@ -33,6 +33,7 @@ function Login() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
+  const [mounted, setMounted] = useState(false)
   const loginMutation = useMutation({
     mutationFn: (token: string) =>
       authApi.login({
@@ -53,6 +54,11 @@ function Login() {
     dispatch(clearUser())
     removeLocalStorageItem(key)
   }, [dispatch, key])
+
+  // Defer animations until after first mount to avoid flash
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   /**
    * Handles the login process
@@ -110,7 +116,9 @@ function Login() {
         <div
           className={cn(
             'z-1 h-full w-full',
-            'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:ease-out'
+            !mounted && 'opacity-0',
+            mounted &&
+              'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 transform-gpu will-change-[transform,opacity] motion-safe:delay-75 motion-safe:duration-700 motion-safe:ease-out'
           )}
         >
           <LoginPanel
