@@ -1,12 +1,14 @@
 import { Outlet } from '@tanstack/react-router'
 import {
+  Eclipse,
   FolderClock,
   LucideCalendar,
+  LucideFileText,
   LucideLayoutDashboard,
 } from 'lucide-react'
 
 import AppSidebar from '@/core/components/app-sidebar'
-import { THEME_LOCAL_STORAGE_KEY } from '@/shared/constant'
+import { THEME_LOCAL_STORAGE_KEY } from '@/shared/config/constant'
 import { ThemeProvider } from '@/shared/provider/theme-provider'
 import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
 import { Toaster } from '@/shared/ui/sonner'
@@ -22,8 +24,13 @@ const platformItems: ISidebarItem[] = [
   },
   {
     title: 'Schedule',
-    url: undefined,
+    url: '/schedule',
     icon: <LucideCalendar />,
+  },
+  {
+    title: 'Published',
+    url: '/published',
+    icon: <LucideFileText />,
   },
 ]
 
@@ -32,6 +39,11 @@ const creationItems: ISidebarItem[] = [
     title: 'Saved Drafts',
     url: '/creation/drafts',
     icon: <FolderClock />,
+  },
+  {
+    title: 'Preferences',
+    url: '/preferences',
+    icon: <Eclipse />,
   },
 ]
 

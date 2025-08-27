@@ -1,5 +1,6 @@
 import { Icon, IconProps } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createLazyRoute } from '@tanstack/react-router'
 import { Frown } from 'lucide-react'
 import {
   ForwardRefExoticComponent,
@@ -11,25 +12,24 @@ import {
 import { toast } from 'sonner'
 
 import { userApi } from '@/core/api/user.api'
+import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
 import {
   toneStyles,
   ToneStyleType,
   writingStyles,
   WritingStyleType,
-} from '@/core/config/user-preferences'
+} from '@/core/config/user-preferences.config'
 import {
   IUserStyleRequest,
   UserStyleResponseSchema,
-  UserStyleStatus,
 } from '@/core/models/user.model'
+import Summary from '@/preferences/container/Summary'
 import SelectionChip from '@/shared/components/selection-chip'
 import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
 import debounce from '@/shared/utils/debounce'
 
-import Summary from '../components/Summary'
-import { queryKeys } from '../utils'
-import Advanced from './Advanced'
+import Advanced from '../container/Advanced'
 
 const Preferences = () => {
   const [selectedStyles, setSelectedStyles] = useState<WritingStyleType[]>([])
@@ -38,7 +38,7 @@ const Preferences = () => {
   const queryClient = useQueryClient()
 
   const { data, status, isLoading, isError } = useQuery({
-    queryKey: [queryKeys.userStyle],
+    queryKey: [QUERY_KEYS.userStyle],
     queryFn: () => userApi.getUserStyle(),
     refetchOnMount: true,
   })
@@ -46,7 +46,7 @@ const Preferences = () => {
   const setUserStyleMutation = useMutation({
     mutationFn: (payload: IUserStyleRequest) => userApi.setUserStyle(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeys.userStyle] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userStyle] })
     },
     onError: () => {
       toast.error('Failed to update user style')
@@ -86,7 +86,7 @@ const Preferences = () => {
 
   if (isError) {
     return (
-      <div className="flex min-h-16 items-center justify-center rounded-lg border-1 border-dashed p-4">
+      <div className="m-auto flex min-h-16 max-w-4xl items-center justify-center rounded-lg border-1 border-dashed p-4">
         <Frown className="mr-2 size-4" />
         Something went wrong, Please try again later
       </div>
@@ -94,7 +94,7 @@ const Preferences = () => {
   }
 
   return (
-    <>
+    <div className="m-auto flex max-w-4xl flex-col p-5">
       <Summary data={data?.data} isLoading={isLoading} />
       {data?.data.style_gen_state !== UserStyleStatus.IN_PROGRESS && (
         <div className="mt-4">
@@ -137,7 +137,7 @@ const Preferences = () => {
             )
         )}
       </div>
-    </>
+    </div>
   )
 }
 
@@ -174,5 +174,9 @@ const renderSelectionGrid = <T extends string>(
     </div>
   )
 }
+
+export const Route = createLazyRoute('/preferences')({
+  component: Preferences,
+})
 
 export default Preferences

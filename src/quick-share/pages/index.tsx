@@ -9,11 +9,15 @@ import { PostSkeleton } from '@/core/components/Post'
 import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
 import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
-import { SharePostModal } from '@/core/components/SharePostModal'
+import {
+  ShareModalOpenState,
+  SharePostModal,
+} from '@/core/components/SharePostModal'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppSelector } from '@/core/hooks/global-state.hook'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
+import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { IDraftRequest } from '@/core/models/draft.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
@@ -24,11 +28,17 @@ import GeneratedPostControls from '../components/GeneratedPostControls'
 
 const QuickShare = () => {
   const [activeTab, setActiveTab] = useState<string>('created-post')
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+  const [isShareModalOpen, setIsShareModalOpen] = useState<ShareModalOpenState>(
+    {
+      open: false,
+      schedule: false,
+    }
+  )
 
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { mutation: publishDraft } = usePublishDraft()
+  const { mutation: scheduleDraft } = useScheduleDraft()
   const user = useUserState()
 
   const saveDraftMutation = useMutation({
@@ -59,7 +69,7 @@ const QuickShare = () => {
   } = useGeneratePosts(preUserPrompt || '')
 
   const isDataFetching = isLoading || isFetching
-  const isLoadingPublish = publishDraft.isPending
+  const isLoadingPublish = publishDraft.isPending || scheduleDraft.isPending
 
   useEffect(() => {
     // Redirect to dashboard if no prompt is available
@@ -84,24 +94,52 @@ const QuickShare = () => {
     }
   }, [error])
 
-  const onSubmit = (postIds: string[]) => {
+  const onSubmit = (
+    postIds: string[],
+    schedule: boolean,
+    scheduleDate?: string
+  ) => {
     const selectedPosts = posts.filter(post => postIds.includes(post.id))
     if (selectedPosts.length === 0) {
-      setIsShareModalOpen(false)
+      setIsShareModalOpen({ open: false, schedule: false })
+      return
+    }
+
+    const payload = selectedPosts.map(p => ({
+      content: p.content,
+      channel: p.channel,
+      attached_media: [],
+    }))
+
+    if (schedule && scheduleDate) {
+      scheduleDraft.mutate(
+        {
+          draftRequest: {
+            posts: payload,
+          },
+          scheduleDate,
+        },
+        {
+          onSuccess: () => {
+            setIsShareModalOpen({ open: false, schedule: false })
+            toast.success('Draft scheduled successfully')
+            navigate({ to: '/schedule' })
+          },
+          onError: () => {
+            toast.error('Failed to schedule draft')
+          },
+        }
+      )
       return
     }
 
     publishDraft.mutate(
       {
-        posts: selectedPosts.map(p => ({
-          content: p.content,
-          channel: p.channel,
-          attached_media: [],
-        })),
+        posts: payload,
       },
       {
         onSuccess: () => {
-          setIsShareModalOpen(false)
+          setIsShareModalOpen({ open: false, schedule: false })
           toast.success('Draft published successfully')
           navigate({ to: '/dashboard' })
         },
@@ -170,7 +208,12 @@ const QuickShare = () => {
                   isLoading={loading}
                   onRetry={refetch}
                   onEdit={handleEdit}
-                  onPublish={() => setIsShareModalOpen(true)}
+                  onPublish={() =>
+                    setIsShareModalOpen({ open: true, schedule: false })
+                  }
+                  onSchedule={() =>
+                    setIsShareModalOpen({ open: true, schedule: true })
+                  }
                 />
               </div>
             )}
@@ -276,10 +319,13 @@ const QuickShare = () => {
               isLoading={loading}
               onlyControls
               onEdit={handleEdit}
-              onRetry={() => {
-                refetch()
-              }}
-              onPublish={() => setIsShareModalOpen(true)}
+              onRetry={refetch}
+              onPublish={() =>
+                setIsShareModalOpen({ open: true, schedule: false })
+              }
+              onSchedule={() =>
+                setIsShareModalOpen({ open: true, schedule: true })
+              }
             />
           </div>
         )}

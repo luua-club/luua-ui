@@ -21,3 +21,17 @@ export enum SOCIAL_STATUS {
   OK,
   WARNING,
 }
+
+/**
+ * Time slot constants
+ */
+export enum TimeSlotInterval {
+  Fifteen = 15,
+  Thirty = 30,
+  Sixty = 60,
+}
+
+/**
+ * Default time slot interval
+ */
+export const DEFAULT_TIME_SLOT_INTERVAL = TimeSlotInterval.Sixty

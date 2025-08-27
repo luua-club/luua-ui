@@ -11,10 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import Account from '../containers/Account'
 
-const Preferences = lazy(() => import('../containers/Preferences'))
 const Socials = lazy(() => import('../containers/Socials'))
 
-const tabValue = ['account', 'socials', 'preferences']
+const tabValue = ['account', 'socials']
 
 const Settings = () => {
   const navigate = useNavigate()
@@ -69,12 +68,6 @@ const Settings = () => {
           >
             Socials
           </TabsTrigger>
-          <TabsTrigger
-            value={tabValue[2]}
-            className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-          >
-            Styles
-          </TabsTrigger>
         </TabsList>
         <TabsContent value={tabValue[0]}>
           <SettingLazySubPages>
@@ -84,11 +77,6 @@ const Settings = () => {
         <TabsContent value={tabValue[1]}>
           <SettingLazySubPages>
             <Socials user={user} />
-          </SettingLazySubPages>
-        </TabsContent>
-        <TabsContent value={tabValue[2]}>
-          <SettingLazySubPages>
-            <Preferences />
           </SettingLazySubPages>
         </TabsContent>
       </Tabs>

@@ -11,6 +11,11 @@ export const LUUA_USER_KEY: string =
   import.meta.env.LUUA_USER_KEY || 'luua-user'
 
 /**
+ * Base URL for the API
+ */
+export const BASE_API_URL = import.meta.env.VITE_LUUA_BACKEND_URL
+
+/**
  * Suggested text that is shown inside prompt box
  */
 export const SUGGESTED_PROMPT_TEXT = [
@@ -35,9 +40,48 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
   },
 ]
 
+/**
+ * Query keys for tanstack query
+ */
 export const QUERY_KEYS = {
   user: 'user',
   drafts: 'drafts',
   draft: 'draft',
   generateAIPost: 'generate-ai-post',
+  scheduleList: 'schedule-list',
+  publishList: 'publish-list',
+  userStyle: 'user-style',
+}
+
+/**
+ * Constants for tanstack query options
+ */
+export const QUERY_CONSTANTS = {
+  staleTime: 5 * 60 * 1000, // 5 minutes
+  gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+}
+
+/**
+ * Constants for API related stuff
+ */
+export const API_CONSTANTS = {
+  statusCode: {
+    success: 200,
+    created: 201,
+    badRequest: 400,
+    unauthorized: 401,
+    forbidden: 403,
+    notFound: 404,
+    internalServerError: 500,
+  },
+}
+
+/**
+ * User style status enum
+ */
+export enum UserStyleStatus {
+  INITIAL = 'initial',
+  IN_PROGRESS = 'in_progress',
+  GENERATED = 'generated',
+  FAILED = 'failed',
 }

@@ -4,9 +4,9 @@ import { type DateRange } from 'react-day-picker'
 
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { toStartOfDayIso } from '@/core/config/utils/common.util'
 import { type ApiResponse } from '@/core/models/api.model'
 import { type IDraftListResponse } from '@/core/models/draft.model'
+import { toStartOfDayIso } from '@/core/utils/common.util'
 
 export function useDraftList() {
   const queryClient = useQueryClient()
@@ -74,6 +74,11 @@ export function useDraftList() {
     const totalCount: number = query.data?.data?.total ?? 0
     if (offset > 0 && totalCount > 0 && list.length === 0) {
       setOffset(Math.max(0, offset - limit))
+    }
+
+    // If there is no data at all, ensure we are on the first page
+    if (totalCount === 0 && offset !== 0) {
+      setOffset(0)
     }
   }, [query.data, offset, limit])
 

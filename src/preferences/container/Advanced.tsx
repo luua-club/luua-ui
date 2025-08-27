@@ -3,17 +3,16 @@ import { CloudAlert } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
+import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
 import {
   IUserAdvancedStyleRequest,
   userStyleResponseType,
-  UserStyleStatus,
 } from '@/core/models/user.model'
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleFileCapture from '../../core/components/StyleFileCapture'
-import StyleTextCapture from '../components/StyleTextCapture'
-import { queryKeys } from '../utils'
+import StyleTextCapture from '../../settings/components/StyleTextCapture'
 
 interface IAdvancedProps {
   data?: userStyleResponseType
@@ -26,7 +25,7 @@ const Advanced = ({ data }: IAdvancedProps) => {
     mutationFn: (payload: IUserAdvancedStyleRequest) =>
       stylesApi.setUserAdvancedStyle(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeys.userStyle] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userStyle] })
       toast.success('Advanced user style updated successfully')
     },
     onError: () => {

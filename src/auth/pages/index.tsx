@@ -1,14 +1,19 @@
 import { CredentialResponse } from '@react-oauth/google'
-import { useQueryClient } from '@tanstack/react-query'
+import {
+  useIsFetching,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { authApi } from '@/core/api/auth.api'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY, QUERY_KEYS } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
-import { ILoginResponse } from '@/core/models/auth.model'
+import { LoginResponse } from '@/core/models/auth.model'
+import { StarsBackground } from '@/shared/ui/star-background'
 import { cn } from '@/shared/utils'
 import {
   getLocalStorageItem,
@@ -17,25 +22,37 @@ import {
 } from '@/shared/utils/localstorage.util'
 
 import { clearUser, setUser } from '../../core/store/auth-slice'
+import InfoPanelOverlay from '../components/InfoPanelOverlay'
 import LoginPanel from '../components/LoginPanel'
 
 function Login() {
-  // UseStates
-  const [isLoading, setIsLoading] = useState(false)
+  // ---- Variables ----
+  const key = useMemo(() => LUUA_USER_KEY, [])
 
-  // UseHooks
+  // ---- Hooks ----
   const router = useRouter()
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
+  const loginMutation = useMutation({
+    mutationFn: (token: string) =>
+      authApi.login({
+        token,
+      }),
+    onSuccess: response => {
+      updateDataAndRedirect(response.data)
+    },
+    onError: () => {
+      toast.error('Something went wrong, Not able to login, Please try again !')
+    },
+  })
+  const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
 
-  // Constants
-  const key = LUUA_USER_KEY
-
+  // ---- Effects ----
   useEffect(() => {
     // Clear user and local storage on mount
     dispatch(clearUser())
     removeLocalStorageItem(key)
-  }, [])
+  }, [dispatch, key])
 
   /**
    * Handles the login process
@@ -45,24 +62,7 @@ function Login() {
    */
   const onLogin = async (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) return
-    setIsLoading(true)
-
-    // Login the user to Backend
-    // Get the response and update the store and local storage
-    // Redirect to the dashboard
-    authApi
-      .login({
-        token: credentialResponse.credential,
-      })
-      .then(response => {
-        updateDataAndRedirect(response.data)
-      })
-      .catch(() => {
-        setIsLoading(false)
-        toast.error(
-          'Something went wrong, Not able to login, Please try again !'
-        )
-      })
+    loginMutation.mutate(credentialResponse.credential)
   }
 
   /**
@@ -70,7 +70,7 @@ function Login() {
    *
    * @param res - The login response
    */
-  const updateDataAndRedirect = async (res: ILoginResponse) => {
+  const updateDataAndRedirect = async (res: LoginResponse) => {
     dispatch(setUser(res.user))
     setLocalStorageItem(key, res)
 
@@ -83,29 +83,52 @@ function Login() {
 
       dispatch(setUser(response.data))
       setLocalStorageItem(key, {
-        ...getLocalStorageItem<ILoginResponse>(key),
+        ...getLocalStorageItem<LoginResponse>(key),
         user: response.data,
       })
 
       router.navigate({ to: '/dashboard' })
-    } catch (err) {
+    } catch {
       toast.error('Something went wrong, Not able to login, Please try again !')
-    } finally {
-      setIsLoading(false)
     }
   }
 
   return (
-    <div className="bg-background flex min-h-screen w-screen">
+    <div className="flex min-h-screen w-screen">
+      {/** Left Panel */}
       <div
-        className={cn('flex w-full items-center justify-center', 'md:flex-1/2')}
+        className={cn(
+          'relative flex w-full items-center justify-center',
+          'md:flex-1/2'
+        )}
       >
-        <LoginPanel isLoading={isLoading} onLogin={onLogin} />
+        {/** Background grid */}
+        <div className="absolute inset-0 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+        {/** Login */}
+        <div
+          className={cn(
+            'z-1 h-full w-full',
+            'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:ease-out'
+          )}
+        >
+          <LoginPanel
+            isLoading={loginMutation.isPending || isFetchingUser > 0}
+            onLogin={onLogin}
+          />
+        </div>
       </div>
+
+      {/** Right Panel */}
       <div
-        className={cn('bg-brand-background-dark hidden flex-1/2', 'md:block')}
+        className={cn(
+          'bg-brand-background-dark m-1.5 hidden flex-1/2 overflow-clip rounded-3xl',
+          'md:block'
+        )}
       >
-        {/* TODO: Add items here */}
+        <StarsBackground className="flex aspect-16/9 items-center justify-center">
+          <InfoPanelOverlay />
+        </StarsBackground>
       </div>
     </div>
   )

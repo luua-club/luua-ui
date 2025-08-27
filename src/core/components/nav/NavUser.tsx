@@ -7,7 +7,8 @@ import {
   LucideSparkles,
 } from 'lucide-react'
 
-import { IUserState } from '@/core/models/user.model'
+import { UserState } from '@/core/models/user.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import {
@@ -21,7 +22,7 @@ import {
 import { Skeleton } from '@/shared/ui/skeleton'
 
 interface INavUserProps {
-  user: IUserState | null
+  user: UserState | null
 }
 
 export function NavUser({ user }: INavUserProps) {
@@ -48,7 +49,7 @@ export function NavUser({ user }: INavUserProps) {
         >
           <Avatar className="h-8 w-8 rounded-full">
             <AvatarImage src={user.profile_image} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{extractUserInitial(user.name)}</AvatarFallback>
           </Avatar>
           <div className="hidden flex-1 text-left text-sm leading-tight lg:grid">
             <span className="truncate font-semibold">{user.name}</span>

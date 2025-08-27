@@ -9,9 +9,10 @@ import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import {
   channelType,
   ISocialChannel,
-  IUserConnectedChannel,
+  UserSocial,
 } from '@/core/models/social.model'
-import { IUserState } from '@/core/models/user.model'
+import { UserState } from '@/core/models/user.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { BorderBeam } from '@/shared/ui/border-beam'
 import { Button } from '@/shared/ui/button'
@@ -19,7 +20,7 @@ import { Card, CardContent, CardFooter } from '@/shared/ui/card'
 import { Separator } from '@/shared/ui/separator'
 import { cn } from '@/shared/utils'
 
-const Socials = ({ user }: { user: IUserState }) => {
+const Socials = ({ user }: { user: UserState }) => {
   const queryClient = useQueryClient()
   const [loadingStates, setLoadingStates] = useState<
     Record<channelType, boolean>
@@ -126,7 +127,7 @@ const SocialCard = ({
   onDisconnect,
 }: {
   platform: ISocialChannel
-  userChannel: IUserConnectedChannel
+  userChannel: UserSocial
   isAccountConnected?: boolean
   isLoading?: boolean
   onConnect?: () => void
@@ -151,7 +152,9 @@ const SocialCard = ({
                   src={userChannel.user_profile_picture}
                   alt={userChannel.user_name}
                 />
-                <AvatarFallback>{'DL'}</AvatarFallback>
+                <AvatarFallback>
+                  {extractUserInitial(userChannel.user_name)}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col pl-2">
                 <h6 className="text-base font-medium">

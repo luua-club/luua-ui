@@ -1,7 +1,7 @@
 import { channelType } from '../models/social.model'
 import {
-  IUser,
   IUserStyleRequest,
+  User,
   userStyleResponseType,
 } from '../models/user.model'
 import { BaseApiService } from './base.api'
@@ -17,7 +17,7 @@ class UserApi extends BaseApiService {
    * @returns Promise<ApiResponse<IUser>> The user profile
    */
   async getUser() {
-    return this.get<IUser>('/profile')
+    return this.get<User>('/profile')
   }
 
   /**

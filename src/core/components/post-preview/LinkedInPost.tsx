@@ -13,7 +13,8 @@ import {
 import { useEffect, useState } from 'react'
 
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
-import { IUserConnectedChannel } from '@/core/models/social.model'
+import { UserSocial } from '@/core/models/social.model'
+import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Textarea } from '@/shared/ui/textarea'
@@ -80,11 +81,12 @@ const LinkedInPost = ({
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
 
-  // Prepare truncated display text (300 words)
-  const words = (content || '').trim().split(/\s+/)
-  const isLong = words.length > 300
+  // Prepare truncated display text (300 characters)
+  const MAX_CHARS = 300
+  const raw = content || ''
+  const isLong = raw.length > MAX_CHARS
   const displayText =
-    expanded || !isLong ? content : words.slice(0, 300).join(' ') + '...'
+    expanded || !isLong ? raw : raw.slice(0, MAX_CHARS).trimEnd() + '...'
 
   return (
     <>
@@ -113,14 +115,14 @@ const LinkedInPost = ({
         {/* Content */}
         {notEditable ? (
           <div className="p-4 pt-1 text-sm">
-            <p className="inline">{displayText}</p>
-            {isLong && !expanded && (
+            <p className="break-words whitespace-pre-wrap">{displayText}</p>
+            {isLong && (
               <Button
                 variant="link"
                 className="!p-0 text-xs text-blue-600"
-                onClick={() => setExpanded(true)}
+                onClick={() => setExpanded(prev => !prev)}
               >
-                more
+                {expanded ? 'See less' : 'See more'}
               </Button>
             )}
           </div>
@@ -192,13 +194,13 @@ const LinkedInPost = ({
   )
 }
 
-const LinkedInPostHeader = ({ user }: { user: IUserConnectedChannel }) => {
+const LinkedInPostHeader = ({ user }: { user: UserSocial }) => {
   return (
     <div className="flex items-start justify-between px-4 py-2">
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <Avatar className={cn('shrink-0 rounded-full', 'h-12 w-12')}>
           <AvatarImage src={user.user_profile_picture} alt={user.user_name} />
-          <AvatarFallback>{'DL'}</AvatarFallback>
+          <AvatarFallback>{extractUserInitial(user.user_name)}</AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-col">
           <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">
