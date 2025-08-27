@@ -1,7 +1,9 @@
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
-import { cn } from '@/shared/utils'
+import LuuaLogo from '@/assets/images/luua-full-black.svg?react'
+import { Highlighter } from '@/shared/ui/highlighter'
 
 interface LoginPanelProps {
   isLoading: boolean
@@ -10,32 +12,37 @@ interface LoginPanelProps {
 
 function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
   return (
-    <div className="flex flex-col items-center">
-      <h1 className={cn('text-5xl font-bold', 'lg:text-6xl', 'xl:text-7xl')}>
-        Login to Luua
-      </h1>
-      <p
-        className={cn(
-          'pt-4 text-center text-base text-gray-400',
-          'lg:text-xl',
-          'xl:text-2xl'
-        )}
-      >
-        Step into high class marketing <br /> boost your productivity.
-      </p>
-      <div className="flex items-center justify-center pt-8">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-5">
+      {/** Logo */}
+      <LuuaLogo className="w-72 lg:w-96 xl:h-[120px] xl:w-[400px]" />
+
+      {/** Tagline */}
+      <Highlighter action="underline" color="var(--brand-accent-yellow)">
+        <p className="text-base font-bold lg:text-xl">
+          For strategically lazy people.
+        </p>
+      </Highlighter>
+
+      {/** Description */}
+      <div className="mt-8 flex flex-col items-center gap-8 md:mt-6">
+        <p className="text-center text-base font-medium text-gray-600 md:text-lg">
+          From idea to post, everything is automated,
+          <br className="hidden lg:block" />
+          making brand-building effortless with Luua.
+        </p>
+
+        {/** Login Button */}
         {isLoading ? (
           <Loader2 className="h-10 w-10 animate-spin" />
         ) : (
           <GoogleLogin
             onSuccess={onLogin}
             onError={() => {
-              /** TODO: Show error notification */
-              console.log('Google login failed')
+              toast.error('Something went wrong, Please try again !')
             }}
             theme="filled_black"
             text="continue_with"
-            width={300}
+            width={280}
           />
         )}
       </div>
