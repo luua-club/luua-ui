@@ -123,7 +123,7 @@ const Create = () => {
    */
   useEffect(() => {
     if (generationError) {
-      toast.error('Something went wrong')
+      toast.error('Something went wrong, Please try again !')
     }
   }, [generationError])
 

@@ -1,9 +1,11 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { Outlet, RouterProvider } from '@tanstack/react-router'
+import { Outlet, RouterProvider, useLocation } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { toast } from 'sonner'
+
+import { Toaster } from '@/shared/ui/sonner'
 
 import { userApi } from './core/api/user.api'
 import { LUUA_USER_KEY, QUERY_KEYS } from './core/config/constant'
@@ -30,12 +32,18 @@ export function AppContent() {
 
   // ---- Hooks ----
   const dispatch = useAppDispatch()
+  const location = useLocation()
+  const isLoginRoute = location.pathname === '/login'
 
-  // GET user profile
-  const { data: userData } = useQuery({
+  // GET user profile, Do not run login route (the same is also ran there)
+  const {
+    data: userData,
+    isError,
+    isEnabled,
+  } = useQuery({
     queryKey: [QUERY_KEYS.user],
     queryFn: () => userApi.getUser(),
-    enabled: !!isLoggedIn,
+    enabled: !!isLoggedIn && !isLoginRoute,
   })
 
   // ---- Effects ----
@@ -48,10 +56,20 @@ export function AppContent() {
     if (UserSchema.safeParse(userData.data).success) {
       dispatch(setUser(userData.data))
     } else {
-      toast.error('Something went wrong, Not able to login, Please try again !')
+      toast.error('Something went wrong, Please try again !')
       logout()
     }
   }, [userData, dispatch])
+
+  // If User profile API fails and is also enabled then run this effect
+  // Note: isEnabled is used because the same query is also ran in login page
+  // so to avoid conflicts and race condition it is used
+  useEffect(() => {
+    if (isError && isEnabled) {
+      toast.error('Something went wrong, Please try again !')
+      logout()
+    }
+  }, [isError, isEnabled])
 
   return (
     <>
@@ -69,6 +87,7 @@ function App() {
         <Provider store={store}>
           {/* Redux provider */}
           <RouterProvider router={router} /> {/* Router provider */}
+          <Toaster />
         </Provider>
       </QueryClientProvider>
     </GoogleOAuthProvider>
