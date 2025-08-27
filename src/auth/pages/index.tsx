@@ -42,7 +42,7 @@ function Login() {
       updateDataAndRedirect(response.data)
     },
     onError: () => {
-      toast.error('Something went wrong, Not able to login, Please try again !')
+      toast.error('Something went wrong, Please try again !')
     },
   })
   const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
@@ -71,7 +71,6 @@ function Login() {
    * @param res - The login response
    */
   const updateDataAndRedirect = async (res: LoginResponse) => {
-    dispatch(setUser(res.user))
     setLocalStorageItem(key, res)
 
     try {
@@ -79,6 +78,7 @@ function Login() {
         queryKey: [QUERY_KEYS.user],
         queryFn: () => userApi.getUser(),
         staleTime: 0,
+        retry: false,
       })
 
       dispatch(setUser(response.data))
@@ -89,7 +89,8 @@ function Login() {
 
       router.navigate({ to: '/dashboard' })
     } catch {
-      toast.error('Something went wrong, Not able to login, Please try again !')
+      removeLocalStorageItem(key)
+      toast.error('Something went wrong, Please try again !')
     }
   }
 

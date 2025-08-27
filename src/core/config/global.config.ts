@@ -23,7 +23,7 @@ export const queryClient = new QueryClient({
         }
 
         // Retry upto 3 times
-        if (failureCount < 3) {
+        if (failureCount < 2) {
           return true
         }
 
