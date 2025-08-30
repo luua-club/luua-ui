@@ -19,8 +19,8 @@ const FormSchema = z.object({
     .min(10, {
       message: 'Sample Text must be at least 10 characters.',
     })
-    .max(1000, {
-      message: 'Sample Text must not be longer than 1000 characters.',
+    .max(10000, {
+      message: 'Sample Text must not be longer than 10000 characters.',
     }),
 })
 
