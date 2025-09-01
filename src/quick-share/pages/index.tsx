@@ -20,6 +20,7 @@ import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { IDraftRequest } from '@/core/models/draft.model'
+import { channelType } from '@/core/models/social.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
@@ -56,7 +57,7 @@ const QuickShare = () => {
     },
   })
 
-  const preUserPrompt = useAppSelector(state => state.promptState.prompt)
+  const preUserPromptState = useAppSelector(state => state.promptState)
   const {
     posts,
     extractedLinks,
@@ -64,19 +65,25 @@ const QuickShare = () => {
     isFetching,
     error,
     setUserPrompt,
+    setUserSearch,
+    setUserChannel,
     key,
     refetch,
-  } = useGeneratePosts(preUserPrompt || '')
+  } = useGeneratePosts(
+    preUserPromptState.prompt || '',
+    preUserPromptState.search,
+    preUserPromptState.channel
+  )
 
   const isDataFetching = isLoading || isFetching
   const isLoadingPublish = publishDraft.isPending || scheduleDraft.isPending
 
   useEffect(() => {
     // Redirect to dashboard if no prompt is available
-    if (!preUserPrompt) {
+    if (!preUserPromptState.prompt) {
       navigate({ to: '/dashboard' })
     }
-  }, [preUserPrompt, navigate])
+  }, [preUserPromptState.prompt, navigate])
 
   useEffect(() => {
     return () => {
@@ -306,12 +313,18 @@ const QuickShare = () => {
 
       {/* Floating Prompt Input */}
       <FloatingPromptInput
-        onChange={prompt => {
-          setUserPrompt(prompt)
+        onChange={(
+          content: string,
+          search: boolean,
+          channel: string | null
+        ) => {
+          setUserPrompt(content)
+          setUserSearch(search)
+          setUserChannel((channel as channelType) ?? null)
           setActiveTab('created-post')
         }}
         loading={loading}
-        expandable
+        hidePromptInfo
       >
         {(!error || posts.length > 0) && (
           <div className="block lg:hidden">

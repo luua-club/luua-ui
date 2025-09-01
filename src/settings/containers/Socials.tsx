@@ -149,7 +149,7 @@ const SocialCard = ({
             <div className="flex items-center">
               <Avatar className="bg-accent h-12 w-12 rounded-full">
                 <AvatarImage
-                  src={userChannel.user_profile_picture}
+                  src={userChannel.user_profile_picture ?? undefined}
                   alt={userChannel.user_name}
                 />
                 <AvatarFallback>

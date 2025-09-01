@@ -19,6 +19,6 @@ export const UserSocialSchema = z.object({
   user_name: z.string(),
   user_id: z.string(),
   user_email: z.string(),
-  user_profile_picture: z.string(),
+  user_profile_picture: z.string().nullable(),
 })
 export type UserSocial = z.infer<typeof UserSocialSchema>

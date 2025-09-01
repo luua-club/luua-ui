@@ -2,6 +2,8 @@ import { Link } from '@tanstack/react-router'
 
 import LogoIconOnly from '@/assets/images/luua-black-icon.svg?react'
 import LogoTextOnly from '@/assets/images/luua-black-text.svg?react'
+import LogoIconOnlyDark from '@/assets/images/luua-white-icon.svg?react'
+import LogoTextOnlyDark from '@/assets/images/luua-white-text.svg?react'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -18,13 +20,31 @@ function AppSidebarHeader() {
           className="data-[slot=sidebar-menu-button]:!p-1.5"
         >
           <Link to="/dashboard">
-            <LogoIconOnly aria-label="Icon" className="!size-5" />
+            {/* Logo Icon */}
+            <LogoIconOnly aria-label="Icon" className="!size-5 dark:hidden" />
+
+            <LogoIconOnlyDark
+              aria-label="Icon"
+              className="hidden !size-5 dark:block"
+            />
+
+            {/* Logo Text */}
             <div className="flex w-full items-center justify-between">
-              <LogoTextOnly aria-label="Text" className="!size-12" />
+              <LogoTextOnly
+                aria-label="Text"
+                className="!size-12 dark:hidden"
+              />
+
+              <LogoTextOnlyDark
+                aria-label="Text"
+                className="hidden !size-12 dark:block"
+              />
+
+              {/* TODO: Plan Badge */}
               <span
                 className={cn(
                   'truncate rounded-sm border-1 border-gray-200 bg-white px-3 py-0.5 text-xs',
-                  'dark:rounded-xs dark:border-dashed dark:border-amber-500 dark:bg-transparent dark:text-amber-500'
+                  'dark:bg-accent dark:text-accent-foreground dark:border-transparent'
                 )}
               >
                 Free
