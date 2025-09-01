@@ -50,6 +50,8 @@ const Create = () => {
     isFetching: isGenerationFetching,
     error: generationError,
     setUserPrompt,
+    setUserSearch,
+    setUserChannel,
   } = useGeneratePosts('')
 
   // Constants
@@ -248,11 +250,18 @@ const Create = () => {
 
       {user && isSocialConnected(activeTab, user) && (
         <FloatingPromptInput
-          onChange={prompt => {
-            setUserPrompt(prompt)
+          onChange={(
+            content: string,
+            search: boolean,
+            channel: string | null
+          ) => {
+            setUserPrompt(content)
+            setUserSearch(search)
+            setUserChannel((channel as channelType) ?? null)
           }}
           loading={isGenerationDataFetching || saveDraftMutation.isPending}
-          expandable
+          hidePromptInfo
+          activeChannel={activeTab as channelType}
         >
           <div className="flex justify-center gap-2 lg:hidden">
             <DraftActions

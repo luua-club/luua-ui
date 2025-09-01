@@ -5,21 +5,37 @@ import { generateApi } from '../api/generate-post.api'
 import { QUERY_KEYS } from '../config/constant'
 import { extractedLinksType } from '../models/generate-post.model'
 import { IPost } from '../models/post.model'
+import { channelType } from '../models/social.model'
 
-export const useGeneratePosts = (initialPrompt: string) => {
+export const useGeneratePosts = (
+  initialPrompt: string,
+  initialSearch?: boolean,
+  initialChannel?: channelType | null
+) => {
   const [userPrompt, setUserPrompt] = useState(initialPrompt)
+  const [userSearch, setUserSearch] = useState<boolean | undefined>(
+    initialSearch
+  )
+  const [userChannel, setUserChannel] = useState<
+    channelType | null | undefined
+  >(initialChannel)
   const [sessionId, setSessionId] = useState<string | null>(null)
 
   const activePrompt = userPrompt || initialPrompt || ''
+  const activeSearch = userSearch ?? initialSearch ?? false
+  const activeChannel = userChannel ?? initialChannel ?? null
   const key = QUERY_KEYS.generateAIPost
 
   const query = useQuery({
-    queryKey: [key, activePrompt],
+    // Excluding sessionId to avoid re-fetch when it's set after first response
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [key, activePrompt, activeSearch, activeChannel],
     queryFn: ({ signal }) =>
       generateApi.generatePost(
         {
           user_prompt: activePrompt,
-          is_search_enabled: true,
+          is_search_enabled: activeSearch,
+          ...(activeChannel ? { post_channels: [activeChannel] } : {}),
           ...(sessionId ? { session_id: sessionId } : {}),
         },
         signal
@@ -66,5 +82,7 @@ export const useGeneratePosts = (initialPrompt: string) => {
     key,
     setSessionId,
     setUserPrompt,
+    setUserSearch,
+    setUserChannel,
   }
 }

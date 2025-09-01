@@ -41,6 +41,13 @@
   --color-brand-background: var(--brand-background);
   --color-brand-accent-yellow: var(--brand-accent-yellow);
   --color-brand-background-dark: var(--brand-background-dark);
+
+  --color-brand-background-warning: var(--brand-background-warning);
+  --color-brand-border-warning: var(--brand-border-warning);
+  --color-brand-text-warning: var(--brand-text-warning);
+  --color-brand-background-success: var(--brand-background-success);
+  --color-brand-border-success: var(--brand-border-success);
+  --color-brand-text-success: var(--brand-text-success);
 }
 
 @layer base {

@@ -36,6 +36,13 @@
   --brand-background: #e8e8e8;
   --brand-accent-yellow: #f4ce14;
   --brand-background-dark: #141414;
+
+  --brand-background-warning: #fffcf0;
+  --brand-border-warning: #fbeeb1;
+  --brand-text-warning: #dc7609;
+  --brand-background-success: #ecfdf3;
+  --brand-border-success: #bffcd9;
+  --brand-text-success: #008a2e;
 }
 
 .dark {
@@ -75,4 +82,11 @@
   --brand-background: #e8e8e8;
   --brand-accent-yellow: #f4ce14;
   --brand-background-dark: #141414;
+
+  --brand-background-warning: #1d1f00;
+  --brand-border-warning: #2e2e00;
+  --brand-text-warning: #f3cf58;
+  --brand-background-success: #001f0f;
+  --brand-border-success: #003d1c;
+  --brand-text-success: #59f3a6;
 }
