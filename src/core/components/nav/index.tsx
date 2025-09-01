@@ -20,15 +20,15 @@ function Nav({ handleSidebar }: INavProps) {
   const currentPageTitle = getCurrentPageTitle(pathname)
 
   return (
-    <nav className="dark:bg-sidebar flex h-14 justify-between border-b-1 p-2">
+    <nav className="flex h-14 justify-between border-b-1 p-2">
       <div className="flex items-center">
         {/* Sidebar toggle */}
         <LucidePanelRight
-          className="cursor-pointer text-gray-500 dark:text-white"
+          className="size-5 cursor-pointer text-gray-500 dark:text-white"
           onClick={handleSidebar}
         />
         {/* Page title */}
-        <h1 className="pl-4 text-lg font-medium text-gray-500 dark:text-white">
+        <h1 className="text-normal pl-3 font-medium text-gray-500 dark:font-normal dark:text-white">
           {currentPageTitle}
         </h1>
       </div>

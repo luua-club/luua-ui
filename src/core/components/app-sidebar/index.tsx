@@ -14,8 +14,8 @@ import AppSidebarPosts from './AppSidebarPosts'
 
 interface IAppSidebarProps {
   platformItems: ISidebarItem[]
-  creationsData?: ISidebarItem[]
-  postsItems?: ISidebarItem[]
+  creationsData: ISidebarItem[]
+  postsItems: ISidebarItem[]
 }
 
 function AppSidebar({

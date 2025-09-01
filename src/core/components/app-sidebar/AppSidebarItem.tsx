@@ -15,7 +15,7 @@ function AppSideBarItem({ item }: IAppSidebarItemProps) {
         <Link
           to={item.url}
           className={cn(
-            'border-dashed [&.active]:border-1 [&.active]:font-semibold [&.active]:text-black',
+            '[&.active]:font-semibold [&.active]:text-black',
             'dark:[&.active]:text-white'
           )}
         >
