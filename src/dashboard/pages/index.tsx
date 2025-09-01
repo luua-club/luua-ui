@@ -9,6 +9,7 @@ import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { channelType } from '@/core/models/social.model'
 import { setPrompt } from '@/core/store/prompt-slice'
+import { UpgradePlanBtn } from '@/shared/components/upgrade-plan-btn'
 import { capitalize } from '@/shared/utils'
 
 const Dashboard = () => {
@@ -38,6 +39,9 @@ const Dashboard = () => {
   return (
     <div className="relative m-auto min-h-[calc(100vh-3.5rem)] max-w-7xl">
       <div className="absolute top-[40%] left-1/2 flex w-full -translate-x-1/2 -translate-y-1/2 transform flex-col gap-6 p-5 lg:max-w-[60%]">
+        <div className="w-fit self-center">
+          <UpgradePlanBtn />
+        </div>
         <motion.h1
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
