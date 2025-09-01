@@ -10,7 +10,7 @@ import { UserSocialSchema } from './social.model'
 export const UserSchema = z.object({
   email: z.string(),
   name: z.string(),
-  profile_image: z.string().nullable(),
+  profile_image: z.string(),
   deactivated: z.boolean(),
   connected_channels: z.object({
     linkedin: UserSocialSchema,
