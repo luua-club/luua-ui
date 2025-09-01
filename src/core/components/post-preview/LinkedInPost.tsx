@@ -199,7 +199,10 @@ const LinkedInPostHeader = ({ user }: { user: UserSocial }) => {
     <div className="flex items-start justify-between px-4 py-2">
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <Avatar className={cn('shrink-0 rounded-full', 'h-12 w-12')}>
-          <AvatarImage src={user.user_profile_picture} alt={user.user_name} />
+          <AvatarImage
+            src={user.user_profile_picture ?? undefined}
+            alt={user.user_name}
+          />
           <AvatarFallback>{extractUserInitial(user.user_name)}</AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-col">
