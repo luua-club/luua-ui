@@ -12,27 +12,15 @@ function AppSideBarItem({ item }: IAppSidebarItemProps) {
   return (
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton tooltip={item.title} asChild>
-        {item.url ? (
-          <Link
-            to={item.url}
-            className={cn(
-              'text-gray-500 [&.active]:border-1 [&.active]:font-semibold [&.active]:text-black',
-              'dark:border-none dark:text-gray-400 dark:[&.active]:text-white'
-            )}
-          >
-            <ItemWithIcon item={item} />
-          </Link>
-        ) : (
-          <SidebarMenuButton
-            tooltip={item.title}
-            className={cn(
-              'text-gray-500 outline-1',
-              'dark:text-gray-400 dark:[&.active]:text-white'
-            )}
-          >
-            <ItemWithIcon item={item} />
-          </SidebarMenuButton>
-        )}
+        <Link
+          to={item.url}
+          className={cn(
+            'border-dashed [&.active]:border-1 [&.active]:font-semibold [&.active]:text-black',
+            'dark:[&.active]:text-white'
+          )}
+        >
+          <ItemWithIcon item={item} />
+        </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
   )

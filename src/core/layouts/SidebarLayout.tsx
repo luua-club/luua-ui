@@ -20,14 +20,9 @@ const platformItems: ISidebarItem[] = [
     icon: <LucideLayoutDashboard />,
   },
   {
-    title: 'Schedule',
-    url: '/schedule',
-    icon: <LucideCalendar />,
-  },
-  {
-    title: 'Published',
-    url: '/published',
-    icon: <LucideFileText />,
+    title: 'Your Styles',
+    url: '/preferences',
+    icon: <Eclipse />,
   },
 ]
 
@@ -37,10 +32,18 @@ const creationItems: ISidebarItem[] = [
     url: '/creation/drafts',
     icon: <FolderClock />,
   },
+]
+
+const postsItems: ISidebarItem[] = [
   {
-    title: 'Preferences',
-    url: '/preferences',
-    icon: <Eclipse />,
+    title: 'Scheduled',
+    url: '/schedule',
+    icon: <LucideCalendar />,
+  },
+  {
+    title: 'Published',
+    url: '/published',
+    icon: <LucideFileText />,
   },
 ]
 
@@ -53,12 +56,16 @@ function SidebarLayout() {
 }
 
 // This component is now inside SidebarProvider, so it can use useSidebar
-function SidebarContent() {
+const SidebarContent = () => {
   const { toggleSidebar } = useSidebar()
 
   return (
     <>
-      <AppSidebar platformItems={platformItems} creationsData={creationItems} />
+      <AppSidebar
+        platformItems={platformItems}
+        creationsData={creationItems}
+        postsItems={postsItems}
+      />
       <div className="w-full">
         <Nav handleSidebar={toggleSidebar} />
         <main>

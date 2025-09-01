@@ -10,13 +10,19 @@ import AppSidebarCreation from './AppSidebarCreation'
 import AppSidebarFooter from './AppSidebarFooter'
 import AppSidebarHeader from './AppSidebarHeader'
 import AppSidebarPlatform from './AppSidebarPlatform'
+import AppSidebarPosts from './AppSidebarPosts'
 
 interface IAppSidebarProps {
   platformItems: ISidebarItem[]
   creationsData?: ISidebarItem[]
+  postsItems?: ISidebarItem[]
 }
 
-function AppSidebar({ platformItems, creationsData }: IAppSidebarProps) {
+function AppSidebar({
+  platformItems,
+  creationsData,
+  postsItems,
+}: IAppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -25,6 +31,7 @@ function AppSidebar({ platformItems, creationsData }: IAppSidebarProps) {
       <SidebarContent>
         <AppSidebarPlatform platformItems={platformItems} />
         <AppSidebarCreation creationsData={creationsData} />
+        <AppSidebarPosts postsItems={postsItems} />
       </SidebarContent>
       <SidebarFooter>
         <AppSidebarFooter />
