@@ -25,7 +25,7 @@ import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
-import GeneratedPostControls from '../components/GeneratedPostControls'
+import GeneratedPostControls from './components/GeneratedPostControls'
 
 const QuickShare = () => {
   const [activeTab, setActiveTab] = useState<string>('created-post')
