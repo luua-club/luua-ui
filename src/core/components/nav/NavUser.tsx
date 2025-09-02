@@ -28,7 +28,7 @@ interface INavUserProps {
 export function NavUser({ user }: INavUserProps) {
   if (!user) {
     return (
-      <div className="flex h-full items-center gap-2 rounded px-3 focus-visible:ring-0 lg:w-50 lg:border-1 lg:border-dashed dark:border-none">
+      <div className="flex h-full items-center gap-2 px-3 focus-visible:ring-0 lg:w-50">
         <Skeleton className="size-8 rounded-full" />
         <div className="hidden flex-1 gap-1 text-left text-sm leading-tight lg:grid">
           <Skeleton className="h-4 w-[80%]" />

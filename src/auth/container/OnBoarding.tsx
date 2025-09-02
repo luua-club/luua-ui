@@ -9,6 +9,7 @@ import {
   ONBOARDING_FORM_SCHEMA,
   OnboardingFormValues,
 } from '@/auth/config/onboarding.config'
+import UserStyles from '@/core/containers/UserStylesChips'
 import { Button } from '@/shared/ui/button'
 import { Form } from '@/shared/ui/form'
 import { Progress } from '@/shared/ui/progress'
@@ -21,9 +22,9 @@ function OnBoarding() {
   const [currentStep, setCurrentStep] = useState(1)
 
   // ---- Variables ----
-  const totalSteps = 2
+  const totalSteps = 3
   const progress = (currentStep / totalSteps) * 100
-  const steps = ['Role & Industry', 'Goal']
+  const steps = ['Role & Industry', 'Goal', 'Styles']
 
   // ---- Hooks ----
   const form = useForm<OnboardingFormValues>({
@@ -67,6 +68,8 @@ function OnBoarding() {
         return <RoleAndIndustry industries={INDUSTRIES} />
       case 2:
         return <Goal goals={GOALS} />
+      case 3:
+        return <UserStyles oneCol />
       default:
         return null
     }

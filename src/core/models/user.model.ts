@@ -1,7 +1,7 @@
 import z from 'zod'
 
 import { UserStyleStatus } from '../config/constant'
-import { toneStyles, writingStyles } from '../config/user-preferences.config'
+import { writingStyles } from '../config/user-preferences.config'
 import { UserSocialSchema } from './social.model'
 
 /**
@@ -37,18 +37,9 @@ export const UserStyleResponseSchema = z.object({
     .array(z.string())
     .transform(arr =>
       arr
-        .map(val => writingStyles.find(style => style.title === val)?.title)
+        .map(val => writingStyles.find(style => style.id === val))
         .filter(v => v !== undefined)
-    )
-    .nullish(),
-  tone: z
-    .array(z.string())
-    .transform(arr =>
-      arr
-        .map(val => toneStyles.find(style => style.title === val)?.title)
-        .filter(v => v !== undefined)
-    )
-    .nullish(),
+    ),
   style_tags: z.array(z.string()).nullish(),
 })
 export type userStyleResponseType = z.infer<typeof UserStyleResponseSchema>
@@ -65,6 +56,5 @@ export interface IUserAdvancedStyleRequest {
  * User style request interface
  */
 export interface IUserStyleRequest {
-  writing_style?: string[]
-  tone?: string[]
+  writing_style: string[]
 }

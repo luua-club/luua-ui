@@ -1,79 +1,52 @@
 import {
-  Icon,
-  IconBriefcase,
-  IconBulb,
-  IconGymnastics,
-  IconHandLoveYou,
-  IconMoodHappy,
-  IconMoodNeutral,
-  IconMoodSmileBeam,
-  IconProps,
-  IconRulerMeasure2,
+  IconBooks,
+  IconCampfire,
+  IconEyeDollar,
+  IconFlask,
   IconSchool,
-  IconTie,
 } from '@tabler/icons-react'
 
-export type WritingStyleType =
-  | 'Casual'
-  | 'Formal'
-  | 'Academic'
-  | 'Creative'
-  | 'Technical'
+import { WritingStyleChip } from '@/shared/models/style-chip.model'
 
-export type ToneStyleType =
-  | 'Friendly'
-  | 'Professional'
-  | 'Assertive'
-  | 'Neutral'
-  | 'Humorous'
-
-export interface ISelectionChip<T extends string> {
-  title: T
-  icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
-}
-
-export const writingStyles: ISelectionChip<WritingStyleType>[] = [
+export const writingStyles: WritingStyleChip[] = [
   {
-    title: 'Casual',
-    icon: IconHandLoveYou,
-  },
-  {
-    title: 'Formal',
-    icon: IconTie,
-  },
-  {
-    title: 'Academic',
+    id: 'the_expert',
+    title: 'The Expert',
+    description: 'Authoritative, insightful, and confident',
+    llm_info: 'Uses more data, assumes a knowledgeable audience',
     icon: IconSchool,
+    color: 'bg-yellow-200',
   },
   {
-    title: 'Creative',
-    icon: IconBulb,
+    id: 'the_friendly_guide',
+    title: 'The Friendly Guide',
+    description: 'Approachable, helpful, and clear',
+    llm_info: 'Breaks down complex topics, uses simpler language',
+    icon: IconBooks,
+    color: 'bg-green-200',
   },
   {
-    title: 'Technical',
-    icon: IconRulerMeasure2,
-  },
-]
-
-export const toneStyles: ISelectionChip<ToneStyleType>[] = [
-  {
-    title: 'Friendly',
-    icon: IconMoodSmileBeam,
+    id: 'the_visionary',
+    title: 'The Visionary',
+    description: 'Inspiring, bold, and forward-looking',
+    llm_info: 'Focuses on trends, ideas, and storytelling',
+    icon: IconEyeDollar,
+    color: 'bg-red-200',
   },
   {
-    title: 'Professional',
-    icon: IconBriefcase,
+    id: 'the_analyst',
+    title: 'The Analyst',
+    description: 'Data-driven, precise, and objective',
+    llm_info: 'Uses numbers, facts, and logical reasoning',
+    icon: IconFlask,
+    color: 'bg-blue-200',
   },
   {
-    title: 'Assertive',
-    icon: IconGymnastics,
-  },
-  {
-    title: 'Neutral',
-    icon: IconMoodNeutral,
-  },
-  {
-    title: 'Humorous',
-    icon: IconMoodHappy,
+    id: 'the_challenger',
+    title: 'The Challenger',
+    description: 'Provocative, opinionated, and direct',
+    llm_info: 'Designed to spark debate and strong reactions',
+    icon: IconCampfire,
+    color: 'bg-orange-200',
   },
 ]
