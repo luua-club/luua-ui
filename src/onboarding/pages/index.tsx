@@ -7,12 +7,6 @@ import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import {
-  GOALS,
-  INDUSTRIES,
-  ONBOARDING_FORM_SCHEMA,
-  OnboardingFormValues,
-} from '@/auth/config/onboarding.config'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY } from '@/core/config/constant'
 import UserStyles from '@/core/containers/UserStyles'
@@ -29,6 +23,12 @@ import {
 
 import Goal from '../components/Goal'
 import RoleAndIndustry from '../components/RolesAndIndustry'
+import {
+  GOALS,
+  INDUSTRIES,
+  ONBOARDING_FORM_SCHEMA,
+  OnboardingFormValues,
+} from '../config/onboarding.config'
 
 function OnBoarding() {
   // ---- State ----
@@ -75,6 +75,8 @@ function OnBoarding() {
    *  Handles the form submission
    */
   const onSubmit = async (values: OnboardingFormValues) => {
+    // eslint-disable-next-line no-console
+    console.log(values)
     try {
       if (styles.length > 0) {
         await Promise.all([
