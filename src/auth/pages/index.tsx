@@ -13,6 +13,7 @@ import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY, QUERY_KEYS } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { LoginResponse } from '@/core/models/auth.model'
+import { BorderBeam } from '@/shared/ui/border-beam'
 import { StarsBackground } from '@/shared/ui/star-background'
 import { cn } from '@/shared/utils'
 import {
@@ -24,10 +25,12 @@ import {
 import { clearUser, setUser } from '../../core/store/auth-slice'
 import InfoPanelOverlay from '../components/InfoPanelOverlay'
 import LoginPanel from '../components/LoginPanel'
+import OnBoarding from '../container/OnBoarding'
 
 function Login() {
   // ---- Variables ----
   const key = useMemo(() => LUUA_USER_KEY, [])
+  const [showOnBoarding, setShowOnboarding] = useState(false)
 
   // ---- Hooks ----
   const router = useRouter()
@@ -93,7 +96,11 @@ function Login() {
         user: response.data,
       })
 
-      router.navigate({ to: '/dashboard' })
+      if (res.new_user) {
+        setShowOnboarding(true)
+      } else {
+        router.navigate({ to: '/dashboard' })
+      }
     } catch {
       removeLocalStorageItem(key)
       toast.error('Something went wrong, Please try again !')
@@ -101,7 +108,7 @@ function Login() {
   }
 
   return (
-    <div className="flex min-h-screen w-screen">
+    <div className="flex min-h-screen w-screen overflow-hidden">
       {/** Left Panel */}
       <div
         className={cn(
@@ -113,26 +120,43 @@ function Login() {
         <div className="absolute inset-0 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
         {/** Login */}
-        <div
-          className={cn(
-            'z-1 h-full w-full',
-            !mounted && 'opacity-0',
-            mounted &&
-              'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 transform-gpu will-change-[transform,opacity] motion-safe:delay-75 motion-safe:duration-700 motion-safe:ease-out'
-          )}
-        >
-          <LoginPanel
-            isLoading={loginMutation.isPending || isFetchingUser > 0}
-            onLogin={onLogin}
-          />
-        </div>
+
+        {showOnBoarding ? (
+          <div className="relative z-1 h-fit w-[90%] rounded-lg border border-gray-200 bg-white px-4 py-4 sm:w-[80%] sm:px-5 sm:py-7 lg:max-w-md">
+            <BorderBeam
+              duration={20}
+              size={150}
+              colorTo={'#0a0a0a'}
+              colorFrom={'#0a0a0a'}
+              borderWidth={2}
+            />
+            <h1 className="text-xl font-semibold sm:text-3xl">
+              Tell us about yourself
+            </h1>
+            <OnBoarding />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'z-1 h-full w-full',
+              !mounted && 'opacity-0',
+              mounted &&
+                'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 transform-gpu will-change-[transform,opacity] motion-safe:delay-75 motion-safe:duration-700 motion-safe:ease-out'
+            )}
+          >
+            <LoginPanel
+              isLoading={loginMutation.isPending || isFetchingUser > 0}
+              onLogin={onLogin}
+            />
+          </div>
+        )}
       </div>
 
       {/** Right Panel */}
       <div
         className={cn(
           'bg-brand-background-dark m-1.5 hidden flex-1/2 overflow-clip rounded-3xl',
-          'md:block'
+          'lg:block'
         )}
       >
         <StarsBackground className="flex aspect-16/9 items-center justify-center">

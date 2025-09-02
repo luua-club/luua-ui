@@ -1,7 +1,5 @@
 import z from 'zod'
 
-import { UserSchema } from './user.model'
-
 /**
  * Login request schema
  */
@@ -16,6 +14,6 @@ export type LoginRequest = z.infer<typeof LoginRequestSchema>
 export const LoginResponseSchema = z.object({
   access_token: z.string(),
   token_type: z.string(),
-  user: UserSchema,
+  new_user: z.boolean(),
 })
 export type LoginResponse = z.infer<typeof LoginResponseSchema>
