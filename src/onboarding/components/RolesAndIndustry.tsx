@@ -1,6 +1,5 @@
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,7 +20,11 @@ interface RoleAndIndustryProps {
 
 function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
+      <h1 className="text-base font-medium">
+        Tell us a bit about you to personalize your content from day one.
+      </h1>
+
       {/** Role Section */}
       <FormField
         name="role"
@@ -37,9 +40,6 @@ function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
                 className="bg-white text-xs sm:text-base"
               />
             </FormControl>
-            <FormDescription>
-              Help us tailor content to your role.
-            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -50,7 +50,7 @@ function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
         name="industry"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-base font-semibold sm:text-lg">
+            <FormLabel className="mt-4 text-base font-semibold sm:text-lg">
               What&apos;s your industry?
             </FormLabel>
             <Select

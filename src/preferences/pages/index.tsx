@@ -4,7 +4,7 @@ import { Frown } from 'lucide-react'
 
 import { userApi } from '@/core/api/user.api'
 import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
-import UserStyles from '@/core/containers/UserStylesChips'
+import UserStyles from '@/core/containers/UserStyles'
 import Summary from '@/preferences/container/Summary'
 
 import Advanced from '../container/Advanced'

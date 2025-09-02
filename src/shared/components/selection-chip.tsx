@@ -54,19 +54,11 @@ const SelectionChip = ({
 
         <p
           className={cn(
-            'text-muted-foreground px-3 text-sm text-balance',
+            'text-muted-foreground px-3 pb-3 text-sm text-balance',
             isSelected && 'text-gray-800'
           )}
         >
           {chip.description}
-        </p>
-        <p
-          className={cn(
-            'px-3 pb-2 text-xs text-gray-400',
-            isSelected && 'text-gray-800'
-          )}
-        >
-          {chip.llm_info}
         </p>
       </CardContent>
     </Card>

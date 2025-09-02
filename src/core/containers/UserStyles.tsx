@@ -20,13 +20,17 @@ import {
 interface UserStylesProps {
   data?: userStyleResponseType
   isLoading?: boolean
-  oneCol?: boolean
+  initialGridCol?: number
+  customHeader?: React.ReactNode
+  onChange?: (writing_style: string[]) => void
 }
 
 function UserStyles({
   data,
   isLoading = false,
-  oneCol = false,
+  initialGridCol = 3,
+  customHeader,
+  onChange,
 }: UserStylesProps) {
   const [selectedStyles, setSelectedStyles] = useState<WritingStyleChip[]>([])
   const queryClient = useQueryClient()
@@ -52,6 +56,10 @@ function UserStyles({
   }, [data])
 
   const submitSelectedStyles = () => {
+    if (onChange) {
+      return
+    }
+
     setUserStyleMutation.mutate({
       writing_style: selectedStyles.map(i => i.id),
     })
@@ -63,14 +71,24 @@ function UserStyles({
       : [...selectedStyles, item]
 
     setSelectedStyles(items)
+
+    if (onChange) {
+      onChange(items.map(i => i.id))
+    }
   }
 
   return (
     <>
-      <div className="py-4">
-        <h1 className="text-lg font-medium">User Styles</h1>
-      </div>
-      <Separator />
+      {customHeader ? (
+        customHeader
+      ) : (
+        <>
+          <div className="py-4">
+            <h1 className="text-lg font-medium">User Styles</h1>
+          </div>
+          <Separator />
+        </>
+      )}
       <div className="mt-4">
         {UserStylesChips(
           selectedStyles,
@@ -78,7 +96,8 @@ function UserStyles({
           isLoading || setUserStyleMutation.isPending,
           handleSelection,
           submitSelectedStyles,
-          oneCol
+          initialGridCol,
+          Boolean(onChange)
         )}
       </div>
     </>
@@ -91,14 +110,14 @@ const UserStylesChips = (
   isLoading: boolean,
   onSelect: (item: WritingStyleChip) => void,
   onSubmit: () => void,
-  oneCol?: boolean
+  initialGridCol?: number,
+  hideSaveButton?: boolean
 ) => {
   return (
     <div
       className={cn(
-        'mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3',
-        isLoading && 'opacity-50',
-        oneCol && '!grid-cols-1'
+        `mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-${initialGridCol}`,
+        isLoading && 'opacity-50'
       )}
     >
       {items.map(item => (
@@ -110,20 +129,22 @@ const UserStylesChips = (
           onSelect={() => onSelect(item)}
         />
       ))}
-      <div
-        className={cn(
-          'flex cursor-pointer items-center justify-center gap-2 rounded-lg border-1 text-lg font-medium hover:bg-gray-100',
-          isLoading && 'cursor-not-allowed'
-        )}
-        onClick={!isLoading ? onSubmit : undefined}
-      >
-        Save
-        {isLoading ? (
-          <Loader2 className="mr-2 animate-spin" />
-        ) : (
-          <Save className="size-5" />
-        )}
-      </div>
+      {!hideSaveButton && (
+        <div
+          className={cn(
+            'flex cursor-pointer items-center justify-center gap-2 rounded-lg border-1 text-lg font-medium hover:bg-gray-100',
+            isLoading && 'cursor-not-allowed'
+          )}
+          onClick={!isLoading ? onSubmit : undefined}
+        >
+          Save
+          {isLoading ? (
+            <Loader2 className="mr-2 animate-spin" />
+          ) : (
+            <Save className="size-5" />
+          )}
+        </div>
+      )}
     </div>
   )
 }
