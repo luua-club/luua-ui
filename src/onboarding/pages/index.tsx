@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -132,7 +133,12 @@ function OnBoarding() {
     <div className="h-screen w-screen">
       <div className="h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
-      <div className="absolute inset-0 mx-auto my-auto flex h-fit max-w-2xl flex-col justify-center p-5 sm:rounded-lg sm:border-1 sm:bg-white sm:shadow-lg">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+        className="absolute inset-0 mx-auto my-auto flex h-fit max-w-2xl flex-col justify-center p-5 sm:rounded-lg sm:border-1 sm:bg-white sm:shadow-lg"
+      >
         <BorderBeam
           duration={20}
           size={150}
@@ -193,7 +199,7 @@ function OnBoarding() {
             </form>
           </Form>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
