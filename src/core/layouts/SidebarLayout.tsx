@@ -5,6 +5,7 @@ import {
   LucideCalendar,
   LucideFileText,
   LucideLayoutDashboard,
+  PlusCircle,
 } from 'lucide-react'
 
 import AppSidebar from '@/core/components/app-sidebar'
@@ -27,6 +28,11 @@ const platformItems: ISidebarItem[] = [
 ]
 
 const creationItems: ISidebarItem[] = [
+  {
+    title: 'Create New',
+    url: '/creation/create',
+    icon: <PlusCircle />,
+  },
   {
     title: 'Saved Drafts',
     url: '/creation/drafts',
