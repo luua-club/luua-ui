@@ -29,6 +29,7 @@ interface InputPromptProps {
   socials: InputPromptSocial[]
   hidePromptInfo?: boolean
   activeChannel?: string | null
+  className?: string
   onChange: (content: string, search: boolean, channel: string | null) => void
 }
 
@@ -38,6 +39,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   socials = [],
   hidePromptInfo = false,
   activeChannel = null,
+  className,
   onChange,
 }) => {
   // --- State ---
@@ -95,11 +97,11 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className={cn('z-10 flex flex-col')}>
       <div
         className={cn(
-          'relative flex flex-col rounded-xl border-1',
-          'dark:bg-card'
+          'bg-card relative flex flex-col rounded-xl border-1',
+          className
         )}
       >
         {/* Input */}

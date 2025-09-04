@@ -63,7 +63,7 @@ function Post({
   return (
     <Card
       className={cn(
-        'relative flex flex-col rounded-md p-0 shadow-none',
+        'bg-card relative flex flex-col rounded-md p-0 shadow-none',
         fullView ? 'h-fit' : 'min-h-52 overflow-hidden',
         tileView ? 'min-h-30' : 'h-fit'
       )}
@@ -88,24 +88,26 @@ function Post({
                     <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <span>{platform?.name} account not connected</span>
+                    <span className="text-card-foreground">
+                      {platform?.name} account not connected
+                    </span>
                   </TooltipContent>
                 </Tooltip>
               )}
             </div>
-            <p className="truncate text-xs font-medium text-gray-400">
+            <p className="truncate text-xs font-medium text-zinc-400">
               {user.username}
             </p>
           </div>
 
           {platform && platform.logo && (
-            <platform.logo className="size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
+            <platform.logo className="dark:bg-card size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
           )}
         </div>
         {!tileView && <hr />}
         <p
           className={cn(
-            'mt-3 line-clamp-5 px-4 text-sm text-gray-600',
+            'text-card-foreground mt-3 line-clamp-5 px-4 text-sm',
             fullView ? 'line-clamp-none pb-4' : undefined,
             tileView ? 'mt-0 line-clamp-2' : undefined
           )}
@@ -115,7 +117,7 @@ function Post({
 
         {attached_media && attached_media.length !== 0 && !tileView && (
           <>
-            <span className="absolute right-1 bottom-0 flex items-center justify-center p-2 text-[10px] text-gray-400">
+            <span className="text-card-foreground absolute right-1 bottom-0 flex items-center justify-center p-2 text-[10px]">
               <Paperclip className="size-3" />+{attached_media.length}
             </span>
           </>
