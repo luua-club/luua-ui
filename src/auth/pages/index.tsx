@@ -93,7 +93,7 @@ function Login() {
         user: response.data,
       })
 
-      router.navigate({ to: '/dashboard' })
+      router.navigate({ to: res.new_user ? '/onboarding' : '/dashboard' })
     } catch {
       removeLocalStorageItem(key)
       toast.error('Something went wrong, Please try again !')
@@ -101,7 +101,7 @@ function Login() {
   }
 
   return (
-    <div className="flex min-h-screen w-screen">
+    <div className="flex min-h-screen w-screen overflow-hidden">
       {/** Left Panel */}
       <div
         className={cn(
@@ -132,7 +132,7 @@ function Login() {
       <div
         className={cn(
           'bg-brand-background-dark m-1.5 hidden flex-1/2 overflow-clip rounded-3xl',
-          'md:block'
+          'lg:block'
         )}
       >
         <StarsBackground className="flex aspect-16/9 items-center justify-center">
