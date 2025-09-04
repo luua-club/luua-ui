@@ -8,7 +8,6 @@ import {
   Smile,
   ThumbsUp,
   TriangleAlert,
-  X,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 

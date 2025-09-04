@@ -1,9 +1,4 @@
-import {
-  ArrowDownToDot,
-  ChevronRight,
-  Loader2,
-  OctagonPause,
-} from 'lucide-react'
+import { ChevronRight, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { SchedulePicker } from '@/shared/components/schedule-picker'
