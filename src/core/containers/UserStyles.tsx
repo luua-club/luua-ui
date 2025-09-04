@@ -32,9 +32,11 @@ function UserStyles({
   customHeader,
   onChange,
 }: UserStylesProps) {
+  // ---- State ----
   const [selectedStyles, setSelectedStyles] = useState<WritingStyleChip[]>([])
-  const queryClient = useQueryClient()
 
+  // ---- Hooks ----
+  const queryClient = useQueryClient()
   const setUserStyleMutation = useMutation({
     mutationFn: (payload: IUserStyleRequest) => userApi.setUserStyle(payload),
     onSuccess: () => {
@@ -45,6 +47,10 @@ function UserStyles({
     },
   })
 
+  // ---- Effects ----
+  /**
+   * Sets the selected styles based on the data prop.
+   */
   useEffect(() => {
     if (data) {
       const parse = UserStyleResponseSchema.safeParse(data)
@@ -55,6 +61,10 @@ function UserStyles({
     }
   }, [data])
 
+  // ---- Functions ----
+  /**
+   * Submits the selected styles to the API.
+   */
   const submitSelectedStyles = () => {
     if (onChange) {
       return
@@ -65,6 +75,9 @@ function UserStyles({
     })
   }
 
+  /**
+   * Handles the selection of a writing style chip.
+   */
   const handleSelection = (item: WritingStyleChip) => {
     const items = selectedStyles.includes(item)
       ? selectedStyles.filter(i => i !== item)
@@ -104,6 +117,9 @@ function UserStyles({
   )
 }
 
+/**
+ * Render user styles chips.
+ */
 const UserStylesChips = (
   selectedItems: WritingStyleChip[],
   items: WritingStyleChip[],
