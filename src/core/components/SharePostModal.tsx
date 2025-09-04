@@ -1,4 +1,9 @@
-import { Loader2 } from 'lucide-react'
+import {
+  ArrowDownToDot,
+  ChevronRight,
+  Loader2,
+  OctagonPause,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { SchedulePicker } from '@/shared/components/schedule-picker'
@@ -122,8 +127,9 @@ export function SharePostModal({
             <div
               key={post.id}
               className={cn(
-                'relative rounded-lg border-2 border-transparent',
-                selectedPosts.includes(post.id) && 'border-black',
+                'relative rounded-lg border-1 border-transparent',
+                selectedPosts.includes(post.id) &&
+                  'dark:border-card-foreground border-black',
                 'cursor-pointer'
               )}
               onClick={() => {
@@ -131,7 +137,7 @@ export function SharePostModal({
               }}
             >
               <Checkbox
-                className="absolute top-[-10px] right-[-8px] z-10 size-5 cursor-pointer bg-white"
+                className="absolute top-[-10px] right-[-8px] z-10 size-5 cursor-pointer rounded-full bg-white dark:bg-black"
                 checked={selectedPosts.includes(post.id)}
                 onCheckedChange={checked => {
                   togglePost(post.id, checked)
@@ -142,15 +148,14 @@ export function SharePostModal({
                 id={post.id}
                 channel={post.channel}
                 content={post.content}
-                tileView
               />
             </div>
           ))}
         </div>
-        <div className="mt-6 flex gap-4">
+        <div className="mt-8 flex justify-between gap-4">
           <Button
             variant="outline"
-            className="flex-1"
+            className="text-card-foreground"
             onClick={() => {
               onOpenChange({ ...isOpen, open: false })
             }}
@@ -159,7 +164,6 @@ export function SharePostModal({
           </Button>
           <Button
             variant="default"
-            className="flex-1"
             onClick={() => {
               if (isOpen.schedule) {
                 setShowSchedule(true)
@@ -189,19 +193,25 @@ export function SharePostModal({
     >
       <DialogContent
         className={cn(
-          'w-full max-w-sm bg-white p-6 md:max-w-xl dark:bg-zinc-900',
+          'bg-card w-full max-w-sm p-6 md:max-w-xl',
           showSchedule && '!max-w-fit'
         )}
       >
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-zinc-900 md:text-2xl dark:text-white">
-            Final Review
-            <span className="mt-2 pl-2 text-xs text-zinc-400 md:mt-0 dark:text-zinc-600">
-              {new Date().toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+          <DialogTitle className="mb-4 flex flex-col gap-2 text-xl font-semibold text-zinc-800 md:text-2xl dark:text-zinc-300">
+            Almost There
+            <span className="flex justify-between text-sm">
+              <span className="flex items-center gap-1">
+                Give your post a quick review
+                <ChevronRight className="size-4" />
+              </span>
+              <span>
+                {new Date().toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
             </span>
           </DialogTitle>
         </DialogHeader>
@@ -216,7 +226,7 @@ export function SharePostModal({
         ) : (
           <PostModalContent />
         )}
-        <DialogClose />
+        <DialogClose className="text-card-foreground" />
       </DialogContent>
     </Dialog>
   )

@@ -17,12 +17,12 @@ import { UserSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
+import { Skeleton } from '@/shared/ui/skeleton'
 import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { useUserState } from '../../hooks/user-state.hook'
-import { PostSkeleton } from '../Post'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
@@ -71,7 +71,7 @@ const LinkedInPost = ({
   }, [initialContent])
 
   if (!user || loading) {
-    return <PostSkeleton />
+    return <LinkedInPostSkeleton />
   }
 
   const user_social = { ...user.connected_channels.linkedin }
@@ -92,12 +92,12 @@ const LinkedInPost = ({
     <>
       <div
         className={cn(
-          'relative rounded-lg border-1 bg-white',
+          'bg-card relative rounded-lg border-1',
           isActionLoading && 'opacity-50'
         )}
       >
         {!user_social.connected && (
-          <div className="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border-1 border-dashed bg-white">
+          <div className="bg-card absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border-1 border-dashed">
             <Tooltip>
               <TooltipTrigger>
                 <TriangleAlert className="size-4 animate-pulse text-yellow-600" />
@@ -119,7 +119,7 @@ const LinkedInPost = ({
             {isLong && (
               <Button
                 variant="link"
-                className="!p-0 text-xs text-blue-600"
+                className="!p-0 text-xs text-blue-600 dark:text-blue-300"
                 onClick={() => setExpanded(prev => !prev)}
               >
                 {expanded ? 'See less' : 'See more'}
@@ -209,14 +209,13 @@ const LinkedInPostHeader = ({ user }: { user: UserSocial }) => {
           <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">
             {user.user_name}
           </h6>
-          <p className="truncate text-xs font-medium text-gray-400">
+          <p className="truncate text-xs font-medium text-gray-400 dark:text-gray-300">
             CEO of Copy-Pasting Content
           </p>
         </div>
       </div>
-      <div className="flex gap-4 text-gray-400">
+      <div className="flex gap-4 text-gray-400 dark:text-gray-300">
         <Ellipsis className="size-5" />
-        <X className="size-5" />
       </div>
     </div>
   )
@@ -228,19 +227,21 @@ const LinkedInPostFooter = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
-            <div className="rounded-full border-1 border-dotted bg-blue-200 p-1">
+            <div className="rounded-full border-1 border-dotted bg-blue-200 p-1 dark:bg-blue-300 dark:text-black">
               <ThumbsUp className="size-2 sm:size-3" />
             </div>
-            <div className="rounded-full border-1 border-dotted bg-red-200 p-1">
+            <div className="rounded-full border-1 border-dotted bg-red-200 p-1 dark:bg-red-300 dark:text-black">
               <Heart className="size-2 sm:size-3" />
             </div>
-            <div className="rounded-full border-1 border-dotted bg-yellow-200 p-1">
+            <div className="rounded-full border-1 border-dotted bg-yellow-200 p-1 dark:bg-yellow-300 dark:text-black">
               <Smile className="size-2 sm:size-3" />
             </div>
           </div>
-          <p className="text-xs text-gray-600 sm:text-sm">22,636</p>
+          <p className="dark:text-card-foreground text-xs text-gray-600 sm:text-sm">
+            22,636
+          </p>
         </div>
-        <p className="flex items-center text-xs text-gray-600 sm:text-sm">
+        <p className="dark:text-card-foreground flex items-center text-xs text-gray-600 sm:text-sm">
           745 comments <Dot className="size-2 sm:size-3" /> 229 reposts
         </p>
       </div>
@@ -262,6 +263,43 @@ const LinkedInPostFooter = () => {
           <Send className="size-4" />
           <span className="hidden sm:inline">Send</span>
         </p>
+      </div>
+    </div>
+  )
+}
+
+export const LinkedInPostSkeleton = () => {
+  return (
+    <div className="bg-card relative rounded-lg border-1">
+      {/* Header */}
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2">
+        <Skeleton className="h-12 w-12 rounded-full" />
+        <div className="flex min-w-0 flex-col">
+          <Skeleton className="mb-1 h-4 w-32" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+      </div>
+
+      {/* Media preview */}
+      <div className="p-4">
+        <Skeleton className="h-40 w-full rounded-md" />
+      </div>
+
+      {/* Footer */}
+      <div className="flex flex-col gap-2 px-4 pt-2 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-10" />
+          </div>
+          <Skeleton className="h-5 w-20" />
+        </div>
+        <hr />
+        <div className="flex justify-around">
+          <Skeleton className="h-5 w-20 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
+        </div>
       </div>
     </div>
   )

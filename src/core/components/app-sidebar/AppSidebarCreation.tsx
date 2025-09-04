@@ -6,7 +6,7 @@ import {
   SidebarMenu,
 } from '@/shared/ui/sidebar'
 
-import AppSidebarCollapsedItem from './AppSidebarCollapsedItem'
+import AppSideBarItem from './AppSidebarItem'
 
 interface IAppSidebarCreationProps {
   creationsData: ISidebarItem[]
@@ -20,8 +20,8 @@ function AppSidebarCreation({ creationsData }: IAppSidebarCreationProps) {
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {creationsData.map(data => (
-            <AppSidebarCollapsedItem key={data.title} item={data} />
+          {creationsData.map(item => (
+            <AppSideBarItem key={item.title} item={item} />
           ))}
         </SidebarMenu>
       </SidebarGroupContent>

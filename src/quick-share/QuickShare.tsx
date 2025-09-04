@@ -1,348 +1,162 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
-import { RotateCcw } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { PlugZap } from 'lucide-react'
 
-import { draftsApi } from '@/core/api/drafts.api'
-import { PostSkeleton } from '@/core/components/Post'
-import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
-import TwitterPost from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
-import {
-  ShareModalOpenState,
-  SharePostModal,
-} from '@/core/components/SharePostModal'
-import { QUERY_KEYS } from '@/core/config/constant'
-import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
-import { useAppSelector } from '@/core/hooks/global-state.hook'
-import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
-import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
-import { useUserState } from '@/core/hooks/user-state.hook'
-import { IDraftRequest } from '@/core/models/draft.model'
+import { SharePostModal } from '@/core/components/SharePostModal'
 import { channelType } from '@/core/models/social.model'
-import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
+import { Tabs } from '@/shared/ui/tabs'
 
-import GeneratedPostControls from './components/GeneratedPostControls'
+import PostControls from './components/PostControls'
+import TabHistoryContent from './components/TabHistoryContent'
+import TabList from './components/TabList'
+import TabPostContent from './components/TabPostContent'
+import TabSourcesContent from './components/TabSourcesContent'
+import { useQuickShare } from './hooks/quick-share.hook'
 
 const QuickShare = () => {
-  const [activeTab, setActiveTab] = useState<string>('created-post')
-  const [isShareModalOpen, setIsShareModalOpen] = useState<ShareModalOpenState>(
-    {
-      open: false,
-      schedule: false,
-    }
-  )
-
+  // ---- Hooks ----
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const { mutation: publishDraft } = usePublishDraft()
-  const { mutation: scheduleDraft } = useScheduleDraft()
-  const user = useUserState()
-
-  const saveDraftMutation = useMutation({
-    mutationFn: (payload: IDraftRequest) => draftsApi.postDraft(payload),
-    onSuccess: response => {
-      toast.success('Draft saved successfully')
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-      navigate({
-        to: '/creation/create',
-        search: { draftId: response.data.draft.id },
-      })
-    },
-    onError: () => {
-      toast.error('Failed to save draft')
-    },
-  })
-
-  const preUserPromptState = useAppSelector(state => state.promptState)
   const {
+    // state
+    activeTab,
+    setActiveTab,
+    isShareModalOpen,
+    setIsShareModalOpen,
+    history,
+
+    // data
     posts,
     extractedLinks,
-    isLoading,
-    isFetching,
     error,
+    isGeneratedDataFetching,
+    isLoadingPublish,
+    loading,
+    activeChannels,
+    user,
+
+    // actions
+    refetch,
+    onSubmit,
+    handleEdit,
+    rollbackTo,
+
+    // setters bridging FloatingPromptInput
     setUserPrompt,
     setUserSearch,
     setUserChannel,
-    key,
-    refetch,
-  } = useGeneratePosts(
-    preUserPromptState.prompt || '',
-    preUserPromptState.search,
-    preUserPromptState.channel
-  )
+    clearRollback,
+  } = useQuickShare()
 
-  const isDataFetching = isLoading || isFetching
-  const isLoadingPublish = publishDraft.isPending || scheduleDraft.isPending
-
-  useEffect(() => {
-    // Redirect to dashboard if no prompt is available
-    if (!preUserPromptState.prompt) {
-      navigate({ to: '/dashboard' })
-    }
-  }, [preUserPromptState.prompt, navigate])
-
-  useEffect(() => {
-    return () => {
-      // Cancel any ongoing generate-ai-post queries
-      queryClient.cancelQueries({ queryKey: [key] })
-    }
-  }, [queryClient, key])
-
+  // ---- Functions ----
   /**
-   * Ran when genAI API error
+   * Returns the post controls or null if no controls are available
+   *
+   * @returns {JSX.Element | null} The post controls or null if no controls are available
    */
-  useEffect(() => {
-    if (error) {
-      toast.error('Something went wrong while generating posts')
-    }
-  }, [error])
+  const getPostControls = () => {
+    // If there is an error or no posts are generated, return null
+    if (error || posts.length === 0) return null
 
-  const onSubmit = (
-    postIds: string[],
-    schedule: boolean,
-    scheduleDate?: string
-  ) => {
-    const selectedPosts = posts.filter(post => postIds.includes(post.id))
-    if (selectedPosts.length === 0) {
-      setIsShareModalOpen({ open: false, schedule: false })
-      return
-    }
-
-    const payload = selectedPosts.map(p => ({
-      content: p.content,
-      channel: p.channel,
-      attached_media: [],
-    }))
-
-    if (schedule && scheduleDate) {
-      scheduleDraft.mutate(
-        {
-          draftRequest: {
-            posts: payload,
-          },
-          scheduleDate,
-        },
-        {
-          onSuccess: () => {
-            setIsShareModalOpen({ open: false, schedule: false })
-            toast.success('Draft scheduled successfully')
-            navigate({ to: '/schedule' })
-          },
-          onError: () => {
-            toast.error('Failed to schedule draft')
-          },
-        }
+    // If user is not connected to any socials, return null
+    if (
+      !user?.connected_channels.linkedin.connected &&
+      !user?.connected_channels.twitter.connected
+    ) {
+      return (
+        <Button
+          variant="destructive"
+          className="text-xs"
+          onClick={() =>
+            navigate({ to: '/settings', search: { tabs: 'socials' } })
+          }
+        >
+          <PlugZap />
+          Connect Socials
+        </Button>
       )
-      return
     }
 
-    publishDraft.mutate(
-      {
-        posts: payload,
-      },
-      {
-        onSuccess: () => {
-          setIsShareModalOpen({ open: false, schedule: false })
-          toast.success('Draft published successfully')
-          navigate({ to: '/dashboard' })
-        },
-        onError: () => {
-          toast.error('Failed to publish draft')
-        },
-      }
+    // If user is connected to socials, return the post controls
+    return (
+      <PostControls
+        isLoading={loading}
+        onRetry={refetch}
+        onEdit={handleEdit}
+        onPublish={() => setIsShareModalOpen({ open: true, schedule: false })}
+        onSchedule={() => setIsShareModalOpen({ open: true, schedule: true })}
+      />
     )
   }
 
-  const handleEdit = () => {
-    if (!user) {
-      return
-    }
-
-    const payload = posts
-      .filter(
-        p =>
-          user.connected_channels[
-            p.channel.toLowerCase() as keyof typeof user.connected_channels
-          ].connected
-      )
-      .map(p => ({
-        content: p.content,
-        channel: p.channel,
-        attached_media: [],
-      }))
-
-    saveDraftMutation.mutate({
-      posts: payload,
-    })
-  }
-
-  const loading =
-    isDataFetching || saveDraftMutation.isPending || publishDraft.isPending
-
   return (
     <>
-      <div className="m-auto flex max-w-4xl flex-col p-5">
+      {/** Main Content */}
+      <div className="relative m-auto max-w-7xl p-2">
+        {/** Post Controls */}
+        <div className="hidden gap-2 py-1 lg:absolute lg:top-2 lg:right-2 lg:flex">
+          {getPostControls()}
+        </div>
+
+        {/** Tabs */}
         <Tabs
           className="w-full"
           defaultValue="created-post"
           value={activeTab}
           onValueChange={val => setActiveTab(val)}
         >
-          <TabsList className="w-full px-2 py-6 lg:w-fit">
-            <TabsTrigger
-              value="created-post"
-              className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-            >
-              Created Posts
-            </TabsTrigger>
-            <TabsTrigger
-              value="sources"
-              className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-              disabled={loading}
-            >
-              Sources
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="created-post" className="flex flex-col">
-            {/** Generated Post Controls */}
-            {(!error || posts.length > 0) && (
-              <div className="hidden lg:block">
-                <GeneratedPostControls
-                  isLoading={loading}
-                  onRetry={refetch}
-                  onEdit={handleEdit}
-                  onPublish={() =>
-                    setIsShareModalOpen({ open: true, schedule: false })
-                  }
-                  onSchedule={() =>
-                    setIsShareModalOpen({ open: true, schedule: true })
-                  }
-                />
-              </div>
-            )}
+          <TabList loading={loading} />
 
-            {/** External Resources */}
-            {extractedLinks.length > 0 && !loading && (
-              <div className="mt-4 hidden w-full gap-2 lg:flex">
-                {extractedLinks.slice(0, 5).map(link_data => (
-                  <div key={link_data.url} className="flex-1">
-                    <ExternalResourceChip
-                      url={link_data.url}
-                      title={link_data.content}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+          {/** Mobile Post Controls */}
+          <div className="mt-2 flex items-center justify-center lg:hidden">
+            {getPostControls()}
+          </div>
 
-            {/** Generated Posts */}
-            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {isDataFetching ? (
-                <>
-                  <PostSkeleton />
-                  <PostSkeleton />
-                </>
-              ) : (
-                posts.map(post => {
-                  if (post.channel === 'LinkedIn') {
-                    return (
-                      <LinkedInPost
-                        key={post.id}
-                        initialContent={post.content}
-                        loading={isDataFetching}
-                        notEditable
-                      />
-                    )
-                  }
-                  return (
-                    <TwitterPost
-                      key={post.id}
-                      initialContent={post.content}
-                      loading={isDataFetching}
-                      notEditable
-                    />
-                  )
-                })
-              )}
-            </div>
+          {/** Tabs Content */}
+          <TabPostContent
+            extractedLinks={extractedLinks}
+            loading={loading}
+            activeChannels={activeChannels}
+            isGeneratedDataFetching={isGeneratedDataFetching}
+            posts={posts}
+            error={error}
+            refetch={refetch}
+          />
 
-            {error && posts.length === 0 && (
-              <div className="flex w-full items-center justify-center rounded-lg border border-dashed p-5">
-                <p className="pr-2 text-center text-sm text-gray-500">
-                  Something went wrong please
-                  <span>
-                    <Button
-                      variant="outline"
-                      onClick={() => refetch()}
-                      className="mt-2 ml-2 px-2 py-1 text-sm sm:mt-0"
-                    >
-                      <RotateCcw className="size-3" />
-                      Retry
-                    </Button>
-                  </span>
-                </p>
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="sources">
-            <h2 className="mt-2 text-2xl font-semibold">All sources used</h2>
-            {extractedLinks.length > 0 && !isDataFetching ? (
-              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                {extractedLinks.map(link_data => (
-                  <div key={link_data.url}>
-                    <ExternalResourceChip
-                      url={link_data.url}
-                      title={link_data.content}
-                      showIcon
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-4 flex w-full items-center justify-center rounded-lg border border-dashed p-5">
-                <p className="text-sm text-gray-500">No sources used</p>
-              </div>
-            )}
-          </TabsContent>
+          {/** Tabs Content, History */}
+          <TabHistoryContent
+            history={history}
+            onRollback={idx => rollbackTo(idx)}
+            onSwitchToPosts={() => setActiveTab('created-post')}
+          />
+
+          {/** Tabs Content, Sources Used */}
+          <TabSourcesContent
+            extractedLinks={extractedLinks}
+            isGeneratedDataFetching={isGeneratedDataFetching}
+          />
         </Tabs>
       </div>
 
       {/* Floating Prompt Input */}
-      <FloatingPromptInput
-        onChange={(
-          content: string,
-          search: boolean,
-          channel: string | null
-        ) => {
-          setUserPrompt(content)
-          setUserSearch(search)
-          setUserChannel((channel as channelType) ?? null)
-          setActiveTab('created-post')
-        }}
-        loading={loading}
-        hidePromptInfo
-      >
-        {(!error || posts.length > 0) && (
-          <div className="block lg:hidden">
-            <GeneratedPostControls
-              isLoading={loading}
-              onlyControls
-              onEdit={handleEdit}
-              onRetry={refetch}
-              onPublish={() =>
-                setIsShareModalOpen({ open: true, schedule: false })
-              }
-              onSchedule={() =>
-                setIsShareModalOpen({ open: true, schedule: true })
-              }
-            />
-          </div>
-        )}
-      </FloatingPromptInput>
+      {activeTab === 'created-post' && (
+        <FloatingPromptInput
+          onChange={(
+            content: string,
+            search: boolean,
+            channel: string | null
+          ) => {
+            // Any new prompt should exit rollback mode and show fresh generation
+            clearRollback()
+            setUserPrompt(content)
+            setUserSearch(search)
+            setUserChannel((channel as channelType) ?? null)
+            setActiveTab('created-post')
+          }}
+          loading={loading}
+          hidePromptInfo
+        />
+      )}
 
       {/* Share Post Modal */}
       <SharePostModal

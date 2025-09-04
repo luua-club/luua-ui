@@ -25,10 +25,10 @@ const ExternalResourceChip = ({
           onClick={() => window.open(url, '_blank')}
         >
           <div className="text-left text-sm">
-            <span className="block truncate text-xs font-medium text-gray-400">
+            <span className="block truncate text-xs font-medium text-gray-400 dark:text-gray-300">
               {extractDomain(url)}
             </span>
-            <span className="block truncate text-xs font-semibold">
+            <span className="block truncate pt-1 text-xs font-semibold dark:text-white">
               {title}
             </span>
           </div>
