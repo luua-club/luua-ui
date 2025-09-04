@@ -248,6 +248,7 @@ export const useQuickShare = () => {
     const entry = history[index]
     if (!entry) return
     setOverriddenPosts(entry.posts)
+    toast.info('Rolled back', { position: 'top-right', duration: 800 })
   }
 
   // ---- Variables ----

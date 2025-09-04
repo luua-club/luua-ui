@@ -47,38 +47,43 @@ function TabHistoryContent({
         </p>
       )}
 
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-8">
         {history.map((entry, idx) => (
-          <div
-            key={entry.id}
-            className="bg-card relative flex flex-col gap-4 rounded-md border p-3"
-          >
-            {/* Rollback Button */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleRollback(idx)}
-              className="!bg-card absolute -top-6 -right-5 text-xs"
-            >
-              <RotateCcw className="size-3" />
-              Rollback
-            </Button>
+          <div key={entry.id} className="flex flex-col">
+            <div className="flex items-center justify-between">
+              {/* Date */}
+              <p className="text-muted-foreground text-xs font-semibold">
+                {formatDate(entry.createdAt, 'h:mm:ss a')}
+              </p>
 
-            {/* Date */}
-            <p className="text-muted-foreground absolute -top-6 left-0 text-xs">
-              {formatDate(entry.createdAt, 'h:mm:ss a')}
-            </p>
-
-            {/* Prompt */}
-            <p className="line-clamp-3 text-sm font-medium">{entry.prompt}</p>
+              {/* Rollback Button */}
+              <Button
+                size="sm"
+                variant="link"
+                onClick={() => handleRollback(idx)}
+                className="text-muted-foreground text-xs font-semibold"
+              >
+                <RotateCcw className="size-3" />
+                Rollback
+              </Button>
+            </div>
 
             {/* Posts */}
             <div
-              className={`grid grid-cols-1 gap-4 lg:grid-cols-${entry.posts.length > 1 ? '2' : '1'}`}
+              key={entry.id}
+              className="bg-card flex flex-col gap-4 rounded-md border p-3"
             >
-              {entry.posts.map(post => (
-                <Post {...post} key={post.id} />
-              ))}
+              {/* Prompt */}
+              <p className="line-clamp-3 text-sm font-medium">{entry.prompt}</p>
+
+              {/* Posts */}
+              <div
+                className={`grid grid-cols-1 gap-4 lg:grid-cols-${entry.posts.length > 1 ? '2' : '1'}`}
+              >
+                {entry.posts.map(post => (
+                  <Post {...post} key={post.id} />
+                ))}
+              </div>
             </div>
           </div>
         ))}
