@@ -51,6 +51,7 @@ export const QUERY_KEYS = {
   scheduleList: 'schedule-list',
   publishList: 'publish-list',
   userStyle: 'user-style',
+  autopilotSettings: 'autopilot-settings',
 }
 
 /**
