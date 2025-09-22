@@ -67,6 +67,10 @@ const getCurrentPageTitle = (pathname: urlType) => {
       return 'Published'
     case '/preferences':
       return 'Preferences'
+    case '/auto-gen/inspiration':
+      return 'Inspiration'
+    case '/auto-gen/drafts':
+      return 'AI Drafts'
     default:
       return 'Dashboard'
   }

@@ -6,6 +6,7 @@ import {
   SidebarHeader,
 } from '@/shared/ui/sidebar'
 
+import AppSidebarAutoGen from './AppSidebarAutoGen'
 import AppSidebarCreation from './AppSidebarCreation'
 import AppSidebarFooter from './AppSidebarFooter'
 import AppSidebarHeader from './AppSidebarHeader'
@@ -16,12 +17,14 @@ interface IAppSidebarProps {
   platformItems: ISidebarItem[]
   creationsData: ISidebarItem[]
   postsItems: ISidebarItem[]
+  autoGenItems: ISidebarItem[]
 }
 
 function AppSidebar({
   platformItems,
   creationsData,
   postsItems,
+  autoGenItems,
 }: IAppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
@@ -32,6 +35,7 @@ function AppSidebar({
         <AppSidebarPlatform platformItems={platformItems} />
         <AppSidebarCreation creationsData={creationsData} />
         <AppSidebarPosts postsItems={postsItems} />
+        <AppSidebarAutoGen autoGenItems={autoGenItems} />
       </SidebarContent>
       <SidebarFooter>
         <AppSidebarFooter />
