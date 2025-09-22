@@ -40,7 +40,7 @@ import {
   autoGenSettingsSchema,
 } from '../models/auto-gen-settings.model'
 
-type InspirationSettingsModalProps = {
+type AutoGenSettingsModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   defaultBasePrompt?: string
@@ -48,13 +48,13 @@ type InspirationSettingsModalProps = {
   defaultChannels?: channelType[]
 }
 
-function InspirationSettingsModal({
+function AutoGenSettingsModal({
   open,
   onOpenChange,
   defaultBasePrompt,
   defaultFrequencyDays,
   defaultChannels,
-}: InspirationSettingsModalProps) {
+}: AutoGenSettingsModalProps) {
   // --- Form ---
   const resolver = zodResolver(
     autoGenSettingsSchema
@@ -296,4 +296,4 @@ const ChannelsField = ({ formControl }: FormFieldProps) => {
   )
 }
 
-export default InspirationSettingsModal
+export default AutoGenSettingsModal
