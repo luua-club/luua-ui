@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { inspirationApi } from '@/core/api/inspiration.api'
+import { QUERY_KEYS } from '@/core/config/constant'
 import type { InspirationResponse } from '@/core/models/inspiration.model'
 import LinkContentCard from '@/shared/components/link-content-card'
 import PaginationList from '@/shared/components/pagination-list'
@@ -26,12 +27,15 @@ function InspirationsCrud() {
   // --- Hooks ---
   const queryClient = useQueryClient()
   const { data, isLoading, isError } = useQuery<InspirationResponse>({
-    queryKey: ['inspirations', { offset, limit }],
-    queryFn: async () => {
-      const res = await inspirationApi.getInspirations({
-        limit,
-        offset,
-      })
+    queryKey: [QUERY_KEYS.inspirations, { offset, limit }],
+    queryFn: async ({ signal }) => {
+      const res = await inspirationApi.getInspirations(
+        {
+          limit,
+          offset,
+        },
+        signal
+      )
       return res.data as InspirationResponse
     },
     staleTime: 60_000,
@@ -61,7 +65,9 @@ function InspirationsCrud() {
     },
     onSettled: () => {
       // refetch list; deleting flags will be cleared on list success
-      queryClient.invalidateQueries({ queryKey: ['inspirations'] })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.inspirations],
+      })
     },
   })
 

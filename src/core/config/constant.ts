@@ -52,6 +52,7 @@ export const QUERY_KEYS = {
   publishList: 'publish-list',
   userStyle: 'user-style',
   autopilotSettings: 'autopilot-settings',
+  inspirations: 'inspirations',
 }
 
 /**

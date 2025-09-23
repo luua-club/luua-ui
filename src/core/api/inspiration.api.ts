@@ -12,11 +12,15 @@ class InspirationApi extends BaseApiService {
    * @param req - Request parameters
    * @returns Promise<InspirationResponse>
    */
-  async getInspirations(req: { limit?: number; offset?: number }) {
+  async getInspirations(
+    req: { limit?: number; offset?: number },
+    signal?: AbortSignal
+  ) {
     const { limit, offset } = req
 
     return this.get<InspirationResponse>('/', {
       params: { limit, offset, sort_order: 'desc' },
+      signal,
     })
   }
 

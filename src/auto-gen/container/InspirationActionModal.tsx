@@ -6,6 +6,7 @@ import { type Resolver, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { inspirationApi } from '@/core/api/inspiration.api'
+import { QUERY_KEYS } from '@/core/config/constant'
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -86,7 +87,9 @@ function InspirationActionModal({
       }),
     onSuccess: () => {
       toast.success('Inspiration added successfully')
-      queryClient.invalidateQueries({ queryKey: ['inspirations'] })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.inspirations],
+      })
       form.reset()
       onOpenChange(false)
     },
@@ -106,7 +109,9 @@ function InspirationActionModal({
       }),
     onSuccess: () => {
       toast.success('Inspiration updated successfully')
-      queryClient.invalidateQueries({ queryKey: ['inspirations'] })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.inspirations],
+      })
       form.reset()
       onOpenChange(false)
     },
