@@ -32,19 +32,24 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-sm bg-white p-6 dark:bg-zinc-900">
+      <DialogContent className="bg-card w-full max-w-sm p-6">
+        {/* --- Dialog Header --- */}
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
+          <DialogTitle className="text-card-foreground text-lg font-semibold">
+            {title}
+          </DialogTitle>
         </DialogHeader>
+
+        {/* --- Dialog Description --- */}
         {description ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            {description}
-          </p>
+          <p className="text-card-foreground mt-2 text-sm">{description}</p>
         ) : null}
+        {/* --- Dialog Actions --- */}
+
         <div className="mt-6 flex gap-3">
           <Button
             variant="outline"
-            className="flex-1"
+            className="text-card-foreground flex-1"
             onClick={() => onOpenChange(false)}
           >
             {cancelLabel}
@@ -58,7 +63,7 @@ export function ConfirmDialog({
             {confirmLabel}
           </Button>
         </div>
-        <DialogClose />
+        <DialogClose className="text-card-foreground" />
       </DialogContent>
     </Dialog>
   )

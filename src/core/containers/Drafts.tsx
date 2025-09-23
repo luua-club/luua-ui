@@ -31,6 +31,7 @@ interface DraftsProps {
 }
 
 const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
+  // --- Hooks ---
   const {
     dateRange,
     setDateRange,
@@ -55,6 +56,7 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
   } = useDraftList(showOnlyAutoGen)
   const navigate = useNavigate()
 
+  // --- Handlers ---
   const handleDeleteDraft = (draftId: string) => openDelete(draftId)
 
   if (isError) {
@@ -69,10 +71,12 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
 
   return (
     <div className="m-auto flex max-w-4xl flex-col p-5">
+      {/* --- Header --- */}
       <h1 className="text-xl font-semibold">
         {showOnlyAutoGen ? 'Your Generated AI Drafts' : 'Your Saved Drafts'}
       </h1>
 
+      {/* --- Filters & Sorting --- */}
       <div className="mt-8">
         <ListControls
           dateRange={dateRange}
@@ -82,26 +86,29 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
         />
       </div>
 
+      {/* --- Drafts List --- */}
       <div className="mt-4 flex flex-col gap-4">
         {isLoading && (
-          <div className="bg-sidebar rounded-lg border-1 p-4">
+          <div className="bg-card rounded-lg border-1 p-4">
             <PostSkeleton />
           </div>
         )}
         {!isLoading && (
           <>
             {drafts.length === 0 && (
-              <div className="bg-sidebar flex h-24 items-center justify-center rounded-lg border-1">
+              <div className="bg-card flex h-24 items-center justify-center rounded-lg border-1">
                 <p className="text-sm font-semibold">No drafts found</p>
               </div>
             )}
             {drafts.map((draft: DraftItem, idx: number) => {
               return (
                 <div
-                  className={`bg-sidebar rounded-lg border-1 p-4 pt-2 ${deletingIds.has(draft.id) ? 'pointer-events-none opacity-50' : ''}`}
+                  className={`bg-card rounded-lg border-1 p-4 pt-2 ${deletingIds.has(draft.id) ? 'pointer-events-none opacity-50' : ''}`}
                   key={draft.id}
                 >
+                  {/* --- Draft Header --- */}
                   <div className="mb-2 flex items-center justify-between">
+                    {/* --- Draft Date --- */}
                     <p
                       title={new Date(draft.updated_at).toString()}
                       className="text-xs font-semibold sm:text-base"
@@ -112,6 +119,7 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                       )}
                     </p>
 
+                    {/* --- Draft Actions --- */}
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
@@ -156,6 +164,8 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                       </DropdownMenu>
                     </div>
                   </div>
+
+                  {/* --- Draft Posts --- */}
                   <div className="mt-4 flex flex-col gap-4">
                     {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft, postId =>
                       openDeletePost(draft.id, postId)
@@ -174,6 +184,7 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
         )}
       </div>
 
+      {/* --- Pagination --- */}
       {!isLoading && drafts.length > 0 && total > limit && (
         <div className="mt-8 mb-8">
           <PaginationList
@@ -185,10 +196,11 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
         </div>
       )}
 
+      {/* --- Confirm Dialog --- */}
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={open => (open ? undefined : closeDelete())}
-        title={pendingDeletePost ? 'Delete post?' : 'Delete draft?'}
+        title={pendingDeletePost ? 'Delete post ?' : 'Delete draft ?'}
         description={
           pendingDeletePost
             ? 'This action cannot be undone. This will permanently delete the selected post from the draft.'
