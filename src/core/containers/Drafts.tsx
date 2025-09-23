@@ -145,11 +145,31 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              navigate({
+                                to: `/creation/create`,
+                                search: {
+                                  draftId: draft.id,
+                                  publish: true,
+                                },
+                              })
+                            }
+                          >
                             <Send className="size-4" />
                             Publish
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              navigate({
+                                to: `/creation/create`,
+                                search: {
+                                  draftId: draft.id,
+                                  schedule: true,
+                                },
+                              })
+                            }
+                          >
                             <Calendar className="size-4" />
                             Schedule
                           </DropdownMenuItem>

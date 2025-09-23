@@ -9,6 +9,7 @@ import { type IDraftListResponse } from '@/core/models/draft.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 
 export function useDraftList(showOnlyAutoGen: boolean = false) {
+  // --- Hooks ---
   const queryClient = useQueryClient()
 
   // ----- Filters & Sorting -----

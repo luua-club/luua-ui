@@ -82,6 +82,43 @@ export const useCreateDraft = () => {
   }, [draftQuery.data])
 
   /**
+   * Handle query parameter to open share modal
+   */
+  const handleQueryParameter = useCallback(
+    (paramName: string, modalState: ShareModalOpenState) => {
+      const paramValue = new URLSearchParams(location.search).get(paramName)
+      if (paramValue === 'true' && draftQuery.data) {
+        setIsShareModalOpen(modalState)
+        // Remove parameter from URL while keeping others
+        const newSearch = new URLSearchParams(location.search)
+        newSearch.delete(paramName)
+        if (newSearch.toString()) {
+          // If there are remaining parameters, preserve them
+          window.history.replaceState(
+            null,
+            '',
+            `${location.pathname}?${newSearch.toString()}`
+          )
+        } else {
+          // If no parameters left, remove query string entirely
+          window.history.replaceState(null, '', location.pathname)
+        }
+      }
+    },
+    [location.search, location.pathname, draftQuery.data]
+  )
+
+  /**
+   * Handle query parameters to open share modal
+   */
+  useEffect(() => {
+    // Handle publish parameter
+    handleQueryParameter('publish', { open: true, schedule: false })
+    // Handle schedule parameter
+    handleQueryParameter('schedule', { open: true, schedule: true })
+  }, [handleQueryParameter])
+
+  /**
    * Redirect to creation page if fetching the draft fails
    */
   useEffect(() => {
@@ -280,6 +317,7 @@ export const useCreateDraft = () => {
         }
 
         handleClick()
+        navigate({ to: '/dashboard' })
       },
       onError: () => {
         toast.error('Failed to publish posts')
