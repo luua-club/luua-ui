@@ -79,6 +79,22 @@ const TwitterPost = (props: TwitterPostProps) => {
   // -- RENDER --
   return (
     <div className="relative">
+      {!props.notEditable && (
+        <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
+          {!props.isActionLoading && (
+            <div className="lg:absolute lg:top-0 lg:-right-10">
+              <PostActions
+                onEmojiSelect={addEmoji}
+                onDelete={() => {
+                  onDelete()
+                  props.onContentChange?.('')
+                  props.handlePostDelete?.()
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
       <div
         className={cn(
           'bg-card relative flex h-fit gap-2 rounded-lg border-1 p-4',
@@ -163,22 +179,6 @@ const TwitterPost = (props: TwitterPostProps) => {
           <TwitterPostFooter />
         </div>
       </div>
-      {!props.notEditable && (
-        <div className="mt-2 flex justify-end">
-          {!props.isActionLoading && (
-            <div className="absolute top-0 -right-10">
-              <PostActions
-                onEmojiSelect={addEmoji}
-                onDelete={() => {
-                  onDelete()
-                  props.onContentChange?.('')
-                  props.handlePostDelete?.()
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Extra Actions */}
       <TwitterPostFooterActions content={content} />
@@ -256,7 +256,7 @@ const TwitterPostFooterActions = ({ content }: { content: string }) => {
         : ''
 
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="mt-2 flex items-center justify-end gap-2 lg:mt-0">
       <p className={cn('text-xs', textColor)}>
         {usedChars}/{maxChars}
       </p>

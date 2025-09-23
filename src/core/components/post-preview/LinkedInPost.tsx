@@ -80,6 +80,23 @@ const LinkedInPost = (props: LinkedInPostProps) => {
 
   return (
     <div className="relative">
+      {!props.notEditable && (
+        <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
+          {!props.isActionLoading && (
+            <div className="lg:absolute lg:top-0 lg:-right-10">
+              <PostActions
+                onEmojiSelect={addEmoji}
+                onDelete={() => {
+                  onDelete()
+                  props.onContentChange?.('')
+                  props.handlePostDelete?.()
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       <div
         className={cn(
           'bg-card relative rounded-lg border-1',
@@ -161,22 +178,6 @@ const LinkedInPost = (props: LinkedInPostProps) => {
         {/* Footer */}
         <LinkedInPostFooter />
       </div>
-      {!props.notEditable && (
-        <div className="mt-2 flex justify-end">
-          {!props.isActionLoading && (
-            <div className="absolute top-0 -right-10">
-              <PostActions
-                onEmojiSelect={addEmoji}
-                onDelete={() => {
-                  onDelete()
-                  props.onContentChange?.('')
-                  props.handlePostDelete?.()
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
 
       {/** Actions */}
       <LinkedInPostFooterActions content={content} />
@@ -271,7 +272,7 @@ const LinkedInPostFooterActions = ({ content }: { content: string }) => {
         : ''
 
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="mt-2 flex items-center justify-end gap-2 lg:mt-0">
       <p className={cn('text-xs', textColor)}>
         {usedChars}/{maxChars}
       </p>

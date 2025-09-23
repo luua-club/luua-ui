@@ -26,7 +26,7 @@ const PostActions = ({ onEmojiSelect, onDelete }: IPostActionsProps) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex gap-2 lg:flex-col">
       <Button
         variant="destructive"
         className="size-7"

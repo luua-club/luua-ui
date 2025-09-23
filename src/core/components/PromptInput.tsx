@@ -78,7 +78,7 @@ export const FloatingPromptInput = ({
   return (
     <>
       <div className="h-48 w-full bg-transparent" />
-      <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center px-5 lg:px-0">
+      <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center px-2 sm:px-5 lg:px-0">
         <div className="flex w-full max-w-2xl flex-col gap-2 pb-4">
           {children}
           <PromptInput {...props} />

@@ -1,7 +1,11 @@
 import { Link } from '@tanstack/react-router'
 
 import { ISidebarItem } from '@/core/models/sidebar.model'
-import { SidebarMenuButton, SidebarMenuItem } from '@/shared/ui/sidebar'
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/shared/ui/sidebar'
 import { cn } from '@/shared/utils'
 
 interface IAppSidebarItemProps {
@@ -9,9 +13,17 @@ interface IAppSidebarItemProps {
 }
 
 function AppSideBarItem({ item }: IAppSidebarItemProps) {
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
+
   return (
     <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton tooltip={item.title} asChild>
+      <SidebarMenuButton tooltip={item.title} asChild onClick={handleClick}>
         <Link
           to={item.url}
           className={cn(

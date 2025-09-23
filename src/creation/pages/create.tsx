@@ -231,7 +231,7 @@ const Create = () => {
           hidePromptInfo
           activeChannel={activeTab as channelType}
         >
-          <div className="flex justify-center gap-2 lg:hidden">
+          <div className="mb-2 flex justify-center gap-2 lg:hidden">
             <DraftActions
               handleSaveDraft={handleSaveDraft}
               handlePublishDraft={() =>
