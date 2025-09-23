@@ -27,30 +27,20 @@ import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
 
 interface LinkedInPostProps {
-  onContentChange?: (content: string) => void
   initialContent?: string
   loading?: boolean
-  handlePostDelete?: () => void
-  isActionLoading?: boolean
   notEditable?: boolean
+  isActionLoading?: boolean
+  onContentChange?: (content: string) => void
+  handlePostDelete?: () => void
 }
 
-const LinkedInPost = ({
-  onContentChange,
-  initialContent,
-  loading = false,
-  handlePostDelete,
-  isActionLoading = false,
-  notEditable = false,
-}: LinkedInPostProps) => {
+const LinkedInPost = (props: LinkedInPostProps) => {
   const user = useUserState()
 
   const {
     content,
     setContent,
-    attachedFiles,
-    setAttachedFiles,
-    imagePreviews,
     textareaRef,
     updateSelectionRef,
     addEmoji,
@@ -64,12 +54,12 @@ const LinkedInPost = ({
 
   // Initialize from parent if provided
   useEffect(() => {
-    if (typeof initialContent === 'string') {
-      setContent(initialContent)
+    if (typeof props.initialContent === 'string') {
+      setContent(props.initialContent)
     }
-  }, [initialContent])
+  }, [props.initialContent, setContent])
 
-  if (!user || loading) {
+  if (!user || props.loading) {
     return <LinkedInPostSkeleton />
   }
 
@@ -88,11 +78,11 @@ const LinkedInPost = ({
     expanded || !isLong ? raw : raw.slice(0, MAX_CHARS).trimEnd() + '...'
 
   return (
-    <>
+    <div className="relative">
       <div
         className={cn(
           'bg-card relative rounded-lg border-1',
-          isActionLoading && 'opacity-50'
+          props.isActionLoading && 'opacity-50'
         )}
       >
         {!user_social.connected && (
@@ -112,7 +102,7 @@ const LinkedInPost = ({
         <LinkedInPostHeader user={user_social} />
 
         {/* Content */}
-        {notEditable ? (
+        {props.notEditable ? (
           <div className="p-4 pt-1 text-sm">
             <p className="break-words whitespace-pre-wrap">{displayText}</p>
             {isLong && (
@@ -128,7 +118,7 @@ const LinkedInPost = ({
         ) : (
           <Textarea
             className={cn(
-              'min-h-20',
+              'min-h-20 !bg-transparent',
               // Base visuals and typography
               'resize-none border-0 p-4 pt-1 shadow-none',
               // Caret, placeholder and selection for a premium feel
@@ -146,50 +136,47 @@ const LinkedInPost = ({
             onChange={e => {
               const val = e.target.value
               setContent(val)
-              onContentChange?.(val)
+              props.onContentChange?.(val)
             }}
             onSelect={updateSelectionRef}
             onKeyUp={updateSelectionRef}
             onClick={updateSelectionRef}
-            disabled={isActionLoading}
+            disabled={props.isActionLoading}
           />
         )}
 
         {/* Image Preview */}
         <PostImagePreview
-          imagePreviews={imagePreviews}
-          onRemove={isActionLoading ? undefined : removeImageAt}
+          imagePreviews={[]}
+          onRemove={props.isActionLoading ? undefined : removeImageAt}
         />
 
         {/* Attachments */}
         <PostAttachmentPreview
-          attachedFiles={attachedFiles}
-          onRemove={isActionLoading ? undefined : removeAttachmentAt}
+          attachedFiles={[]}
+          onRemove={props.isActionLoading ? undefined : removeAttachmentAt}
         />
 
         {/* Footer */}
         <LinkedInPostFooter />
       </div>
-      {!notEditable && (
+      {!props.notEditable && (
         <div className="mt-2 flex justify-end">
-          {!isActionLoading && (
-            <PostActions
-              maxFiles={8}
-              attachedFiles={attachedFiles}
-              onFilesChange={files => {
-                setAttachedFiles(files)
-              }}
-              onEmojiSelect={addEmoji}
-              onDelete={() => {
-                onDelete()
-                onContentChange?.('')
-                handlePostDelete?.()
-              }}
-            />
+          {!props.isActionLoading && (
+            <div className="absolute top-0 -right-10">
+              <PostActions
+                onEmojiSelect={addEmoji}
+                onDelete={() => {
+                  onDelete()
+                  props.onContentChange?.('')
+                  props.handlePostDelete?.()
+                }}
+              />
+            </div>
           )}
         </div>
       )}
-    </>
+    </div>
   )
 }
 

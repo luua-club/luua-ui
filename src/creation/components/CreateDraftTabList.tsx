@@ -18,10 +18,11 @@ interface ICreateDraftTabListProps {
   toggleSocial: (name: string, checked: boolean) => void
 }
 
-const CreateDraftTabList = ({
+function CreateDraftTabList({
   selectedSocials,
   toggleSocial,
-}: ICreateDraftTabListProps) => {
+}: ICreateDraftTabListProps) {
+  // ----- State -----
   const user = useUserState()
 
   if (!user) {
@@ -34,6 +35,7 @@ const CreateDraftTabList = ({
 
   return (
     <TabsList className="w-full px-2 py-6 lg:w-fit">
+      {/** Socials Horizontal list */}
       {selectedSocials.map(name => (
         <TabsTrigger key={name} value={name} className="px-2 py-4 text-xs">
           {(() => {
@@ -62,6 +64,7 @@ const CreateDraftTabList = ({
         </TabsTrigger>
       ))}
 
+      {/** Dropdown - select or unselect socials*/}
       <div className="ml-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild disabled={selectedSocials.length === 0}>

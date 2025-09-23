@@ -1,6 +1,7 @@
 import { Paperclip, SmilePlus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
+import { ComingSoonBtn } from '@/shared/components/coming-soon-btn'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import EmojiPopover from '@/shared/components/emoji-popover'
 import { Button } from '@/shared/ui/button'
@@ -14,29 +15,27 @@ import {
   DialogTrigger,
 } from '@/shared/ui/dialog'
 
-import StyleFileCapture from '../StyleFileCapture'
-
 interface IPostActionsProps {
-  maxFiles?: number
-  attachedFiles: File[]
-  onFilesChange: (files: File[]) => void
   onEmojiSelect: (emoji: string) => void
   onDelete: () => void
 }
 
 //TODO: REFACTOR THIS, FILE UPLOAD WILL HAPPEN TO SERVER
-const PostActions = ({
-  maxFiles = 4,
-  attachedFiles,
-  onFilesChange,
-  onEmojiSelect,
-  onDelete,
-}: IPostActionsProps) => {
+const PostActions = ({ onEmojiSelect, onDelete }: IPostActionsProps) => {
   const [open, setOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col gap-2">
+      <Button
+        variant="destructive"
+        className="size-7"
+        aria-label="Delete post"
+        onClick={() => setConfirmOpen(true)}
+      >
+        <Trash2 className="size-3" />
+      </Button>
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="inline-flex size-7">
           <Button asChild variant="outline">
@@ -45,32 +44,16 @@ const PostActions = ({
             </span>
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-full p-6 md:w-fit">
+        <DialogContent className="bg-card text-card-foreground w-full p-6 md:w-fit">
           <DialogClose />
           <DialogHeader className="mb-4">
             <DialogTitle>Upload files</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-muted-foreground">
               Drag and drop images or PDFs, or choose files to upload.
             </DialogDescription>
           </DialogHeader>
-          <div className="pt-2">
-            <StyleFileCapture
-              accept="image/*,application/pdf"
-              maxFiles={maxFiles}
-              maxSize={4 * 1024 * 1024}
-              multiple
-              hideSubmit
-              onFilesChange={files => {
-                onFilesChange(files)
-                setOpen(false)
-              }}
-              value={attachedFiles}
-              description={
-                <span className="text-xs">
-                  Upload up to {maxFiles} images or PDFs, max 4MB each.
-                </span>
-              }
-            />
+          <div className="flex pt-2">
+            <ComingSoonBtn />
           </div>
         </DialogContent>
       </Dialog>
@@ -80,15 +63,6 @@ const PostActions = ({
           <SmilePlus className="size-3" />
         </Button>
       </EmojiPopover>
-
-      <Button
-        variant="destructive"
-        className="size-7"
-        aria-label="Delete post"
-        onClick={() => setConfirmOpen(true)}
-      >
-        <Trash2 className="size-3" />
-      </Button>
 
       <ConfirmDialog
         open={confirmOpen}

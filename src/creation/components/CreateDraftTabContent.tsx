@@ -1,34 +1,25 @@
 import type React from 'react'
 
-import { PostSkeleton } from '@/core/components/Post'
-import { useUserState } from '@/core/hooks/user-state.hook'
 import { channelType } from '@/core/models/social.model'
-import {
-  isMoreThanOneSocialIsConnected,
-  isSocialConnected,
-} from '@/core/utils/social.utils'
-import { Switch } from '@/shared/ui/switch'
+import { UserState } from '@/core/models/user.model'
+import { isSocialConnected } from '@/core/utils/social.utils'
 import { TabsContent } from '@/shared/ui/tabs'
 
 import SocialNotConnected from './SocialNotConnected'
 
 interface ICreateDraftTabContentProps {
   tabName: channelType
-  isSyncing: boolean
-  onToggleSync: () => void
+  user: UserState | null
   getPostComponent: (name: channelType) => React.ReactElement | null
 }
 
-const CreateDraftTabContent = ({
+function CreateDraftTabContent({
   tabName,
-  isSyncing,
-  onToggleSync,
+  user,
   getPostComponent,
-}: ICreateDraftTabContentProps) => {
-  const user = useUserState()
-
+}: ICreateDraftTabContentProps) {
   if (!user) {
-    return <PostSkeleton />
+    return
   }
 
   return (
@@ -39,16 +30,6 @@ const CreateDraftTabContent = ({
     >
       {isSocialConnected(tabName, user) ? (
         <div className="mx-auto mt-2 max-w-2xl">
-          {isMoreThanOneSocialIsConnected(user) && (
-            <div className="flex items-center justify-end pb-2">
-              <p className="text-xs font-medium text-gray-500">Sync content</p>
-              <Switch
-                className="shrink-0 scale-70 cursor-pointer"
-                checked={isSyncing}
-                onCheckedChange={onToggleSync}
-              />
-            </div>
-          )}
           {getPostComponent(tabName)}
         </div>
       ) : (

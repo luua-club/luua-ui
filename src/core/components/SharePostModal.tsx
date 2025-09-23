@@ -143,6 +143,7 @@ export function SharePostModal({
                 id={post.id}
                 channel={post.channel}
                 content={post.content}
+                tileView
               />
             </div>
           ))}

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
@@ -29,7 +29,6 @@ export const useCreateDraft = () => {
   const [postDrafts, setPostDrafts] = useState<PostDraftsType>(
     {} as PostDraftsType
   )
-  const [isSyncing, setIsSyncing] = useState<boolean>(false)
   const [isShareModalOpen, setIsShareModalOpen] = useState<ShareModalOpenState>(
     {
       open: false,
@@ -139,31 +138,18 @@ export const useCreateDraft = () => {
    * @param val - The new content value
    * @param name - The channel name ('LinkedIn' or 'Twitter')
    */
-  const handleContentChange = (val: string, name: channelType) => {
-    // When syncing, mirror the content to all supported channels
-    if (isSyncing) {
+  const handleContentChange = useCallback(
+    (val: string, name: channelType) => {
       setPostDrafts(prev => ({
         ...prev,
-        LinkedIn: {
-          ...(prev.LinkedIn ?? { channel: 'LinkedIn' }),
-          content: val,
-        },
-        Twitter: {
-          ...(prev.Twitter ?? { channel: 'Twitter' }),
+        [name]: {
+          ...(prev[name] ?? { channel: name }),
           content: val,
         },
       }))
-      return
-    }
-
-    setPostDrafts(prev => ({
-      ...prev,
-      [name]: {
-        ...(prev[name] ?? { channel: name }),
-        content: val,
-      },
-    }))
-  }
+    },
+    [setPostDrafts]
+  )
 
   /**
    * Returns the draft request payload
@@ -333,8 +319,6 @@ export const useCreateDraft = () => {
     saveDraftMutation,
     deletePostMutation,
     publishDraft,
-    isSyncing,
-    setIsSyncing,
     handleContentChange,
     handleSaveDraft,
     handleSubmitDraft,

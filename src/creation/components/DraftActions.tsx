@@ -24,7 +24,7 @@ const DraftActions = ({
           variant="outline"
           className="text-xs"
           onClick={handleSaveDraft}
-          disabled={isActionDisabled()}
+          disabled={isActionDisabled() || isLoading}
         >
           {isLoading ? (
             <Loader2 className="size-4 animate-spin" />
@@ -36,7 +36,7 @@ const DraftActions = ({
       <Button
         variant="outline"
         className="text-xs"
-        disabled={isActionDisabled()}
+        disabled={isActionDisabled() || isLoading}
         onClick={handleScheduleDraft}
       >
         <Calendar className="size-3" />
@@ -45,7 +45,7 @@ const DraftActions = ({
       <Button
         variant="default"
         className="text-xs"
-        disabled={isActionDisabled()}
+        disabled={isActionDisabled() || isLoading}
         onClick={handlePublishDraft}
       >
         <Send className="size-3" />

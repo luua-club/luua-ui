@@ -7,3 +7,37 @@
 body.dark {
   background-color: var(--brand-background-dark);
 }
+
+/*
+  Themed scrollbar utility
+  Usage: add class "scrollbar" to any scrollable container.
+  It uses existing CSS variables so it automatically adapts to light/dark.
+*/
+:where(.scrollbar) {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  /* thumb color, track color */
+  scrollbar-color: color-mix(in oklch, var(--foreground) 25%, transparent)
+    transparent;
+}
+
+/* WebKit browsers */
+:where(.scrollbar)::-webkit-scrollbar {
+  width: 10px;
+}
+
+:where(.scrollbar)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:where(.scrollbar)::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 25%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+:where(.scrollbar):hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 38%, transparent);
+}
