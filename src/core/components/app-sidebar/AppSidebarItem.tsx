@@ -16,7 +16,7 @@ function AppSideBarItem({ item }: IAppSidebarItemProps) {
           to={item.url}
           className={cn(
             '[&.active]:font-semibold [&.active]:text-black',
-            'dark:[&.active]:text-white'
+            'dark:[&.active]:bg-sidebar-accent dark:[&.active]:font-bold dark:[&.active]:text-white'
           )}
         >
           <ItemWithIcon item={item} />

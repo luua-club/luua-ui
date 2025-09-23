@@ -8,7 +8,7 @@ import { type ApiResponse } from '@/core/models/api.model'
 import { type IDraftListResponse } from '@/core/models/draft.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 
-export function useDraftList() {
+export function useDraftList(showOnlyAutoGen: boolean = false) {
   const queryClient = useQueryClient()
 
   // ----- Filters & Sorting -----
@@ -44,15 +44,26 @@ export function useDraftList() {
 
   // ----- Query: fetch drafts list -----
   const query = useQuery<ApiResponse<IDraftListResponse>>({
-    queryKey: [QUERY_KEYS.drafts, from, to, limit, offset, sortDir],
+    queryKey: [
+      QUERY_KEYS.drafts,
+      from,
+      to,
+      limit,
+      offset,
+      sortDir,
+      showOnlyAutoGen,
+    ],
     queryFn: () =>
-      draftsApi.getDrafts({
-        limit,
-        offset,
-        sort: sortDir,
-        from,
-        to,
-      }),
+      draftsApi.getDrafts(
+        {
+          limit,
+          offset,
+          sort: sortDir,
+          from,
+          to,
+        },
+        showOnlyAutoGen
+      ),
     placeholderData: prev => prev,
     refetchOnMount: 'always',
   })

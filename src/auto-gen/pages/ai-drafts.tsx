@@ -1,7 +1,9 @@
 import { createLazyRoute } from '@tanstack/react-router'
 
+import Drafts from '@/core/containers/Drafts'
+
 function AIDrafts() {
-  return <div>AIDrafts</div>
+  return <Drafts showOnlyAutoGen />
 }
 
 export const Route = createLazyRoute('/auto-gen/drafts')({
