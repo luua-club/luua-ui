@@ -10,6 +10,7 @@ export type PostItem = Pick<
 export type DraftItem = {
   id: string
   posts: PostItem[]
+  autopilot?: boolean
   created_at: string
   updated_at: string
 }

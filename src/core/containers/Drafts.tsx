@@ -13,6 +13,7 @@ import Post, { PostSkeleton } from '@/core/components/Post'
 import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
+import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import {
   DropdownMenu,
@@ -112,11 +113,16 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                     {/* --- Draft Date --- */}
                     <p
                       title={new Date(draft.updated_at).toString()}
-                      className="text-xs font-semibold sm:text-base"
+                      className="flex items-center gap-2 text-xs font-semibold sm:text-base"
                     >
                       {format(
                         new Date(draft.updated_at),
                         'EEE, MMM d, hh:mm a'
+                      )}
+                      {draft.autopilot && (
+                        <Badge variant="default" className="italic">
+                          Auto Gen ⚡
+                        </Badge>
                       )}
                     </p>
 
