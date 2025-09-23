@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { UserSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
@@ -176,6 +177,9 @@ const LinkedInPost = (props: LinkedInPostProps) => {
           )}
         </div>
       )}
+
+      {/** Actions */}
+      <LinkedInPostFooterActions content={content} />
     </div>
   )
 }
@@ -250,6 +254,27 @@ const LinkedInPostFooter = () => {
           <span className="hidden sm:inline">Send</span>
         </p>
       </div>
+    </div>
+  )
+}
+
+const LinkedInPostFooterActions = ({ content }: { content: string }) => {
+  const maxChars = POST_WORD_COUNT.LinkedIn
+  const usedChars = content.length
+
+  // Determine text color based on character count
+  const textColor =
+    usedChars >= maxChars
+      ? 'text-red-600 dark:text-red-400'
+      : usedChars >= maxChars * 0.5
+        ? 'text-yellow-500 dark:text-yellow-400'
+        : ''
+
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <p className={cn('text-xs', textColor)}>
+        {usedChars}/{maxChars}
+      </p>
     </div>
   )
 }
