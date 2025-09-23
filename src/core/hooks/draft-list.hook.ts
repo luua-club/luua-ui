@@ -59,8 +59,8 @@ export function useDraftList(showOnlyAutoGen: boolean = false) {
           limit,
           offset,
           sort: sortDir,
-          from,
-          to,
+          from: from,
+          to: to,
         },
         showOnlyAutoGen
       ),

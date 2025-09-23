@@ -27,6 +27,13 @@ export default function DateRangePicker({
     DateRange | undefined
   >(undefined)
 
+  // Reset internal state when controlled value is cleared
+  React.useEffect(() => {
+    if (value === undefined) {
+      setUncontrolledRange(undefined)
+    }
+  }, [value])
+
   // Prefer controlled value if provided; otherwise use internal state
   const selectedRange = value ?? uncontrolledRange
 

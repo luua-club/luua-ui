@@ -83,6 +83,7 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
           onDateRangeChange={setDateRange}
           sort={sort}
           onSortChange={setSort}
+          allDateSelectable
         />
       </div>
 
