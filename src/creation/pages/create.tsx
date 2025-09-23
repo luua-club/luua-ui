@@ -1,10 +1,13 @@
 import { createLazyRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { PostSkeleton } from '@/core/components/Post'
-import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
-import TwitterPost from '@/core/components/post-preview/TwitterPost'
+import LinkedInPost, {
+  LinkedInPostSkeleton,
+} from '@/core/components/post-preview/LinkedInPost'
+import TwitterPost, {
+  TwitterPostSkeleton,
+} from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
@@ -17,7 +20,7 @@ import { Tabs } from '@/shared/ui/tabs'
 import CreateDraftTabContent from '../components/CreateDraftTabContent'
 import CreateDraftTabList from '../components/CreateDraftTabList'
 import DraftActions from '../components/DraftActions'
-import { PostDraftsType, useCreateDraft } from '../hooks/create-draft.hook'
+import { useCreateDraft } from '../hooks/create-draft.hook'
 
 const Create = () => {
   // States
@@ -28,13 +31,10 @@ const Create = () => {
   const user = useUserState()
   const {
     postDrafts,
-    setPostDrafts,
     draftEnabled,
     draftQuery,
     saveDraftMutation,
     deletePostMutation,
-    isSyncing,
-    setIsSyncing,
     handleContentChange,
     handleSaveDraft,
     isDraftActionsDisabled,
@@ -55,7 +55,7 @@ const Create = () => {
   } = useGeneratePosts('')
 
   // Constants
-  const socials = SOCIAL_PLATFORM.map(p => p.name)
+  const socials = useMemo(() => SOCIAL_PLATFORM.map(p => p.name), [])
   const isGenerationDataFetching = isGenerationLoading || isGenerationFetching
 
   /**
@@ -71,10 +71,10 @@ const Create = () => {
     }).map(sp => sp.name)
 
     const nextSelected = connected.length > 0 ? connected : socials
-    setSelectedSocials(prev => (prev.length === 0 ? nextSelected : prev))
 
+    setSelectedSocials(prev => (prev.length === 0 ? nextSelected : prev))
     setActiveTab(prev => (prev ? prev : (nextSelected[0] ?? '')))
-  }, [user])
+  }, [socials, user])
 
   /**
    * Ensure active tab is set appropriately on first load
@@ -84,41 +84,6 @@ const Create = () => {
       setActiveTab(selectedSocials[0] ?? '')
     }
   }, [selectedSocials, activeTab])
-
-  /**
-   * When syncing is enabled or active tab changes, copy active tab's content
-   * to the other post so the active tab acts as source of truth.
-   */
-  useEffect(() => {
-    if (!isSyncing) return
-    if (!activeTab) return
-
-    const activeTabContent = postDrafts[activeTab as channelType]?.content ?? ''
-    const targetSocials = selectedSocials.filter(n => n !== activeTab)
-
-    const next: PostDraftsType = {
-      ...postDrafts,
-    }
-
-    let needsUpdate = false
-
-    targetSocials.forEach((target: string) => {
-      const social = target as channelType
-
-      const current = postDrafts[social]?.content ?? ''
-      if (current !== activeTabContent) {
-        next[social] = {
-          ...(postDrafts[social] ?? { channel: social }),
-          content: activeTabContent,
-        }
-        needsUpdate = true
-      }
-    })
-
-    if (needsUpdate) {
-      setPostDrafts(next)
-    }
-  }, [isSyncing, activeTab])
 
   /**
    * Ran when genAI API error
@@ -137,14 +102,10 @@ const Create = () => {
       return
     }
 
-    const post = generatedPostContent.find(p => p.channel === activeTab)
-    if (
-      post &&
-      post.content !== postDrafts[activeTab as channelType]?.content
-    ) {
-      handleContentChange(post.content, activeTab as channelType)
-    }
-  }, [generatedPostContent])
+    generatedPostContent.forEach(post => {
+      handleContentChange(post.content, post.channel as channelType)
+    })
+  }, [generatedPostContent, handleContentChange])
 
   /**
    * It toggles the social in the selected socials list
@@ -207,6 +168,7 @@ const Create = () => {
   return (
     <>
       <div className="relative m-auto max-w-7xl p-2">
+        {/** Actions on top right - Schedule/publish/save */}
         <div className="hidden gap-2 py-1 lg:absolute lg:top-2 lg:right-2 lg:flex">
           <DraftActions
             handleSaveDraft={handleSaveDraft}
@@ -217,19 +179,26 @@ const Create = () => {
               setIsShareModalOpen({ open: true, schedule: true })
             }
             isActionDisabled={isDraftActionsDisabled || !user}
-            isLoading={saveDraftMutation.isPending}
+            isLoading={saveDraftMutation.isPending || isGenerationDataFetching}
           />
         </div>
+
+        {/** Tabs on top left */}
         <Tabs className="w-full" value={activeTab} onValueChange={setActiveTab}>
-          {/** Tabs List */}
+          {/** Tabs List - Linkedin/Twitter */}
           <CreateDraftTabList
             selectedSocials={selectedSocials}
             toggleSocial={toggleSocial}
           />
 
+          {/** Loading placeholder */}
           {selectedSocials.length === 0 && (
             <div className="mx-auto mt-2 w-full md:w-fit md:min-w-2xl">
-              <PostSkeleton />
+              {(activeTab as channelType) === 'LinkedIn' ? (
+                <LinkedInPostSkeleton />
+              ) : (
+                <TwitterPostSkeleton />
+              )}
             </div>
           )}
 
@@ -240,8 +209,7 @@ const Create = () => {
             <CreateDraftTabContent
               key={social.name}
               tabName={social.name}
-              isSyncing={isSyncing}
-              onToggleSync={() => setIsSyncing(!isSyncing)}
+              user={user}
               getPostComponent={getPostComponent}
             />
           ))}
@@ -263,7 +231,7 @@ const Create = () => {
           hidePromptInfo
           activeChannel={activeTab as channelType}
         >
-          <div className="flex justify-center gap-2 lg:hidden">
+          <div className="mb-2 flex justify-center gap-2 lg:hidden">
             <DraftActions
               handleSaveDraft={handleSaveDraft}
               handlePublishDraft={() =>

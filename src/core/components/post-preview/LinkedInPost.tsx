@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { UserSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
@@ -27,30 +28,20 @@ import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
 
 interface LinkedInPostProps {
-  onContentChange?: (content: string) => void
   initialContent?: string
   loading?: boolean
-  handlePostDelete?: () => void
-  isActionLoading?: boolean
   notEditable?: boolean
+  isActionLoading?: boolean
+  onContentChange?: (content: string) => void
+  handlePostDelete?: () => void
 }
 
-const LinkedInPost = ({
-  onContentChange,
-  initialContent,
-  loading = false,
-  handlePostDelete,
-  isActionLoading = false,
-  notEditable = false,
-}: LinkedInPostProps) => {
+const LinkedInPost = (props: LinkedInPostProps) => {
   const user = useUserState()
 
   const {
     content,
     setContent,
-    attachedFiles,
-    setAttachedFiles,
-    imagePreviews,
     textareaRef,
     updateSelectionRef,
     addEmoji,
@@ -64,12 +55,12 @@ const LinkedInPost = ({
 
   // Initialize from parent if provided
   useEffect(() => {
-    if (typeof initialContent === 'string') {
-      setContent(initialContent)
+    if (typeof props.initialContent === 'string') {
+      setContent(props.initialContent)
     }
-  }, [initialContent])
+  }, [props.initialContent, setContent])
 
-  if (!user || loading) {
+  if (!user || props.loading) {
     return <LinkedInPostSkeleton />
   }
 
@@ -88,11 +79,28 @@ const LinkedInPost = ({
     expanded || !isLong ? raw : raw.slice(0, MAX_CHARS).trimEnd() + '...'
 
   return (
-    <>
+    <div className="relative">
+      {!props.notEditable && (
+        <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
+          {!props.isActionLoading && (
+            <div className="lg:absolute lg:top-0 lg:-right-10">
+              <PostActions
+                onEmojiSelect={addEmoji}
+                onDelete={() => {
+                  onDelete()
+                  props.onContentChange?.('')
+                  props.handlePostDelete?.()
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       <div
         className={cn(
           'bg-card relative rounded-lg border-1',
-          isActionLoading && 'opacity-50'
+          props.isActionLoading && 'opacity-50'
         )}
       >
         {!user_social.connected && (
@@ -112,7 +120,7 @@ const LinkedInPost = ({
         <LinkedInPostHeader user={user_social} />
 
         {/* Content */}
-        {notEditable ? (
+        {props.notEditable ? (
           <div className="p-4 pt-1 text-sm">
             <p className="break-words whitespace-pre-wrap">{displayText}</p>
             {isLong && (
@@ -128,7 +136,7 @@ const LinkedInPost = ({
         ) : (
           <Textarea
             className={cn(
-              'min-h-20',
+              'min-h-20 !bg-transparent',
               // Base visuals and typography
               'resize-none border-0 p-4 pt-1 shadow-none',
               // Caret, placeholder and selection for a premium feel
@@ -146,50 +154,34 @@ const LinkedInPost = ({
             onChange={e => {
               const val = e.target.value
               setContent(val)
-              onContentChange?.(val)
+              props.onContentChange?.(val)
             }}
             onSelect={updateSelectionRef}
             onKeyUp={updateSelectionRef}
             onClick={updateSelectionRef}
-            disabled={isActionLoading}
+            disabled={props.isActionLoading}
           />
         )}
 
         {/* Image Preview */}
         <PostImagePreview
-          imagePreviews={imagePreviews}
-          onRemove={isActionLoading ? undefined : removeImageAt}
+          imagePreviews={[]}
+          onRemove={props.isActionLoading ? undefined : removeImageAt}
         />
 
         {/* Attachments */}
         <PostAttachmentPreview
-          attachedFiles={attachedFiles}
-          onRemove={isActionLoading ? undefined : removeAttachmentAt}
+          attachedFiles={[]}
+          onRemove={props.isActionLoading ? undefined : removeAttachmentAt}
         />
 
         {/* Footer */}
         <LinkedInPostFooter />
       </div>
-      {!notEditable && (
-        <div className="mt-2 flex justify-end">
-          {!isActionLoading && (
-            <PostActions
-              maxFiles={8}
-              attachedFiles={attachedFiles}
-              onFilesChange={files => {
-                setAttachedFiles(files)
-              }}
-              onEmojiSelect={addEmoji}
-              onDelete={() => {
-                onDelete()
-                onContentChange?.('')
-                handlePostDelete?.()
-              }}
-            />
-          )}
-        </div>
-      )}
-    </>
+
+      {/** Actions */}
+      {!props.notEditable && <LinkedInPostFooterActions content={content} />}
+    </div>
   )
 }
 
@@ -263,6 +255,27 @@ const LinkedInPostFooter = () => {
           <span className="hidden sm:inline">Send</span>
         </p>
       </div>
+    </div>
+  )
+}
+
+const LinkedInPostFooterActions = ({ content }: { content: string }) => {
+  const maxChars = POST_WORD_COUNT.LinkedIn
+  const usedChars = content.length
+
+  // Determine text color based on character count
+  const textColor =
+    usedChars >= maxChars
+      ? 'text-red-600 dark:text-red-400'
+      : usedChars >= maxChars * 0.5
+        ? 'text-yellow-500 dark:text-yellow-400'
+        : ''
+
+  return (
+    <div className="mt-2 flex items-center justify-end gap-2 lg:mt-2">
+      <p className={cn('text-xs', textColor)}>
+        {usedChars}/{maxChars}
+      </p>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import { addYears, endOfYear, startOfToday } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 
 import DateRangePicker from '@/shared/components/date-range-picker'
@@ -24,12 +25,18 @@ const ListControls = ({
   onSortChange,
   hideSort = false,
 }: ListControlsProps) => {
+  const today = startOfToday()
+  const maxDate = endOfYear(addYears(today, 1))
+
   return (
     <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
       <DateRangePicker
         value={dateRange}
         onValueChange={onDateRangeChange}
         className="w-full md:w-auto"
+        startMonth={today}
+        endMonth={maxDate}
+        disabled={[{ before: today }, { after: maxDate }]}
       />
 
       {!hideSort && onSortChange && (

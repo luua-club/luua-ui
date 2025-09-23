@@ -7,6 +7,9 @@
     "utils": "@/shared/utils"
   },
   "iconLibrary": "lucide",
+  "registries": {
+    "@magicui": "https://magicui.design/r/{name}.json"
+  },
   "rsc": false,
   "style": "new-york",
   "tailwind": {

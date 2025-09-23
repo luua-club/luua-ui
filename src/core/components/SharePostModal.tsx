@@ -53,25 +53,22 @@ export function SharePostModal({
     const key = channel.toLowerCase() as 'linkedin' | 'twitter'
     return Boolean(connections?.[key]?.connected)
   }
-
+  // Initialize selection only when the modal opens. Do not overwrite user
+  // choices while the modal remains open.
   useEffect(() => {
-    // Preselect only the posts for channels that are connected
-    const nextSelected = posts
-      .filter(p => isChannelConnected(p.channel))
-      .map(p => p.id)
+    if (!isOpen.open) return
 
-    // Avoid unnecessary state updates to prevent re-render loops
     setSelectedPosts(prev => {
-      if (
-        prev.length === nextSelected.length &&
-        prev.every((id, i) => id === nextSelected[i])
-      ) {
-        return prev
-      }
+      if (prev.length > 0) return prev
+      const nextSelected = posts
+        .filter(p => isChannelConnected(p.channel))
+        .map(p => p.id)
       return nextSelected
     })
-    // Only depend on primitive connection flags to avoid changing on every render
-  }, [posts, connections?.linkedin?.connected, connections?.twitter?.connected])
+    // Intentionally not depending on `posts` to avoid resetting user selection
+    // due to parent re-renders while the dialog stays open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen.open])
 
   const togglePost = (postId: string, checked: string | boolean) => {
     const isChecked = checked === true || checked === 'true'
@@ -143,6 +140,7 @@ export function SharePostModal({
                 id={post.id}
                 channel={post.channel}
                 content={post.content}
+                tileView
               />
             </div>
           ))}
@@ -184,6 +182,10 @@ export function SharePostModal({
       onOpenChange={open => {
         onOpenChange({ ...isOpen, open })
         setShowSchedule(false)
+        // Clear selection on close so that next open can re-initialize
+        if (!open) {
+          setSelectedPosts([])
+        }
       }}
     >
       <DialogContent

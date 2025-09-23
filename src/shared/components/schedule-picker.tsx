@@ -1,5 +1,6 @@
 import {
   addYears,
+  endOfYear,
   format,
   isAfter,
   isSameDay,
@@ -31,7 +32,8 @@ export function SchedulePicker({
 
   const today = startOfToday()
   const fromMonth = today
-  const toMonth = addYears(today, 5)
+  // Allow scheduling only till the end of next year (current year + 1)
+  const toMonth = endOfYear(addYears(today, 1))
 
   const parseTime = (time: string, baseDate: Date) => {
     const [h, m] = time.split(':').map(Number)
@@ -41,6 +43,8 @@ export function SchedulePicker({
   // Determine if a time slot should be disabled (only past times on today)
   const isSlotDisabled = (time: string) => {
     if (!date) return true
+    // Disallow any time if selected date is beyond allowed max
+    if (isAfter(date, toMonth)) return true
     const now = new Date()
     if (!isSameDay(date, now)) return false
     const slotDate = parseTime(time, date)
@@ -84,7 +88,7 @@ export function SchedulePicker({
             captionLayout="dropdown"
             startMonth={fromMonth}
             endMonth={toMonth}
-            disabled={[{ before: startOfToday() }]}
+            disabled={[{ before: startOfToday() }, { after: toMonth }]}
             showOutsideDays={false}
             className="bg-transparent p-0 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(12)]"
             formatters={{
@@ -94,7 +98,7 @@ export function SchedulePicker({
             }}
           />
         </div>
-        <div className="no-scrollbar inset-y-0 right-0 flex max-h-72 w-full scroll-pb-6 flex-col gap-4 overflow-y-auto border-t p-6 md:absolute md:max-h-none md:w-48 md:border-t-0 md:border-l">
+        <div className="scrollbar inset-y-0 right-0 flex max-h-72 w-full scroll-pb-6 flex-col gap-4 overflow-y-auto border-t p-6 md:absolute md:max-h-none md:w-48 md:border-t-0 md:border-l">
           <div className="grid gap-2">
             {timeSlots.map(time => (
               <Button
@@ -138,7 +142,9 @@ export function SchedulePicker({
           )}
         </div>
         <Button
-          disabled={!date || !selectedTime || isLoading}
+          disabled={
+            !date || isAfter(date, toMonth) || !selectedTime || isLoading
+          }
           className="w-full md:ml-auto md:w-auto"
           variant="brandAccent"
           onClick={() => onSubmit?.({ date: date!, time: selectedTime! })}

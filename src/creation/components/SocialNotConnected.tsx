@@ -4,21 +4,28 @@ import { PlugZap } from 'lucide-react'
 import { channelType } from '@/core/models/social.model'
 import { Button } from '@/shared/ui/button'
 
-const SocialNotConnected = ({ social }: { social: channelType }) => {
+interface SocialNotConnectedProps {
+  social: channelType
+}
+
+function SocialNotConnected({ social }: SocialNotConnectedProps) {
   const navigate = useNavigate()
 
   return (
-    <div className="bg-sidebar flex flex-col items-center justify-center gap-4 rounded-md border-1 px-16 py-10">
-      <p className="text-lg font-semibold">
+    <div className="flex flex-col items-center justify-center gap-4 pt-10">
+      {/* Helping text */}
+      <p className="text-center text-lg font-semibold">
         Connect {social} in settings to start writing.
       </p>
+
+      {/* Connect button */}
       <Button
         variant="default"
         onClick={() =>
           navigate({ to: '/settings', search: { tabs: 'socials' } })
         }
       >
-        <PlugZap />
+        <PlugZap className="size-4" />
         Connect
       </Button>
     </div>

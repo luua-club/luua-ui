@@ -1,6 +1,6 @@
 import { IconBrandLinkedin, IconBrandX } from '@tabler/icons-react'
 
-import { ISocialChannel } from '../models/social.model'
+import { channelType, ISocialChannel } from '../models/social.model'
 
 /**
  * The key to store the user in local storage
@@ -86,4 +86,12 @@ export enum UserStyleStatus {
   IN_PROGRESS = 'in_progress',
   GENERATED = 'generated',
   FAILED = 'failed',
+}
+
+/**
+ * Post word count for each channel
+ */
+export const POST_WORD_COUNT: { [key in channelType]: number } = {
+  Twitter: 280,
+  LinkedIn: 3000,
 }

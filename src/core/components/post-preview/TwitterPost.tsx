@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import {
   Bookmark,
   ChartNoAxesColumn,
+  CirclePlus,
   Dot,
   Ellipsis,
   Heart,
@@ -12,11 +13,14 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 
+import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { UserSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { Button } from '@/shared/ui/button'
+import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
@@ -27,29 +31,20 @@ import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
 
 interface TwitterPostProps {
-  onContentChange?: (content: string) => void
   initialContent?: string
   loading?: boolean
-  handlePostDelete?: () => void
-  isActionLoading?: boolean
   notEditable?: boolean
+  isActionLoading?: boolean
+  onContentChange?: (content: string) => void
+  handlePostDelete?: () => void
 }
 
-const TwitterPost = ({
-  onContentChange,
-  initialContent,
-  loading = false,
-  handlePostDelete,
-  isActionLoading = false,
-  notEditable = false,
-}: TwitterPostProps) => {
+const TwitterPost = (props: TwitterPostProps) => {
+  // -- HOOKS --
   const user = useUserState()
-
   const {
     content,
     setContent,
-    attachedFiles,
-    setAttachedFiles,
     imagePreviews,
     textareaRef,
     updateSelectionRef,
@@ -59,30 +54,51 @@ const TwitterPost = ({
     removeAttachmentAt,
   } = usePostComposer()
 
-  // Initialize from parent if provided
+  // -- EFFECTS --
+  /**
+   * Initialize from parent if provided
+   */
   useEffect(() => {
-    if (typeof initialContent === 'string') {
-      setContent(initialContent)
+    if (typeof props.initialContent === 'string') {
+      setContent(props.initialContent)
     }
-  }, [initialContent])
+  }, [props.initialContent, setContent])
 
-  if (!user || loading) {
+  // -- EARLY RETURNS --
+  if (!user || props.loading) {
     return <TwitterPostSkeleton />
   }
 
+  // -- LOCAL VARS --
   const user_social = { ...user.connected_channels.twitter }
-
   user_social.user_name = user_social.user_name || user.name
   user_social.user_id = user_social.user_id || user.email
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
 
+  // -- RENDER --
   return (
-    <>
+    <div className="relative">
+      {!props.notEditable && (
+        <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
+          {!props.isActionLoading && (
+            <div className="lg:absolute lg:top-0 lg:-right-10">
+              <PostActions
+                onEmojiSelect={addEmoji}
+                onDelete={() => {
+                  onDelete()
+                  props.onContentChange?.('')
+                  props.handlePostDelete?.()
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
       <div
         className={cn(
           'bg-card relative flex h-fit gap-2 rounded-lg border-1 p-4',
-          isActionLoading && 'opacity-50'
+          props.isActionLoading && 'opacity-50'
         )}
       >
         {!user_social.connected && (
@@ -112,7 +128,7 @@ const TwitterPost = ({
           <TwitterPostHeader user={user_social} />
 
           {/* Content */}
-          {notEditable ? (
+          {props.notEditable ? (
             <p className="p-0 pt-1 text-sm break-words whitespace-pre-wrap">
               {content}
             </p>
@@ -120,7 +136,7 @@ const TwitterPost = ({
             <Textarea
               className={cn(
                 // Base visuals and typography
-                'resize-none border-0 p-0 pt-1 shadow-none',
+                'resize-none border-0 !bg-transparent p-0 pt-1 shadow-none',
                 // Caret, placeholder and selection for a premium feel
                 'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
                 // Smooth color transitions
@@ -132,16 +148,16 @@ const TwitterPost = ({
               placeholder="What's on your mind?"
               ref={textareaRef}
               value={content}
-              maxLength={280}
+              maxLength={POST_WORD_COUNT.Twitter}
               onChange={e => {
                 const val = e.target.value
                 setContent(val)
-                onContentChange?.(val)
+                props.onContentChange?.(val)
               }}
               onSelect={updateSelectionRef}
               onKeyUp={updateSelectionRef}
               onClick={updateSelectionRef}
-              disabled={isActionLoading}
+              disabled={props.isActionLoading}
             />
           )}
 
@@ -149,40 +165,24 @@ const TwitterPost = ({
           <div className="overflow-hidden rounded-lg">
             <PostImagePreview
               imagePreviews={imagePreviews}
-              onRemove={isActionLoading ? undefined : removeImageAt}
+              onRemove={props.isActionLoading ? undefined : removeImageAt}
             />
           </div>
 
           {/* Attachments */}
           <PostAttachmentPreview
-            attachedFiles={attachedFiles}
-            onRemove={isActionLoading ? undefined : removeAttachmentAt}
+            attachedFiles={[]}
+            onRemove={props.isActionLoading ? undefined : removeAttachmentAt}
           />
 
           {/* Footer */}
           <TwitterPostFooter />
         </div>
       </div>
-      {!notEditable && (
-        <div className="mt-2 flex justify-end">
-          {!isActionLoading && (
-            <PostActions
-              maxFiles={4}
-              attachedFiles={attachedFiles}
-              onFilesChange={files => {
-                setAttachedFiles(files)
-              }}
-              onEmojiSelect={addEmoji}
-              onDelete={() => {
-                onDelete()
-                onContentChange?.('')
-                handlePostDelete?.()
-              }}
-            />
-          )}
-        </div>
-      )}
-    </>
+
+      {/* Extra Actions */}
+      {!props.notEditable && <TwitterPostFooterActions content={content} />}
+    </div>
   )
 }
 
@@ -239,6 +239,38 @@ const TwitterPostFooter = () => {
         <Bookmark className="size-4" />
         <Share className="size-4" />
       </div>
+    </div>
+  )
+}
+
+const TwitterPostFooterActions = ({ content }: { content: string }) => {
+  const maxChars = POST_WORD_COUNT.Twitter
+  const usedChars = content.length
+
+  // Determine text color based on character count
+  const textColor =
+    usedChars >= maxChars
+      ? 'text-red-600 dark:text-red-400'
+      : usedChars >= maxChars * 0.5
+        ? 'text-yellow-600 dark:text-yellow-400'
+        : ''
+
+  return (
+    <div className="mt-2 flex items-center justify-end gap-2 lg:mt-2">
+      <p className={cn('text-xs', textColor)}>
+        {usedChars}/{maxChars}
+      </p>
+      <Separator orientation="vertical" className="!h-4" />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" className="size-6">
+            <CirclePlus />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p>Threads coming soon !</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   )
 }
