@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
+import confetti from 'canvas-confetti'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -247,7 +248,38 @@ export const useCreateDraft = () => {
         setIsShareModalOpen({ open: false, schedule: false })
         toast.success('Post are published successfully')
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-        navigate({ to: '/dashboard' })
+
+        const handleClick = () => {
+          const end = Date.now() + 500 // 500 ms
+          const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
+
+          const frame = () => {
+            if (Date.now() > end) return
+
+            confetti({
+              particleCount: 2,
+              angle: 60,
+              spread: 55,
+              startVelocity: 60,
+              origin: { x: 0, y: 0.5 },
+              colors: colors,
+            })
+            confetti({
+              particleCount: 2,
+              angle: 120,
+              spread: 55,
+              startVelocity: 60,
+              origin: { x: 1, y: 0.5 },
+              colors: colors,
+            })
+
+            requestAnimationFrame(frame)
+          }
+
+          frame()
+        }
+
+        handleClick()
       },
       onError: () => {
         toast.error('Failed to publish posts')
