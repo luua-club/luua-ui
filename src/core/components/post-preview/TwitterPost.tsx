@@ -181,7 +181,7 @@ const TwitterPost = (props: TwitterPostProps) => {
       </div>
 
       {/* Extra Actions */}
-      <TwitterPostFooterActions content={content} />
+      {!props.notEditable && <TwitterPostFooterActions content={content} />}
     </div>
   )
 }
@@ -256,7 +256,7 @@ const TwitterPostFooterActions = ({ content }: { content: string }) => {
         : ''
 
   return (
-    <div className="mt-2 flex items-center justify-end gap-2 lg:mt-0">
+    <div className="mt-2 flex items-center justify-end gap-2 lg:mt-2">
       <p className={cn('text-xs', textColor)}>
         {usedChars}/{maxChars}
       </p>
