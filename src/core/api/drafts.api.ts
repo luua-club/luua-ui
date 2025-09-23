@@ -16,11 +16,29 @@ class DraftsApi extends BaseApiService {
     return this.post<IDraftResponse>(data)
   }
 
-  async getDrafts(request: IDraftListRequest) {
+  async getDrafts(request: IDraftListRequest, autopilot = false) {
     const { from = null, to = null, sort = 'desc', limit, offset } = request
+    const payload: {
+      from: string | null
+      to: string | null
+      sort: string
+      limit: number
+      offset: number
+      autopilot?: boolean
+    } = {
+      from,
+      to,
+      sort,
+      limit,
+      offset,
+    }
+
+    if (autopilot) {
+      payload['autopilot'] = true
+    }
 
     return this.get<IDraftListResponse>(undefined, {
-      params: { from, to, sort, limit, offset },
+      params: payload,
     })
   }
 

@@ -1,7 +1,9 @@
 import { Outlet } from '@tanstack/react-router'
 import {
+  BaggageClaim,
   Eclipse,
   FolderClock,
+  Lightbulb,
   LucideCalendar,
   LucideFileText,
   LucideLayoutDashboard,
@@ -53,6 +55,19 @@ const postsItems: ISidebarItem[] = [
   },
 ]
 
+const autoGenItems: ISidebarItem[] = [
+  {
+    title: 'Inspiration',
+    url: '/auto-gen/inspiration',
+    icon: <Lightbulb />,
+  },
+  {
+    title: 'AI Drafts',
+    url: '/auto-gen/drafts',
+    icon: <BaggageClaim />,
+  },
+]
+
 function SidebarLayout() {
   return (
     <SidebarProvider>
@@ -71,6 +86,7 @@ const SidebarContent = () => {
         platformItems={platformItems}
         creationsData={creationItems}
         postsItems={postsItems}
+        autoGenItems={autoGenItems}
       />
       <div className="w-full">
         <Nav handleSidebar={toggleSidebar} />

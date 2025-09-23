@@ -6,6 +6,7 @@ import {
 
 import { AppContent } from '@/App'
 import authRoute from '@/auth/router'
+import autoGenRouteTree from '@/auto-gen/router'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
 import creationRouteTree from '@/creation/router'
 import dashboardRoute from '@/dashboard/router'
@@ -40,6 +41,7 @@ const routeTree = rootRoute.addChildren([
     creationRouteTree,
     publishedRoute,
     preferencesRoute,
+    autoGenRouteTree,
   ]),
 ])
 
