@@ -1,3 +1,5 @@
+import { Factory, Luggage } from 'lucide-react'
+
 import {
   FormControl,
   FormField,
@@ -20,18 +22,14 @@ interface RoleAndIndustryProps {
 
 function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
   return (
-    <div className="space-y-4">
-      <h1 className="text-base font-medium">
-        Tell us a bit about you to personalize your content from day one.
-      </h1>
-
+    <>
       {/** Role Section */}
       <FormField
         name="role"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-base font-semibold sm:text-lg">
-              What&apos;s your professional role?
+            <FormLabel className="text-base font-semibold">
+              <Luggage className="size-5" /> What&apos;s your professional role?
             </FormLabel>
             <FormControl>
               <Input
@@ -50,8 +48,8 @@ function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
         name="industry"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="mt-4 text-base font-semibold sm:text-lg">
-              What&apos;s your industry?
+            <FormLabel className="mt-8 text-base font-semibold">
+              <Factory className="size-5" /> What&apos;s your industry?
             </FormLabel>
             <Select
               onValueChange={field.onChange}
@@ -75,7 +73,7 @@ function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
           </FormItem>
         )}
       />
-    </div>
+    </>
   )
 }
 

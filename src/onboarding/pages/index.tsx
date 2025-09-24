@@ -1,18 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, PencilRuler } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import LogoIconOnly from '@/assets/images/luua-black-icon.svg?react'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY } from '@/core/config/constant'
 import UserStyles from '@/core/containers/UserStyles'
 import { LoginResponse } from '@/core/models/auth.model'
-import { IUserStyleRequest } from '@/core/models/user.model'
-import { BorderBeam } from '@/shared/ui/border-beam'
+import {
+  IUserStyleRequest,
+  UserOnboardingRequest,
+} from '@/core/models/user.model'
 import { Button } from '@/shared/ui/button'
 import { Form } from '@/shared/ui/form'
 import { Progress } from '@/shared/ui/progress'
@@ -56,6 +59,10 @@ function OnBoarding() {
     mutationFn: (payload: IUserStyleRequest) => userApi.setUserStyle(payload),
   })
 
+  const userOnboardingMutation = useMutation({
+    mutationFn: (payload: UserOnboardingRequest) => userApi.onboarding(payload),
+  })
+
   // ---- Functions ----
   /**
    * Handles the next step
@@ -75,15 +82,17 @@ function OnBoarding() {
    *  Handles the form submission
    */
   const onSubmit = async (values: OnboardingFormValues) => {
-    // eslint-disable-next-line no-console
-    console.log(values)
     try {
       if (styles.length > 0) {
         await Promise.all([
           setUserStyleMutation.mutateAsync({ writing_style: styles }),
+          userOnboardingMutation.mutateAsync({
+            role: values.role,
+            industry: values.industry,
+            goal: values.goal,
+          }),
         ])
       }
-      // TODO: call onboarding api call
     } catch {
       toast.error('Something Went Wrong')
     } finally {
@@ -112,10 +121,11 @@ function OnBoarding() {
             initialGridCol={2}
             customHeader={
               <div className="flex flex-col gap-2 pb-2">
-                <h1 className="text-lg font-medium">
-                  How would you describe your writing style?
+                <h1 className="flex items-center gap-2 text-base font-semibold">
+                  <PencilRuler className="size-5" /> How would you describe your
+                  writing style?
                 </h1>
-                <p className="text-muted-foreground text-base">
+                <p className="text-muted-foreground text-sm">
                   Choose the style that best fits your goal. The AI will adapt
                   its tone and structure accordingly.
                 </p>
@@ -130,34 +140,35 @@ function OnBoarding() {
   }
 
   return (
-    <div className="h-screen w-screen">
+    <div className="flex h-screen w-screen flex-col sm:items-center">
       {/* Background  */}
-      <div className="h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div className="absolute inset-0 hidden h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] sm:block"></div>
+
+      <div className="flex flex-col items-center justify-center gap-4 p-5 text-center sm:z-10">
+        <div className="flex items-center justify-center">
+          <LogoIconOnly
+            aria-label="Icon"
+            className="size-18 rounded-full border-1 border-dashed p-3"
+          />
+        </div>
+        {/* Header */}
+        <h1 className="text-xl font-semibold sm:text-3xl">
+          Let&apos;s get you in the club!
+        </h1>
+        <p className="text-muted-foreground text-balance">
+          Tell us a bit about you to personalize your content from day one.
+        </p>
+      </div>
 
       {/* Card */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-        className="absolute inset-0 mx-auto my-auto flex h-fit max-w-2xl flex-col justify-center p-5 sm:rounded-lg sm:border-1 sm:bg-white sm:shadow-lg"
+        className="relative flex w-full flex-col justify-center rounded-lg bg-white p-5 sm:w-fit sm:min-w-xl sm:border-1"
       >
-        {/* Beam */}
-        <BorderBeam
-          duration={20}
-          size={150}
-          colorTo={'#0a0a0a'}
-          colorFrom={'#0a0a0a'}
-          borderWidth={2}
-          className="hidden sm:block"
-        />
-
-        {/* Header */}
-        <h1 className="text-xl font-semibold sm:text-3xl">
-          Let&apos;s get you in the Luua club!
-        </h1>
-
         {/* Progress Bar */}
-        <div className="mt-4 space-y-2">
+        <div className="mt-2 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="font-medium">
               Step {currentStep} of {totalSteps}
@@ -170,7 +181,7 @@ function OnBoarding() {
         </div>
 
         {/* Form */}
-        <div className="mt-10 min-h-1/2">
+        <div className="mt-8 min-h-1/2">
           <Form {...form}>
             <form className="flex flex-col gap-4">
               {/* Step Content */}
