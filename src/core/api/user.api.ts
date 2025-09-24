@@ -2,6 +2,7 @@ import { channelType } from '../models/social.model'
 import {
   IUserStyleRequest,
   User,
+  UserOnboardingRequest,
   userStyleResponseType,
 } from '../models/user.model'
 import { BaseApiService } from './base.api'
@@ -47,6 +48,16 @@ class UserApi extends BaseApiService {
    */
   async disconnectSocial(platform: channelType) {
     return this.patch({ channel: platform }, '/disconnect-social')
+  }
+
+  /**
+   * Set the user onboarding
+   
+   * @param data - The user onboarding request data
+   * @returns Promise<ApiResponse<unknown>> The response from the server
+   */
+  async onboarding(data: UserOnboardingRequest) {
+    return this.post(data, '/onboarding')
   }
 }
 

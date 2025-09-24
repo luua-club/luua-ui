@@ -58,3 +58,12 @@ export interface IUserAdvancedStyleRequest {
 export interface IUserStyleRequest {
   writing_style: string[]
 }
+
+/**
+ * User onboarding request interface
+ */
+export interface UserOnboardingRequest {
+  role?: string
+  industry?: string
+  goal?: string
+}
