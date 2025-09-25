@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRight, TestTubeDiagonal } from 'lucide-react'
+import { ChevronRight, Loader2, TestTubeDiagonal } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -26,9 +26,13 @@ const FormSchema = z.object({
 
 interface IStyleTextCapture {
   handleSubmit: (data: string) => void
+  isLoading: boolean
 }
 
-const StyleTextCapture = ({ handleSubmit }: IStyleTextCapture) => {
+const StyleTextCapture = ({
+  handleSubmit,
+  isLoading = false,
+}: IStyleTextCapture) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -38,6 +42,7 @@ const StyleTextCapture = ({ handleSubmit }: IStyleTextCapture) => {
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     handleSubmit(data.sampleText)
+    form.reset()
   }
 
   return (
@@ -63,8 +68,17 @@ const StyleTextCapture = ({ handleSubmit }: IStyleTextCapture) => {
             </FormItem>
           )}
         />
-        <Button type="submit" variant="secondary" className="mt-4 w-fit">
-          <TestTubeDiagonal />
+        <Button
+          type="submit"
+          variant="secondary"
+          className="mt-4 w-fit"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <TestTubeDiagonal />
+          )}
           Analyze sample text
           <ChevronRight />
         </Button>
