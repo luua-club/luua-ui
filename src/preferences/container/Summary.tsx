@@ -2,15 +2,17 @@ import { Loader, X } from 'lucide-react'
 
 import { UserStyleStatus } from '@/core/config/constant'
 import { userStyleResponseType } from '@/core/models/user.model'
+import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { cn } from '@/shared/utils'
 
 interface ISummaryProps {
   data?: userStyleResponseType
+  onHelperTextClick: () => void
   isLoading: boolean
 }
 
-const Summary = ({ data, isLoading }: ISummaryProps) => {
+const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
   // --- Early return ---
   if (!data || isLoading) {
     return (
@@ -109,8 +111,14 @@ const Summary = ({ data, isLoading }: ISummaryProps) => {
       {/* INITIAL Helper text */}
       {status === UserStyleStatus.INITIAL && (
         <div className="bg flex items-center justify-center gap-1 pt-4 text-sm font-medium">
-          Help Luua understand your writing style by providing some sample or
-          inspiration.
+          Help Luua understand your writing style by providing
+          <Button
+            variant="link"
+            className="!p-0 underline"
+            onClick={onHelperTextClick}
+          >
+            some sample or inspiration.
+          </Button>
         </div>
       )}
 

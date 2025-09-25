@@ -37,7 +37,13 @@ const Preferences = () => {
   return (
     <div className="m-auto flex max-w-4xl flex-col p-5">
       {/* --- Summary --- */}
-      <Summary data={data?.data} isLoading={isLoading} />
+      <Summary
+        data={data?.data}
+        isLoading={isLoading}
+        onHelperTextClick={() => {
+          setActiveTab(tabValue[1])
+        }}
+      />
 
       {/* --- Heading --- */}
       <div className="mt-8 py-4">
