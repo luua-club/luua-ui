@@ -1,11 +1,12 @@
 import { createLazyRoute } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
   CircleCheck,
   CircleX,
   ClipboardCheck,
+  PlusCircle,
   RotateCcw,
-  SearchSlash,
   TriangleAlert,
 } from 'lucide-react'
 
@@ -20,19 +21,19 @@ import { cn } from '@/shared/utils'
 import usePublishList from '../hooks/publish-list.hook'
 
 const Published = () => {
+  const router = useRouter()
   const {
     dateRange,
     setDateRange,
-    selectedPost,
     isPending,
     sort,
     setSort,
     posts,
-    setSelectedPost,
     total,
     limit,
     offset,
     setOffset,
+    formatSelectedRange,
   } = usePublishList()
 
   const getPostStatus = (status: postStatusType | undefined) => {
@@ -68,30 +69,22 @@ const Published = () => {
       title="Published Posts"
       dateRange={dateRange}
       onDateRangeChange={setDateRange}
-      selectedPost={selectedPost}
       isPending={isPending}
       sort={sort}
+      dateRangeLabel={formatSelectedRange()}
       onSortChange={setSort}
     >
-      <div className="space-y-4">
+      <div className="space-y-6">
         {posts.map(post => (
           <div key={post.id} className={`relative flex flex-col gap-2`}>
-            <div
-              className={`cursor-pointer rounded-lg border-2 ${
-                selectedPost?.id === post.id
-                  ? 'border-black'
-                  : 'border-transparent'
-              }`}
-              onClick={() => setSelectedPost(post)}
-            >
-              <Post tileView {...post} />
+            <div>
+              <Post {...post} />
               {post.status === 'Failed' && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
                       className={cn(
-                        'absolute -top-2 -right-2 rounded-full border-1 border-dashed bg-white p-1 text-yellow-600',
-                        selectedPost?.id === post.id && 'border-black'
+                        'bg-card absolute -top-2.5 -right-2.5 rounded-full border-1 border-dashed p-1 text-yellow-600 dark:text-yellow-400'
                       )}
                     >
                       <TriangleAlert className="size-4" />
@@ -101,23 +94,28 @@ const Published = () => {
                 </Tooltip>
               )}
             </div>
+
             <div className="mx-1 -mt-1 flex items-center justify-between gap-2">
               <p className="flex items-center gap-2 text-xs font-medium">
                 <span
                   className={cn(
-                    'flex items-center gap-1 text-gray-500',
-                    post.status === 'Failed' && 'text-red-600',
-                    post.status === 'Queued' && 'text-yellow-600',
-                    post.status === 'Published' && 'text-green-600'
+                    'flex items-center gap-1 text-zinc-600 dark:text-zinc-300',
+                    post.status === 'Failed' &&
+                      'text-red-600 dark:text-red-400',
+                    post.status === 'Queued' &&
+                      'text-yellow-600 dark:text-yellow-400',
+                    post.status === 'Published' &&
+                      'text-green-600 dark:text-green-400'
                   )}
                 >
                   {getPostStatus(post.status)}
                 </span>
+
                 {post.status === 'Failed' && (
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     size="sm"
-                    className="h-fit !p-1 text-xs"
+                    className="h-fit !rounded-sm !px-1 !py-0.5 text-xs"
                   >
                     <RotateCcw className="size-3" />
                     Retry
@@ -125,7 +123,7 @@ const Published = () => {
                 )}
               </p>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-zinc-600 dark:text-zinc-300">
                 {post.published_at &&
                   format(
                     new Date(post.published_at as string),
@@ -148,9 +146,19 @@ const Published = () => {
         )}
 
         {posts.length === 0 && (
-          <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-gray-500">
-            <SearchSlash className="size-12" />
-            <p className="font-semibold">No published posts found</p>
+          <div className="flex h-48 w-full flex-col items-center justify-center gap-4">
+            <p className="text-lg font-semibold">No published posts found</p>
+
+            <Button
+              variant="default"
+              onClick={() => {
+                router.navigate({ to: '/creation/create' })
+              }}
+              className="text-xs"
+            >
+              Create Now
+              <PlusCircle className="size-3" />
+            </Button>
           </div>
         )}
       </div>

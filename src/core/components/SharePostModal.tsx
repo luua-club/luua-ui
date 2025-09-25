@@ -197,7 +197,7 @@ export function SharePostModal({
         <DialogHeader>
           <DialogTitle className="mb-4 flex flex-col gap-2 text-xl font-semibold text-zinc-800 md:text-2xl dark:text-zinc-300">
             Almost There
-            <span className="flex justify-between text-sm">
+            <span className="flex flex-col justify-between gap-2 text-sm sm:flex-row sm:gap-0">
               <span className="flex items-center gap-1">
                 Give your post a quick review
                 <ChevronRight className="size-4" />

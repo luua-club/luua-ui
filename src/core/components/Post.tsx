@@ -1,4 +1,4 @@
-import { Paperclip, TriangleAlert } from 'lucide-react'
+import { TriangleAlert } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Card, CardContent } from '@/shared/ui/card'
@@ -14,16 +14,13 @@ import { extractUserInitial } from '../utils/common.util'
 
 type PostProps = IPost & {
   isLoading?: boolean
-  fullView?: boolean
   tileView?: boolean
 }
 
 function Post({
   channel,
   content,
-  attached_media,
   isLoading = false,
-  fullView = false,
   tileView = false,
 }: PostProps) {
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
@@ -64,12 +61,13 @@ function Post({
     <Card
       className={cn(
         'bg-card relative flex flex-col rounded-md p-0 shadow-none',
-        fullView ? 'h-fit' : 'min-h-52 overflow-hidden',
-        tileView ? 'min-h-30' : 'h-fit'
+        tileView ? 'min-h-auto' : 'h-fit'
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">
+        {/** USER INFO */}
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3">
+          {/** AVATAR */}
           <Avatar
             className={cn(
               'shrink-0 rounded-full',
@@ -79,6 +77,8 @@ function Post({
             <AvatarImage src={user.image} alt={user.name} />
             <AvatarFallback>{extractUserInitial(user.name)}</AvatarFallback>
           </Avatar>
+
+          {/** USER INFO */}
           <div className="flex min-w-0 flex-col">
             <div className="flex min-w-0 items-center gap-2 text-sm font-medium sm:text-base">
               <h6 className="truncate">{user.name}</h6>
@@ -100,28 +100,24 @@ function Post({
             </p>
           </div>
 
+          {/** SOCIAL LOGO */}
           {platform && platform.logo && (
             <platform.logo className="dark:bg-card size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
           )}
         </div>
+
+        {/** SEPARATOR */}
         {!tileView && <hr />}
+
+        {/** CONTENT */}
         <p
           className={cn(
-            'text-card-foreground mt-3 line-clamp-5 px-4 text-sm',
-            fullView ? 'line-clamp-none pb-4' : undefined,
+            'text-card-foreground my-4 line-clamp-5 px-4 text-sm',
             tileView ? 'mt-0 line-clamp-2' : undefined
           )}
         >
           {content}
         </p>
-
-        {attached_media && attached_media.length !== 0 && !tileView && (
-          <>
-            <span className="text-card-foreground absolute right-1 bottom-0 flex items-center justify-center p-2 text-[10px]">
-              <Paperclip className="size-3" />+{attached_media.length}
-            </span>
-          </>
-        )}
       </CardContent>
     </Card>
   )
