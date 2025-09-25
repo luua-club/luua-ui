@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import {
-  LucideBell,
   LucideChevronsUpDown,
   LucideLogOut,
   LucideSettings,
   LucideSparkles,
+  MessageCircleQuestionMark,
 } from 'lucide-react'
 
 import { UserState } from '@/core/models/user.model'
@@ -76,7 +76,7 @@ const NavUserDropdownContent = ({ logout }: { logout: () => void }) => {
       <DropdownMenuGroup>
         <DropdownMenuItem>
           <LucideSparkles />
-          Go Pro <span className="text-xs text-gray-500">Coming Soon</span>
+          Go Pro ✨
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
@@ -86,8 +86,8 @@ const NavUserDropdownContent = ({ logout }: { logout: () => void }) => {
           <Link to="/settings">Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <LucideBell />
-          Notifications
+          <MessageCircleQuestionMark />
+          Get Help
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
