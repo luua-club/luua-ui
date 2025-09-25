@@ -6,7 +6,6 @@ import { type DateRange } from 'react-day-picker'
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { type ApiResponse } from '@/core/models/api.model'
-import { IPost } from '@/core/models/post.model'
 import { type IScheduledPostResponse } from '@/core/models/schedule.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 import { DEFAULT_TIME_SLOT_INTERVAL } from '@/shared/config/constant'
@@ -14,7 +13,6 @@ import { getTimeSlots } from '@/shared/utils/time'
 
 const useScheduleList = () => {
   const queryClient = useQueryClient()
-  const [selectedPost, setSelectedPost] = useState<IPost | null>(null)
 
   // ----- Filters -----
   const today = new Date()
@@ -54,7 +52,10 @@ const useScheduleList = () => {
     refetchOnMount: 'always',
   })
 
-  const posts = query.data?.data?.posts ?? []
+  const posts = useMemo(
+    () => query.data?.data?.posts ?? [],
+    [query.data?.data?.posts]
+  )
   const total: number = query.data?.data?.total ?? 0
 
   // Reset pagination when filters change
@@ -73,7 +74,6 @@ const useScheduleList = () => {
     if (totalCount === 0 && offset !== 0) {
       setOffset(0)
     }
-    setSelectedPost(null)
   }, [query.data, offset, limit])
 
   // ----- Mutation: delete a scheduled post -----
@@ -205,9 +205,6 @@ const useScheduleList = () => {
     formatHour,
     formatSlotRange,
     formatSelectedRange,
-    // Selected post
-    selectedPost,
-    setSelectedPost,
     // Deletion controls
     confirmOpen,
     openDelete,

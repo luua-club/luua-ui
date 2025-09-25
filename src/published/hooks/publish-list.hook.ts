@@ -1,17 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import { DateRange } from 'react-day-picker'
 
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { ApiResponse } from '@/core/models/api.model'
-import { IPost } from '@/core/models/post.model'
 import { IPublishedPostListResponse } from '@/core/models/published-post.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 
 const usePublishList = () => {
-  const [selectedPost, setSelectedPost] = useState<IPost | null>(null)
-
   // ----- Filters & Sorting -----
   // Date range used to fetch drafts (inclusive of `from` and `to`).
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
@@ -66,8 +64,16 @@ const usePublishList = () => {
     if (totalCount === 0 && offset !== 0) {
       setOffset(0)
     }
-    setSelectedPost(null)
   }, [query.data, offset, limit])
+
+  const formatSelectedRange = () => {
+    if (!dateRange?.from) return ''
+    const fromDate = dateRange.from
+    const toDate = dateRange.to ?? dateRange.from
+    if (fromDate.getTime() === toDate.getTime())
+      return format(fromDate, 'MMM d, yyyy')
+    return `${format(fromDate, 'MMM d, yyyy')} – ${format(toDate, 'MMM d, yyyy')}`
+  }
 
   return {
     ...query,
@@ -79,10 +85,9 @@ const usePublishList = () => {
     setOffset,
     dateRange,
     setDateRange,
+    formatSelectedRange,
     sort,
     setSort,
-    selectedPost,
-    setSelectedPost,
   }
 }
 

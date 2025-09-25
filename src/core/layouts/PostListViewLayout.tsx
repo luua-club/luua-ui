@@ -1,20 +1,11 @@
-import { MonitorSmartphone } from 'lucide-react'
 import { ReactNode } from 'react'
 import { DateRange } from 'react-day-picker'
 
 import ListControls from '@/core/components/ListControls'
-import LinkedInPost from '@/core/components/post-preview/LinkedInPost'
-import TwitterPost from '@/core/components/post-preview/TwitterPost'
 
 import { PostSkeleton } from '../components/Post'
 
 type SortType = 'created_at' | 'updated_at'
-
-type PostPreview = {
-  id: string | number
-  channel: string
-  content: string
-}
 
 type Props = {
   title: string
@@ -24,7 +15,6 @@ type Props = {
   onSortChange?: (value: SortType) => void
   hideSort?: boolean
   dateRangeLabel?: string
-  selectedPost?: PostPreview | null
   children: ReactNode
   isPending: boolean
 }
@@ -37,12 +27,11 @@ const PostListViewLayout = ({
   onSortChange,
   hideSort,
   dateRangeLabel,
-  selectedPost,
   children,
   isPending,
 }: Props) => {
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-5">
+    <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
       {/* Controls */}
       <ListControls
         dateRange={dateRange}
@@ -50,39 +39,21 @@ const PostListViewLayout = ({
         sort={sort}
         onSortChange={onSortChange}
         hideSort={hideSort}
+        allDateSelectable
       />
 
       {/* Header */}
-      <div className="flex flex-col items-end justify-between sm:flex-row">
+      <div className="mt-4 flex flex-col justify-between sm:flex-row sm:items-end">
         <h1 className="text-xl font-medium">{title}</h1>
         {dateRangeLabel ? (
-          <p className="text-base font-semibold text-gray-500">
+          <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
             {dateRangeLabel}
           </p>
         ) : null}
       </div>
 
-      <div className="flex gap-4">
-        {/* Left: List Container - children are rendered here */}
-        <div className="w-full space-y-6 lg:basis-3/4">
-          {isPending ? <PostSkeleton tileView /> : children}
-        </div>
-
-        {/* Right: Preview Panel */}
-        <div className="hidden lg:block lg:min-w-96 lg:basis-1/2">
-          {selectedPost ? (
-            selectedPost.channel === 'Twitter' ? (
-              <TwitterPost notEditable initialContent={selectedPost.content} />
-            ) : (
-              <LinkedInPost notEditable initialContent={selectedPost.content} />
-            )
-          ) : (
-            <div className="flex h-96 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-gray-500">
-              <MonitorSmartphone size={48} />
-              <p className="font-semibold">Click a post to preview</p>
-            </div>
-          )}
-        </div>
+      <div className="w-full space-y-6">
+        {isPending ? <PostSkeleton tileView /> : children}
       </div>
     </div>
   )
