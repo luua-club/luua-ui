@@ -39,31 +39,30 @@ function Inspiration() {
 
   return (
     <div className="m-auto max-w-4xl p-5">
-      <div className="mb-2 flex flex-col items-center justify-between gap-4 md:flex-row md:gap-8">
-        {/* Header */}
-        <h1 className="flex items-center gap-3 text-xl font-medium md:text-base">
-          <Network className="size-5" />
-          Auto Generation
-        </h1>
+      <div className="rounded-lg border p-5">
+        <div className="mb-2 flex flex-col items-center justify-between gap-4 md:flex-row md:gap-8">
+          {/* Header */}
+          <h1 className="flex items-center gap-3 text-xl font-medium md:text-base">
+            <Network className="size-5" />
+            Auto Generation
+          </h1>
 
-        {/* Actions */}
-        <AutoGenActions
-          checked={checked}
-          setChecked={setChecked}
-          setIsSettingsOpen={setIsSettingsOpen}
-          isLoading={isLoading}
-        />
+          {/* Actions */}
+          <AutoGenActions
+            checked={checked}
+            setChecked={setChecked}
+            setIsSettingsOpen={setIsSettingsOpen}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Description */}
+        <p className="text-muted-foreground mt-4 text-center md:text-left">
+          Save any article, video, or link as inspiration and set your preferred
+          posting frequency. Luua will automatically turn your inspirations into
+          ready-to-use posts, scheduled at the best times for your timezone.
+        </p>
       </div>
-
-      {/* Separator */}
-      <Separator />
-
-      {/* Description */}
-      <p className="text-muted-foreground mt-4 text-center md:text-left">
-        Save any article, video, or link as inspiration and set your preferred
-        posting frequency. Luua will automatically turn your inspirations into
-        ready-to-use posts, scheduled at the best times for your timezone.
-      </p>
 
       {/* Header */}
       <h1 className="mt-8 flex items-center justify-center gap-3 text-xl font-medium md:justify-start md:text-base">

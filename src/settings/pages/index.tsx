@@ -3,7 +3,7 @@ import {
   useLocation,
   useNavigate,
 } from '@tanstack/react-router'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 
 import { useUserState } from '@/core/hooks/user-state.hook'
 import GlobalLoader from '@/shared/components/global-loader'
@@ -18,7 +18,10 @@ const tabValue = ['account', 'socials']
 const Settings = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const searchParams = new URLSearchParams(location.search)
+  const searchParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  )
   const [activeTab, setActiveTab] = useState<string>(tabValue[0])
 
   useEffect(() => {

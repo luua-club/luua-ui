@@ -18,7 +18,7 @@ import { Button } from '@/shared/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
-import usePublishList from '../hooks/publish-list.hook'
+import usePublishList from './hooks/publish-list.hook'
 
 const Published = () => {
   const router = useRouter()

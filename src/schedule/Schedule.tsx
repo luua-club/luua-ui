@@ -10,7 +10,7 @@ import { Button } from '@/shared/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
-import useScheduleList from '../hooks/schedule-list.hook'
+import useScheduleList from './hooks/schedule-list.hook'
 
 const Schedule = () => {
   const router = useRouter()
