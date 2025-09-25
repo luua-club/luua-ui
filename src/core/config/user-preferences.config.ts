@@ -15,7 +15,7 @@ export const writingStyles: WritingStyleChip[] = [
     description: 'Authoritative, insightful, and confident',
     llm_info: 'Uses more data, assumes a knowledgeable audience',
     icon: IconSchool,
-    color: 'bg-yellow-200',
+    color: 'bg-yellow-200 dark:bg-yellow-400',
   },
   {
     id: 'the_friendly_guide',
@@ -23,7 +23,7 @@ export const writingStyles: WritingStyleChip[] = [
     description: 'Approachable, helpful, and clear',
     llm_info: 'Breaks down complex topics, uses simpler language',
     icon: IconBooks,
-    color: 'bg-green-200',
+    color: 'bg-green-200 dark:bg-green-400',
   },
   {
     id: 'the_visionary',
@@ -31,7 +31,7 @@ export const writingStyles: WritingStyleChip[] = [
     description: 'Inspiring, bold, and forward-looking',
     llm_info: 'Focuses on trends, ideas, and storytelling',
     icon: IconEyeDollar,
-    color: 'bg-red-200',
+    color: 'bg-red-200 dark:bg-red-400',
   },
   {
     id: 'the_analyst',
@@ -39,7 +39,7 @@ export const writingStyles: WritingStyleChip[] = [
     description: 'Data-driven, precise, and objective',
     llm_info: 'Uses numbers, facts, and logical reasoning',
     icon: IconFlask,
-    color: 'bg-blue-200',
+    color: 'bg-blue-200 dark:bg-blue-400',
   },
   {
     id: 'the_challenger',
@@ -47,6 +47,6 @@ export const writingStyles: WritingStyleChip[] = [
     description: 'Provocative, opinionated, and direct',
     llm_info: 'Designed to spark debate and strong reactions',
     icon: IconCampfire,
-    color: 'bg-orange-200',
+    color: 'bg-orange-200 dark:bg-orange-400',
   },
 ]

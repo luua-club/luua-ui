@@ -49,7 +49,7 @@ const StyleFileCapture: React.FC<StyleFileCaptureProps> = ({
   maxSize = 5 * 1024 * 1024,
   multiple = true,
   description = (
-    <span className="font-base text-gray-600">
+    <span className="font-base text-muted-foreground">
       Could upload up to 5 image upto 5MB each.
     </span>
   ),
@@ -126,10 +126,10 @@ const StyleFileCapture: React.FC<StyleFileCaptureProps> = ({
                   }}
                   multiple={multiple}
                 >
-                  <FormDescription className="font-base text-gray-600">
+                  <FormDescription className="font-base text-muted-foreground">
                     {description}
                   </FormDescription>
-                  <FileUploadDropzone className="min-h-20 flex-row flex-wrap border-dotted text-center">
+                  <FileUploadDropzone className="min-h-20 flex-row flex-wrap border-3 border-dotted text-center">
                     <CloudUpload className="size-4" />
                     Drag and drop or
                     <FileUploadTrigger asChild>

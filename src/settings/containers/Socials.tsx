@@ -91,7 +91,7 @@ const Socials = ({ user }: { user: UserState }) => {
         <h1 className="text-lg font-medium">Social Platforms</h1>
       </div>
       <Separator />
-      <p className="text-muted-foreground mt-4 text-base text-balance lg:max-w-2xl">
+      <p className="text-card-foreground mt-4 text-base text-balance lg:max-w-2xl">
         Social account connection is required to post content to your social
         accounts, AI content can only be generated only when at least one social
         account is connected.
@@ -183,7 +183,7 @@ const SocialCard = ({
         </div>
         <p
           className={cn(
-            'mt-2 text-sm text-gray-400',
+            'text-card-foreground mt-2 text-sm',
             isAccountConnected ? '' : 'text-black'
           )}
         >

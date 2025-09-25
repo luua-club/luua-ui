@@ -1,8 +1,9 @@
-import { Clock, Lightbulb } from 'lucide-react'
+import { Loader, X } from 'lucide-react'
 
 import { UserStyleStatus } from '@/core/config/constant'
 import { userStyleResponseType } from '@/core/models/user.model'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { cn } from '@/shared/utils'
 
 interface ISummaryProps {
   data?: userStyleResponseType
@@ -10,7 +11,8 @@ interface ISummaryProps {
 }
 
 const Summary = ({ data, isLoading }: ISummaryProps) => {
-  if (!data || isLoading)
+  // --- Early return ---
+  if (!data || isLoading) {
     return (
       <>
         <div className="py-4">
@@ -22,62 +24,79 @@ const Summary = ({ data, isLoading }: ISummaryProps) => {
         </div>
       </>
     )
+  }
 
+  // --- Variables ---
   const sources = data.source_count ?? 0
   const characters = data.source_length ?? 0
   const styles = data.style_tags ?? []
   const status = data.style_gen_state
 
-  if (
-    status === UserStyleStatus.INITIAL ||
-    status === UserStyleStatus.IN_PROGRESS
-  )
+  // --- Functions ---
+  /**
+   * Returns the stat value with loading or failed icon
+   *
+   * @param stat - The stat value
+   * @returns The stat value with loading or failed icon
+   */
+  const getStat = (stat: number) => {
     return (
-      <div className="bg-sidebar mt-2 flex min-h-24 items-center justify-center rounded-lg border-1 border-dashed p-4">
-        <p className="flex items-center gap-1 text-center text-sm font-medium">
-          {status === UserStyleStatus.IN_PROGRESS ? (
-            <>
-              <Clock className="size-4" />
-              Luua is currently analyzing your writing style. This may take some
-              time.
-            </>
-          ) : (
-            <>
-              <Lightbulb className="size-4" />
-              Help Luua understand your writing style by providing some sample
-              or inspiration.
-            </>
-          )}
-        </p>
-      </div>
+      <p className="text-card-foreground text-xl font-bold">
+        {status === UserStyleStatus.IN_PROGRESS ? (
+          <Loader className="mt-2 size-4 animate-spin" />
+        ) : status === UserStyleStatus.FAILED ? (
+          <X className="mt-2 size-4 text-red-400" />
+        ) : (
+          stat
+        )}
+      </p>
     )
+  }
 
   return (
     <>
+      {/* Heading */}
       <div className="py-4">
         <h1 className="text-lg font-medium">Analysis Summary</h1>
       </div>
 
+      {/* Stats */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="border-sidebar-border bg-sidebar rounded-lg border-1 p-4">
+        {/* Stat: Sources Analyzed */}
+        <div
+          className={cn(
+            'border-sidebar-border bg-sidebar rounded-lg border-1 p-4',
+            {
+              'opacity-50': status === UserStyleStatus.INITIAL,
+            }
+          )}
+        >
           <p className="text-sm font-semibold">Sources Analyzed</p>
-          <p className="text-lg font-medium text-gray-600">{sources}</p>
+          {getStat(sources)}
         </div>
-        <div className="border-sidebar-border bg-sidebar rounded-lg border-1 p-4">
+
+        {/* Stat: Total Characters */}
+        <div
+          className={cn(
+            'border-sidebar-border bg-sidebar rounded-lg border-1 p-4',
+            {
+              'opacity-50': status === UserStyleStatus.INITIAL,
+            }
+          )}
+        >
           <p className="text-sm font-semibold">Total Characters</p>
-          <p className="truncate text-lg font-medium text-gray-600">
-            {characters}
-          </p>
+          {getStat(characters)}
         </div>
       </div>
 
+      {/* Styles chips */}
       {styles.length ? (
         <>
-          <p className="py-4 text-base font-medium">Style Profile</p>
+          <p className="py-4 text-sm font-semibold">Styles Profile</p>
           <div className="flex flex-wrap gap-2">
             {styles.map(style => (
               <p
-                className="rounded-md border-1 px-4 py-2 text-sm font-medium"
+                className="border-sidebar-border bg-sidebar text-card-foreground rounded-md border-1 px-4 py-2 text-sm font-semibold"
                 key={style}
               >
                 {style}
@@ -86,6 +105,29 @@ const Summary = ({ data, isLoading }: ISummaryProps) => {
           </div>
         </>
       ) : null}
+
+      {/* INITIAL Helper text */}
+      {status === UserStyleStatus.INITIAL && (
+        <div className="bg flex items-center justify-center gap-1 pt-4 text-sm font-medium">
+          Help Luua understand your writing style by providing some sample or
+          inspiration.
+        </div>
+      )}
+
+      {/* IN_PROGRESS Helper text */}
+      {status === UserStyleStatus.IN_PROGRESS && (
+        <div className="bg flex items-center justify-center gap-1 pt-4 text-sm font-medium text-yellow-600 dark:text-yellow-400">
+          Luua is currently analyzing your writing style. This may take some
+          time.
+        </div>
+      )}
+
+      {/* FAILED Helper text */}
+      {status === UserStyleStatus.FAILED && (
+        <div className="bg flex items-center justify-center gap-1 pt-4 text-sm font-medium text-red-600 dark:text-red-400">
+          Failed to analyze your writing style. Please try again.
+        </div>
+      )}
     </>
   )
 }

@@ -22,7 +22,9 @@ const SelectionChip = ({
     <Card
       className={cn(
         'bg-card cursor-pointer border-2 p-0 shadow-none',
-        isSelected ? 'border-gray-800' : 'border-gray-100 hover:border-gray-200'
+        isSelected
+          ? 'border-gray-800 dark:border-zinc-500'
+          : 'dark:border-sidebar-accent dark:hover:bg-sidebar-accent border-gray-100 hover:border-gray-200 dark:hover:border-zinc-500'
       )}
       onClick={!disabled ? () => onSelect(chip) : undefined}
     >
@@ -30,7 +32,7 @@ const SelectionChip = ({
         <div className="flex items-center gap-2 p-3 pb-0">
           <div
             className={cn(
-              'flex size-8 items-center justify-center rounded-md',
+              'flex size-8 items-center justify-center rounded-md dark:text-zinc-800',
               chip.color
             )}
           >
@@ -40,14 +42,14 @@ const SelectionChip = ({
           <p
             className={cn(
               'text-card-foreground flex flex-1 items-center justify-between text-base font-medium',
-              isSelected && 'text-gray-800'
+              isSelected && 'text-gray-800 dark:text-zinc-200'
             )}
           >
             {chip.title}
             {isSelected ? (
               <CircleCheck className="size-5" />
             ) : (
-              <Circle className="size-5 text-gray-300" />
+              <Circle className="size-5 text-gray-300 dark:text-zinc-200" />
             )}
           </p>
         </div>
@@ -55,7 +57,7 @@ const SelectionChip = ({
         <p
           className={cn(
             'text-muted-foreground px-3 pb-3 text-sm text-balance',
-            isSelected && 'text-gray-800'
+            isSelected && 'text-gray-800 dark:text-zinc-200'
           )}
         >
           {chip.description}

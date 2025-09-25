@@ -1,24 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CloudAlert } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
-import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
-import {
-  IUserAdvancedStyleRequest,
-  userStyleResponseType,
-} from '@/core/models/user.model'
-import { Separator } from '@/shared/ui/separator'
+import { QUERY_KEYS } from '@/core/config/constant'
+import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleFileCapture from '../../core/components/StyleFileCapture'
-import StyleTextCapture from '../../settings/components/StyleTextCapture'
+import StyleTextCapture from '../../core/components/StyleTextCapture'
 
-interface IAdvancedProps {
-  data?: userStyleResponseType
-}
-
-const Advanced = ({ data }: IAdvancedProps) => {
+const Advanced = () => {
   const queryClient = useQueryClient()
 
   const setAdvancedUserStyleMutation = useMutation({
@@ -35,33 +26,16 @@ const Advanced = ({ data }: IAdvancedProps) => {
 
   return (
     <>
-      {/* Heading */}
-      <div className="py-4">
-        <h1 className="text-lg font-medium">Enhanced User Style Capture</h1>
-      </div>
-      <Separator />
-      <p className="text-muted-foreground mt-4 text-base">
-        Help Luua learn your unique writing style! Share your writing samples by
-        pasting text or uploading files. Luua will analyze how you naturally
-        communicate - your word choices, humor, and tone - to create content
-        that genuinely sounds like you.
-      </p>
-      <div className="mt-4">
-        <p className="text-base font-medium">
-          Please provide your writing samples.
-        </p>
-        {data?.style_gen_state === UserStyleStatus.FAILED && (
-          <p className="mt-1 flex items-center text-sm text-red-400">
-            <CloudAlert className="mr-1 size-4" />
-            Luua was not able to process your last uploaded style. Please try
-            again.
-          </p>
-        )}
+      <div className="mt-2">
         <div className="lg:w-2/3">
           <Tabs className="mt-4 w-full flex-1" defaultValue="textSample">
             <TabsList className="w-full lg:w-fit">
-              <TabsTrigger value="textSample">Text Sample</TabsTrigger>
-              <TabsTrigger value="fileSample">File Sample</TabsTrigger>
+              <TabsTrigger value="textSample" className="text-xs">
+                Text Sample
+              </TabsTrigger>
+              <TabsTrigger value="fileSample" className="text-xs">
+                File Sample
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="textSample">
               <StyleTextCapture
@@ -70,10 +44,11 @@ const Advanced = ({ data }: IAdvancedProps) => {
                     style_text: data,
                   })
                 }}
+                isLoading={setAdvancedUserStyleMutation.isPending}
               />
             </TabsContent>
             <TabsContent value="fileSample">
-              <StyleFileCapture />
+              <StyleFileCapture submitVariant="secondary" />
             </TabsContent>
           </Tabs>
         </div>
