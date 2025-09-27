@@ -12,14 +12,20 @@ interface IThemeToggleProps {
 function ThemeToggle({ className }: IThemeToggleProps) {
   const { theme, setTheme } = useTheme()
 
+  // Determine if dark mode is active (either explicitly set or system preference)
+  const isDarkMode =
+    theme === 'dark' ||
+    (theme === 'system' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches)
+
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <LucideSun className="h-[1rem] w-[1rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
       <LucideMoon className="absolute h-[1rem] w-[1rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
       <Switch
         className="cursor-pointer"
-        checked={theme === 'dark'}
-        onCheckedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        checked={isDarkMode}
+        onCheckedChange={() => setTheme(isDarkMode ? 'light' : 'dark')}
       />
     </div>
   )

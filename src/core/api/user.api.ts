@@ -59,6 +59,24 @@ class UserApi extends BaseApiService {
   async onboarding(data: UserOnboardingRequest) {
     return this.post(data, '/onboarding')
   }
+
+  /**
+   * Delete the user account
+   *
+   * @returns Promise<ApiResponse<void>> The response from the server
+   */
+  async deleteAccount() {
+    return this.post({}, '/delete-account')
+  }
+
+  /**
+   * Reset the user style
+   *
+   * @returns Promise<ApiResponse<void>> The response from the server
+   */
+  async resetUserStyle() {
+    return this.post({}, '/reset_style')
+  }
 }
 
 export const userApi = new UserApi()

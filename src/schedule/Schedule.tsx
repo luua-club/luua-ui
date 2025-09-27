@@ -1,6 +1,6 @@
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { PlusCircle, RotateCcw, Trash2, TriangleAlert } from 'lucide-react'
+import { PlusCircle, Trash2, TriangleAlert } from 'lucide-react'
 
 import Post, { PostSkeleton } from '@/core/components/Post'
 import PostListViewLayout from '@/core/layouts/PostListViewLayout'
@@ -95,32 +95,16 @@ const Schedule = () => {
                           'MMM d, h:mm a'
                         )}
 
-                        <div className="flex items-center gap-2">
-                          {post.status === 'Failed' && (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="h-6 text-xs"
-                              onClick={e => {
-                                e.stopPropagation()
-                              }}
-                            >
-                              Failed please retry
-                              <RotateCcw className="size-3" />
-                            </Button>
-                          )}
-
-                          <Button
-                            variant="destructive"
-                            className="size-6"
-                            onClick={e => {
-                              e.stopPropagation()
-                              openDelete(post.id)
-                            }}
-                          >
-                            <Trash2 className="size-3" />
-                          </Button>
-                        </div>
+                        <Button
+                          variant="destructive"
+                          className="size-6"
+                          onClick={e => {
+                            e.stopPropagation()
+                            openDelete(post.id)
+                          }}
+                        >
+                          <Trash2 className="size-3" />
+                        </Button>
                       </div>
                     </div>
                   ))}

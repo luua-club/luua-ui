@@ -54,6 +54,7 @@ const StyleTextCapture = ({
         <FormField
           control={form.control}
           name="sampleText"
+          disabled={isLoading}
           render={({ field }) => (
             <FormItem>
               <FormControl>

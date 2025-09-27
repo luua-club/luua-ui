@@ -22,10 +22,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
+import { AutoResizeTextarea } from '../AutoResizeTextarea'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
@@ -133,22 +133,19 @@ const TwitterPost = (props: TwitterPostProps) => {
               {content}
             </p>
           ) : (
-            <Textarea
+            <AutoResizeTextarea
               className={cn(
-                // Base visuals and typography
-                'resize-none border-0 !bg-transparent p-0 pt-1 shadow-none',
-                // Caret, placeholder and selection for a premium feel
+                'min-h-20 !bg-transparent',
+                'border-0 p-4 pt-1 shadow-none',
                 'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
-                // Smooth color transitions
                 'transition-colors duration-200',
-                // Remove focus visuals completely (Textarea base adds focus-visible ring + border)
                 'focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none',
                 'focus-visible:border-transparent focus-visible:shadow-none focus-visible:ring-0'
               )}
               placeholder="What's on your mind?"
               ref={textareaRef}
               value={content}
-              maxLength={POST_WORD_COUNT.Twitter}
+              maxLength={3000}
               onChange={e => {
                 const val = e.target.value
                 setContent(val)

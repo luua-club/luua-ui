@@ -48,6 +48,19 @@
   --color-brand-background-success: var(--brand-background-success);
   --color-brand-border-success: var(--brand-border-success);
   --color-brand-text-success: var(--brand-text-success);
+  --color-brand-background-info: color-mix(
+    in oklab,
+    light-dark(var(--color-sky-600), var(--color-sky-400)) 10%,
+    var(--background)
+  );
+  --color-brand-text-info: light-dark(
+    var(--color-sky-600),
+    var(--color-sky-400)
+  );
+  --color-brand-border-info: light-dark(
+    var(--color-sky-600),
+    var(--color-sky-400)
+  );
 
   /* Animations */
   --animate-gradient: gradient 8s linear infinite;

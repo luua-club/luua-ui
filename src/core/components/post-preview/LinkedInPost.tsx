@@ -18,11 +18,11 @@ import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { useUserState } from '../../hooks/user-state.hook'
+import { AutoResizeTextarea } from '../AutoResizeTextarea'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
@@ -134,16 +134,12 @@ const LinkedInPost = (props: LinkedInPostProps) => {
             )}
           </div>
         ) : (
-          <Textarea
+          <AutoResizeTextarea
             className={cn(
               'min-h-20 !bg-transparent',
-              // Base visuals and typography
-              'resize-none border-0 p-4 pt-1 shadow-none',
-              // Caret, placeholder and selection for a premium feel
+              'border-0 p-4 pt-1 shadow-none',
               'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
-              // Smooth color transitions
               'transition-colors duration-200',
-              // Remove focus visuals completely (Textarea base adds focus-visible ring + border)
               'focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none',
               'focus-visible:border-transparent focus-visible:shadow-none focus-visible:ring-0'
             )}

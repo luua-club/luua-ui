@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute } from '@tanstack/react-router'
 import { useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
@@ -9,8 +10,11 @@ import {
   RotateCcw,
   TriangleAlert,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
+import { postsApi } from '@/core/api/posts.api'
 import Post from '@/core/components/Post'
+import { QUERY_KEYS } from '@/core/config/constant'
 import PostListViewLayout from '@/core/layouts/PostListViewLayout'
 import { postStatusType } from '@/core/models/post.model'
 import PaginationList from '@/shared/components/pagination-list'
@@ -35,6 +39,22 @@ const Published = () => {
     setOffset,
     formatSelectedRange,
   } = usePublishList()
+  const queryClient = useQueryClient()
+
+  const retryPostMutation = useMutation({
+    mutationFn: (id: string) => {
+      return postsApi.retryPost(id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.publishList],
+      })
+      toast.success('Post retried successfully')
+    },
+    onError: () => {
+      toast.error('Failed to retry post')
+    },
+  })
 
   const getPostStatus = (status: postStatusType | undefined) => {
     switch (status) {
@@ -116,8 +136,18 @@ const Published = () => {
                     variant="destructive"
                     size="sm"
                     className="h-fit !rounded-sm !px-1 !py-0.5 text-xs"
+                    onClick={e => {
+                      e.stopPropagation()
+                      retryPostMutation.mutate(post.id)
+                    }}
+                    disabled={retryPostMutation.isPending}
                   >
-                    <RotateCcw className="size-3" />
+                    <RotateCcw
+                      className={cn(
+                        'size-3',
+                        retryPostMutation.isPending && 'animate-spin'
+                      )}
+                    />
                     Retry
                   </Button>
                 )}

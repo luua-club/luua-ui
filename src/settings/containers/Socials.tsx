@@ -184,7 +184,7 @@ const SocialCard = ({
         <p
           className={cn(
             'text-card-foreground mt-2 text-sm',
-            isAccountConnected ? '' : 'text-black'
+            isAccountConnected ? '' : 'text-card-foreground'
           )}
         >
           {isAccountConnected

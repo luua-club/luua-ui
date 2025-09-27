@@ -1,4 +1,4 @@
-import { ChevronRight, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { SchedulePicker } from '@/shared/components/schedule-picker'
@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/dialog'
@@ -119,9 +120,9 @@ export function SharePostModal({
             <div
               key={post.id}
               className={cn(
-                'relative rounded-lg border-1 border-transparent',
+                'dark:border-sidebar-accent dark:hover:bg-sidebar-accent relative rounded-lg border-2 border-gray-100',
                 selectedPosts.includes(post.id) &&
-                  'dark:border-card-foreground border-black',
+                  'border-gray-800 dark:border-zinc-500',
                 'cursor-pointer'
               )}
               onClick={() => {
@@ -129,7 +130,7 @@ export function SharePostModal({
               }}
             >
               <Checkbox
-                className="absolute top-[-10px] right-[-8px] z-10 size-5 cursor-pointer rounded-full bg-white dark:bg-black"
+                className="absolute top-[-10px] right-[-8px] z-10 size-5 cursor-pointer rounded-full border-2 bg-white dark:border-zinc-500 dark:bg-zinc-800"
                 checked={selectedPosts.includes(post.id)}
                 onCheckedChange={checked => {
                   togglePost(post.id, checked)
@@ -198,10 +199,7 @@ export function SharePostModal({
           <DialogTitle className="mb-4 flex flex-col gap-2 text-xl font-semibold text-zinc-800 md:text-2xl dark:text-zinc-300">
             Almost There
             <span className="flex flex-col justify-between gap-2 text-sm sm:flex-row sm:gap-0">
-              <span className="flex items-center gap-1">
-                Give your post a quick review
-                <ChevronRight className="size-4" />
-              </span>
+              Give your post a quick review
               <span>
                 {new Date().toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -212,6 +210,10 @@ export function SharePostModal({
             </span>
           </DialogTitle>
         </DialogHeader>
+
+        <DialogDescription>
+          <BestTimeTip />
+        </DialogDescription>
 
         {showSchedule ? (
           <ScheduleModalContent
@@ -226,5 +228,31 @@ export function SharePostModal({
         <DialogClose className="text-card-foreground" />
       </DialogContent>
     </Dialog>
+  )
+}
+
+const BestTimeTip = () => {
+  return (
+    <div className="border-brand-border-info bg-brand-background-info text-brand-text-info rounded-sm border p-4 text-xs">
+      <p>
+        <strong>Tip:</strong> Catch your audience when they&apos;re most active
+        for the best reach.
+      </p>
+
+      <ul className="mt-2 flex list-disc flex-col gap-2 pl-4">
+        <li>
+          <strong>Mon-Fri:</strong> Early mornings (8-10 a.m.) and lunchtime are
+          your sweet spots.
+        </li>
+        <li>
+          <strong>Wed & Thu:</strong> Extra boost around 9 a.m. with mornings
+          (8-10 a.m.) staying strong.
+        </li>
+        <li>
+          <strong>Fri-Sun:</strong> Mornings (8-9 a.m.) work best, with Sunday
+          noon as a bonus.
+        </li>
+      </ul>
+    </div>
   )
 }

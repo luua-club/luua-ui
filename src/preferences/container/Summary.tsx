@@ -1,5 +1,8 @@
-import { Loader, X } from 'lucide-react'
+import { useMutation } from '@tanstack/react-query'
+import { Loader, Trash2, X } from 'lucide-react'
+import { toast } from 'sonner'
 
+import { userApi } from '@/core/api/user.api'
 import { UserStyleStatus } from '@/core/config/constant'
 import { userStyleResponseType } from '@/core/models/user.model'
 import { Button } from '@/shared/ui/button'
@@ -13,8 +16,19 @@ interface ISummaryProps {
 }
 
 const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
+  // --- Mutations ---
+  const resetUserStyle = useMutation({
+    mutationFn: () => userApi.resetUserStyle(),
+    onSuccess: () => {
+      toast.success('User style reset successfully')
+    },
+    onError: () => {
+      toast.error('Failed to reset user style')
+    },
+  })
+
   // --- Early return ---
-  if (!data || isLoading) {
+  if (!data || isLoading || resetUserStyle.isPending) {
     return (
       <>
         <div className="py-4">
@@ -58,8 +72,15 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
   return (
     <>
       {/* Heading */}
-      <div className="py-4">
+      <div className="flex items-center justify-between py-4">
         <h1 className="text-lg font-medium">Analysis Summary</h1>
+        <Button
+          variant="outline"
+          className="h-7 rounded-sm text-xs text-red-600 dark:text-red-400"
+          onClick={() => resetUserStyle.mutate()}
+        >
+          <Trash2 /> Reset Styles
+        </Button>
       </div>
 
       {/* Stats */}
@@ -110,15 +131,14 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
 
       {/* INITIAL Helper text */}
       {status === UserStyleStatus.INITIAL && (
-        <div className="bg flex items-center justify-center gap-1 pt-4 text-sm font-medium">
+        <div className="pt-4 text-center text-sm font-medium">
           Help Luua understand your writing style by providing
-          <Button
-            variant="link"
-            className="!p-0 underline"
+          <span
+            className="ml-1 cursor-pointer underline"
             onClick={onHelperTextClick}
           >
             some sample or inspiration.
-          </Button>
+          </span>
         </div>
       )}
 
@@ -132,8 +152,14 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
 
       {/* FAILED Helper text */}
       {status === UserStyleStatus.FAILED && (
-        <div className="bg flex items-center justify-center gap-1 pt-4 text-sm font-medium text-red-600 dark:text-red-400">
-          Failed to analyze your writing style. Please try again.
+        <div className="pt-4 text-center text-sm font-medium text-red-600 dark:text-red-400">
+          Failed to analyze your writing style.
+          <span
+            className="ml-1 cursor-pointer underline"
+            onClick={onHelperTextClick}
+          >
+            Please try again.
+          </span>
         </div>
       )}
     </>

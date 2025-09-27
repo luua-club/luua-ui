@@ -60,7 +60,7 @@ function Inspiration() {
         <p className="text-muted-foreground mt-4 text-center md:text-left">
           Save any article, video, or link as inspiration and set your preferred
           posting frequency. Luua will automatically turn your inspirations into
-          ready-to-use posts, scheduled at the best times for your timezone.
+          ready-to-use posts.
         </p>
       </div>
 

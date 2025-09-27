@@ -23,6 +23,7 @@ interface UserStylesProps {
   initialGridCol?: number
   customHeader?: React.ReactNode
   hideHeader?: boolean
+  showSuccessToast?: boolean
   onChange?: (writing_style: string[]) => void
 }
 
@@ -32,6 +33,7 @@ function UserStyles({
   initialGridCol = 3,
   customHeader,
   hideHeader = false,
+  showSuccessToast = false,
   onChange,
 }: UserStylesProps) {
   // ---- State ----
@@ -43,6 +45,9 @@ function UserStyles({
     mutationFn: (payload: IUserStyleRequest) => userApi.setUserStyle(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userStyle] })
+      if (showSuccessToast) {
+        toast.success('User style updated successfully')
+      }
     },
     onError: () => {
       toast.error('Failed to update user style')

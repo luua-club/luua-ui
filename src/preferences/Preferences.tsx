@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import Advanced from './container/Advanced'
 
-const tabValue = ['styles', 'advanced']
+export const tabValue = ['styles', 'advanced']
 
 const Preferences = () => {
   // --- State ---
@@ -85,6 +85,7 @@ const Preferences = () => {
             data={data?.data}
             isLoading={isLoading || isPending}
             hideHeader
+            showSuccessToast
           />
         </TabsContent>
 
