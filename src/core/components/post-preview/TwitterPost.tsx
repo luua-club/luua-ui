@@ -135,7 +135,7 @@ const TwitterPost = (props: TwitterPostProps) => {
           ) : (
             <AutoResizeTextarea
               className={cn(
-                'min-h-20 !bg-transparent',
+                'min-h-20 !bg-transparent !pl-0',
                 'border-0 p-4 pt-1 shadow-none',
                 'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
                 'transition-colors duration-200',
