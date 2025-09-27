@@ -10,10 +10,11 @@ import GlobalLoader from '@/shared/components/global-loader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import Account from '../containers/Account'
+import Pricing from '../containers/Pricing'
 
 const Socials = lazy(() => import('../containers/Socials'))
 
-const tabValue = ['account', 'socials']
+const tabValue = ['account', 'socials', 'billing']
 
 const Settings = () => {
   const navigate = useNavigate()
@@ -59,17 +60,14 @@ const Settings = () => {
         }}
       >
         <TabsList className="w-full px-2 py-6 lg:w-fit">
-          <TabsTrigger
-            value={tabValue[0]}
-            className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-          >
+          <TabsTrigger value={tabValue[0]} className="px-2 py-4 text-xs">
             Account
           </TabsTrigger>
-          <TabsTrigger
-            value={tabValue[1]}
-            className="px-2 py-4 text-sm lg:px-4 lg:text-base"
-          >
+          <TabsTrigger value={tabValue[1]} className="px-2 py-4 text-xs">
             Socials
+          </TabsTrigger>
+          <TabsTrigger value={tabValue[2]} className="px-2 py-4 text-xs">
+            Billing
           </TabsTrigger>
         </TabsList>
         <TabsContent value={tabValue[0]}>
@@ -80,6 +78,11 @@ const Settings = () => {
         <TabsContent value={tabValue[1]}>
           <SettingLazySubPages>
             <Socials user={user} />
+          </SettingLazySubPages>
+        </TabsContent>
+        <TabsContent value={tabValue[2]}>
+          <SettingLazySubPages>
+            <Pricing user={user} />
           </SettingLazySubPages>
         </TabsContent>
       </Tabs>
