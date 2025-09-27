@@ -82,7 +82,7 @@ const Settings = () => {
         </TabsContent>
         <TabsContent value={tabValue[2]}>
           <SettingLazySubPages>
-            <Pricing user={user} />
+            <Pricing />
           </SettingLazySubPages>
         </TabsContent>
       </Tabs>

@@ -1,11 +1,10 @@
 import { Check, Flower, Sprout, X } from 'lucide-react'
 
-import { UserState } from '@/core/models/user.model'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 
-function Pricing({ user }: { user: UserState }) {
+function Pricing() {
   return (
     <>
       <div className="py-4 text-center">
@@ -15,7 +14,7 @@ function Pricing({ user }: { user: UserState }) {
           Best Choice!
         </p>
       </div>
-      <div className="my-2 grid gap-6 md:grid-cols-2">
+      <div className="my-2 grid gap-6 lg:grid-cols-2">
         {/* Free Plan */}
         <Card className="h-fit rounded-2xl border p-2 shadow-none">
           <CardHeader className="bg-secondary rounded-2xl p-5">
