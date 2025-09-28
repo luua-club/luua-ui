@@ -14,6 +14,7 @@ interface PromptInputProps {
   hidePromptInfo?: boolean
   activeChannel?: channelType | null
   className?: string
+  hideAllSocial?: boolean
 }
 
 export const PromptInput = ({
@@ -22,6 +23,7 @@ export const PromptInput = ({
   hidePromptInfo,
   activeChannel,
   className,
+  hideAllSocial,
 }: PromptInputProps) => {
   const userState = useUserState()
 
@@ -63,6 +65,7 @@ export const PromptInput = ({
       hidePromptInfo={hidePromptInfo}
       activeChannel={activeChannel}
       className={cn(className)}
+      hideAllSocial={hideAllSocial}
     />
   )
 }
@@ -79,7 +82,7 @@ export const FloatingPromptInput = ({
     <>
       <div className="h-48 w-full bg-transparent" />
       <div className="fixed bottom-0 flex w-[-webkit-fill-available] justify-center px-2 sm:px-5 lg:px-0">
-        <div className="flex w-full max-w-2xl flex-col gap-2 pb-4">
+        <div className="bg-card flex w-full max-w-2xl flex-col gap-2 pt-4 pb-4 lg:bg-transparent lg:pt-0">
           {children}
           <PromptInput {...props} />
         </div>

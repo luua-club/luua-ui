@@ -1,9 +1,9 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { userApi } from '@/core/api/user.api'
-import { UserStyleStatus } from '@/core/config/constant'
+import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
 import { userStyleResponseType } from '@/core/models/user.model'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
@@ -16,7 +16,8 @@ interface ISummaryProps {
 }
 
 const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
-  // --- Mutations ---
+  // --- Hooks ---
+  const queryClient = useQueryClient()
   const resetUserStyle = useMutation({
     mutationFn: () => userApi.resetUserStyle(),
     onSuccess: () => {
@@ -24,6 +25,11 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
     },
     onError: () => {
       toast.error('Failed to reset user style')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.userStyle],
+      })
     },
   })
 

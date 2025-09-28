@@ -10,7 +10,8 @@ import { channelType } from '../models/social.model'
 export const useGeneratePosts = (
   initialPrompt: string,
   initialSearch?: boolean,
-  initialChannel?: channelType | null
+  initialChannel?: channelType | null,
+  baseInput?: string | null
 ) => {
   // ---- State ----
   const [userPrompt, setUserPrompt] = useState(initialPrompt)
@@ -26,6 +27,7 @@ export const useGeneratePosts = (
   const activePrompt = userPrompt || initialPrompt || ''
   const activeSearch = userSearch ?? initialSearch ?? false
   const activeChannel = userChannel ?? initialChannel ?? null
+  const activeBaseInput = baseInput || null
   const key = QUERY_KEYS.generateAIPost
 
   // ---- Hooks ----
@@ -40,6 +42,7 @@ export const useGeneratePosts = (
           is_search_enabled: activeSearch,
           ...(activeChannel ? { post_channels: [activeChannel] } : {}),
           ...(sessionId ? { session_id: sessionId } : {}),
+          base_input: activeBaseInput,
         },
         signal
       ),

@@ -28,6 +28,7 @@ interface InputPromptProps {
   placeholder?: string[]
   socials: InputPromptSocial[]
   hidePromptInfo?: boolean
+  hideAllSocial?: boolean
   activeChannel?: string | null
   className?: string
   onChange: (content: string, search: boolean, channel: string | null) => void
@@ -38,6 +39,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   placeholder = [],
   socials = [],
   hidePromptInfo = false,
+  hideAllSocial = false,
   activeChannel = null,
   className,
   onChange,
@@ -54,6 +56,16 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   useEffect(() => {
     setSelectedSocial(activeChannel)
   }, [activeChannel])
+
+  // Ensure a single social is always selected when hideAllSocial is true
+  useEffect(() => {
+    if (hideAllSocial) {
+      // If none selected, default to first available social
+      if (!selectedSocial) {
+        setSelectedSocial(socials[0]?.text ?? null)
+      }
+    }
+  }, [hideAllSocial, socials, selectedSocial])
 
   // --- Handler ---
   /**
@@ -142,6 +154,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
           searchEnabled={searchEnabled}
           setSearchEnabled={setSearchEnabled}
           handleGeneratePost={handleGeneratePost}
+          hideAllSocial={hideAllSocial}
         />
       </div>
 
@@ -161,6 +174,7 @@ interface PromptControlsProps {
   searchEnabled: boolean
   setSearchEnabled: (search: boolean) => void
   handleGeneratePost: () => void
+  hideAllSocial: boolean
 }
 
 const PromptControls: React.FC<PromptControlsProps> = ({
@@ -171,6 +185,7 @@ const PromptControls: React.FC<PromptControlsProps> = ({
   searchEnabled,
   setSearchEnabled,
   handleGeneratePost,
+  hideAllSocial,
 }) => {
   return (
     <div className="flex items-center justify-between p-2 pt-0">
@@ -196,9 +211,15 @@ const PromptControls: React.FC<PromptControlsProps> = ({
       <div className="flex items-center">
         {/* Select Socials */}
         <Select
-          value={selectedSocial ?? '__ALL__'}
+          value={
+            hideAllSocial
+              ? (selectedSocial ?? socials[0]?.text ?? '')
+              : (selectedSocial ?? '__ALL__')
+          }
           onValueChange={val =>
-            setSelectedSocial(val === '__ALL__' ? null : val)
+            hideAllSocial
+              ? setSelectedSocial(val)
+              : setSelectedSocial(val === '__ALL__' ? null : val)
           }
         >
           <SelectTrigger
@@ -209,10 +230,14 @@ const PromptControls: React.FC<PromptControlsProps> = ({
             )}
             style={{ boxShadow: 'none', outline: 'none', border: 0 }}
           >
-            <SelectValue placeholder="All Socials" />
+            <SelectValue
+              placeholder={hideAllSocial ? 'Select social' : 'All Socials'}
+            />
           </SelectTrigger>
           <SelectContent className="font-semibold text-gray-500 dark:text-gray-300">
-            <SelectItem value="__ALL__">All Socials</SelectItem>
+            {!hideAllSocial && (
+              <SelectItem value="__ALL__">All Socials</SelectItem>
+            )}
             {socials.map((social, idx) => (
               <SelectItem key={idx} value={social.text}>
                 {social.text}

@@ -4,7 +4,7 @@ import { channelType } from './social.model'
 
 export interface IGeneratePostRequest {
   user_prompt: string
-  base_input?: string
+  base_input?: string | null
   post_channels?: channelType[]
   is_search_enabled: boolean
   session_id?: string

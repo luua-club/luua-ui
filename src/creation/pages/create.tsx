@@ -52,7 +52,12 @@ const Create = () => {
     setUserPrompt,
     setUserSearch,
     setUserChannel,
-  } = useGeneratePosts('')
+  } = useGeneratePosts(
+    '',
+    undefined,
+    undefined,
+    postDrafts[activeTab as channelType]?.content
+  )
 
   // Constants
   const socials = useMemo(() => SOCIAL_PLATFORM.map(p => p.name), [])
@@ -226,10 +231,14 @@ const Create = () => {
             setUserPrompt(content)
             setUserSearch(search)
             setUserChannel((channel as channelType) ?? null)
+            if (channel) {
+              setActiveTab(channel as channelType)
+            }
           }}
           loading={isGenerationDataFetching || saveDraftMutation.isPending}
           hidePromptInfo
           activeChannel={activeTab as channelType}
+          hideAllSocial
         >
           <div className="mb-2 flex justify-center gap-2 lg:hidden">
             <DraftActions

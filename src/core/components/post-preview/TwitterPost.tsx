@@ -22,10 +22,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
-import { AutoResizeTextarea } from '../AutoResizeTextarea'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
@@ -133,9 +133,9 @@ const TwitterPost = (props: TwitterPostProps) => {
               {content}
             </p>
           ) : (
-            <AutoResizeTextarea
+            <Textarea
               className={cn(
-                'min-h-20 !bg-transparent !pl-0',
+                'min-h-32 !bg-transparent !pl-0 md:min-h-20',
                 'border-0 p-4 pt-1 shadow-none',
                 'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
                 'transition-colors duration-200',
