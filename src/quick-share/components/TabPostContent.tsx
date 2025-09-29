@@ -1,5 +1,5 @@
 import { IconSkull } from '@tabler/icons-react'
-import { RotateCcw } from 'lucide-react'
+import { Loader, RotateCcw } from 'lucide-react'
 
 import LinkedInPost, {
   LinkedInPostSkeleton,
@@ -7,10 +7,12 @@ import LinkedInPost, {
 import TwitterPost, {
   TwitterPostSkeleton,
 } from '@/core/components/post-preview/TwitterPost'
+import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { IPost } from '@/core/models/post.model'
 import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 import { TabsContent } from '@/shared/ui/tabs'
+import { WordRotate } from '@/shared/ui/word-rotate'
 import { cn } from '@/shared/utils'
 
 interface TabPostContentProps {
@@ -36,11 +38,11 @@ function TabPostContent({
 
   return (
     <TabsContent value="created-post" className="flex flex-col">
-      <div className="mx-auto mt-4 flex flex-col gap-4 lg:w-5xl">
+      <div className="mx-auto flex flex-col gap-4 lg:w-5xl">
         {/** Floating Extracted Sources */}
         {extractedLinks.length > 0 && !loading && (
-          <div className="hidden w-full gap-2 lg:flex lg:justify-center">
-            {extractedLinks.slice(0, 5).map(link_data => (
+          <div className="hidden gap-2 lg:flex lg:flex-wrap lg:justify-center">
+            {extractedLinks.map(link_data => (
               <div key={link_data.url} className="max-w-52 flex-1">
                 <ExternalResourceChip
                   url={link_data.url}
@@ -51,10 +53,30 @@ function TabPostContent({
           </div>
         )}
 
+        {/** Loading text */}
+        <div
+          className={cn(
+            'mx-auto flex w-full flex-col items-center justify-center gap-1',
+            !isGeneratedDataFetching && 'hidden'
+          )}
+        >
+          <WordRotate
+            words={[
+              'Cooking something up...',
+              'Just a sec...',
+              'Sprinkling some AI magic...',
+              'Still Brewing the answer...',
+            ]}
+            duration={3000}
+            className="text-sm font-medium text-gray-600 select-none dark:text-gray-300"
+          />
+          <Loader className="size-3 animate-spin" />
+        </div>
+
         {/* Posts */}
         <div
           className={cn(
-            'mx-auto mt-2 grid w-full grid-cols-1 gap-6 lg:grid-cols-2',
+            'mx-auto mt-4 grid w-full grid-cols-1 gap-6 lg:grid-cols-2',
             channels && 'lg:w-xl lg:grid-cols-1'
           )}
         >
@@ -69,21 +91,43 @@ function TabPostContent({
             posts.map(post => {
               if (post.channel === 'LinkedIn') {
                 return (
-                  <LinkedInPost
-                    key={post.id}
+                  <div key={post.id}>
+                    <p className="text-muted-foreground mb-2 ml-2 flex items-center gap-1 text-xs font-semibold">
+                      {(() => {
+                        const social = SOCIAL_PLATFORM.find(
+                          s => s.name === post.channel
+                        )
+                        const Logo = social?.logo
+                        return Logo ? <Logo className="size-3.5" /> : null
+                      })()}
+                      {post.channel.toUpperCase()}
+                    </p>
+                    <LinkedInPost
+                      initialContent={post.content}
+                      loading={isGeneratedDataFetching}
+                      notEditable
+                    />
+                  </div>
+                )
+              }
+              return (
+                <div key={post.id}>
+                  <p className="text-muted-foreground mb-2 ml-2 flex items-center gap-1 text-xs font-semibold">
+                    {(() => {
+                      const social = SOCIAL_PLATFORM.find(
+                        s => s.name === post.channel
+                      )
+                      const Logo = social?.logo
+                      return Logo ? <Logo className="size-3.5" /> : null
+                    })()}
+                    {post.channel.toUpperCase()}
+                  </p>
+                  <TwitterPost
                     initialContent={post.content}
                     loading={isGeneratedDataFetching}
                     notEditable
                   />
-                )
-              }
-              return (
-                <TwitterPost
-                  key={post.id}
-                  initialContent={post.content}
-                  loading={isGeneratedDataFetching}
-                  notEditable
-                />
+                </div>
               )
             })
           )}

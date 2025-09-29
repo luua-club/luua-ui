@@ -1,4 +1,4 @@
-import { BookOpenText, History, PenLine } from 'lucide-react'
+import { History, PenLine } from 'lucide-react'
 
 import { TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
@@ -18,13 +18,6 @@ function TabList({ loading }: TabListProps) {
         disabled={loading}
       >
         <History className="size-3" /> History
-      </TabsTrigger>
-      <TabsTrigger
-        value="sources"
-        className="px-2 py-4 text-xs"
-        disabled={loading}
-      >
-        <BookOpenText className="size-3" /> Sources
       </TabsTrigger>
     </TabsList>
   )

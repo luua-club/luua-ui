@@ -11,7 +11,6 @@ import PostControls from './components/PostControls'
 import TabHistoryContent from './components/TabHistoryContent'
 import TabList from './components/TabList'
 import TabPostContent from './components/TabPostContent'
-import TabSourcesContent from './components/TabSourcesContent'
 import { useQuickShare } from './hooks/quick-share.hook'
 
 const QuickShare = () => {
@@ -128,12 +127,6 @@ const QuickShare = () => {
             history={history}
             onRollback={idx => rollbackTo(idx)}
             onSwitchToPosts={() => setActiveTab('created-post')}
-          />
-
-          {/** Tabs Content, Sources Used */}
-          <TabSourcesContent
-            extractedLinks={extractedLinks}
-            isGeneratedDataFetching={isGeneratedDataFetching}
           />
         </Tabs>
       </div>
