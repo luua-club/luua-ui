@@ -39,6 +39,7 @@ type InspirationActionModalProps = {
     url: string
     additional_context: string | null
   }
+  disabled?: boolean
 }
 
 function InspirationActionModal({
@@ -46,6 +47,7 @@ function InspirationActionModal({
   onOpenChange,
   mode = 'create',
   initialData,
+  disabled = false,
 }: InspirationActionModalProps) {
   // --- Forms ---
   const resolver = zodResolver(
@@ -204,7 +206,8 @@ function InspirationActionModal({
                 disabled={
                   !form.formState.isValid ||
                   createMutation.isPending ||
-                  updateMutation.isPending
+                  updateMutation.isPending ||
+                  disabled
                 }
                 variant={'default'}
               >

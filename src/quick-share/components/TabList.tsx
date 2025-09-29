@@ -17,7 +17,7 @@ function TabList({ loading }: TabListProps) {
         className="px-2 py-4 text-xs"
         disabled={loading}
       >
-        <History className="size-3" /> History
+        <History className="size-3" /> Past responses
       </TabsTrigger>
     </TabsList>
   )

@@ -4,7 +4,9 @@ import { toast } from 'sonner'
 
 import { autopilotApi } from '@/core/api/autopilot.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { AutopilotSettings } from '@/core/models/autopilot.model'
+import { channelType } from '@/core/models/social.model'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { Switch } from '@/shared/ui/switch'
@@ -25,6 +27,7 @@ function AutoGenActions({
 }: AutoGenActionsProps) {
   // --- Hooks ---
   const queryClient = useQueryClient()
+  const user = useUserState()
 
   /**
    * Enable/Disable auto-gen
@@ -44,6 +47,33 @@ function AutoGenActions({
       toast.error('Something went wrong!')
     },
   })
+
+  const getChannels = () => {
+    const channels: channelType[] = []
+
+    if (user?.connected_channels.linkedin.connected) {
+      channels.push('LinkedIn')
+    }
+
+    if (user?.connected_channels.twitter.connected) {
+      channels.push('Twitter')
+    }
+
+    return channels
+  }
+
+  const getPayload = (enabled: boolean) => {
+    const payload: Partial<AutopilotSettings> = {
+      enabled,
+    }
+
+    if (enabled) {
+      payload.frequency_days = 5
+      payload.channels = getChannels()
+    }
+
+    return payload
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -77,15 +107,12 @@ function AutoGenActions({
           onCheckedChange={next => {
             // Optimistic update
             setChecked(next)
-            updateSettingsMutation.mutate(
-              { enabled: next },
-              {
-                onError: () => {
-                  // Rollback UI on error
-                  setChecked(!next)
-                },
-              }
-            )
+            updateSettingsMutation.mutate(getPayload(next), {
+              onError: () => {
+                // Rollback UI on error
+                setChecked(!next)
+              },
+            })
           }}
         />
       </div>

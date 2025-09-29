@@ -2,6 +2,7 @@ import { formatDate } from 'date-fns'
 import { History, RotateCcw } from 'lucide-react'
 
 import Post from '@/core/components/Post'
+import ExternalResourceChip from '@/shared/components/external-resource-chip'
 import { Button } from '@/shared/ui/button'
 import { TabsContent } from '@/shared/ui/tabs'
 
@@ -35,15 +36,15 @@ function TabHistoryContent({
       className="mx-auto flex w-full max-w-4xl flex-col gap-3"
     >
       {/* Heading */}
-      <h2 className="mt-2 mb-6 flex items-center gap-2 text-2xl font-semibold">
+      <h2 className="mt-2 mb-4 flex items-center gap-2 text-2xl font-semibold">
         <History />
-        History
+        Past responses
       </h2>
 
       {/* No History */}
       {history.length === 0 && (
         <p className="text-muted-foreground text-base">
-          No history yet. Generate some posts to see them here.
+          No past response yet. Generate some posts to see them here.
         </p>
       )}
 
@@ -64,7 +65,7 @@ function TabHistoryContent({
                 className="text-muted-foreground text-xs font-semibold"
               >
                 <RotateCcw className="size-3" />
-                Rollback
+                USE THIS
               </Button>
             </div>
 
@@ -75,6 +76,20 @@ function TabHistoryContent({
             >
               {/* Prompt */}
               <p className="line-clamp-3 text-sm font-medium">{entry.prompt}</p>
+
+              {/* Extracted Links */}
+              {entry.extractedLinks && entry.extractedLinks.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {entry.extractedLinks.map(link => (
+                    <div key={link.url} className="max-w-52 flex-1">
+                      <ExternalResourceChip
+                        url={link.url}
+                        title={link.content}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Posts */}
               <div

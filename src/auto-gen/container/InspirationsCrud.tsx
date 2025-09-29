@@ -20,6 +20,7 @@ function InspirationsCrud() {
     id: string
     url: string
     additional_context: string | null
+    utilized: boolean
   } | null>(null)
   const [offset, setOffset] = useState(0)
   const limit = 10
@@ -145,6 +146,7 @@ function InspirationsCrud() {
                 id: insp.id,
                 url: insp.link,
                 additional_context: insp.additional_context ?? null,
+                utilized: insp.utilized || false,
               })
               setTimeout(() => setIsModalOpen(true), 0)
             }}
@@ -208,6 +210,7 @@ function InspirationsCrud() {
         }}
         mode={editData ? 'edit' : 'create'}
         initialData={editData ?? undefined}
+        disabled={editData?.utilized}
       />
     </div>
   )

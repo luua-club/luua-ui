@@ -13,6 +13,7 @@ import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { IDraftRequest } from '@/core/models/draft.model'
+import { extractedLinksType } from '@/core/models/generate-post.model'
 import { IPost } from '@/core/models/post.model'
 
 export interface HistoryEntry {
@@ -20,6 +21,7 @@ export interface HistoryEntry {
   prompt: string
   createdAt: string
   posts: Pick<IPost, 'id' | 'channel' | 'content'>[]
+  extractedLinks: extractedLinksType[]
 }
 
 export const useQuickShare = () => {
@@ -36,6 +38,10 @@ export const useQuickShare = () => {
   const lastPushedSignature = useRef<string | null>(null)
   const [overriddenPosts, setOverriddenPosts] = useState<
     Pick<IPost, 'id' | 'channel' | 'content'>[] | null
+  >(null)
+  const [rolledBackPrompt, setRolledBackPrompt] = useState<string | null>(null)
+  const [overriddenExtractedLinks, setOverriddenExtractedLinks] = useState<
+    extractedLinksType[] | null
   >(null)
 
   // ---- Hooks ----
@@ -138,6 +144,7 @@ export const useQuickShare = () => {
       prompt: activePrompt,
       createdAt: new Date().toISOString(),
       posts: [...posts],
+      extractedLinks: [...(extractedLinks ?? [])],
     }
 
     setHistory(prev => [entry, ...prev])
@@ -279,8 +286,27 @@ export const useQuickShare = () => {
   const rollbackTo = (index: number) => {
     const entry = history[index]
     if (!entry) return
+    // Enter rollback mode: show historical posts, buffer prompt but do not trigger fetch yet
     setOverriddenPosts(entry.posts)
+    setOverriddenExtractedLinks(entry.extractedLinks)
+    setRolledBackPrompt(entry.prompt)
     toast.info('Rolled back', { position: 'top-right', duration: 800 })
+  }
+
+  /**
+   * Retry generation. If we are in rollback mode with a buffered prompt,
+   * apply that prompt (which triggers fetch via queryKey change) and exit rollback.
+   * Otherwise, just refetch with the current active prompt.
+   */
+  const handleRetry = () => {
+    if (rolledBackPrompt) {
+      setUserPrompt(rolledBackPrompt)
+      setRolledBackPrompt(null)
+      setOverriddenPosts(null)
+      setOverriddenExtractedLinks(null)
+      return
+    }
+    refetch()
   }
 
   // ---- Variables ----
@@ -301,12 +327,16 @@ export const useQuickShare = () => {
     setIsShareModalOpen,
     history,
     rollbackTo,
-    clearRollback: () => setOverriddenPosts(null),
+    clearRollback: () => {
+      setOverriddenPosts(null)
+      setOverriddenExtractedLinks(null)
+      setRolledBackPrompt(null)
+    },
     isRolledBack: overriddenPosts !== null,
 
     // data
     posts: overriddenPosts ?? posts,
-    extractedLinks,
+    extractedLinks: overriddenExtractedLinks ?? extractedLinks,
     error,
     isGeneratedDataFetching,
     isLoadingPublish,
@@ -316,6 +346,7 @@ export const useQuickShare = () => {
 
     // actions
     refetch,
+    handleRetry,
     onSubmit,
     handleEdit,
 

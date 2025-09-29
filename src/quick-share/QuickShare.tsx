@@ -36,6 +36,7 @@ const QuickShare = () => {
 
     // actions
     refetch,
+    handleRetry,
     onSubmit,
     handleEdit,
     rollbackTo,
@@ -80,7 +81,7 @@ const QuickShare = () => {
     return (
       <PostControls
         isLoading={loading}
-        onRetry={refetch}
+        onRetry={handleRetry}
         onEdit={handleEdit}
         onPublish={() => setIsShareModalOpen({ open: true, schedule: false })}
         onSchedule={() => setIsShareModalOpen({ open: true, schedule: true })}
