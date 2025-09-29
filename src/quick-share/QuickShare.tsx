@@ -1,9 +1,15 @@
-import { createLazyRoute, useNavigate } from '@tanstack/react-router'
+import {
+  createLazyRoute,
+  useBlocker,
+  useNavigate,
+} from '@tanstack/react-router'
 import { PlugZap } from 'lucide-react'
+import { useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
 import { channelType } from '@/core/models/social.model'
+import { ConfirmDialog } from '@/shared/components/confirm-dialog'
 import { Button } from '@/shared/ui/button'
 import { Tabs } from '@/shared/ui/tabs'
 
@@ -16,6 +22,12 @@ import { useQuickShare } from './hooks/quick-share.hook'
 const QuickShare = () => {
   // ---- Hooks ----
   const navigate = useNavigate()
+  const [allowLeave, setAllowLeave] = useState(false)
+  const blocker = useBlocker({
+    shouldBlockFn: () => !allowLeave,
+    withResolver: true,
+    enableBeforeUnload: true,
+  })
   const {
     // state
     activeTab,
@@ -82,15 +94,39 @@ const QuickShare = () => {
       <PostControls
         isLoading={loading}
         onRetry={handleRetry}
-        onEdit={handleEdit}
-        onPublish={() => setIsShareModalOpen({ open: true, schedule: false })}
-        onSchedule={() => setIsShareModalOpen({ open: true, schedule: true })}
+        onEdit={() => {
+          setAllowLeave(true)
+          handleEdit()
+        }}
+        onPublish={() => {
+          setAllowLeave(true)
+          setIsShareModalOpen({ open: true, schedule: false })
+        }}
+        onSchedule={() => {
+          setAllowLeave(true)
+          setIsShareModalOpen({ open: true, schedule: true })
+        }}
       />
     )
   }
 
   return (
     <>
+      {/* Leave Confirmation Modal */}
+      <ConfirmDialog
+        open={blocker.status === 'blocked'}
+        onOpenChange={open => {
+          if (!open && blocker.status === 'blocked') {
+            if (blocker.reset) blocker.reset()
+          }
+        }}
+        title="Leave this page?"
+        description="If you leave now, your current data on this page will be lost."
+        confirmLabel="Leave page"
+        cancelLabel="Stay"
+        onConfirm={() => blocker.proceed && blocker.proceed()}
+      />
+
       {/** Main Content */}
       <div className="relative m-auto max-w-7xl p-2">
         {/** Post Controls */}
@@ -157,7 +193,12 @@ const QuickShare = () => {
         isOpen={isShareModalOpen}
         posts={posts}
         isLoading={isLoadingPublish}
-        onOpenChange={setIsShareModalOpen}
+        onOpenChange={open => {
+          setIsShareModalOpen(open)
+          if (!open.open) {
+            setAllowLeave(false)
+          }
+        }}
         onSubmit={onSubmit}
       />
     </>
