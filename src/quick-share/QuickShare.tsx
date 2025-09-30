@@ -1,10 +1,5 @@
-import {
-  createLazyRoute,
-  useBlocker,
-  useNavigate,
-} from '@tanstack/react-router'
+import { createLazyRoute, useNavigate } from '@tanstack/react-router'
 import { PlugZap } from 'lucide-react'
-import { useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
@@ -22,12 +17,6 @@ import { useQuickShare } from './hooks/quick-share.hook'
 const QuickShare = () => {
   // ---- Hooks ----
   const navigate = useNavigate()
-  const [allowLeave, setAllowLeave] = useState(false)
-  const blocker = useBlocker({
-    shouldBlockFn: () => !allowLeave,
-    withResolver: true,
-    enableBeforeUnload: true,
-  })
   const {
     // state
     activeTab,
@@ -58,6 +47,9 @@ const QuickShare = () => {
     setUserSearch,
     setUserChannel,
     clearRollback,
+    // navigation guard
+    navBlocker,
+    setAllowLeave,
   } = useQuickShare()
 
   // ---- Functions ----
@@ -114,17 +106,17 @@ const QuickShare = () => {
     <>
       {/* Leave Confirmation Modal */}
       <ConfirmDialog
-        open={blocker.status === 'blocked'}
+        open={navBlocker.status === 'blocked'}
         onOpenChange={open => {
-          if (!open && blocker.status === 'blocked') {
-            if (blocker.reset) blocker.reset()
+          if (!open && navBlocker.status === 'blocked') {
+            if (navBlocker.reset) navBlocker.reset()
           }
         }}
         title="Leave this page?"
         description="If you leave now, your current data on this page will be lost."
         confirmLabel="Leave page"
         cancelLabel="Stay"
-        onConfirm={() => blocker.proceed && blocker.proceed()}
+        onConfirm={() => navBlocker.proceed && navBlocker.proceed()}
       />
 
       {/** Main Content */}

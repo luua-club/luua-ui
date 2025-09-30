@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useBlocker, useNavigate } from '@tanstack/react-router'
 import confetti from 'canvas-confetti'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -33,6 +33,9 @@ export const useQuickShare = () => {
       schedule: false,
     }
   )
+  // Navigation guard state
+  const [allowLeave, setAllowLeave] = useState(false)
+  const [blockerEnabled, setBlockerEnabled] = useState(false)
   // History State
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const lastPushedSignature = useRef<string | null>(null)
@@ -48,6 +51,14 @@ export const useQuickShare = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const user = useUserState()
+
+  // ---- Internal navigation blocker (custom modal is handled in component via resolver) ----
+  const navBlocker = useBlocker({
+    shouldBlockFn: () => !allowLeave,
+    withResolver: true,
+    enableBeforeUnload: false,
+    disabled: !blockerEnabled,
+  })
 
   // ---- Mutations ----
   const { mutation: publishDraft } = usePublishDraft()
@@ -101,7 +112,14 @@ export const useQuickShare = () => {
    */
   useEffect(() => {
     if (!preUserPromptState.prompt) {
+      // Bypass blocker for programmatic redirect
+      setAllowLeave(true)
       navigate({ to: '/dashboard' })
+      // Reset shortly after to re-enable guard for subsequent actions
+      setTimeout(() => setAllowLeave(false), 200)
+    } else {
+      // Enable blocker only if we're staying on this page
+      setBlockerEnabled(true)
     }
   }, [preUserPromptState.prompt, navigate])
 
@@ -349,6 +367,10 @@ export const useQuickShare = () => {
     handleRetry,
     onSubmit,
     handleEdit,
+
+    // navigation guard controls
+    setAllowLeave,
+    navBlocker,
 
     // setters bridging FloatingPromptInput
     setUserPrompt,
