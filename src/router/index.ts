@@ -11,6 +11,7 @@ import SidebarLayout from '@/core/layouts/SidebarLayout'
 import creationRouteTree from '@/creation/router'
 import dashboardRoute from '@/dashboard/router'
 import onboardingRoute from '@/onboarding/router/router'
+import paymentsRoute from '@/payments/router'
 import preferencesRoute from '@/preferences/router'
 import publishedRoute from '@/published/router'
 import quickShareRoute from '@/quick-share/router'
@@ -42,6 +43,7 @@ const routeTree = rootRoute.addChildren([
     publishedRoute,
     preferencesRoute,
     autoGenRouteTree,
+    paymentsRoute,
   ]),
 ])
 

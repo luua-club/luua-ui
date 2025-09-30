@@ -1,0 +1,154 @@
+import { Flower, InfinityIcon } from 'lucide-react'
+
+import { IUsageSummary } from '@/core/models/payment.model'
+import { Card, CardContent, CardHeader } from '@/shared/ui/card'
+import { Skeleton } from '@/shared/ui/skeleton'
+
+interface IUsageSummaryProps {
+  usageSummary: IUsageSummary | undefined
+}
+
+function UsageSummary({ usageSummary }: IUsageSummaryProps) {
+  if (!usageSummary) {
+    return <UsageSummarySkeleton />
+  }
+
+  return (
+    <>
+      <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="space-y-2">
+          <p className="text-3xl font-semibold">Current Plan</p>
+          <p className="text-muted-foreground text-sm text-balance">
+            {usageSummary.plan_type === 'Pro'
+              ? 'You can cancel your subscription at any time.'
+              : 'You can upgrade your plan to Pro to get more features.'}
+          </p>
+        </div>
+
+        <Card className="gap-2 rounded-md p-3 shadow-none">
+          <CardHeader className="flex items-center gap-1 px-2">
+            <Flower className="size-4" />
+            <p className="font-semibold">
+              {usageSummary.plan_type}
+              {usageSummary.plan_type === 'Pro' ? (
+                <span className="text-muted-foreground ml-2 text-xs">
+                  10$/month
+                </span>
+              ) : (
+                <span className="text-muted-foreground ml-2 text-xs">
+                  0$/month
+                </span>
+              )}
+            </p>
+          </CardHeader>
+
+          <CardContent className="px-2">
+            <p className="text-muted-foreground text-xs">
+              {usageSummary.plan_type === 'Pro'
+                ? 'Advanced tools for serious growth'
+                : 'Basic tools for exploring'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="bg-background mt-4 mb-10 rounded-2xl border p-0 shadow-none">
+        <div className="grid md:grid-cols-2 md:items-start lg:grid-cols-3">
+          <div className="space-y-4 p-4">
+            <p className="text-muted-foreground text-sm font-medium">
+              Remaining Credits
+            </p>
+            <p className="text-3xl font-semibold tracking-tight">
+              {usageSummary.credits.consumed}{' '}
+              <span className="text-muted-foreground text-base">
+                / {usageSummary.credits.total}
+              </span>
+            </p>
+          </div>
+
+          <div className="space-y-4 border-r-2 border-l-2 border-dashed p-4">
+            <p className="text-muted-foreground text-sm font-medium">
+              Auto Pilot Posts
+            </p>
+            <p className="text-3xl font-semibold tracking-tight">
+              {usageSummary.limits.auto_pilot_posts.total !== -1 ? (
+                usageSummary.limits.auto_pilot_posts.used
+              ) : (
+                <InfinityIcon className="size-8" />
+              )}{' '}
+              <span className="text-muted-foreground text-base">
+                {usageSummary.limits.auto_pilot_posts.total !== -1
+                  ? `/ ${usageSummary.limits.auto_pilot_posts.total}`
+                  : null}
+              </span>
+            </p>
+          </div>
+
+          <div className="space-y-4 p-4">
+            <p className="text-muted-foreground text-sm font-medium">
+              Scheduled Posts
+            </p>
+            <p className="text-3xl font-semibold tracking-tight">
+              {usageSummary.limits.scheduled_posts.total !== -1 ? (
+                usageSummary.limits.scheduled_posts.used
+              ) : (
+                <InfinityIcon className="size-8" />
+              )}{' '}
+              <span className="text-muted-foreground text-base">
+                {usageSummary.limits.scheduled_posts.total !== -1
+                  ? `/ ${usageSummary.limits.scheduled_posts.total}`
+                  : null}
+              </span>
+            </p>
+          </div>
+        </div>
+      </Card>
+    </>
+  )
+}
+
+function UsageSummarySkeleton() {
+  return (
+    <>
+      <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-44" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+
+        <Card className="gap-2 rounded-md p-3 shadow-none">
+          <CardHeader className="flex items-center gap-2 px-2">
+            <Skeleton className="size-5 rounded-full" />
+            <Skeleton className="h-4 w-28" />
+          </CardHeader>
+
+          <CardContent className="space-y-2 px-2">
+            <Skeleton className="h-3 w-40" />
+            <Skeleton className="h-3 w-32" />
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="bg-background mt-4 mb-10 rounded-2xl border p-0 shadow-none">
+        <div className="grid md:grid-cols-2 md:items-start lg:grid-cols-3">
+          <div className="space-y-4 p-4">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-8 w-32" />
+          </div>
+
+          <div className="space-y-4 border-r-2 border-l-2 border-dashed p-4">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-8 w-32" />
+          </div>
+
+          <div className="space-y-4 p-4">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-8 w-32" />
+          </div>
+        </div>
+      </Card>
+    </>
+  )
+}
+
+export default UsageSummary

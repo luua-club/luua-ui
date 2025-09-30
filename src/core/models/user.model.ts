@@ -12,6 +12,7 @@ export const UserSchema = z.object({
   name: z.string(),
   profile_image: z.string(),
   deactivated: z.boolean(),
+  plan: z.enum(['Free', 'Pro']),
   connected_channels: z.object({
     linkedin: UserSocialSchema,
     twitter: UserSocialSchema,

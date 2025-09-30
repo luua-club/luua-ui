@@ -53,6 +53,8 @@ export const QUERY_KEYS = {
   userStyle: 'user-style',
   autopilotSettings: 'autopilot-settings',
   inspirations: 'inspirations',
+  subscriptionDetails: 'subscription-details',
+  usageSummary: 'usage-summary',
 }
 
 /**

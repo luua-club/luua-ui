@@ -10,7 +10,7 @@ import GlobalLoader from '@/shared/components/global-loader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import Account from '../containers/Account'
-import Pricing from '../containers/Pricing'
+import BillingAndCredits from '../containers/BillingAndCredits'
 
 const Socials = lazy(() => import('../containers/Socials'))
 
@@ -67,7 +67,7 @@ const Settings = () => {
             Socials
           </TabsTrigger>
           <TabsTrigger value={tabValue[2]} className="px-2 py-4 text-xs">
-            Billing
+            Billing And Subscription
           </TabsTrigger>
         </TabsList>
         <TabsContent value={tabValue[0]}>
@@ -82,7 +82,7 @@ const Settings = () => {
         </TabsContent>
         <TabsContent value={tabValue[2]}>
           <SettingLazySubPages>
-            <Pricing />
+            <BillingAndCredits />
           </SettingLazySubPages>
         </TabsContent>
       </Tabs>
