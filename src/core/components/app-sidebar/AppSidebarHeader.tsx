@@ -4,6 +4,8 @@ import LogoIconOnly from '@/assets/images/luua-black-icon.svg?react'
 import LogoTextOnly from '@/assets/images/luua-black-text.svg?react'
 import LogoIconOnlyDark from '@/assets/images/luua-white-icon.svg?react'
 import LogoTextOnlyDark from '@/assets/images/luua-white-text.svg?react'
+import { useUserState } from '@/core/hooks/user-state.hook'
+import { ProPlanChip } from '@/shared/components/pro-plan-chip'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -12,6 +14,9 @@ import {
 import { cn } from '@/shared/utils'
 
 function AppSidebarHeader() {
+  const user = useUserState()
+  const isProPlan = user?.plan === 'Pro'
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -30,25 +35,30 @@ function AppSidebarHeader() {
 
             {/* Logo Text */}
             <div className="flex w-full items-center justify-between">
-              <LogoTextOnly
-                aria-label="Text"
-                className="!size-12 dark:hidden"
-              />
+              <div className="flex items-center gap-1">
+                <LogoTextOnly
+                  aria-label="Text"
+                  className="!size-12 dark:hidden"
+                />
 
-              <LogoTextOnlyDark
-                aria-label="Text"
-                className="hidden !size-12 dark:block"
-              />
+                <LogoTextOnlyDark
+                  aria-label="Text"
+                  className="hidden !size-12 dark:block"
+                />
+              </div>
 
-              {/* TODO: Plan Badge */}
-              <span
-                className={cn(
-                  'truncate rounded-sm border-1 border-gray-200 bg-white px-3 py-0.5 text-xs',
-                  'dark:bg-accent dark:text-accent-foreground dark:border-transparent'
-                )}
-              >
-                Free
-              </span>
+              {isProPlan ? (
+                <ProPlanChip />
+              ) : (
+                <span
+                  className={cn(
+                    'truncate rounded-xs border-1 border-gray-200 bg-white px-3 py-0.5 text-xs font-semibold',
+                    'dark:bg-accent dark:text-accent-foreground dark:border-transparent'
+                  )}
+                >
+                  Free
+                </span>
+              )}
             </div>
           </Link>
         </SidebarMenuButton>

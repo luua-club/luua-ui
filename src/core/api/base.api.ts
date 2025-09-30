@@ -219,9 +219,9 @@ export class BaseApiService {
     }
 
     /**
-     * Auto-logout on 401 or 403 (unauthorized)
+     * Auto-logout on 401 (unauthorized)
      */
-    if (status === 401 || status === 403) {
+    if (status === 401) {
       logout()
     }
 

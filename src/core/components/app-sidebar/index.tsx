@@ -1,4 +1,5 @@
 import { ISidebarItem } from '@/core/models/sidebar.model'
+import { Separator } from '@/shared/ui/separator'
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +34,7 @@ function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <AppSidebarPlatform platformItems={platformItems} />
+        <Separator />
         <AppSidebarCreation creationsData={creationsData} />
         <AppSidebarPosts postsItems={postsItems} />
         <AppSidebarAutoGen autoGenItems={autoGenItems} />

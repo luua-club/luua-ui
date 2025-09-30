@@ -28,4 +28,24 @@ const isMoreThanOneSocialIsConnected = (user: UserState) => {
   return connectedPlatforms.length > 1
 }
 
-export { isMoreThanOneSocialIsConnected, isSocialConnected }
+/**
+ * Checks if all socials are connected for a user by their plan.
+ *
+ * @param user - The user object containing connection status
+ * @returns True if all socials are connected, false otherwise
+ */
+const areAllSocialsConnectedByPlan = (user: UserState) => {
+  if (user.plan === 'Free') {
+    return isSocialConnected('LinkedIn', user)
+  }
+
+  return (
+    isSocialConnected('LinkedIn', user) && isSocialConnected('Twitter', user)
+  )
+}
+
+export {
+  areAllSocialsConnectedByPlan,
+  isMoreThanOneSocialIsConnected,
+  isSocialConnected,
+}

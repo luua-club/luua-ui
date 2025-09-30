@@ -1,31 +1,50 @@
 import { Outlet } from '@tanstack/react-router'
 import {
-  BaggageClaim,
-  Eclipse,
-  FolderClock,
+  Cable,
+  DollarSign,
+  FileCheck,
+  FolderClosed,
+  FolderHeart,
+  House,
   Lightbulb,
   LucideCalendar,
-  LucideFileText,
-  LucideLayoutDashboard,
-  PlusCircle,
+  Paintbrush,
+  PencilRuler,
 } from 'lucide-react'
+import { useMemo } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar'
 import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
 
 import Nav from '../components/nav'
+import { useUserState } from '../hooks/user-state.hook'
 import { ISidebarItem } from '../models/sidebar.model'
+import { areAllSocialsConnectedByPlan } from '../utils/social.utils'
 
 const platformItems: ISidebarItem[] = [
   {
     title: 'Dashboard',
     url: '/dashboard',
-    icon: <LucideLayoutDashboard />,
+    icon: <House />,
   },
   {
     title: 'Your Styles',
     url: '/preferences',
-    icon: <Eclipse />,
+    icon: <Paintbrush />,
+  },
+  {
+    title: 'Socials',
+    url: '/settings',
+    search: {
+      tabs: 'socials',
+    },
+    ping: 'success',
+    icon: <Cable />,
+  },
+  {
+    title: 'Plan & Pricing',
+    url: '/payments',
+    icon: <DollarSign />,
   },
 ]
 
@@ -33,12 +52,12 @@ const creationItems: ISidebarItem[] = [
   {
     title: 'Create New',
     url: '/creation/create',
-    icon: <PlusCircle />,
+    icon: <PencilRuler />,
   },
   {
     title: 'Saved Drafts',
     url: '/creation/drafts',
-    icon: <FolderClock />,
+    icon: <FolderClosed />,
   },
 ]
 
@@ -51,7 +70,7 @@ const postsItems: ISidebarItem[] = [
   {
     title: 'Published',
     url: '/published',
-    icon: <LucideFileText />,
+    icon: <FileCheck />,
   },
 ]
 
@@ -64,7 +83,7 @@ const autoGenItems: ISidebarItem[] = [
   {
     title: 'AI Drafts',
     url: '/auto-gen/drafts',
-    icon: <BaggageClaim />,
+    icon: <FolderHeart />,
   },
 ]
 
@@ -78,12 +97,41 @@ function SidebarLayout() {
 
 // This component is now inside SidebarProvider, so it can use useSidebar
 const SidebarContent = () => {
+  // --- Hooks ---
   const { toggleSidebar } = useSidebar()
+  const user = useUserState()
+
+  // --- Memoized Variables ---
+  /**
+   * Memoize the social connection status check
+   */
+  const areAllSocialsConnected = useMemo(
+    () => (user ? areAllSocialsConnectedByPlan(user) : false),
+    [user]
+  )
+
+  /**
+   * Memoize the platform items array to prevent unnecessary re-renders
+   */
+  const platformItemsWithSocials = useMemo(
+    () =>
+      platformItems.map(item => {
+        if (item.title === 'Socials') {
+          return {
+            ...item,
+            ping: areAllSocialsConnected ? 'success' : 'error',
+          }
+        }
+
+        return item
+      }) as ISidebarItem[],
+    [areAllSocialsConnected]
+  )
 
   return (
     <>
       <AppSidebar
-        platformItems={platformItems}
+        platformItems={platformItemsWithSocials}
         creationsData={creationItems}
         postsItems={postsItems}
         autoGenItems={autoGenItems}

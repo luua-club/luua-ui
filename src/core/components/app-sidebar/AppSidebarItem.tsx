@@ -13,26 +13,61 @@ interface IAppSidebarItemProps {
 }
 
 function AppSideBarItem({ item }: IAppSidebarItemProps) {
+  // --- State and Variables ---
+  const linkClassName = cn(
+    '[&.active]:font-semibold [&.active]:text-black',
+    'dark:[&.active]:bg-sidebar-accent dark:[&.active]:font-bold dark:[&.active]:text-white'
+  )
+
+  // --- Hooks ---
   const { isMobile, setOpenMobile } = useSidebar()
 
+  // --- Handlers ---
+  /**
+   * Handles the click event of the sidebar item
+
+   */
   const handleClick = () => {
     if (isMobile) {
       setOpenMobile(false)
     }
   }
 
+  /**
+   * Renders the content of the sidebar item
+   *
+   * @returns The content of the sidebar item
+   */
+  const renderContent = () => {
+    if (item.externalUrl) {
+      return (
+        <a
+          href={item.externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClassName}
+        >
+          <ItemWithIcon item={item} />
+        </a>
+      )
+    }
+
+    return (
+      <Link
+        to={item.url}
+        params={item.params}
+        search={item.search}
+        className={linkClassName}
+      >
+        <ItemWithIcon item={item} />
+      </Link>
+    )
+  }
+
   return (
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton tooltip={item.title} asChild onClick={handleClick}>
-        <Link
-          to={item.url}
-          className={cn(
-            '[&.active]:font-semibold [&.active]:text-black',
-            'dark:[&.active]:bg-sidebar-accent dark:[&.active]:font-bold dark:[&.active]:text-white'
-          )}
-        >
-          <ItemWithIcon item={item} />
-        </Link>
+        {renderContent()}
       </SidebarMenuButton>
     </SidebarMenuItem>
   )

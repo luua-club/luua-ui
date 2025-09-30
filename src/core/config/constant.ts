@@ -97,3 +97,10 @@ export const POST_WORD_COUNT: { [key in channelType]: number } = {
   Twitter: 280,
   LinkedIn: 3000,
 }
+
+/**
+ * External URLs
+ */
+export const EXTERNAL_URLS = {
+  contactUs: 'https://luua.club/contact-us',
+}
