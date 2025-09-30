@@ -67,7 +67,7 @@ const Settings = () => {
             Socials
           </TabsTrigger>
           <TabsTrigger value={tabValue[2]} className="px-2 py-4 text-xs">
-            Billing
+            Billing And Subscription
           </TabsTrigger>
         </TabsList>
         <TabsContent value={tabValue[0]}>

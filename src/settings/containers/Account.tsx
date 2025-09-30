@@ -22,6 +22,9 @@ const Account = ({ user }: { user: UserState }) => {
     onError: () => {
       toast.error('Failed to delete account')
     },
+    onSettled: () => {
+      setConfirmOpen(false)
+    },
   })
 
   // --- Functions ---
