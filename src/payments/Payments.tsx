@@ -1,13 +1,14 @@
+import { createLazyRoute } from '@tanstack/react-router'
 import { Check, Flower, Sprout, X } from 'lucide-react'
 
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 
-function Pricing() {
+function Payments() {
   return (
-    <>
-      <div className="py-4 text-center">
+    <div className="m-auto max-w-4xl p-2">
+      <div className="mt-4 py-4 text-center">
         <h1 className="text-3xl font-bold">Pricing Details</h1>
         <p className="text-muted-foreground my-2">
           A Comprehensive Breakdown of Our Pricing Plans to Help You Make the
@@ -30,7 +31,7 @@ function Pricing() {
               </span>
             </p>
             <Button variant="outline" className="mt-5 rounded-full">
-              Basic Access
+              Current Plan
             </Button>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 px-4">
@@ -89,7 +90,7 @@ function Pricing() {
               </span>
             </p>
             <Button variant="default" className="mt-5 rounded-full">
-              Get Started
+              Upgrade Plan
             </Button>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 px-4">
@@ -131,8 +132,12 @@ function Pricing() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   )
 }
 
-export default Pricing
+export const Route = createLazyRoute('/payments')({
+  component: Payments,
+})
+
+export default Payments
