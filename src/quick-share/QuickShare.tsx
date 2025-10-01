@@ -4,6 +4,10 @@ import { PlugZap } from 'lucide-react'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
 import { channelType } from '@/core/models/social.model'
+import {
+  isAnySocialConnected,
+  isSocialConnected,
+} from '@/core/utils/social.utils'
 import { ConfirmDialog } from '@/shared/components/confirm-dialog'
 import { Button } from '@/shared/ui/button'
 import { Tabs } from '@/shared/ui/tabs'
@@ -59,14 +63,17 @@ const QuickShare = () => {
    * @returns {JSX.Element | null} The post controls or null if no controls are available
    */
   const getPostControls = () => {
+    if (!user) return null
+
     // If there is an error or no posts are generated, return null
     if (error || posts.length === 0) return null
 
+    const x = activeChannels
+      ? !isSocialConnected(activeChannels, user)
+      : !isAnySocialConnected(user)
+
     // If user is not connected to any socials, return null
-    if (
-      !user?.connected_channels.linkedin.connected &&
-      !user?.connected_channels.twitter.connected
-    ) {
+    if (x) {
       return (
         <Button
           variant="destructive"
@@ -177,6 +184,7 @@ const QuickShare = () => {
           }}
           loading={loading}
           hidePromptInfo
+          activeChannel={activeChannels}
         />
       )}
 

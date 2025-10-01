@@ -101,7 +101,7 @@ export const useQuickShare = () => {
     setUserSearch,
     setUserChannel,
   } = useGeneratePosts(
-    preUserPromptState.prompt || '',
+    preUserPromptState.prompt ?? '',
     preUserPromptState.search,
     preUserPromptState.channel
   )
@@ -335,7 +335,7 @@ export const useQuickShare = () => {
     saveDraftMutation.isPending ||
     publishDraft.isPending
 
-  const activeChannels = preUserPromptState.channel || userChannel
+  const activeChannels = userChannel
 
   return {
     // state

@@ -77,7 +77,7 @@ function TabPostContent({
         <div
           className={cn(
             'mx-auto mt-4 grid w-full grid-cols-1 gap-6 lg:grid-cols-2',
-            channels && 'lg:w-xl lg:grid-cols-1'
+            channels && 'lg:w-2xl lg:grid-cols-1'
           )}
         >
           {isGeneratedDataFetching ? (

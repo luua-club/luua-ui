@@ -14,19 +14,27 @@ export const useGeneratePosts = (
   baseInput?: string | null
 ) => {
   // ---- State ----
-  const [userPrompt, setUserPrompt] = useState(initialPrompt)
-  const [userSearch, setUserSearch] = useState<boolean | undefined>(
-    initialSearch
-  )
-  const [userChannel, setUserChannel] = useState<
-    channelType | null | undefined
-  >(initialChannel)
+  const [userPrompt, setUserPrompt] = useState('')
+  const [userSearch, setUserSearch] = useState<boolean | undefined>(undefined)
+  const [userChannel, setUserChannel] = useState<channelType | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
 
+  useEffect(() => {
+    if (initialChannel) {
+      setUserChannel(initialChannel)
+    }
+    if (initialPrompt) {
+      setUserPrompt(initialPrompt)
+    }
+    if (initialSearch) {
+      setUserSearch(initialSearch)
+    }
+  }, [initialChannel, initialPrompt, initialSearch])
+
   // ---- Computed Variables ----
-  const activePrompt = userPrompt || initialPrompt || ''
-  const activeSearch = userSearch ?? initialSearch ?? false
-  const activeChannel = userChannel ?? initialChannel ?? null
+  const activePrompt = userPrompt || ''
+  const activeSearch = userSearch ?? false
+  const activeChannel = userChannel ?? null
   const activeBaseInput = baseInput || null
   const key = QUERY_KEYS.generateAIPost
 

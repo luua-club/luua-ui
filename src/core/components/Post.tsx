@@ -112,7 +112,7 @@ function Post({
         {/** CONTENT */}
         <p
           className={cn(
-            'text-card-foreground my-4 line-clamp-5 px-4 text-sm',
+            'text-card-foreground my-4 px-4 text-sm',
             tileView ? 'mt-0 line-clamp-2' : undefined
           )}
         >
