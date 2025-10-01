@@ -48,6 +48,13 @@ export const PromptInput = ({
   }
 
   const connectedSocials = SOCIAL_PLATFORM
+  let isAllSocialsHidden = hideAllSocial
+  let lockedSocials: string[] = []
+
+  if (userState?.plan === 'Free') {
+    isAllSocialsHidden = true
+    lockedSocials = ['Twitter']
+  }
 
   return (
     <InputPrompt
@@ -61,11 +68,12 @@ export const PromptInput = ({
           status: getSocialStatus(social.name),
         })),
       ]}
+      lockedSocials={lockedSocials}
       onChange={onChange}
       hidePromptInfo={hidePromptInfo}
       activeChannel={activeChannel}
       className={cn(className)}
-      hideAllSocial={hideAllSocial}
+      hideAllSocial={isAllSocialsHidden}
     />
   )
 }

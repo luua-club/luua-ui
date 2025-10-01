@@ -103,7 +103,7 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
 
-      {/* Get Help */}
+      {/* Contact Us */}
       <DropdownMenuGroup>
         <DropdownMenuItem className="cursor-pointer">
           <MessageCircleQuestionMark />
@@ -112,7 +112,7 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Get Help
+            Contact Us
           </a>
         </DropdownMenuItem>
 

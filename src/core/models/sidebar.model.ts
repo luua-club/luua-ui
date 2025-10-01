@@ -8,6 +8,7 @@ export interface ISidebarItem {
   externalUrl?: string
   params?: LinkProps['params']
   search?: LinkProps['search']
+  tooltip?: string
   ping?: 'success' | 'error'
   icon?: React.ReactNode
   onlyOpen?: boolean

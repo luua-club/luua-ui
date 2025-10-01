@@ -120,6 +120,9 @@ const SidebarContent = () => {
           return {
             ...item,
             ping: areAllSocialsConnected ? 'success' : 'error',
+            tooltip: areAllSocialsConnected
+              ? 'All socials connected'
+              : 'Some socials not connected',
           }
         }
 

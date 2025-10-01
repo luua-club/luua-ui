@@ -1,6 +1,6 @@
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { CircleQuestionMark, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 import Logo from '@/assets/images/luua-black-icon.svg?react'
 import LogoDark from '@/assets/images/luua-white-icon.svg?react'

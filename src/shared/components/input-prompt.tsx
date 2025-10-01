@@ -3,10 +3,11 @@ import {
   CircleCheckBig,
   Globe,
   Loader2,
+  Lock,
   Send,
   TriangleAlert,
 } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SOCIAL_STATUS } from '../config/constant'
 import { InputPromptSocial } from '../models/Input-prompt.model'
@@ -31,6 +32,7 @@ interface InputPromptProps {
   hideAllSocial?: boolean
   activeChannel?: string | null
   className?: string
+  lockedSocials?: string[] | null
   onChange: (content: string, search: boolean, channel: string | null) => void
 }
 
@@ -42,6 +44,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   hideAllSocial = false,
   activeChannel = null,
   className,
+  lockedSocials = null,
   onChange,
 }) => {
   // --- State ---
@@ -57,15 +60,27 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
     setSelectedSocial(activeChannel)
   }, [activeChannel])
 
+  /**
+   * Helper function to get default social (LinkedIn preferred)
+   *
+   * @returns string | null
+   */
+  const getDefaultSocial = useCallback(() => {
+    const linkedIn = socials.find(
+      social => social.text.toLowerCase() === 'linkedin'
+    )
+    return linkedIn?.text ?? socials[0]?.text ?? null
+  }, [socials])
+
   // Ensure a single social is always selected when hideAllSocial is true
   useEffect(() => {
     if (hideAllSocial) {
-      // If none selected, default to first available social
+      // If none selected, default to LinkedIn
       if (!selectedSocial) {
-        setSelectedSocial(socials[0]?.text ?? null)
+        setSelectedSocial(getDefaultSocial())
       }
     }
-  }, [hideAllSocial, socials, selectedSocial])
+  }, [hideAllSocial, selectedSocial, getDefaultSocial])
 
   // --- Handler ---
   /**
@@ -155,6 +170,8 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
           setSearchEnabled={setSearchEnabled}
           handleGeneratePost={handleGeneratePost}
           hideAllSocial={hideAllSocial}
+          getDefaultSocial={getDefaultSocial}
+          lockedSocials={lockedSocials}
         />
       </div>
 
@@ -175,6 +192,8 @@ interface PromptControlsProps {
   setSearchEnabled: (search: boolean) => void
   handleGeneratePost: () => void
   hideAllSocial: boolean
+  getDefaultSocial: () => string | null
+  lockedSocials: string[] | null
 }
 
 const PromptControls: React.FC<PromptControlsProps> = ({
@@ -186,7 +205,16 @@ const PromptControls: React.FC<PromptControlsProps> = ({
   setSearchEnabled,
   handleGeneratePost,
   hideAllSocial,
+  getDefaultSocial,
+  lockedSocials,
 }) => {
+  // Helper function to check if a social is locked
+  const isSocialLocked = (socialText: string) => {
+    if (!lockedSocials) return false
+    return lockedSocials.some(
+      locked => locked.toLowerCase() === socialText.toLowerCase()
+    )
+  }
   return (
     <div className="flex items-center justify-between p-2 pt-0">
       {/** Left Side */}
@@ -213,7 +241,7 @@ const PromptControls: React.FC<PromptControlsProps> = ({
         <Select
           value={
             hideAllSocial
-              ? (selectedSocial ?? socials[0]?.text ?? '')
+              ? (selectedSocial ?? getDefaultSocial() ?? '')
               : (selectedSocial ?? '__ALL__')
           }
           onValueChange={val =>
@@ -238,31 +266,50 @@ const PromptControls: React.FC<PromptControlsProps> = ({
             {!hideAllSocial && (
               <SelectItem value="__ALL__">All Socials</SelectItem>
             )}
-            {socials.map((social, idx) => (
-              <SelectItem key={idx} value={social.text}>
-                {social.text}
-                {social.status === SOCIAL_STATUS.WARNING && (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <TriangleAlert className="size-3 text-yellow-600 dark:text-yellow-300" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>{social.tooltip} not connected</span>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-                {social.status === SOCIAL_STATUS.OK && (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <CircleCheckBig className="size-3 text-green-600 dark:text-green-300" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <span>{social.tooltip} connected</span>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </SelectItem>
-            ))}
+            {socials.map((social, idx) => {
+              const isLocked = isSocialLocked(social.text)
+              return (
+                <SelectItem key={idx} value={social.text} disabled={isLocked}>
+                  {social.text}
+                  {isLocked && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="pointer-events-auto inline-flex">
+                          <Lock className="size-3 text-gray-600 dark:text-gray-400" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <span>{social.text} is locked, Go Pro to unlock</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {!isLocked && social.status === SOCIAL_STATUS.WARNING && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-flex">
+                          <TriangleAlert className="size-3 text-yellow-600 dark:text-yellow-300" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <span>{social.tooltip} not connected</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {!isLocked && social.status === SOCIAL_STATUS.OK && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="inline-flex">
+                          <CircleCheckBig className="size-3 text-green-600 dark:text-green-300" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <span>{social.tooltip} connected</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
 

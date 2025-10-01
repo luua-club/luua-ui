@@ -6,6 +6,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/shared/ui/sidebar'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 interface IAppSidebarItemProps {
@@ -74,7 +75,7 @@ function AppSideBarItem({ item }: IAppSidebarItemProps) {
 }
 
 interface IItemWithIconProps {
-  item: Pick<ISidebarItem, 'icon' | 'title' | 'ping'>
+  item: Pick<ISidebarItem, 'icon' | 'title' | 'ping' | 'tooltip'>
 }
 
 const ItemWithIcon = ({ item }: IItemWithIconProps) => {
@@ -82,14 +83,19 @@ const ItemWithIcon = ({ item }: IItemWithIconProps) => {
     <>
       {item.icon}
       <span>{item.title}</span>
-      {item.ping && (
-        <span
-          className={cn(
-            'size-1.5 animate-pulse rounded-full',
-            item.ping === 'success' ? 'bg-green-500' : 'bg-red-500'
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {item.ping && (
+            <span
+              className={cn(
+                'size-1.5 animate-pulse rounded-full',
+                item.ping === 'success' ? 'bg-green-500' : 'bg-red-500'
+              )}
+            ></span>
           )}
-        ></span>
-      )}
+        </TooltipTrigger>
+        <TooltipContent>{item.tooltip}</TooltipContent>
+      </Tooltip>
     </>
   )
 }
