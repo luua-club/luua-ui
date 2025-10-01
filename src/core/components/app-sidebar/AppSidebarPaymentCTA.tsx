@@ -48,7 +48,7 @@ function AppSidebarPaymentCTA() {
             <p className="text-sm text-balance">
               Upgrade your plan to
               <span className="mx-1">
-                <AnimatedGradientText className="text-sm font-medium">
+                <AnimatedGradientText className="text-sm font-bold">
                   Pro
                 </AnimatedGradientText>
               </span>

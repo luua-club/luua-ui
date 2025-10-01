@@ -5,7 +5,6 @@ import LogoTextOnly from '@/assets/images/luua-black-text.svg?react'
 import LogoIconOnlyDark from '@/assets/images/luua-white-icon.svg?react'
 import LogoTextOnlyDark from '@/assets/images/luua-white-text.svg?react'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import { ProPlanChip } from '@/shared/components/pro-plan-chip'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -48,7 +47,13 @@ function AppSidebarHeader() {
               </div>
 
               {isProPlan ? (
-                <ProPlanChip />
+                <span
+                  className={cn(
+                    'bg-brand-accent-yellow truncate rounded-xs px-3 py-0.5 text-xs font-semibold text-black'
+                  )}
+                >
+                  Pro
+                </span>
               ) : (
                 <span
                   className={cn(

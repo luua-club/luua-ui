@@ -4,6 +4,9 @@ import { LucidePanelRight } from 'lucide-react'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { urlType } from '@/core/models/urls.model'
 import ThemeToggle from '@/shared/components/theme-toggle'
+import { Badge } from '@/shared/ui/badge'
+import { Separator } from '@/shared/ui/separator'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
 import { NavUser } from './NavUser'
 
@@ -21,21 +24,31 @@ function Nav({ handleSidebar }: INavProps) {
 
   return (
     <nav className="flex h-14 justify-between border-b-1 p-2">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         {/* Sidebar toggle */}
-        <LucidePanelRight
-          className="size-5 cursor-pointer text-gray-500 dark:text-white"
-          onClick={handleSidebar}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <LucidePanelRight
+              className="size-4 cursor-pointer"
+              onClick={handleSidebar}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            Expand / Collapse Sidebar, CTRL+B
+          </TooltipContent>
+        </Tooltip>
+
         {/* Page title */}
-        <h1 className="text-normal pl-3 font-medium text-gray-500 dark:font-normal dark:text-white">
-          {currentPageTitle}
-        </h1>
+        <h1 className="text-sm font-medium">{currentPageTitle}</h1>
+
+        <Badge variant="secondary" className="rounded-xs">
+          Beta
+        </Badge>
       </div>
       <div className="flex items-center">
         {/* Dark mode toggle */}
-        <ThemeToggle className="mr-4" />
-
+        <ThemeToggle />
+        <Separator orientation="vertical" className="mr-1 ml-3 !h-7" />
         {/* User info */}
         <NavUser user={user} />
       </div>
@@ -54,25 +67,25 @@ const getCurrentPageTitle = (pathname: urlType) => {
     case '/dashboard':
       return 'Dashboard'
     case '/settings':
-      return 'Settings'
+      return 'User Settings'
     case '/quick-share':
-      return 'Quick Share'
+      return 'Quick Share Posts'
     case '/creation/create':
-      return 'Create'
+      return 'Create New Post'
     case '/creation/drafts':
-      return 'Saved Drafts'
+      return 'Saved Drafts Posts'
     case '/schedule':
-      return 'Schedule'
+      return 'Scheduled Posts'
     case '/published':
-      return 'Published'
+      return 'Published Posts'
     case '/preferences':
-      return 'Preferences'
+      return 'User AI Preferences'
     case '/auto-gen/inspiration':
-      return 'Inspiration'
+      return 'Inspiration Board'
     case '/auto-gen/drafts':
-      return 'AI Drafts'
+      return 'AI Drafts Post'
     case '/payments':
-      return 'Payments'
+      return 'Payments & Pricing'
     default:
       return 'Dashboard'
   }

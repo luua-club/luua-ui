@@ -1,12 +1,15 @@
+import { IconBrandChrome } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import {
   LucideChevronsUpDown,
   LucideLogOut,
-  LucideSettings,
   LucideSparkles,
   MessageCircleQuestionMark,
+  Receipt,
+  UserCog,
 } from 'lucide-react'
 
+import { EXTERNAL_URLS } from '@/core/config/constant'
 import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
@@ -61,37 +64,79 @@ export function NavUser({ user }: INavUserProps) {
         </Button>
       </DropdownMenuTrigger>
       {/* Content - the dropdown menu */}
-      <NavUserDropdownContent logout={user.logout} />
+      <NavUserDropdownContent user={user} />
     </DropdownMenu>
   )
 }
 
-const NavUserDropdownContent = ({ logout }: { logout: () => void }) => {
+const NavUserDropdownContent = ({ user }: { user: UserState }) => {
+  const isProPlan = user.plan === 'Pro'
+
   return (
     <DropdownMenuContent
       className="dark:bg-sidebar w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
       side={'bottom'}
       align="end"
     >
+      {/* Plan Benefits */}
       <DropdownMenuGroup>
-        <DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
           <LucideSparkles />
-          Go Pro ✨
+          {/** TODO: Plan benefits - open paid plan modal */}
+          {isProPlan ? 'Plan Benefits' : <Link to="/payments">Go Pro</Link>}
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
+
+      {/* Account and Subscription */}
       <DropdownMenuGroup>
-        <DropdownMenuItem>
-          <LucideSettings />
-          <Link to="/settings">Settings</Link>
+        <DropdownMenuItem className="cursor-pointer">
+          <UserCog />
+          <Link to="/settings">Account</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <MessageCircleQuestionMark />
-          Get Help
+        <DropdownMenuItem className="cursor-pointer">
+          <Receipt />
+          <Link to="/settings" search={{ tabs: 'billing' }}>
+            Subscription
+          </Link>
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={logout}>
+
+      {/* Get Help */}
+      <DropdownMenuGroup>
+        <DropdownMenuItem className="cursor-pointer">
+          <MessageCircleQuestionMark />
+          <a
+            href={EXTERNAL_URLS.contactUs}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Get Help
+          </a>
+        </DropdownMenuItem>
+
+        {/* TODO: Add link for  Chrome Extension */}
+        <DropdownMenuItem className="cursor-pointer">
+          <IconBrandChrome />
+          <a
+            href={EXTERNAL_URLS.contactUs}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download Chrome Extension
+          </a>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
+
+      <DropdownMenuSeparator />
+
+      {/* Log out */}
+      <DropdownMenuItem
+        onClick={user.logout}
+        variant="destructive"
+        className="cursor-pointer"
+      >
         <LucideLogOut />
         Log out
       </DropdownMenuItem>
