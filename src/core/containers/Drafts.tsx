@@ -131,9 +131,9 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                           <TooltipTrigger asChild>
                             <Badge
                               variant="outline"
-                              className="rounded-xs font-semibold text-cyan-600 dark:text-cyan-400"
+                              className="rounded-xs border-orange-600 font-semibold text-orange-600 dark:border-orange-400 dark:text-orange-400"
                             >
-                              <Bot />
+                              <Bot className="!size-3.5" />
                               Auto Gen
                             </Badge>
                           </TooltipTrigger>

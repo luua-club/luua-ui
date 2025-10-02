@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, SquarePlus } from 'lucide-react'
+import { CircleSlash, Loader, SquarePlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { inspirationApi } from '@/core/api/inspiration.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import type { InspirationResponse } from '@/core/models/inspiration.model'
 import LinkContentCard from '@/shared/components/link-content-card'
 import PaginationList from '@/shared/components/pagination-list'
@@ -27,6 +28,7 @@ function InspirationsCrud() {
 
   // --- Hooks ---
   const queryClient = useQueryClient()
+  const user = useUserState()
   const { data, isLoading, isError } = useQuery<InspirationResponse>({
     queryKey: [QUERY_KEYS.inspirations, { offset, limit }],
     queryFn: async ({ signal }) => {
@@ -108,24 +110,23 @@ function InspirationsCrud() {
   const renderBody = () => {
     if (isLoading) {
       return (
-        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-          Loading inspirations...
-          <Loader2 className="size-3 animate-spin" />
-        </div>
+        <Loader className="col-span-full mx-auto mt-6 size-5 animate-spin" />
       )
     }
 
     if (isError) {
       return (
-        <div className="text-sm text-red-500">Failed to load inspirations</div>
+        <div className="text-sm font-semibold text-red-500">
+          Failed to load inspirations
+        </div>
       )
     }
 
     if (!data || data.inspirations.length === 0) {
       return (
-        <div className="text-muted-foreground col-span-full text-sm">
-          No inspirations yet. Click &quot;Add Inspiration&quot; to create one.
-        </div>
+        <p className="col-span-full mx-auto mt-8 flex items-center gap-2 text-sm font-semibold">
+          <CircleSlash className="size-4" /> No inspirations found
+        </p>
       )
     }
 
@@ -163,7 +164,7 @@ function InspirationsCrud() {
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
-        <p className="text-muted-foreground">
+        <p className="font-medium">
           These are list of inspirations, you can add, update and delete them
           here.
         </p>
@@ -175,6 +176,7 @@ function InspirationsCrud() {
           }}
           variant="outline"
           size="sm"
+          disabled={user?.plan === 'Free'}
         >
           <SquarePlus className="size-4" />
           Add Inspiration

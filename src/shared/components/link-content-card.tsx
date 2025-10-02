@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card'
+import { Separator } from '../ui/separator'
 
 interface LinkContentCardProps {
   createdAt: string
@@ -32,7 +33,7 @@ function LinkContentCard({
 }: LinkContentCardProps) {
   return (
     <Card
-      className={`flex flex-col gap-4 py-4 shadow-none ${isProcessing ? 'opacity-50' : ''}`}
+      className={`flex flex-col gap-4 rounded-sm py-4 shadow-none ${isProcessing ? 'opacity-50' : ''}`}
     >
       {/* Header */}
       <CardHeader className="flex items-start justify-between gap-2 px-4">
@@ -50,11 +51,16 @@ function LinkContentCard({
 
         {/* Utilized Badge */}
         {utilized && (
-          <Badge className="border-transparent bg-blue-600 text-xs text-white">
-            Utilized
+          <Badge
+            variant="outline"
+            className="rounded-xs border-orange-600 font-semibold text-orange-600 dark:border-orange-400 dark:text-orange-400"
+          >
+            UTILIZED
           </Badge>
         )}
       </CardHeader>
+
+      <Separator />
 
       {/* Content */}
       <CardContent className="line-clamp-3 flex-1 px-4">
@@ -67,7 +73,9 @@ function LinkContentCard({
       {/* Footer */}
       <CardFooter className="flex items-center justify-between gap-2 px-4 text-xs">
         {/* Created At */}
-        {format(new Date(createdAt), 'PPpp')}
+        <p className="text-muted-foreground font-semibold">
+          {format(new Date(createdAt), 'PPpp')}
+        </p>
 
         {/** Actions */}
         <div className="flex items-center gap-2">
