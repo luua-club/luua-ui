@@ -1,6 +1,6 @@
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader } from 'lucide-react'
 
 import Logo from '@/assets/images/luua-black-icon.svg?react'
 import LogoDark from '@/assets/images/luua-white-icon.svg?react'
@@ -32,7 +32,7 @@ const Dashboard = () => {
   if (!userState) {
     return (
       <div className="relative min-h-[calc(100vh-3.5rem)]">
-        <Loader2 className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin duration-75" />
+        <Loader className="absolute top-[40%] left-1/2 size-5 -translate-x-1/2 -translate-y-1/2 animate-spin duration-75" />
       </div>
     )
   }
