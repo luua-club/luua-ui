@@ -26,7 +26,7 @@ const Dashboard = () => {
     dispatch(
       setPrompt({ prompt: value, search, channel: channel as channelType })
     )
-    router.navigate({ to: '/quick-share' })
+    router.navigate({ to: '/creation/create' })
   }
 
   if (!userState) {

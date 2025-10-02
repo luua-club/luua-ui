@@ -5,6 +5,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
+import { toast } from 'sonner'
 
 import { BASE_API_URL } from '../config/constant'
 import { authInterceptor } from '../interceptors/auth.interceptor'
@@ -223,6 +224,13 @@ export class BaseApiService {
      */
     if (status === 401) {
       logout()
+    }
+
+    /**
+     * Limit reached on 403
+     */
+    if (status === 403) {
+      toast.error('You Have Reached Your Current Plan Limit')
     }
 
     return apiError

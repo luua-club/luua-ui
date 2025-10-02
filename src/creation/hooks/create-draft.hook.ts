@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useBlocker, useLocation, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
 import confetti from 'canvas-confetti'
 import { useCallback, useEffect, useState } from 'react'
@@ -36,6 +36,9 @@ export const useCreateDraft = () => {
       schedule: false,
     }
   )
+  // Navigation guard state
+  const [allowLeave, setAllowLeave] = useState(false)
+  const [blockerEnabled, setBlockerEnabled] = useState(false)
 
   // ----- Hooks -----
   const location = useLocation()
@@ -47,6 +50,21 @@ export const useCreateDraft = () => {
   // ----- Variables -----
   const draftId = new URLSearchParams(location.search).get('draftId')
   const draftEnabled = Boolean(draftId)
+  // ---- Internal navigation blocker (custom modal is handled in page via resolver) ----
+  const navBlocker = useBlocker({
+    shouldBlockFn: () => !allowLeave,
+    withResolver: true,
+    enableBeforeUnload: false,
+    disabled: !blockerEnabled,
+  })
+
+  // Enable blocker when there is any unsaved content in editor
+  useEffect(() => {
+    const hasContent =
+      Boolean(postDrafts.LinkedIn?.content) ||
+      Boolean(postDrafts.Twitter?.content)
+    setBlockerEnabled(hasContent)
+  }, [postDrafts.LinkedIn?.content, postDrafts.Twitter?.content])
 
   // ----- API calls with Effects -----
   /**
@@ -129,6 +147,8 @@ export const useCreateDraft = () => {
         toast.error('Something went wrong')
       }
 
+      // Bypass blocker for programmatic redirect
+      setAllowLeave(true)
       navigate({ to: '/creation/create' })
     }
   }, [draftQuery.isError, draftQuery.error, navigate])
@@ -141,6 +161,8 @@ export const useCreateDraft = () => {
     onSuccess: response => {
       toast.success('Draft saved successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+      // Ensure navigation is not blocked after save
+      setAllowLeave(true)
       navigate({
         to: '/creation/create',
         search: { draftId: response.data.draft.id },
@@ -269,6 +291,8 @@ export const useCreateDraft = () => {
             setIsShareModalOpen({ open: false, schedule: false })
             toast.success('Draft scheduled successfully')
             queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+            // Bypass blocker for programmatic navigation
+            setAllowLeave(true)
             navigate({ to: '/schedule' })
           },
           onError: () => {
@@ -317,6 +341,8 @@ export const useCreateDraft = () => {
         }
 
         handleClick()
+        // Bypass blocker for programmatic navigation
+        setAllowLeave(true)
         navigate({ to: '/dashboard' })
       },
       onError: () => {
@@ -382,22 +408,35 @@ export const useCreateDraft = () => {
   }
 
   return {
+    // ----- State -----
     postDrafts,
     setPostDrafts,
+    isShareModalOpen,
+    setIsShareModalOpen,
+
+    // ----- Variables -----
     draftEnabled,
+    draftId,
+
+    // ----- Query/Mutation -----
     draftQuery,
     saveDraftMutation,
     deletePostMutation,
     publishDraft,
+    scheduleDraft,
+
+    // ----- Handlers -----
     handleContentChange,
     handleSaveDraft,
     handleSubmitDraft,
-    isDraftActionsDisabled,
     handleDeletePost,
-    draftId,
-    isShareModalOpen,
-    setIsShareModalOpen,
-    scheduleDraft,
+    isDraftActionsDisabled,
+
+    // ----- Utilities -----
     getSharePosts,
+
+    // ----- Navigation guard controls -----
+    setAllowLeave,
+    navBlocker,
   }
 }

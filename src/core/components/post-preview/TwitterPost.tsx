@@ -1,6 +1,8 @@
+import { useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
   Bookmark,
+  Box,
   ChartNoAxesColumn,
   CirclePlus,
   Dot,
@@ -9,13 +11,14 @@ import {
   MessageCircle,
   Repeat2,
   Share,
-  TriangleAlert,
+  Unplug,
 } from 'lucide-react'
 import { useEffect } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
+import { PostPreviewProps } from '@/core/models/post.model'
 import { UserSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
@@ -30,18 +33,10 @@ import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
 
-interface TwitterPostProps {
-  initialContent?: string
-  loading?: boolean
-  notEditable?: boolean
-  isActionLoading?: boolean
-  onContentChange?: (content: string) => void
-  handlePostDelete?: () => void
-}
-
-const TwitterPost = (props: TwitterPostProps) => {
+const TwitterPost = (props: PostPreviewProps) => {
   // -- HOOKS --
   const user = useUserState()
+  const router = useRouter()
   const {
     content,
     setContent,
@@ -75,11 +70,54 @@ const TwitterPost = (props: TwitterPostProps) => {
   user_social.user_id = user_social.user_id || user.email
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
+  const overlayClassNames =
+    'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
+  const isProPlan = user.plan === 'Pro'
 
   // -- RENDER --
   return (
     <div className="relative">
-      {!props.notEditable && (
+      {!isProPlan && (
+        <div className={overlayClassNames}>
+          <p className="font-semibold">
+            Upgrade plan to post content on twitter
+          </p>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() =>
+              router.navigate({
+                to: '/payments',
+              })
+            }
+            className="text-xs"
+          >
+            <Box /> Upgrade Plan
+          </Button>
+        </div>
+      )}
+
+      {!user_social.connected && isProPlan && (
+        <div className={overlayClassNames}>
+          <p className="font-semibold">
+            Please connect your twitter account to post content
+          </p>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() =>
+              router.navigate({
+                to: '/settings',
+                search: { tabs: 'socials' },
+              })
+            }
+          >
+            <Unplug /> Connect
+          </Button>
+        </div>
+      )}
+
+      {!props.notEditable && user_social.connected && (
         <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
           {!props.isActionLoading && (
             <div className="lg:absolute lg:top-0 lg:-right-10">
@@ -101,19 +139,6 @@ const TwitterPost = (props: TwitterPostProps) => {
           props.isActionLoading && 'opacity-50'
         )}
       >
-        {!user_social.connected && (
-          <div className="bg-card absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border-1 border-dashed">
-            <Tooltip>
-              <TooltipTrigger>
-                <TriangleAlert className="size-4 animate-pulse text-yellow-600" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <span>Twitter account not connected</span>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        )}
-
         <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
           <AvatarImage
             src={user_social.user_profile_picture}
@@ -135,7 +160,7 @@ const TwitterPost = (props: TwitterPostProps) => {
           ) : (
             <Textarea
               className={cn(
-                'min-h-32 !bg-transparent !pl-0 md:min-h-20',
+                'min-h-32 resize-none !bg-transparent !pl-0 md:min-h-20',
                 'border-0 p-4 pt-1 shadow-none',
                 'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
                 'transition-colors duration-200',

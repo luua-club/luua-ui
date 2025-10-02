@@ -14,7 +14,6 @@ import onboardingRoute from '@/onboarding/router/router'
 import paymentsRoute from '@/payments/router'
 import preferencesRoute from '@/preferences/router'
 import publishedRoute from '@/published/router'
-import quickShareRoute from '@/quick-share/router'
 import scheduleRoute from '@/schedule/router'
 import settingsRouteTree from '@/settings/router'
 
@@ -38,7 +37,6 @@ const routeTree = rootRoute.addChildren([
     dashboardRoute,
     scheduleRoute,
     settingsRouteTree,
-    quickShareRoute,
     creationRouteTree,
     publishedRoute,
     preferencesRoute,

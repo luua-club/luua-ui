@@ -1,3 +1,4 @@
+import { useRouter } from '@tanstack/react-router'
 import {
   Dot,
   Ellipsis,
@@ -7,19 +8,19 @@ import {
   Send,
   Smile,
   ThumbsUp,
-  TriangleAlert,
+  Unplug,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
+import { PostPreviewProps } from '@/core/models/post.model'
 import { UserSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Textarea } from '@/shared/ui/textarea'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { useUserState } from '../../hooks/user-state.hook'
@@ -27,17 +28,9 @@ import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
 
-interface LinkedInPostProps {
-  initialContent?: string
-  loading?: boolean
-  notEditable?: boolean
-  isActionLoading?: boolean
-  onContentChange?: (content: string) => void
-  handlePostDelete?: () => void
-}
-
-const LinkedInPost = (props: LinkedInPostProps) => {
+const LinkedInPost = (props: PostPreviewProps) => {
   const user = useUserState()
+  const router = useRouter()
 
   const {
     content,
@@ -77,10 +70,32 @@ const LinkedInPost = (props: LinkedInPostProps) => {
   const isLong = raw.length > MAX_CHARS
   const displayText =
     expanded || !isLong ? raw : raw.slice(0, MAX_CHARS).trimEnd() + '...'
+  const overlayClassNames =
+    'bg-background/10 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[7px]'
 
   return (
     <div className="relative">
-      {!props.notEditable && (
+      {!user_social.connected && (
+        <div className={overlayClassNames}>
+          <p className="font-bold">
+            Please connect your linkedIn account to post content
+          </p>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() =>
+              router.navigate({
+                to: '/settings',
+                search: { tabs: 'socials' },
+              })
+            }
+          >
+            <Unplug /> Connect
+          </Button>
+        </div>
+      )}
+
+      {!props.notEditable && user_social.connected && (
         <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
           {!props.isActionLoading && (
             <div className="lg:absolute lg:top-0 lg:-right-10">
@@ -103,19 +118,6 @@ const LinkedInPost = (props: LinkedInPostProps) => {
           props.isActionLoading && 'opacity-50'
         )}
       >
-        {!user_social.connected && (
-          <div className="bg-card absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border-1 border-dashed">
-            <Tooltip>
-              <TooltipTrigger>
-                <TriangleAlert className="size-4 animate-pulse text-yellow-600" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <span>LinkedIn account not connected</span>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        )}
-
         {/* Header */}
         <LinkedInPostHeader user={user_social} />
 
@@ -136,7 +138,7 @@ const LinkedInPost = (props: LinkedInPostProps) => {
         ) : (
           <Textarea
             className={cn(
-              'min-h-52 !bg-transparent md:min-h-20',
+              'min-h-52 resize-none !bg-transparent md:min-h-20',
               'border-0 p-4 pt-1 shadow-none',
               'caret-primary placeholder:text-muted-foreground/60 selection:bg-brand-accent-yellow selection:text-black',
               'transition-colors duration-200',
