@@ -1,103 +1,120 @@
 import { createLazyRoute } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { HistoryIcon, Loader, PenLine } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-import LinkedInPost, {
-  LinkedInPostSkeleton,
-} from '@/core/components/post-preview/LinkedInPost'
-import TwitterPost, {
-  TwitterPostSkeleton,
-} from '@/core/components/post-preview/TwitterPost'
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
-import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
+import { useAppDispatch, useAppSelector } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { channelType } from '@/core/models/social.model'
+import { clearPrompt } from '@/core/store/prompt-slice'
 import { isSocialConnected } from '@/core/utils/social.utils'
-import { Tabs } from '@/shared/ui/tabs'
+import { ConfirmDialog } from '@/shared/components/confirm-dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
+import { WordRotate } from '@/shared/ui/word-rotate'
+import { cn } from '@/shared/utils'
 
-import CreateDraftTabContent from '../components/CreateDraftTabContent'
-import CreateDraftTabList from '../components/CreateDraftTabList'
+import CreatedPosts from '../components/CreatedPosts'
 import DraftActions from '../components/DraftActions'
+import PastResponse from '../components/PastResponse'
 import { useCreateDraft } from '../hooks/create-draft.hook'
 
-const Create = () => {
-  // States
-  const [selectedSocials, setSelectedSocials] = useState<string[]>([])
-  const [activeTab, setActiveTab] = useState<string>('')
+enum TabValue {
+  CREATED_POST = 'created-post',
+  PAST_RESPONSES = 'past-responses',
+}
+const SOCIAL_TABS: channelType[] = ['LinkedIn', 'Twitter']
 
-  // Hooks
+function Create() {
+  // ---- States ----
+  const [activeTab, setActiveTab] = useState<TabValue>(TabValue.CREATED_POST)
+  const [activeSocialTab, setActiveSocialTab] = useState<channelType>(
+    SOCIAL_TABS[0]
+  )
+
+  // ---- Hooks Helper Functions ----
+  /**
+   * Returns the current state
+   *
+   * @returns The current state
+   */
+  const getCurrentState = () => {
+    if (!postDrafts.LinkedIn?.content && !postDrafts.Twitter?.content) {
+      return null
+    }
+
+    return {
+      linkedin: postDrafts.LinkedIn?.content ?? null,
+      twitter: postDrafts.Twitter?.content ?? null,
+    }
+  }
+
+  // ---- Hooks & Selectors ----
+  const dispatch = useAppDispatch()
+  const preUserPromptState = useAppSelector(state => state.promptState)
   const user = useUserState()
   const {
+    // State
     postDrafts,
+    isShareModalOpen,
+    setIsShareModalOpen,
+    setAllowLeave,
+    navBlocker,
+
+    // Variables
     draftEnabled,
+
+    // Query/Mutation
     draftQuery,
     saveDraftMutation,
     deletePostMutation,
+
+    // Handlers
     handleContentChange,
     handleSaveDraft,
-    isDraftActionsDisabled,
-    handleDeletePost,
-    isShareModalOpen,
-    setIsShareModalOpen,
-    getSharePosts,
     handleSubmitDraft,
+    handleDeletePost,
+    isDraftActionsDisabled,
+
+    // Utilities
+    getSharePosts,
   } = useCreateDraft()
+
   const {
+    // State
     posts: generatedPostContent,
+    extractedLinks,
+    history,
+
+    // Loading
     isLoading: isGenerationLoading,
     isFetching: isGenerationFetching,
-    error: generationError,
-    setUserPrompt,
-    setUserSearch,
-    setUserChannel,
+
+    // Setters
+    setUserPrompt: setGenerationUserPrompt,
+    setUserSearch: setGenerationUserSearch,
+    setUserChannel: setGenerationUserChannel,
   } = useGeneratePosts(
-    '',
-    undefined,
-    undefined,
-    postDrafts[activeTab as channelType]?.content
+    preUserPromptState.prompt ?? '',
+    preUserPromptState.search,
+    preUserPromptState.channel,
+    getCurrentState()
   )
 
-  // Constants
-  const socials = useMemo(() => SOCIAL_PLATFORM.map(p => p.name), [])
+  // ---- Variables ----
   const isGenerationDataFetching = isGenerationLoading || isGenerationFetching
 
+  // ---- Effects ----
   /**
-   * Initialize selected socials from user's connected channels when user loads/changes
+   * Clear prompt state on component unmount to prevent unwanted API calls
+   * when navigating back to this page
    */
   useEffect(() => {
-    if (!user) {
-      return
+    return () => {
+      dispatch(clearPrompt())
     }
-
-    const connected = SOCIAL_PLATFORM.filter(sp => {
-      return isSocialConnected(sp.name, user)
-    }).map(sp => sp.name)
-
-    const nextSelected = connected.length > 0 ? connected : socials
-
-    setSelectedSocials(prev => (prev.length === 0 ? nextSelected : prev))
-    setActiveTab(prev => (prev ? prev : (nextSelected[0] ?? '')))
-  }, [socials, user])
-
-  /**
-   * Ensure active tab is set appropriately on first load
-   */
-  useEffect(() => {
-    if (!selectedSocials.includes(activeTab)) {
-      setActiveTab(selectedSocials[0] ?? '')
-    }
-  }, [selectedSocials, activeTab])
-
-  /**
-   * Ran when genAI API error
-   */
-  useEffect(() => {
-    if (generationError) {
-      toast.error('Something went wrong, Please try again !')
-    }
-  }, [generationError])
+  }, [dispatch])
 
   /**
    * Ran when genAI creates Posts
@@ -108,163 +125,189 @@ const Create = () => {
     }
 
     generatedPostContent.forEach(post => {
-      handleContentChange(post.content, post.channel as channelType)
+      handleContentChange(post.content, post.channel)
     })
   }, [generatedPostContent, handleContentChange])
 
+  // ---- Main Functions ----
   /**
-   * It toggles the social in the selected socials list
-   * If the social is checked, it adds the social to the list
-   * If the social is unchecked, it removes the social from the list
-   * If the list has only one social, it does nothing
+   * Returns the draft action component
    *
-   * @param name - Social name
-   * @param checked - Whether the social is checked
+   * @returns The draft action component
    */
-  const toggleSocial = (name: string, checked: boolean) => {
-    setSelectedSocials(prev => {
-      if (checked) {
-        if (prev.includes(name)) return prev
-        return [...prev, name]
-      }
-
-      if (prev.length <= 1) return prev
-      return prev.filter(s => s !== name)
-    })
-  }
-
-  /**
-   * Get post component based on social
-   *
-   * @param name - Social name
-   * @returns Post component
-   */
-  const getPostComponent = (name: channelType) => {
-    switch (name) {
-      case 'LinkedIn':
-        return (
-          <LinkedInPost
-            onContentChange={val => handleContentChange(val, name)}
-            initialContent={postDrafts[name]?.content}
-            loading={
-              (draftEnabled && draftQuery.isPending) || isGenerationDataFetching
-            }
-            isActionLoading={deletePostMutation.isPending}
-            handlePostDelete={() => handleDeletePost(postDrafts[name]?.id)}
-          />
-        )
-      case 'Twitter':
-        return (
-          <TwitterPost
-            onContentChange={val => handleContentChange(val, name)}
-            initialContent={postDrafts[name]?.content}
-            loading={
-              (draftEnabled && draftQuery.isPending) || isGenerationDataFetching
-            }
-            isActionLoading={deletePostMutation.isPending}
-            handlePostDelete={() => handleDeletePost(postDrafts[name]?.id)}
-          />
-        )
-      default:
-        return null
+  const getDraftActions = () => {
+    if (activeTab === TabValue.PAST_RESPONSES) {
+      return null
     }
+
+    return (
+      <DraftActions
+        handlePublishDraft={() => {
+          setAllowLeave(true)
+          setIsShareModalOpen({ open: true, schedule: false })
+        }}
+        handleScheduleDraft={() => {
+          setAllowLeave(true)
+          setIsShareModalOpen({ open: true, schedule: true })
+        }}
+        handleSaveDraft={() => {
+          setAllowLeave(true)
+          handleSaveDraft()
+        }}
+        isLoading={
+          saveDraftMutation.isPending ||
+          isGenerationDataFetching ||
+          isDraftActionsDisabled()
+        }
+        extractedLinks={extractedLinks}
+      />
+    )
   }
 
   return (
     <>
+      {/* Leave Confirmation Modal */}
+      <ConfirmDialog
+        open={navBlocker.status === 'blocked'}
+        onOpenChange={open => {
+          if (!open && navBlocker.status === 'blocked') {
+            if (navBlocker.reset) navBlocker.reset()
+          }
+        }}
+        title="Leave this page?"
+        description="If you leave now, your current data on this page will be lost."
+        confirmLabel="Leave page"
+        cancelLabel="Stay"
+        onConfirm={() => navBlocker.proceed && navBlocker.proceed()}
+      />
+
       <div className="relative m-auto max-w-7xl p-2">
         {/** Actions on top right - Schedule/publish/save */}
         <div className="hidden gap-2 py-1 lg:absolute lg:top-2 lg:right-2 lg:flex">
-          <DraftActions
-            handleSaveDraft={handleSaveDraft}
-            handlePublishDraft={() =>
-              setIsShareModalOpen({ open: true, schedule: false })
-            }
-            handleScheduleDraft={() =>
-              setIsShareModalOpen({ open: true, schedule: true })
-            }
-            isActionDisabled={isDraftActionsDisabled || !user}
-            isLoading={saveDraftMutation.isPending || isGenerationDataFetching}
-          />
+          {getDraftActions()}
         </div>
 
-        {/** Tabs on top left */}
-        <Tabs className="w-full" value={activeTab} onValueChange={setActiveTab}>
-          {/** Tabs List - Linkedin/Twitter */}
-          <CreateDraftTabList
-            selectedSocials={selectedSocials}
-            toggleSocial={toggleSocial}
-          />
+        <Tabs
+          className="w-full"
+          value={activeTab}
+          onValueChange={val => setActiveTab(val as TabValue)}
+        >
+          {/** Tabs List */}
+          <CreateTabList loading={isGenerationDataFetching} />
 
-          {/** Loading placeholder */}
-          {selectedSocials.length === 0 && (
-            <div className="mx-auto mt-2 w-full md:w-fit md:min-w-2xl">
-              {(activeTab as channelType) === 'LinkedIn' ? (
-                <LinkedInPostSkeleton />
-              ) : (
-                <TwitterPostSkeleton />
-              )}
-            </div>
-          )}
-
-          {/** Tabs Content */}
-          {SOCIAL_PLATFORM.filter(social =>
-            selectedSocials.includes(social.name)
-          ).map(social => (
-            <CreateDraftTabContent
-              key={social.name}
-              tabName={social.name}
-              user={user}
-              getPostComponent={getPostComponent}
+          {/** Tabs Content - LinkedIn/Twitter Editor */}
+          <TabsContent value={TabValue.CREATED_POST}>
+            <CreatedPosts
+              allSocialTabs={SOCIAL_TABS}
+              activeTab={activeSocialTab}
+              setActiveTab={setActiveSocialTab}
+              post={{
+                handleContentChange,
+                postDrafts,
+                loading:
+                  (draftEnabled && draftQuery.isPending) ||
+                  isGenerationDataFetching,
+                isActionLoading: deletePostMutation.isPending,
+                handlePostDelete: (postId?: string) => handleDeletePost(postId),
+              }}
             />
-          ))}
+
+            {/** Loading text */}
+            <div
+              className={cn(
+                'mx-auto mt-2 flex w-full max-w-2xl items-center justify-end gap-1',
+                !isGenerationDataFetching && 'hidden'
+              )}
+            >
+              <WordRotate
+                words={[
+                  'Cooking something up...',
+                  'Just a sec...',
+                  'Sprinkling some AI magic...',
+                  'Still Brewing the answer...',
+                ]}
+                duration={3000}
+                className="text-sm font-medium text-gray-600 select-none dark:text-gray-300"
+              />
+              <Loader className="size-3 animate-spin" />
+            </div>
+          </TabsContent>
+
+          {/** Tabs Content - Past Responses */}
+          <TabsContent value={TabValue.PAST_RESPONSES}>
+            <PastResponse history={history} />
+          </TabsContent>
         </Tabs>
       </div>
-
-      {user && isSocialConnected(activeTab, user) && (
-        <FloatingPromptInput
-          onChange={(
-            content: string,
-            search: boolean,
-            channel: string | null
-          ) => {
-            setUserPrompt(content)
-            setUserSearch(search)
-            setUserChannel((channel as channelType) ?? null)
-            if (channel) {
-              setActiveTab(channel as channelType)
-            }
-          }}
-          loading={isGenerationDataFetching || saveDraftMutation.isPending}
-          hidePromptInfo
-          activeChannel={activeTab as channelType}
-          hideAllSocial
-        >
-          <div className="mb-2 flex justify-center gap-2 lg:hidden">
-            <DraftActions
-              handleSaveDraft={handleSaveDraft}
-              handlePublishDraft={() =>
-                setIsShareModalOpen({ open: true, schedule: false })
-              }
-              handleScheduleDraft={() =>
-                setIsShareModalOpen({ open: true, schedule: true })
-              }
-              isActionDisabled={isDraftActionsDisabled || !user}
-              isLoading={saveDraftMutation.isPending}
-            />
-          </div>
-        </FloatingPromptInput>
-      )}
 
       {/* Share Post Modal */}
       <SharePostModal
         isOpen={isShareModalOpen}
         posts={getSharePosts()}
         isLoading={isDraftActionsDisabled()}
-        onOpenChange={setIsShareModalOpen}
+        onOpenChange={open => {
+          setIsShareModalOpen(open)
+          if (!open.open) {
+            setAllowLeave(false)
+          }
+        }}
         onSubmit={handleSubmitDraft}
       />
+
+      {/** Floating Prompt Input */}
+      {user &&
+        isSocialConnected(activeSocialTab, user) &&
+        activeTab === TabValue.CREATED_POST && (
+          <FloatingPromptInput
+            activeChannel={activeSocialTab}
+            onChange={(
+              content: string,
+              search: boolean,
+              channel: string | null
+            ) => {
+              setGenerationUserPrompt(content)
+              setGenerationUserSearch(search)
+              setGenerationUserChannel(channel as channelType)
+
+              if (channel) {
+                setActiveSocialTab(channel as channelType)
+              }
+            }}
+            loading={isGenerationDataFetching || saveDraftMutation.isPending}
+            hidePromptInfo
+          >
+            <div className="mb-2 flex justify-center gap-2 lg:hidden">
+              {getDraftActions()}
+            </div>
+          </FloatingPromptInput>
+        )}
     </>
+  )
+}
+
+/**
+ * Create tab list component
+ */
+interface CreateTabListProps {
+  loading: boolean
+}
+const CreateTabList = ({ loading }: CreateTabListProps) => {
+  return (
+    <TabsList className="w-full px-2 py-6 lg:w-fit">
+      {/** Created Posts Tab */}
+      <TabsTrigger value={TabValue.CREATED_POST} className="px-2 py-4 text-xs">
+        <PenLine className="size-3" /> Created Posts
+      </TabsTrigger>
+
+      {/** Past Responses Tab */}
+      <TabsTrigger
+        value={TabValue.PAST_RESPONSES}
+        className="px-2 py-4 text-xs"
+        disabled={loading}
+      >
+        <HistoryIcon className="size-3" /> Past Generated Posts
+      </TabsTrigger>
+    </TabsList>
   )
 }
 

@@ -1,6 +1,8 @@
 import { TriangleAlert } from 'lucide-react'
+import { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
@@ -15,6 +17,7 @@ import { extractUserInitial } from '../utils/common.util'
 type PostProps = IPost & {
   isLoading?: boolean
   tileView?: boolean
+  maintainFormatting?: boolean
 }
 
 function Post({
@@ -22,7 +25,11 @@ function Post({
   content,
   isLoading = false,
   tileView = false,
+  maintainFormatting = false,
 }: PostProps) {
+  // Read-more toggle for not-editable view
+  const [expanded, setExpanded] = useState(false)
+
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
   const userState = useUserState()
 
@@ -57,6 +64,14 @@ function Post({
     }
   }
 
+  const MAX_CHARS = 300
+  const raw = content || ''
+  const isLong = raw.length > MAX_CHARS
+  const displayText =
+    expanded || !isLong
+      ? content
+      : content.slice(0, MAX_CHARS).trimEnd() + '...'
+
   return (
     <Card
       className={cn(
@@ -88,9 +103,7 @@ function Post({
                     <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <span className="text-card-foreground">
-                      {platform?.name} account not connected
-                    </span>
+                    <span>{platform?.name} account not connected</span>
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -110,14 +123,29 @@ function Post({
         {!tileView && <hr />}
 
         {/** CONTENT */}
-        <p
-          className={cn(
-            'text-card-foreground my-4 px-4 text-sm',
-            tileView ? 'mt-0 line-clamp-2' : undefined
-          )}
-        >
-          {content}
-        </p>
+        {maintainFormatting ? (
+          <div className="p-4 pt-1 text-sm">
+            <p className="break-words whitespace-pre-wrap">{displayText}</p>
+            {isLong && (
+              <Button
+                variant="link"
+                className="!p-0 text-xs text-blue-600 dark:text-blue-300"
+                onClick={() => setExpanded(prev => !prev)}
+              >
+                {expanded ? 'See less' : 'See more'}
+              </Button>
+            )}
+          </div>
+        ) : (
+          <p
+            className={cn(
+              'text-card-foreground my-4 px-4 text-sm',
+              tileView ? 'mt-0 line-clamp-3' : undefined
+            )}
+          >
+            {content}
+          </p>
+        )}
       </CardContent>
     </Card>
   )

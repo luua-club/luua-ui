@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Settings2 } from 'lucide-react'
+import { useRouter } from '@tanstack/react-router'
+import { Box, Loader, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { autopilotApi } from '@/core/api/autopilot.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { AutopilotSettings } from '@/core/models/autopilot.model'
-import { channelType } from '@/core/models/social.model'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { Switch } from '@/shared/ui/switch'
@@ -28,6 +28,7 @@ function AutoGenActions({
   // --- Hooks ---
   const queryClient = useQueryClient()
   const user = useUserState()
+  const router = useRouter()
 
   /**
    * Enable/Disable auto-gen
@@ -48,20 +49,6 @@ function AutoGenActions({
     },
   })
 
-  const getChannels = () => {
-    const channels: channelType[] = []
-
-    if (user?.connected_channels.linkedin.connected) {
-      channels.push('LinkedIn')
-    }
-
-    if (user?.connected_channels.twitter.connected) {
-      channels.push('Twitter')
-    }
-
-    return channels
-  }
-
   const getPayload = (enabled: boolean) => {
     const payload: Partial<AutopilotSettings> = {
       enabled,
@@ -69,10 +56,27 @@ function AutoGenActions({
 
     if (enabled) {
       payload.frequency_days = 5
-      payload.channels = getChannels()
+      payload.channels = ['Twitter', 'LinkedIn']
     }
 
     return payload
+  }
+
+  if (!user) {
+    return <Loader className="size-4 animate-spin" />
+  }
+
+  if (user.plan === 'Free') {
+    return (
+      <Button
+        onClick={() => router.navigate({ to: '/payments' })}
+        size="sm"
+        className="text-xs"
+      >
+        <Box className="size-3.5" />
+        Upgrade Plan
+      </Button>
+    )
   }
 
   return (

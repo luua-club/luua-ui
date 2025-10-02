@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Calendar, Loader2, Send } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { SchedulePicker } from '@/shared/components/schedule-picker'
@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/dialog'
+import { Label } from '@/shared/ui/label'
 import { cn } from '@/shared/utils'
 
 import { useUserState } from '../hooks/user-state.hook'
@@ -108,40 +109,49 @@ export function SharePostModal({
 
   // Inner: Posts grid + actions
   const PostModalContent = () => {
+    if (visiblePosts.length === 0) {
+      return (
+        <div className="mt-4">
+          <p className="text-muted-foreground text-center font-semibold">
+            No posts to share, Please connect your social accounts to share
+            posts
+          </p>
+        </div>
+      )
+    }
+
     return (
       <>
         <div
           className={cn(
-            'mt-4 grid grid-cols-1 gap-4',
-            visiblePosts.length === 2 && 'md:grid-cols-2'
+            'mt-6 grid grid-cols-1 gap-4',
+            visiblePosts.length === 2 && 'lg:grid-cols-2'
           )}
         >
           {visiblePosts.map(post => (
-            <div
-              key={post.id}
-              className={cn(
-                'dark:border-sidebar-accent dark:hover:bg-sidebar-accent relative rounded-lg border-2 border-gray-100',
-                selectedPosts.includes(post.id) &&
-                  'border-gray-800 dark:border-zinc-500',
-                'cursor-pointer'
-              )}
-              onClick={() => {
-                togglePost(post.id, !selectedPosts.includes(post.id))
-              }}
-            >
-              <Checkbox
-                className="absolute top-[-10px] right-[-8px] z-10 size-5 cursor-pointer rounded-full border-2 bg-white dark:border-zinc-500 dark:bg-zinc-800"
-                checked={selectedPosts.includes(post.id)}
-                onCheckedChange={checked => {
-                  togglePost(post.id, checked)
-                }}
-                onClick={e => e.stopPropagation()}
-              />
+            <div key={post.id}>
+              <div className="mb-2 flex items-center gap-2">
+                <Checkbox
+                  className="size-4 cursor-pointer"
+                  checked={selectedPosts.includes(post.id)}
+                  onCheckedChange={checked => {
+                    togglePost(post.id, checked)
+                  }}
+                  onClick={e => e.stopPropagation()}
+                />
+                <Label
+                  htmlFor="terms"
+                  className="text-muted-foreground text-sm font-semibold"
+                >
+                  SELECT {post.channel.toUpperCase()}
+                </Label>
+              </div>
+
               <Post
                 id={post.id}
                 channel={post.channel}
                 content={post.content}
-                tileView
+                maintainFormatting
               />
             </div>
           ))}
@@ -191,23 +201,24 @@ export function SharePostModal({
     >
       <DialogContent
         className={cn(
-          'bg-card w-full max-w-sm p-6 md:max-w-xl',
+          'bg-card w-full p-6 lg:max-w-4xl',
+          visiblePosts.length < 2 && 'lg:max-w-xl',
           showSchedule && '!max-w-fit'
         )}
       >
         <DialogHeader>
-          <DialogTitle className="mb-4 flex flex-col gap-2 text-xl font-semibold text-zinc-800 md:text-2xl dark:text-zinc-300">
-            Almost There
-            <span className="flex flex-col justify-between gap-2 text-sm sm:flex-row sm:gap-0">
-              Give your post a quick review
-              <span>
-                {new Date().toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
+          <DialogTitle className="text-card-foreground mb-4 text-center text-xl font-semibold">
+            {isOpen.schedule ? (
+              <span className="flex w-full items-center justify-center gap-2">
+                <Calendar className="size-5" />
+                Schedule Posts
               </span>
-            </span>
+            ) : (
+              <span className="flex w-full items-center justify-center gap-2">
+                <Send className="size-5" />
+                Publish Posts
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 

@@ -15,6 +15,8 @@ function AppSidebarPaymentCTA() {
   const [shouldRender, setShouldRender] = useState(false)
   const router = useRouter()
 
+  const { isMobile, setOpenMobile } = useSidebar()
+
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 
@@ -60,6 +62,10 @@ function AppSidebarPaymentCTA() {
               className="dark:bg-brand-accent-yellow !h-8 w-full text-xs dark:font-semibold"
               onClick={() => {
                 router.navigate({ to: '/payments' })
+
+                if (isMobile) {
+                  setOpenMobile(false)
+                }
               }}
             >
               <Box /> Upgrade Plan

@@ -13,3 +13,12 @@ export interface IPost {
   created_at?: string
   updated_at?: string
 }
+
+export interface PostPreviewProps {
+  initialContent?: string
+  loading?: boolean
+  notEditable?: boolean
+  isActionLoading?: boolean
+  onContentChange?: (content: string) => void
+  handlePostDelete?: () => void
+}

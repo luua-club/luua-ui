@@ -1,18 +1,24 @@
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
+  Bot,
   Calendar,
+  CircleSlash,
+  FolderClosed,
+  FolderHeart,
+  Loader,
   MoreHorizontal,
   PencilRuler,
   Send,
   Trash,
-  X,
+  Trash2,
 } from 'lucide-react'
 
-import Post, { PostSkeleton } from '@/core/components/Post'
+import Post from '@/core/components/Post'
 import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
+import ErrorBanner from '@/shared/components/error-banner'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import {
@@ -22,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
 import ListControls from '../../core/components/ListControls'
 import PaginationList from '../../shared/components/pagination-list'
@@ -61,20 +68,22 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
   const handleDeleteDraft = (draftId: string) => openDelete(draftId)
 
   if (isError) {
-    return (
-      <div className="bg-sidebar m-auto mt-8 flex h-24 max-w-4xl items-center justify-center rounded-lg border-1 p-5">
-        <p className="text-sm font-semibold">
-          Something Went Wrong, Please retry after some time
-        </p>
-      </div>
-    )
+    return <ErrorBanner />
   }
 
   return (
     <div className="m-auto flex max-w-4xl flex-col p-5">
       {/* --- Header --- */}
-      <h1 className="text-xl font-semibold">
-        {showOnlyAutoGen ? 'Your Generated AI Drafts' : 'Your Saved Drafts'}
+      <h1 className="text-lg font-bold">
+        {showOnlyAutoGen ? (
+          <span className="flex items-center gap-2">
+            <FolderHeart /> Your Generated AI Drafts
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            <FolderClosed /> Your Saved Drafts
+          </span>
+        )}
       </h1>
 
       {/* --- Filters & Sorting --- */}
@@ -90,22 +99,20 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
 
       {/* --- Drafts List --- */}
       <div className="mt-4 flex flex-col gap-4">
-        {isLoading && (
-          <div className="bg-card rounded-lg border-1 p-4">
-            <PostSkeleton />
-          </div>
-        )}
+        {isLoading && <Loader className="mx-auto mt-8 size-5 animate-spin" />}
+
         {!isLoading && (
           <>
             {drafts.length === 0 && (
-              <div className="bg-card flex h-24 items-center justify-center rounded-lg border-1">
-                <p className="text-sm font-semibold">No drafts found</p>
-              </div>
+              <p className="mx-auto mt-8 flex items-center gap-2 text-sm font-semibold">
+                <CircleSlash className="size-4" /> No drafts found
+              </p>
             )}
+
             {drafts.map((draft: DraftItem, idx: number) => {
               return (
                 <div
-                  className={`bg-card rounded-lg border-1 p-4 pt-2 ${deletingIds.has(draft.id) ? 'pointer-events-none opacity-50' : ''}`}
+                  className={`dark:bg-sidebar/40 rounded-lg border-2 border-dotted p-4 pt-2 ${deletingIds.has(draft.id) ? 'pointer-events-none opacity-50' : ''}`}
                   key={draft.id}
                 >
                   {/* --- Draft Header --- */}
@@ -117,12 +124,26 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                     >
                       {format(
                         new Date(draft.updated_at),
-                        'EEE, MMM d, hh:mm a'
+                        'MMM do, EEEE, hh:mm a'
                       )}
                       {draft.autopilot && (
-                        <Badge variant="default" className="italic">
-                          Auto Gen ⚡
-                        </Badge>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              variant="outline"
+                              className="rounded-xs border-orange-600 font-semibold text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                            >
+                              <Bot className="!size-3.5" />
+                              Auto Gen
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <span>
+                              This draft was generated automatically <br /> by
+                              Luua through Auto Gen Feature
+                            </span>
+                          </TooltipContent>
+                        </Tooltip>
                       )}
                     </p>
 
@@ -193,10 +214,13 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                   </div>
 
                   {/* --- Draft Posts --- */}
-                  <div className="mt-4 flex flex-col gap-4">
+                  <div
+                    className={`mt-4 grid grid-cols-1 gap-4 lg:grid-cols-${draft.posts.length > 1 ? '2' : '1'}`}
+                  >
                     {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft, postId =>
                       openDeletePost(draft.id, postId)
                     )}
+
                     {getPost(
                       `${draft.id}-${idx + 1}`,
                       'Twitter',
@@ -265,15 +289,20 @@ const getPost = (
       <div className="relative">
         {draftItem.posts.length > 1 && (
           <Button
-            className="absolute -top-2 -right-2 z-10 size-6 rounded-full !p-0"
+            className="text-destructive !bg-card hover:text-destructive/80 absolute -top-2 -right-2 z-10 size-6 rounded-full !p-0"
             variant="outline"
             size="icon"
             onClick={() => onDelete(item.id)}
           >
-            <X />
+            <Trash2 className="size-3" />
           </Button>
         )}
-        <Post id={`${id}`} channel={item.channel} content={item.content} />
+        <Post
+          id={`${id}`}
+          channel={item.channel}
+          content={item.content}
+          maintainFormatting
+        />
       </div>
     </>
   )

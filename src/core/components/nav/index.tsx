@@ -39,9 +39,9 @@ function Nav({ handleSidebar }: INavProps) {
         </Tooltip>
 
         {/* Page title */}
-        <h1 className="text-sm font-medium">{currentPageTitle}</h1>
+        <h1 className="truncate text-sm font-medium">{currentPageTitle}</h1>
 
-        <Badge variant="secondary" className="rounded-xs">
+        <Badge variant="secondary" className="hidden rounded-xs sm:block">
           Beta
         </Badge>
       </div>
@@ -68,8 +68,6 @@ const getCurrentPageTitle = (pathname: urlType) => {
       return 'Dashboard'
     case '/settings':
       return 'User Settings'
-    case '/quick-share':
-      return 'Quick Share Posts'
     case '/creation/create':
       return 'Create New Post'
     case '/creation/drafts':
