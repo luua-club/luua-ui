@@ -42,8 +42,11 @@ const platformItems: ISidebarItem[] = [
     icon: <Cable />,
   },
   {
-    title: 'Plan & Pricing',
-    url: '/payments',
+    title: 'Billings & Credits',
+    url: '/settings',
+    search: {
+      tabs: 'billing',
+    },
     icon: <DollarSign />,
   },
 ]
