@@ -13,7 +13,6 @@ import { Button } from '@/shared/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/dialog'
@@ -126,9 +125,6 @@ function AutoGenSettingsModal({
             <Settings2 className="size-5" />
             Auto Generation Settings
           </DialogTitle>
-          <DialogDescription className="text-card-foreground">
-            Configure your settings for auto generation.
-          </DialogDescription>
         </DialogHeader>
 
         {/* Form */}

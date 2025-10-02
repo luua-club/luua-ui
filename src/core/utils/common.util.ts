@@ -41,7 +41,7 @@ const toStartOfDayIso = (d?: Date): string | undefined => {
 const extractUserInitial = (name: string) => {
   return name
     .split(' ')
-    .map(word => word[0].toUpperCase())
+    .map(word => word[0]?.toUpperCase())
     .join('')
 }
 

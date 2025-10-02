@@ -39,8 +39,8 @@ function Inspiration() {
 
   return (
     <div className="m-auto max-w-4xl p-5">
-      <div className="rounded-lg border p-5">
-        <div className="mb-2 flex flex-col items-center justify-between gap-4 md:flex-row md:gap-8">
+      <div className="rounded-sm border">
+        <div className="flex flex-col items-center justify-between gap-4 p-4 md:flex-row md:gap-8">
           {/* Header */}
           <h1 className="flex items-center gap-3 text-xl font-medium md:text-base">
             <Network className="size-5" />
@@ -56,8 +56,10 @@ function Inspiration() {
           />
         </div>
 
+        <Separator />
+
         {/* Description */}
-        <p className="text-muted-foreground mt-4 text-center md:text-left">
+        <p className="p-4 text-center font-medium md:text-left">
           Save any article, video, or link as inspiration and set your preferred
           posting frequency. Luua will automatically turn your inspirations into
           ready-to-use posts.

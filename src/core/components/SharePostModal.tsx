@@ -113,7 +113,8 @@ export function SharePostModal({
       return (
         <div className="mt-4">
           <p className="text-muted-foreground text-center font-semibold">
-            No posts to share
+            No posts to share, Please connect your social accounts to share
+            posts
           </p>
         </div>
       )
