@@ -109,6 +109,16 @@ export function SharePostModal({
 
   // Inner: Posts grid + actions
   const PostModalContent = () => {
+    if (visiblePosts.length === 0) {
+      return (
+        <div className="mt-4">
+          <p className="text-muted-foreground text-center font-semibold">
+            No posts to share
+          </p>
+        </div>
+      )
+    }
+
     return (
       <>
         <div
