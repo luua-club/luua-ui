@@ -4,6 +4,7 @@ import { useUserState } from '@/core/hooks/user-state.hook'
 import { IUsageSummary } from '@/core/models/payment.model'
 import { Card, CardContent, CardHeader } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { cn } from '@/shared/utils'
 
 interface IUsageSummaryProps {
   usageSummary: IUsageSummary | undefined
@@ -62,7 +63,13 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <p className="text-muted-foreground text-sm font-medium">
               Remaining Credits
             </p>
-            <p className="text-3xl font-semibold tracking-tight">
+            <p
+              className={cn(
+                'text-3xl font-semibold tracking-tight',
+                usageSummary.credits.consumed === usageSummary.credits.total &&
+                  'text-destructive'
+              )}
+            >
               {usageSummary.credits.consumed}{' '}
               <span className="text-muted-foreground text-base">
                 / {usageSummary.credits.total}
@@ -74,7 +81,14 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <p className="text-muted-foreground text-sm font-medium">
               Auto Pilot Posts
             </p>
-            <p className="text-3xl font-semibold tracking-tight">
+            <p
+              className={cn(
+                'text-3xl font-semibold tracking-tight',
+                usageSummary.limits.auto_pilot_posts.total ===
+                  usageSummary.limits.auto_pilot_posts.used &&
+                  'text-destructive'
+              )}
+            >
               {usageSummary.limits.auto_pilot_posts.total !== -1 ? (
                 usageSummary.limits.auto_pilot_posts.used
               ) : (
@@ -92,7 +106,13 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <p className="text-muted-foreground text-sm font-medium">
               Scheduled Posts
             </p>
-            <p className="text-3xl font-semibold tracking-tight">
+            <p
+              className={cn(
+                'text-3xl font-semibold tracking-tight',
+                usageSummary.limits.scheduled_posts.total ===
+                  usageSummary.limits.scheduled_posts.used && 'text-destructive'
+              )}
+            >
               {usageSummary.limits.scheduled_posts.total !== -1 ? (
                 usageSummary.limits.scheduled_posts.used
               ) : (

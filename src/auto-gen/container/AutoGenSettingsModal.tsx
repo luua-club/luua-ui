@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Settings2 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Control, type Resolver, SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { autopilotApi } from '@/core/api/autopilot.api'
-import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import { QUERY_KEYS } from '@/core/config/constant'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import type { AutopilotSettings } from '@/core/models/autopilot.model'
 import type { channelType } from '@/core/models/social.model'
 import { Button } from '@/shared/ui/button'
@@ -54,6 +55,12 @@ function AutoGenSettingsModal({
   defaultFrequencyDays,
   defaultChannels,
 }: AutoGenSettingsModalProps) {
+  const user = useUserState()
+  const baseChannels = useMemo<channelType[]>(
+    () => (user?.plan === 'Pro' ? ['Twitter', 'LinkedIn'] : ['LinkedIn']),
+    [user?.plan]
+  )
+
   // --- Form ---
   const resolver = zodResolver(
     autoGenSettingsSchema
@@ -64,7 +71,7 @@ function AutoGenSettingsModal({
     defaultValues: {
       base_prompt: defaultBasePrompt ?? '',
       frequency_days: defaultFrequencyDays ?? 5,
-      channels: defaultChannels ?? ['Twitter', 'LinkedIn'],
+      channels: defaultChannels ?? baseChannels,
     },
   })
 
@@ -94,9 +101,16 @@ function AutoGenSettingsModal({
     form.reset({
       base_prompt: defaultBasePrompt ?? '',
       frequency_days: defaultFrequencyDays ?? 5,
-      channels: (defaultChannels ?? ['Twitter', 'LinkedIn']) as channelType[],
+      channels: (defaultChannels ?? baseChannels) as channelType[],
     })
-  }, [open, defaultBasePrompt, defaultFrequencyDays, defaultChannels, form])
+  }, [
+    open,
+    defaultBasePrompt,
+    defaultFrequencyDays,
+    defaultChannels,
+    form,
+    baseChannels,
+  ])
 
   // --- Functions ---
   /**
@@ -141,7 +155,10 @@ function AutoGenSettingsModal({
               <FrequencyField formControl={form.control} />
 
               {/* Channels */}
-              <ChannelsField formControl={form.control} />
+              <ChannelsField
+                formControl={form.control}
+                baseChannels={baseChannels}
+              />
             </div>
 
             {/* Actions */}
@@ -231,7 +248,10 @@ const FrequencyField = ({ formControl }: FormFieldProps) => {
   )
 }
 
-const ChannelsField = ({ formControl }: FormFieldProps) => {
+const ChannelsField = ({
+  formControl,
+  baseChannels,
+}: FormFieldProps & { baseChannels: channelType[] }) => {
   return (
     <FormField
       control={formControl}
@@ -271,14 +291,14 @@ const ChannelsField = ({ formControl }: FormFieldProps) => {
                   usePortal={false}
                   className="z-[100]"
                 >
-                  {SOCIAL_PLATFORM.map(sp => (
+                  {baseChannels.map(sp => (
                     <DropdownMenuCheckboxItem
-                      key={sp.name}
-                      checked={selected?.includes(sp.name as channelType)}
-                      onCheckedChange={() => toggle(sp.name as channelType)}
+                      key={sp}
+                      checked={selected?.includes(sp)}
+                      onCheckedChange={() => toggle(sp)}
                       className="capitalize"
                     >
-                      {sp.name}
+                      {sp}
                     </DropdownMenuCheckboxItem>
                   ))}
                 </DropdownMenuContent>

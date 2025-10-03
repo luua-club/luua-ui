@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 import AutoGenSettingsModal from '@/auto-gen/container/AutoGenSettingsModal'
 import { autopilotApi } from '@/core/api/autopilot.api'
+import { paymentApi } from '@/core/api/payment.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import type { AutopilotSettings } from '@/core/models/autopilot.model'
 import { Separator } from '@/shared/ui/separator'
@@ -25,6 +26,17 @@ function Inspiration() {
     queryKey: [QUERY_KEYS.autopilotSettings],
     queryFn: (): Promise<AutopilotSettings> =>
       autopilotApi.getAutoPilotSettings().then(res => res.data),
+  })
+
+  /**
+   * Fetch usage summary
+   */
+  const { data: usageSummary, isLoading: isUsageSummaryLoading } = useQuery({
+    queryKey: [QUERY_KEYS.usageSummary],
+    queryFn: () => paymentApi.getUsage(),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
   })
 
   // --- Effects ---
@@ -52,7 +64,12 @@ function Inspiration() {
             checked={checked}
             setChecked={setChecked}
             setIsSettingsOpen={setIsSettingsOpen}
-            isLoading={isLoading}
+            isLoading={isLoading || isUsageSummaryLoading}
+            limitReached={
+              usageSummary?.data?.usage_summary.limits.auto_pilot_posts
+                .total ===
+              usageSummary?.data?.usage_summary.limits.auto_pilot_posts.used
+            }
           />
         </div>
 

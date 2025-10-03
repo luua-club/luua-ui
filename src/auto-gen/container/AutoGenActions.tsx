@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { Box, Loader, Settings2 } from 'lucide-react'
+import { Box, CircleAlert, Loader, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { autopilotApi } from '@/core/api/autopilot.api'
@@ -17,6 +17,7 @@ interface AutoGenActionsProps {
   setChecked: (checked: boolean) => void
   setIsSettingsOpen: (open: boolean) => void
   isLoading: boolean
+  limitReached: boolean
 }
 
 function AutoGenActions({
@@ -24,6 +25,7 @@ function AutoGenActions({
   setChecked,
   setIsSettingsOpen,
   isLoading,
+  limitReached,
 }: AutoGenActionsProps) {
   // --- Hooks ---
   const queryClient = useQueryClient()
@@ -56,7 +58,8 @@ function AutoGenActions({
 
     if (enabled) {
       payload.frequency_days = 5
-      payload.channels = ['Twitter', 'LinkedIn']
+      payload.channels =
+        user?.plan === 'Pro' ? ['Twitter', 'LinkedIn'] : ['LinkedIn']
     }
 
     return payload
@@ -66,16 +69,21 @@ function AutoGenActions({
     return <Loader className="size-4 animate-spin" />
   }
 
-  if (user.plan === 'Free') {
+  if (limitReached && !isLoading) {
     return (
-      <Button
-        onClick={() => router.navigate({ to: '/payments' })}
-        size="sm"
-        className="text-xs"
-      >
-        <Box className="size-3.5" />
-        Upgrade Plan
-      </Button>
+      <div className="flex items-center gap-2">
+        <p className="text-destructive flex items-center gap-1 text-xs font-bold">
+          <CircleAlert className="size-3.5" /> Limit Reached
+        </p>
+        <Button
+          onClick={() => router.navigate({ to: '/payments' })}
+          size="sm"
+          className="text-xs"
+        >
+          <Box className="size-3.5" />
+          Upgrade Plan
+        </Button>
+      </div>
     )
   }
 
@@ -89,7 +97,7 @@ function AutoGenActions({
         onClick={() => setIsSettingsOpen(true)}
         aria-label="Open auto generation settings"
         className="!text-sm"
-        disabled={!checked}
+        disabled={!checked || isLoading || updateSettingsMutation.isPending}
       >
         <Settings2 className="size-3.5" />
         Edit
@@ -104,21 +112,24 @@ function AutoGenActions({
           {checked ? 'Enabled' : 'Disabled'}
         </span>
 
-        <Switch
-          className="cursor-pointer"
-          checked={checked}
-          disabled={isLoading || updateSettingsMutation.isPending}
-          onCheckedChange={next => {
-            // Optimistic update
-            setChecked(next)
-            updateSettingsMutation.mutate(getPayload(next), {
-              onError: () => {
-                // Rollback UI on error
-                setChecked(!next)
-              },
-            })
-          }}
-        />
+        {isLoading || updateSettingsMutation.isPending ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          <Switch
+            className="cursor-pointer"
+            checked={checked}
+            onCheckedChange={next => {
+              // Optimistic update
+              setChecked(next)
+              updateSettingsMutation.mutate(getPayload(next), {
+                onError: () => {
+                  // Rollback UI on error
+                  setChecked(!next)
+                },
+              })
+            }}
+          />
+        )}
       </div>
     </div>
   )

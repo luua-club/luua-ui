@@ -296,6 +296,7 @@ export const useCreateDraft = () => {
             navigate({ to: '/schedule' })
           },
           onError: () => {
+            setIsShareModalOpen({ open: false, schedule: false })
             toast.error('Failed to schedule draft')
           },
         }

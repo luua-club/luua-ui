@@ -85,7 +85,7 @@ function App() {
           <ThemeProvider storageKey={THEME_LOCAL_STORAGE_KEY}>
             {/* Redux provider */}
             <RouterProvider router={router} /> {/* Router provider */}
-            <Toaster />
+            <Toaster expand={true} />
           </ThemeProvider>
         </Provider>
       </QueryClientProvider>
