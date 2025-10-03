@@ -1,4 +1,4 @@
-import { createLazyRoute } from '@tanstack/react-router'
+import { createLazyRoute, useLocation } from '@tanstack/react-router'
 import { HistoryIcon, Loader, PenLine } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -52,6 +52,7 @@ function Create() {
 
   // ---- Hooks & Selectors ----
   const dispatch = useAppDispatch()
+  const location = useLocation()
   const preUserPromptState = useAppSelector(state => state.promptState)
   const user = useUserState()
   const {
@@ -115,6 +116,31 @@ function Create() {
       dispatch(clearPrompt())
     }
   }, [dispatch])
+
+  /**
+   * Handle `source` query param to trigger generation and then remove it
+   */
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const source = params.get('source')
+    if (!source) return
+
+    setGenerationUserPrompt(source)
+    setGenerationUserSearch(false)
+
+    params.delete('source')
+    const newSearch = params.toString()
+    if (newSearch) {
+      window.history.replaceState(null, '', `${location.pathname}?${newSearch}`)
+    } else {
+      window.history.replaceState(null, '', location.pathname)
+    }
+  }, [
+    location.search,
+    location.pathname,
+    setGenerationUserPrompt,
+    setGenerationUserSearch,
+  ])
 
   /**
    * Ran when genAI creates Posts
