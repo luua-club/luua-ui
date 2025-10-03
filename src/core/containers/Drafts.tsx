@@ -77,11 +77,11 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
       <h1 className="text-lg font-bold">
         {showOnlyAutoGen ? (
           <span className="flex items-center gap-2">
-            <FolderHeart /> Your Generated AI Drafts
+            <FolderHeart className="size-5" /> Your Generated AI Drafts
           </span>
         ) : (
           <span className="flex items-center gap-2">
-            <FolderClosed /> Your Saved Drafts
+            <FolderClosed className="size-5" /> Your Saved Drafts
           </span>
         )}
       </h1>

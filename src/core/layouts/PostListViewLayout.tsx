@@ -1,14 +1,13 @@
+import { Loader } from 'lucide-react'
 import { ReactNode } from 'react'
 import { DateRange } from 'react-day-picker'
 
 import ListControls from '@/core/components/ListControls'
 
-import { PostSkeleton } from '../components/Post'
-
 type SortType = 'created_at' | 'updated_at'
 
 type Props = {
-  title: string
+  title: ReactNode
   dateRange: DateRange | undefined
   onDateRangeChange: (value: DateRange | undefined) => void
   sort?: SortType
@@ -26,34 +25,47 @@ const PostListViewLayout = ({
   sort,
   onSortChange,
   hideSort,
-  dateRangeLabel,
   children,
   isPending,
 }: Props) => {
   return (
     <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
-      {/* Controls */}
-      <ListControls
-        dateRange={dateRange}
-        onDateRangeChange={onDateRangeChange}
-        sort={sort}
-        onSortChange={onSortChange}
-        hideSort={hideSort}
-        allDateSelectable
-      />
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        {/* Header */}
+        <h1 className="text-lg font-bold">{title}</h1>
 
-      {/* Header */}
-      <div className="mt-4 flex flex-col justify-between sm:flex-row sm:items-end">
-        <h1 className="text-xl font-medium">{title}</h1>
-        {dateRangeLabel ? (
-          <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
-            {dateRangeLabel}
-          </p>
-        ) : null}
+        {/* Controls */}
+        {hideSort && (
+          <ListControls
+            dateRange={dateRange}
+            onDateRangeChange={onDateRangeChange}
+            sort={sort}
+            onSortChange={onSortChange}
+            hideSort={hideSort}
+            allDateSelectable
+          />
+        )}
       </div>
 
+      {!hideSort && (
+        <div className="mt-4">
+          <ListControls
+            dateRange={dateRange}
+            onDateRangeChange={onDateRangeChange}
+            sort={sort}
+            onSortChange={onSortChange}
+            hideSort={hideSort}
+            allDateSelectable
+          />
+        </div>
+      )}
+
       <div className="w-full space-y-6">
-        {isPending ? <PostSkeleton tileView /> : children}
+        {isPending ? (
+          <Loader className="mx-auto mt-8 size-5 animate-spin" />
+        ) : (
+          children
+        )}
       </div>
     </div>
   )

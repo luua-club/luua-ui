@@ -1,10 +1,11 @@
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { PlusCircle, Trash2, TriangleAlert } from 'lucide-react'
+import { LucideCalendar, PlusCircle, Trash2, TriangleAlert } from 'lucide-react'
 
 import Post, { PostSkeleton } from '@/core/components/Post'
 import PostListViewLayout from '@/core/layouts/PostListViewLayout'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
+import ErrorBanner from '@/shared/components/error-banner'
 import PaginationList from '@/shared/components/pagination-list'
 import { Button } from '@/shared/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
@@ -16,6 +17,7 @@ const Schedule = () => {
   const router = useRouter()
   const {
     posts,
+    isError,
     isPending,
     selectedRange,
     setSelectedRange,
@@ -38,7 +40,11 @@ const Schedule = () => {
 
   return (
     <PostListViewLayout
-      title="Scheduled Posts"
+      title={
+        <span className="flex items-center gap-2">
+          <LucideCalendar className="size-5" /> Scheduled Posts
+        </span>
+      }
       dateRange={selectedRange}
       onDateRangeChange={setSelectedRange}
       hideSort
@@ -53,14 +59,14 @@ const Schedule = () => {
             groupedBySlot[slot].length > 0 ? (
               <div
                 key={slot}
-                className="bg-card space-y-4 rounded-lg border-1 border-dashed p-2"
+                className="dark:bg-sidebar/40 rounded-lg border-2 border-dotted p-4 pt-2"
               >
                 {/** Time Slot - eg: 1PM - 2PM */}
-                <h3 className="text-xl font-bold text-zinc-600 dark:text-zinc-300">
+                <h3 className="flex items-center gap-2 text-xs font-bold sm:text-base">
                   {formatSlotRange(slot)}
                 </h3>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className={`mt-4 grid grid-cols-1 gap-4`}>
                   {groupedBySlot[slot].map(post => (
                     <div
                       key={post.id}
@@ -68,7 +74,7 @@ const Schedule = () => {
                     >
                       <div className="relative">
                         {/** Post View */}
-                        <Post {...post} />
+                        <Post {...post} maintainFormatting />
 
                         {/** Warning Symbol */}
                         {post.status === 'Failed' && (
@@ -89,7 +95,7 @@ const Schedule = () => {
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between gap-2 px-2 pb-2 text-xs text-zinc-600 dark:text-zinc-300">
+                      <div className="flex items-center justify-between gap-2 px-2 pb-2 text-sm font-medium text-zinc-600 dark:text-zinc-300">
                         {format(
                           new Date(post.scheduled_at as string),
                           'MMM d, h:mm a'
@@ -97,7 +103,7 @@ const Schedule = () => {
 
                         <Button
                           variant="destructive"
-                          className="size-6"
+                          className="size-6 rounded-sm"
                           onClick={e => {
                             e.stopPropagation()
                             openDelete(post.id)
@@ -124,7 +130,8 @@ const Schedule = () => {
             </div>
           )}
 
-          {posts.length === 0 && (
+          {isError && <ErrorBanner className="mt-0" />}
+          {posts.length === 0 && !isError && (
             <div className="flex h-48 w-full flex-col items-center justify-center gap-4">
               <p className="text-lg font-semibold">No scheduled posts found</p>
 
@@ -142,6 +149,7 @@ const Schedule = () => {
           )}
         </>
       )}
+
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={open => (open ? undefined : closeDelete())}

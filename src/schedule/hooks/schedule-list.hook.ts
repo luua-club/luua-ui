@@ -24,7 +24,7 @@ const useScheduleList = () => {
   })
 
   // ----- Pagination -----
-  const [limit, setLimit] = useState<number>(4)
+  const [limit, setLimit] = useState<number>(20)
   const [offset, setOffset] = useState<number>(0)
 
   // ----- Deletion flow state -----
@@ -52,10 +52,20 @@ const useScheduleList = () => {
     refetchOnMount: 'always',
   })
 
-  const posts = useMemo(
-    () => query.data?.data?.posts ?? [],
-    [query.data?.data?.posts]
-  )
+  // Ensure we never render duplicate cards by de-duplicating posts by id
+  const posts = useMemo(() => {
+    const list = query.data?.data?.posts ?? []
+    const seen = new Set<string>()
+    const unique = [] as typeof list
+    for (const p of list) {
+      const id = (p as unknown as { id?: string })?.id
+      if (!id) continue
+      if (seen.has(id)) continue
+      seen.add(id)
+      unique.push(p)
+    }
+    return unique
+  }, [query.data?.data?.posts])
   const total: number = query.data?.data?.total ?? 0
 
   // Reset pagination when filters change
@@ -165,8 +175,8 @@ const useScheduleList = () => {
     const start = new Date(2000, 0, 1, h, m)
     const end = new Date(start)
     end.setMinutes(end.getMinutes() + (DEFAULT_TIME_SLOT_INTERVAL as number))
-    const startStr = format(start, 'h a')
-    const endStr = format(end, 'h a')
+    const startStr = format(start, 'hh:mm a')
+    const endStr = format(end, 'hh:mm a')
     return `${startStr} - ${endStr}`
   }
 

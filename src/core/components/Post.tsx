@@ -124,7 +124,7 @@ function Post({
 
         {/** CONTENT */}
         {maintainFormatting ? (
-          <div className="p-4 pt-1 text-sm">
+          <div className="p-4 pt-3 text-sm">
             <p className="break-words whitespace-pre-wrap">{displayText}</p>
             {isLong && (
               <Button

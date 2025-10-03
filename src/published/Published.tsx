@@ -6,9 +6,9 @@ import {
   CircleCheck,
   CircleX,
   ClipboardCheck,
+  FolderOpen,
   PlusCircle,
   RotateCcw,
-  TriangleAlert,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -17,9 +17,9 @@ import Post from '@/core/components/Post'
 import { QUERY_KEYS } from '@/core/config/constant'
 import PostListViewLayout from '@/core/layouts/PostListViewLayout'
 import { postStatusType } from '@/core/models/post.model'
+import ErrorBanner from '@/shared/components/error-banner'
 import PaginationList from '@/shared/components/pagination-list'
 import { Button } from '@/shared/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import usePublishList from './hooks/publish-list.hook'
@@ -33,6 +33,7 @@ const Published = () => {
     sort,
     setSort,
     posts,
+    isError,
     total,
     limit,
     offset,
@@ -86,7 +87,11 @@ const Published = () => {
 
   return (
     <PostListViewLayout
-      title="Published Posts"
+      title={
+        <span className="flex items-center gap-2">
+          <FolderOpen className="size-5" /> Published Posts
+        </span>
+      }
       dateRange={dateRange}
       onDateRangeChange={setDateRange}
       isPending={isPending}
@@ -98,20 +103,26 @@ const Published = () => {
         {posts.map(post => (
           <div key={post.id} className={`relative flex flex-col gap-2`}>
             <div>
-              <Post {...post} />
+              <Post {...post} maintainFormatting />
+
               {post.status === 'Failed' && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      className={cn(
-                        'bg-card absolute -top-2.5 -right-2.5 rounded-full border-1 border-dashed p-1 text-yellow-600 dark:text-yellow-400'
-                      )}
-                    >
-                      <TriangleAlert className="size-4" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Publishing failed</TooltipContent>
-                </Tooltip>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -top-2.5 -right-2.5 size-6 rounded-sm text-xs"
+                  onClick={e => {
+                    e.stopPropagation()
+                    retryPostMutation.mutate(post.id)
+                  }}
+                  disabled={retryPostMutation.isPending}
+                >
+                  <RotateCcw
+                    className={cn(
+                      'size-3',
+                      retryPostMutation.isPending && 'animate-spin'
+                    )}
+                  />
+                </Button>
               )}
             </div>
 
@@ -119,7 +130,7 @@ const Published = () => {
               <p className="flex items-center gap-2 text-xs font-medium">
                 <span
                   className={cn(
-                    'flex items-center gap-1 text-zinc-600 dark:text-zinc-300',
+                    'flex items-center gap-1 font-semibold text-zinc-600 dark:text-zinc-300',
                     post.status === 'Failed' &&
                       'text-red-600 dark:text-red-400',
                     post.status === 'Queued' &&
@@ -130,30 +141,9 @@ const Published = () => {
                 >
                   {getPostStatus(post.status)}
                 </span>
-
-                {post.status === 'Failed' && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="h-fit !rounded-sm !px-1 !py-0.5 text-xs"
-                    onClick={e => {
-                      e.stopPropagation()
-                      retryPostMutation.mutate(post.id)
-                    }}
-                    disabled={retryPostMutation.isPending}
-                  >
-                    <RotateCcw
-                      className={cn(
-                        'size-3',
-                        retryPostMutation.isPending && 'animate-spin'
-                      )}
-                    />
-                    Retry
-                  </Button>
-                )}
               </p>
 
-              <p className="text-xs text-zinc-600 dark:text-zinc-300">
+              <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
                 {post.published_at &&
                   format(
                     new Date(post.published_at as string),
@@ -174,8 +164,9 @@ const Published = () => {
             />
           </div>
         )}
+        {isError && <ErrorBanner className="mt-0" />}
 
-        {posts.length === 0 && (
+        {posts.length === 0 && !isError && (
           <div className="flex h-48 w-full flex-col items-center justify-center gap-4">
             <p className="text-lg font-semibold">No published posts found</p>
 
