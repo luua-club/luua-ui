@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { Box, Loader2, LockIcon, PlugZap } from 'lucide-react'
+import { Box, Loader, LockIcon, PlugZap } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -222,7 +222,7 @@ const SocialCard = ({
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="size-3 animate-spin" />
+              <Loader className="size-3 animate-spin" />
             ) : (
               <PlugZap />
             )}

@@ -1,5 +1,5 @@
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
-import { Loader2 } from 'lucide-react'
+import { Loader } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -85,7 +85,7 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
         {/** Login Button (reserve space and fade-in when iframe is ready) */}
         <div className="relative flex h-[44px] w-[280px] items-center justify-center">
           {isLoading ? (
-            <Loader2 className="h-10 w-10 animate-spin" color="black" />
+            <Loader className="h-10 w-10 animate-spin" color="black" />
           ) : (
             <div
               ref={buttonRef}

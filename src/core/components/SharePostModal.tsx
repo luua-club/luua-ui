@@ -1,4 +1,4 @@
-import { Calendar, Loader2, Send } from 'lucide-react'
+import { Calendar, Loader, Send } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { SchedulePicker } from '@/shared/components/schedule-picker'
@@ -177,7 +177,7 @@ export function SharePostModal({
             }}
             disabled={selectedPosts.length === 0 || isLoading}
           >
-            {isLoading && <Loader2 className="mr-2 animate-spin" />}
+            {isLoading && <Loader className="mr-2 animate-spin" />}
             {selectedPosts.length
               ? `${isOpen.schedule ? 'Schedule' : 'Publish'} (${selectedPosts.length})`
               : 'Choose posts'}

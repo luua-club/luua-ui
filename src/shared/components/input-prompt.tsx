@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import {
   CircleCheckBig,
   Globe,
-  Loader2,
+  Loader,
   Lock,
   Send,
   TriangleAlert,
@@ -321,7 +321,7 @@ const PromptControls: React.FC<PromptControlsProps> = ({
           onClick={handleGeneratePost}
         >
           {loading ? (
-            <Loader2 className="size-4 animate-spin" />
+            <Loader className="size-4 animate-spin" />
           ) : (
             <Send className="size-4" />
           )}

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRight, Loader2, TestTubeDiagonal } from 'lucide-react'
+import { ChevronRight, Loader, TestTubeDiagonal } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -76,7 +76,7 @@ const StyleTextCapture = ({
           disabled={isLoading}
         >
           {isLoading ? (
-            <Loader2 className="animate-spin" />
+            <Loader className="animate-spin" />
           ) : (
             <TestTubeDiagonal />
           )}

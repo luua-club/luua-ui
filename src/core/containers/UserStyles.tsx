@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Save } from 'lucide-react'
+import { Loader, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -167,7 +167,7 @@ const UserStylesChips = (
         >
           Save
           {isLoading ? (
-            <Loader2 className="mr-2 animate-spin" />
+            <Loader className="mr-2 animate-spin" />
           ) : (
             <Save className="size-5" />
           )}

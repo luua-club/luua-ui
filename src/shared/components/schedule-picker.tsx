@@ -7,7 +7,7 @@ import {
   set,
   startOfToday,
 } from 'date-fns'
-import { Calendar1, Loader2 } from 'lucide-react'
+import { Calendar1, Loader } from 'lucide-react'
 import * as React from 'react'
 
 import { Button } from '../ui/button'
@@ -149,11 +149,7 @@ export function SchedulePicker({
           variant="brandAccent"
           onClick={() => onSubmit?.({ date: date!, time: selectedTime! })}
         >
-          {isLoading ? (
-            <Loader2 className="mr-2 animate-spin" />
-          ) : (
-            <Calendar1 />
-          )}
+          {isLoading ? <Loader className="mr-2 animate-spin" /> : <Calendar1 />}
           Schedule
         </Button>
       </CardFooter>
