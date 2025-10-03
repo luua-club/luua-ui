@@ -13,7 +13,6 @@ import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY, QUERY_KEYS } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { LoginResponse } from '@/core/models/auth.model'
-import { StarsBackground } from '@/shared/ui/star-background'
 import { cn } from '@/shared/utils'
 import {
   getLocalStorageItem,
@@ -22,7 +21,6 @@ import {
 } from '@/shared/utils/localstorage.util'
 
 import { clearUser, setUser } from '../../core/store/auth-slice'
-import InfoPanelOverlay from '../components/InfoPanelOverlay'
 import LoginPanel from '../components/LoginPanel'
 
 function Login() {
@@ -101,43 +99,23 @@ function Login() {
   }
 
   return (
-    <div className="flex min-h-screen w-screen overflow-hidden">
-      {/** Left Panel */}
+    <div className="relative flex min-h-screen w-screen items-center justify-center overflow-hidden">
+      {/** Background grid */}
+      <div className="absolute inset-0 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+      {/** Login */}
       <div
         className={cn(
-          'relative flex w-full items-center justify-center',
-          'md:flex-1/2'
+          'z-1 w-full max-w-[720px] px-4',
+          !mounted && 'opacity-0',
+          mounted &&
+            'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 transform-gpu will-change-[transform,opacity] motion-safe:delay-75 motion-safe:duration-700 motion-safe:ease-out'
         )}
       >
-        {/** Background grid */}
-        <div className="absolute inset-0 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
-
-        {/** Login */}
-        <div
-          className={cn(
-            'z-1 h-full w-full',
-            !mounted && 'opacity-0',
-            mounted &&
-              'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 transform-gpu will-change-[transform,opacity] motion-safe:delay-75 motion-safe:duration-700 motion-safe:ease-out'
-          )}
-        >
-          <LoginPanel
-            isLoading={loginMutation.isPending || isFetchingUser > 0}
-            onLogin={onLogin}
-          />
-        </div>
-      </div>
-
-      {/** Right Panel */}
-      <div
-        className={cn(
-          'bg-brand-background-dark m-1.5 hidden flex-1/2 overflow-clip rounded-3xl',
-          'lg:block'
-        )}
-      >
-        <StarsBackground className="flex aspect-16/9 items-center justify-center">
-          <InfoPanelOverlay />
-        </StarsBackground>
+        <LoginPanel
+          isLoading={loginMutation.isPending || isFetchingUser > 0}
+          onLogin={onLogin}
+        />
       </div>
     </div>
   )

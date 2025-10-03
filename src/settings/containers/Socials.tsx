@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, PlugZap } from 'lucide-react'
+import { useRouter } from '@tanstack/react-router'
+import { Box, Loader2, LockIcon, PlugZap } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -104,6 +105,7 @@ const Socials = ({ user }: { user: UserState }) => {
           isLoading={loadingStates.Twitter}
           onConnect={() => handleConnect('Twitter')}
           onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
+          showUpgradePlan={user?.plan === 'Free'}
         />
         <SocialCard
           platform={linkedin}
@@ -123,6 +125,7 @@ const SocialCard = ({
   isAccountConnected,
   userChannel,
   isLoading,
+  showUpgradePlan = false,
   onConnect,
   onDisconnect,
 }: {
@@ -130,9 +133,11 @@ const SocialCard = ({
   userChannel: UserSocial
   isAccountConnected?: boolean
   isLoading?: boolean
+  showUpgradePlan?: boolean
   onConnect?: () => void
   onDisconnect?: () => void
 }) => {
+  const router = useRouter()
   return (
     <Card className="relative flex flex-col overflow-hidden rounded-md p-4 shadow-none">
       <BorderBeam
@@ -172,9 +177,15 @@ const SocialCard = ({
               <p className="text-xl font-medium">
                 {platform.name === 'Twitter' ? 'Twitter' : platform.name}
               </p>
-              <span
-                className={cn('size-1.5 animate-pulse rounded-full bg-red-500')}
-              ></span>
+              {showUpgradePlan ? (
+                <LockIcon className="size-4" />
+              ) : (
+                <span
+                  className={cn(
+                    'size-1.5 animate-pulse rounded-full bg-red-500'
+                  )}
+                ></span>
+              )}
             </div>
           )}
           {platform && platform.logo && (
@@ -189,23 +200,35 @@ const SocialCard = ({
         >
           {isAccountConnected
             ? 'Your account is connected, now you can post content to this platform.'
-            : 'Please connect your social account to get started, click on connect button'}
+            : showUpgradePlan
+              ? 'Please upgrade plan to connect your social account, click on upgrade plan button'
+              : 'Please connect your social account to get started, click on connect button'}
         </p>
       </CardContent>
       <CardFooter className="p-0">
-        <Button
-          className="w-full"
-          variant={isAccountConnected ? 'destructive' : 'default'}
-          onClick={!isAccountConnected ? onConnect : onDisconnect}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Loader2 className="size-3 animate-spin" />
-          ) : (
-            <PlugZap />
-          )}
-          {isAccountConnected ? 'Disconnect' : 'Connect'}
-        </Button>
+        {showUpgradePlan ? (
+          <Button
+            className="w-full"
+            variant="default"
+            onClick={() => router.navigate({ to: '/payments' })}
+          >
+            <Box /> Upgrade Plan
+          </Button>
+        ) : (
+          <Button
+            className="w-full"
+            variant={isAccountConnected ? 'destructive' : 'default'}
+            onClick={!isAccountConnected ? onConnect : onDisconnect}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <PlugZap />
+            )}
+            {isAccountConnected ? 'Disconnect' : 'Connect'}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )

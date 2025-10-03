@@ -30,7 +30,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
     return (
       <>
         <div className="space-y-3 py-4">
-          <h1 className="text-lg font-medium">Subscription Overview</h1>
+          <h1 className="font-bold">Subscription Overview</h1>
           <Separator />
           <p className="text-muted-foreground text-sm">
             Summarizes all your payment and subscription for the purchased
@@ -84,7 +84,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
   return (
     <>
       <div className="space-y-3 py-4">
-        <h1 className="text-lg font-medium">Subscription Overview</h1>
+        <h1 className="font-bold">Subscription Overview</h1>
         <Separator />
         <p className="text-muted-foreground text-sm">
           Summarizes all your payment and subscription for the purchased
@@ -166,9 +166,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
             </Table>
           </div>
           <p className="text-muted-foreground px-1 py-4 text-xs font-medium">
-            Once your subscription is activated, your plan will be upgraded to
-            Pro within a few minutes. <br /> If you experience any issues,
-            please contact{' '}
+            Facing issues? please contact us at{' '}
             <a
               href="mailto:support@luua.club"
               className="text-primary hover:underline"

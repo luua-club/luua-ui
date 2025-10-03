@@ -1,3 +1,5 @@
+import { Loader } from 'lucide-react'
+
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -60,6 +62,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={confirmDisabled}
           >
+            {confirmDisabled && <Loader className="size-4 animate-spin" />}
             {confirmLabel}
           </Button>
         </div>

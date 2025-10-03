@@ -77,7 +77,7 @@ function BillingAndCredits() {
     <>
       <UsageSummary usageSummary={usageSummary?.data?.usage_summary} />
 
-      <div className="mt-2">
+      <div className="mt-4">
         <Subscription
           user={user}
           subscriptionDetails={subscriptionDetails?.data?.subscriptions}
@@ -86,9 +86,9 @@ function BillingAndCredits() {
 
       {showCancelSubscription && (
         <div className="mt-8 space-y-3">
-          <h1 className="text-lg font-medium">Cancel Subscription</h1>
+          <h1 className="font-bold">Cancel Subscription</h1>
           <Separator />
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row">
             <div>
               <h3 className="font-medium">Are you sure ?</h3>
               <p className="text-muted-foreground text-sm">

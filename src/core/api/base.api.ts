@@ -204,18 +204,8 @@ export class BaseApiService {
     if (error.response?.data) {
       const errorData = error.response.data as Record<string, unknown>
 
-      if (typeof errorData.message === 'string') {
-        apiError.message = errorData.message
-      } else if (typeof errorData.error === 'string') {
-        apiError.message = errorData.error
-      }
-
-      if (typeof errorData.code === 'string') {
-        apiError.code = errorData.code
-      }
-
-      if (typeof errorData.detail === 'string') {
-        apiError.detail = errorData.detail
+      if (errorData.detail) {
+        apiError.detail = errorData.detail as ApiError['detail']
       }
     }
 

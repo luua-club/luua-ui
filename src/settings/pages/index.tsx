@@ -3,10 +3,10 @@ import {
   useLocation,
   useNavigate,
 } from '@tanstack/react-router'
+import { CableIcon, CircleUser, DollarSign, Loader } from 'lucide-react'
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 
 import { useUserState } from '@/core/hooks/user-state.hook'
-import GlobalLoader from '@/shared/components/global-loader'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import Account from '../containers/Account'
@@ -41,11 +41,10 @@ const Settings = () => {
 
   const user = useUserState()
 
-  //TODO: Implement loading state
   if (!user) {
     return (
-      <div className="h-50">
-        <GlobalLoader />
+      <div className="flex h-50 items-center justify-center">
+        <Loader className="size-4 animate-spin" />
       </div>
     )
   }
@@ -61,13 +60,13 @@ const Settings = () => {
       >
         <TabsList className="w-full px-2 py-6 lg:w-fit">
           <TabsTrigger value={tabValue[0]} className="px-2 py-4 text-xs">
-            Account
+            <CircleUser /> Account
           </TabsTrigger>
           <TabsTrigger value={tabValue[1]} className="px-2 py-4 text-xs">
-            Socials
+            <CableIcon /> Socials
           </TabsTrigger>
           <TabsTrigger value={tabValue[2]} className="px-2 py-4 text-xs">
-            Billing And Subscription
+            <DollarSign /> Billing & Credits
           </TabsTrigger>
         </TabsList>
         <TabsContent value={tabValue[0]}>
@@ -94,8 +93,8 @@ const SettingLazySubPages = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense
       fallback={
-        <div className="h-50">
-          <GlobalLoader />
+        <div className="flex h-50 items-center justify-center">
+          <Loader className="size-4 animate-spin" />
         </div>
       }
     >

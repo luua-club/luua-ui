@@ -1,9 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
+import { Box } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
+import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleFileCapture from '../../core/components/StyleFileCapture'
@@ -11,7 +15,8 @@ import StyleTextCapture from '../../core/components/StyleTextCapture'
 
 const Advanced = () => {
   const queryClient = useQueryClient()
-
+  const user = useUserState()
+  const router = useRouter()
   const setAdvancedUserStyleMutation = useMutation({
     mutationFn: (payload: IUserAdvancedStyleRequest) =>
       stylesApi.setUserAdvancedStyle(payload),
@@ -24,9 +29,13 @@ const Advanced = () => {
     },
   })
 
+  const overlayClassNames =
+    'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
+  const isProPlan = user?.plan === 'Pro'
+
   return (
     <>
-      <div className="mt-2">
+      <div className="relative mt-2">
         <div className="lg:w-2/3">
           <Tabs className="mt-4 w-full flex-1" defaultValue="textSample">
             <TabsList className="w-full lg:w-fit">
@@ -52,6 +61,26 @@ const Advanced = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {!isProPlan && (
+          <div className={overlayClassNames}>
+            <p className="font-semibold">
+              Upgrade plan to access advanced styles
+            </p>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() =>
+                router.navigate({
+                  to: '/payments',
+                })
+              }
+              className="text-xs"
+            >
+              <Box /> Upgrade Plan
+            </Button>
+          </div>
+        )}
       </div>
     </>
   )

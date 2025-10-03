@@ -78,6 +78,9 @@ export const API_CONSTANTS = {
     notFound: 404,
     internalServerError: 500,
   },
+  errorCode: {
+    activeSubscriptionFound: 'active_subscription_found',
+  },
 }
 
 /**

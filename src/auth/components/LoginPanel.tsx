@@ -61,16 +61,18 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
   }, [isLoading])
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-5">
-      {/** Logo */}
-      <LuuaLogo className="w-72 lg:w-96 xl:h-[120px] xl:w-[400px]" />
+    <div className="flex h-full w-full flex-col items-center justify-center gap-6 p-5">
+      <div className="flex flex-col items-center gap-4">
+        {/** Logo */}
+        <LuuaLogo className="w-72 lg:w-96 xl:h-[120px] xl:w-[500px]" />
 
-      {/** Tagline */}
-      <Highlighter action="underline" color="var(--brand-accent-yellow)">
-        <p className="text-base font-bold text-black lg:text-xl">
-          For strategically lazy people.
-        </p>
-      </Highlighter>
+        {/** Tagline */}
+        <Highlighter action="underline" color="var(--brand-accent-yellow)">
+          <p className="text-base font-bold text-black lg:text-2xl">
+            For strategically lazy people.
+          </p>
+        </Highlighter>
+      </div>
 
       {/** Description */}
       <div className="mt-8 flex flex-col items-center gap-8 md:mt-6">

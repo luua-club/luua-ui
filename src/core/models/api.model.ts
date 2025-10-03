@@ -7,6 +7,8 @@ export interface ApiResponse<T> {
 export interface ApiError {
   message: string
   status: number
-  code?: string
-  detail?: string
+  detail?: {
+    error: string
+    error_code: string
+  }
 }
