@@ -7,7 +7,8 @@ import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import LogoIconOnly from '@/assets/images/luua-black-icon.svg?react'
+import Logo from '@/assets/images/luua-black-icon.svg?react'
+import LogoDark from '@/assets/images/luua-white-icon.svg?react'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY } from '@/core/config/constant'
 import UserStyles from '@/core/containers/UserStyles'
@@ -17,8 +18,10 @@ import {
   UserOnboardingRequest,
 } from '@/core/models/user.model'
 import { Button } from '@/shared/ui/button'
+import { DotPattern } from '@/shared/ui/dot-pattern'
 import { Form } from '@/shared/ui/form'
 import { Progress } from '@/shared/ui/progress'
+import { cn } from '@/shared/utils'
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -141,16 +144,20 @@ function OnBoarding() {
 
   return (
     <div className="flex h-screen w-screen flex-col sm:items-center">
-      {/* Background  */}
-      <div className="absolute inset-0 hidden h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] sm:block"></div>
+      <div className="absolute inset-0 flex w-full flex-col items-center justify-center overflow-hidden">
+        <DotPattern
+          glow={true}
+          className={cn(
+            '[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]'
+          )}
+        />
+      </div>
 
       <div className="flex flex-col items-center justify-center gap-4 p-5 text-center sm:z-10">
-        <div className="flex items-center justify-center">
-          <LogoIconOnly
-            aria-label="Icon"
-            className="size-18 rounded-full border-1 border-dashed p-3"
-          />
-        </div>
+        <span className="rounded-full border-2 border-dashed p-4">
+          <Logo className="size-12 dark:hidden" />
+          <LogoDark className="hidden size-12 dark:block" />
+        </span>
         {/* Header */}
         <h1 className="text-xl font-semibold sm:text-3xl">
           Let&apos;s get you in the club!
@@ -165,7 +172,7 @@ function OnBoarding() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-        className="relative flex w-full flex-col justify-center rounded-lg bg-white p-5 sm:w-fit sm:min-w-xl sm:border-1"
+        className="light bg-card relative mt-4 flex w-full flex-col justify-center rounded-lg p-5 sm:w-fit sm:min-w-xl sm:border-1"
       >
         {/* Progress Bar */}
         <div className="mt-2 space-y-2">
