@@ -79,14 +79,17 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
       align="end"
     >
       {/* Plan Benefits */}
-      <DropdownMenuGroup>
-        <DropdownMenuItem className="cursor-pointer">
-          <LucideSparkles />
-          {/** TODO: Plan benefits - open paid plan modal */}
-          {isProPlan ? 'Plan Benefits' : <Link to="/payments">Go Pro</Link>}
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-      <DropdownMenuSeparator />
+      {isProPlan && (
+        <>
+          <DropdownMenuGroup>
+            <DropdownMenuItem className="cursor-pointer">
+              <LucideSparkles />
+              <Link to="/payments">Go Pro</Link>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+        </>
+      )}
 
       {/* Account and Subscription */}
       <DropdownMenuGroup>

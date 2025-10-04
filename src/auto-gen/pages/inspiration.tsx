@@ -8,6 +8,7 @@ import { autopilotApi } from '@/core/api/autopilot.api'
 import { paymentApi } from '@/core/api/payment.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import type { AutopilotSettings } from '@/core/models/autopilot.model'
+import { IUsageSummary } from '@/core/models/payment.model'
 import { Separator } from '@/shared/ui/separator'
 
 import AutoGenActions from '../container/AutoGenActions'
@@ -49,6 +50,27 @@ function Inspiration() {
     }
   }, [data?.enabled])
 
+  /**
+   * Check if the auto pilot posts limit is reached
+   *
+   * @param usageSummary - The usage summary
+   * @returns True if the limit is reached, false otherwise
+   */
+  const limitReached = (usageSummary: IUsageSummary | undefined) => {
+    if (!usageSummary) {
+      return false
+    }
+
+    if (usageSummary.limits.auto_pilot_posts.total === -1) {
+      return false
+    }
+
+    return (
+      usageSummary.limits.auto_pilot_posts.used >=
+      usageSummary.limits.auto_pilot_posts.total
+    )
+  }
+
   return (
     <div className="m-auto max-w-4xl p-5">
       <div className="rounded-sm border">
@@ -65,12 +87,7 @@ function Inspiration() {
             setChecked={setChecked}
             setIsSettingsOpen={setIsSettingsOpen}
             isLoading={isLoading || isUsageSummaryLoading}
-            limitReached={
-              (usageSummary?.data?.usage_summary.limits.auto_pilot_posts.used ||
-                0) >=
-              (usageSummary?.data?.usage_summary.limits.auto_pilot_posts
-                .total || 0)
-            }
+            limitReached={limitReached(usageSummary?.data?.usage_summary)}
           />
         </div>
 

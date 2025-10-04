@@ -1,6 +1,7 @@
-import { createLazyRoute, useRouter } from '@tanstack/react-router'
+import { createLazyRoute, useLocation, useRouter } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Loader } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import Logo from '@/assets/images/luua-black-icon.svg?react'
 import LogoDark from '@/assets/images/luua-white-icon.svg?react'
@@ -13,10 +14,14 @@ import { ProPlanChip } from '@/shared/components/pro-plan-chip'
 import { UpgradePlanBtn } from '@/shared/components/upgrade-plan-btn'
 import { capitalize } from '@/shared/utils'
 
+import WelcomeBanner from '../components/WelcomeBanner'
+
 const Dashboard = () => {
   const dispatch = useAppDispatch()
   const userState = useUserState()
   const router = useRouter()
+  const location = useLocation()
+  const [isWelcomeBannerOpen, setIsWelcomeBannerOpen] = useState(false)
 
   const handleUserPrompt = (
     value: string,
@@ -27,6 +32,32 @@ const Dashboard = () => {
       setPrompt({ prompt: value, search, channel: channel as channelType })
     )
     router.navigate({ to: '/creation/create' })
+  }
+
+  // Check for welcome query parameter and open banner
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const welcome = params.get('welcome')
+
+    if (welcome === 'true') {
+      setIsWelcomeBannerOpen(true)
+      // Clean up URL if welcome parameter is present and valid
+      params.delete('welcome')
+      const newSearch = params.toString()
+      if (newSearch) {
+        window.history.replaceState(
+          null,
+          '',
+          `${location.pathname}?${newSearch}`
+        )
+      } else {
+        window.history.replaceState(null, '', location.pathname)
+      }
+    }
+  }, [location.search, location.pathname])
+
+  const handleWelcomeBannerOpenChange = (open: boolean) => {
+    setIsWelcomeBannerOpen(open)
   }
 
   if (!userState) {
@@ -76,6 +107,10 @@ const Dashboard = () => {
           <PromptInput onChange={handleUserPrompt} />
         </motion.div>
       </div>
+      <WelcomeBanner
+        open={isWelcomeBannerOpen}
+        onOpenChange={handleWelcomeBannerOpenChange}
+      />
     </div>
   )
 }
