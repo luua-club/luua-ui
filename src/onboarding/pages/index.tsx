@@ -86,15 +86,22 @@ function OnBoarding() {
    */
   const onSubmit = async (values: OnboardingFormValues) => {
     try {
+      const promises: Promise<unknown>[] = []
+      promises.push(
+        userOnboardingMutation.mutateAsync({
+          role: values.role,
+          industry: values.industry,
+          goal: values.goal,
+        })
+      )
       if (styles.length > 0) {
-        await Promise.all([
-          setUserStyleMutation.mutateAsync({ writing_style: styles }),
-          userOnboardingMutation.mutateAsync({
-            role: values.role,
-            industry: values.industry,
-            goal: values.goal,
-          }),
-        ])
+        promises.push(
+          setUserStyleMutation.mutateAsync({ writing_style: styles })
+        )
+      }
+
+      if (promises.length > 0) {
+        await Promise.all([...promises])
       }
     } catch {
       toast.error('Something Went Wrong')
@@ -169,10 +176,10 @@ function OnBoarding() {
 
       {/* Card */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-        className="light bg-card relative mt-4 flex w-full flex-col justify-center rounded-lg p-5 sm:w-fit sm:min-w-xl sm:border-1"
+        className="sm:bg-card relative mt-4 flex w-full flex-col justify-center rounded-lg p-5 sm:w-fit sm:min-w-xl sm:border-1"
       >
         {/* Progress Bar */}
         <div className="mt-2 space-y-2">

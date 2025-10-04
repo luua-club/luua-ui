@@ -1,6 +1,5 @@
 import { Flag } from 'lucide-react'
 
-import { Button } from '@/shared/ui/button'
 import { FormField, FormItem, FormLabel, FormMessage } from '@/shared/ui/form'
 import { cn } from '@/shared/utils'
 
@@ -25,21 +24,19 @@ function Goal({ goals }: GoalProps) {
               {goals.map(g => {
                 const selected = field.value === g
                 return (
-                  <Button
-                    type="button"
+                  <div
                     key={g}
-                    variant="outline"
-                    size="sm"
                     onClick={() => {
                       if (!selected) field.onChange(g)
                     }}
                     className={cn(
-                      'max-w-full min-w-0 rounded-md !p-6 text-xs text-wrap break-words whitespace-normal sm:text-sm',
-                      selected && 'bg-brand-accent-yellow border-transparent'
+                      'border-input bg-background hover:bg-sidebar hover:text-accent-foreground max-w-full min-w-0 cursor-pointer rounded-md border !p-4 text-xs font-semibold text-wrap break-words whitespace-normal sm:text-sm',
+                      selected &&
+                        'bg-brand-accent-yellow border-transparent dark:bg-yellow-500 dark:text-black'
                     )}
                   >
                     {g}
-                  </Button>
+                  </div>
                 )
               })}
             </div>
