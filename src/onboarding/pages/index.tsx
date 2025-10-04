@@ -223,9 +223,16 @@ function OnBoarding() {
                   <Button
                     type="button"
                     size="sm"
+                    disabled={
+                      setUserStyleMutation.isPending ||
+                      userOnboardingMutation.isPending
+                    }
                     onClick={() => onSubmit(form.getValues())}
                   >
-                    {setUserStyleMutation.isPending ? 'Saving...' : 'Complete'}
+                    {setUserStyleMutation.isPending ||
+                    userOnboardingMutation.isPending
+                      ? 'Saving...'
+                      : 'Complete'}
                   </Button>
                 )}
               </div>
