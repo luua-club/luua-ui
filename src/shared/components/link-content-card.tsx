@@ -60,7 +60,7 @@ function LinkContentCard({
         )}
       </CardHeader>
 
-      <Separator />
+      {description && <Separator />}
 
       {/* Content */}
       <CardContent className="line-clamp-3 flex-1 px-4">
