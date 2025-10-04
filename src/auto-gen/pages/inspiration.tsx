@@ -66,9 +66,10 @@ function Inspiration() {
             setIsSettingsOpen={setIsSettingsOpen}
             isLoading={isLoading || isUsageSummaryLoading}
             limitReached={
-              usageSummary?.data?.usage_summary.limits.auto_pilot_posts
-                .total ===
-              usageSummary?.data?.usage_summary.limits.auto_pilot_posts.used
+              (usageSummary?.data?.usage_summary.limits.auto_pilot_posts.used ||
+                0) >=
+              (usageSummary?.data?.usage_summary.limits.auto_pilot_posts
+                .total || 0)
             }
           />
         </div>

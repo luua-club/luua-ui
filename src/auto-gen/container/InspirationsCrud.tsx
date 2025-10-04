@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 
 import { inspirationApi } from '@/core/api/inspiration.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { useUserState } from '@/core/hooks/user-state.hook'
 import type { InspirationResponse } from '@/core/models/inspiration.model'
 import LinkContentCard from '@/shared/components/link-content-card'
 import PaginationList from '@/shared/components/pagination-list'
@@ -28,7 +27,6 @@ function InspirationsCrud() {
 
   // --- Hooks ---
   const queryClient = useQueryClient()
-  const user = useUserState()
   const { data, isLoading, isError } = useQuery<InspirationResponse>({
     queryKey: [QUERY_KEYS.inspirations, { offset, limit }],
     queryFn: async ({ signal }) => {
@@ -176,7 +174,7 @@ function InspirationsCrud() {
           }}
           variant="outline"
           size="sm"
-          disabled={user?.plan === 'Free'}
+          disabled={isLoading}
         >
           <SquarePlus className="size-4" />
           Add Inspiration

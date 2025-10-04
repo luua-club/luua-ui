@@ -66,7 +66,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <p
               className={cn(
                 'text-3xl font-semibold tracking-tight',
-                usageSummary.credits.consumed === usageSummary.credits.total &&
+                usageSummary.credits.consumed >= usageSummary.credits.total &&
                   'text-destructive'
               )}
             >
@@ -84,8 +84,8 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <p
               className={cn(
                 'text-3xl font-semibold tracking-tight',
-                usageSummary.limits.auto_pilot_posts.total ===
-                  usageSummary.limits.auto_pilot_posts.used &&
+                usageSummary.limits.auto_pilot_posts.used >=
+                  usageSummary.limits.auto_pilot_posts.total &&
                   'text-destructive'
               )}
             >
@@ -109,8 +109,9 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <p
               className={cn(
                 'text-3xl font-semibold tracking-tight',
-                usageSummary.limits.scheduled_posts.total ===
-                  usageSummary.limits.scheduled_posts.used && 'text-destructive'
+                usageSummary.limits.scheduled_posts.used >=
+                  usageSummary.limits.scheduled_posts.total &&
+                  'text-destructive'
               )}
             >
               {usageSummary.limits.scheduled_posts.total !== -1 ? (
