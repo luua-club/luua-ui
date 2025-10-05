@@ -14,6 +14,7 @@ import { ProPlanChip } from '@/shared/components/pro-plan-chip'
 import { UpgradePlanBtn } from '@/shared/components/upgrade-plan-btn'
 import { capitalize } from '@/shared/utils'
 
+import ProWelcomeBanner from '../components/ProWelcomeBanner'
 import WelcomeBanner from '../components/WelcomeBanner'
 
 const Dashboard = () => {
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const router = useRouter()
   const location = useLocation()
   const [isWelcomeBannerOpen, setIsWelcomeBannerOpen] = useState(false)
+  const [isProWelcomeBannerOpen, setIsProWelcomeBannerOpen] = useState(false)
 
   const handleUserPrompt = (
     value: string,
@@ -38,10 +40,26 @@ const Dashboard = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const welcome = params.get('welcome')
+    const pro = params.get('pro')
+
+    if (pro === 'true') {
+      setIsProWelcomeBannerOpen(true)
+      params.delete('pro')
+      const newSearch = params.toString()
+      if (newSearch) {
+        window.history.replaceState(
+          null,
+          '',
+          `${location.pathname}?${newSearch}`
+        )
+      } else {
+        window.history.replaceState(null, '', location.pathname)
+      }
+      return
+    }
 
     if (welcome === 'true') {
       setIsWelcomeBannerOpen(true)
-      // Clean up URL if welcome parameter is present and valid
       params.delete('welcome')
       const newSearch = params.toString()
       if (newSearch) {
@@ -55,10 +73,6 @@ const Dashboard = () => {
       }
     }
   }, [location.search, location.pathname])
-
-  const handleWelcomeBannerOpenChange = (open: boolean) => {
-    setIsWelcomeBannerOpen(open)
-  }
 
   if (!userState) {
     return (
@@ -107,10 +121,20 @@ const Dashboard = () => {
           <PromptInput onChange={handleUserPrompt} />
         </motion.div>
       </div>
-      <WelcomeBanner
-        open={isWelcomeBannerOpen}
-        onOpenChange={handleWelcomeBannerOpenChange}
-      />
+
+      {isWelcomeBannerOpen && (
+        <WelcomeBanner
+          open={isWelcomeBannerOpen}
+          onOpenChange={setIsWelcomeBannerOpen}
+        />
+      )}
+
+      {isProWelcomeBannerOpen && (
+        <ProWelcomeBanner
+          open={isProWelcomeBannerOpen}
+          onOpenChange={setIsProWelcomeBannerOpen}
+        />
+      )}
     </div>
   )
 }
