@@ -156,6 +156,9 @@ function PlanCards() {
             <li className="flex items-center gap-2">
               <Check className="size-4" />
               Supports LinkedIn + Twitter
+              <span className="text-muted-foreground text-xs">
+                (threads coming soon)
+              </span>
             </li>
           </ul>
 

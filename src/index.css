@@ -21,7 +21,6 @@ body,
 * {
   /* Firefox */
   scrollbar-width: thin;
-  scrollbar-gutter: stable;
   /* thumb color, track color */
   scrollbar-color: color-mix(in oklch, var(--foreground) 25%, transparent)
     transparent;
