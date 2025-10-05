@@ -1,7 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import {
   Cable,
-  DollarSign,
   FileCheck,
   FolderClosed,
   FolderHeart,
