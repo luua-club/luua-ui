@@ -41,14 +41,6 @@ const platformItems: ISidebarItem[] = [
     ping: 'success',
     icon: <Cable />,
   },
-  {
-    title: 'Billings & Credits',
-    url: '/settings',
-    search: {
-      tabs: 'billing',
-    },
-    icon: <DollarSign />,
-  },
 ]
 
 const creationItems: ISidebarItem[] = [

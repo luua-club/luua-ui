@@ -170,7 +170,7 @@ function WelcomeBanner({ open, onOpenChange }: WelcomeBannerProps) {
         <div />
       </DrawerTrigger>
       <DrawerContent className="!h-[90vh] !max-h-[90vh] focus:!outline-none">
-        <div className="scrollbar mx-auto w-full flex-1 overflow-y-auto px-2 sm:max-w-xl lg:max-w-2xl">
+        <div className="mx-auto w-full flex-1 overflow-y-auto px-2 sm:max-w-xl lg:max-w-2xl">
           {/** Progress Bar */}
           <DrawerHeader className="space-y-4 px-2">
             <Progress value={progress} className="mb-4" />
