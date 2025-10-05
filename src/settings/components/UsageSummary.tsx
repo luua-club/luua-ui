@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import { Flower, InfinityIcon } from 'lucide-react'
 
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -24,9 +25,13 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
         <div className="space-y-2">
           <p className="text-3xl font-semibold">Current Plan</p>
           <p className="text-muted-foreground text-sm text-balance">
-            {isProPlan
-              ? 'You can cancel your subscription at any time.'
-              : 'You can upgrade your plan to Pro to get more features.'}
+            Your limit will reset on
+            <span className="ml-1 font-semibold text-cyan-600 dark:text-cyan-400">
+              {format(
+                new Date(usageSummary.cycle_period.end_date),
+                'dd MMM yyyy'
+              )}
+            </span>
           </p>
         </div>
 
@@ -163,7 +168,7 @@ function UsageSummarySkeleton() {
             <Skeleton className="h-8 w-32" />
           </div>
 
-          <div className="space-y-4 border-r-2 border-l-2 border-dashed p-4">
+          <div className="space-y-4 p-4 sm:border-r-2 sm:border-l-2 sm:border-dashed">
             <Skeleton className="h-4 w-36" />
             <Skeleton className="h-8 w-32" />
           </div>
