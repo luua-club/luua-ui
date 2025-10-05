@@ -25,11 +25,11 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
         <div className="space-y-2">
           <p className="text-3xl font-semibold">Current Plan</p>
           <p className="text-muted-foreground text-sm text-balance">
-            Your limit will reset on
+            Limits will reset around this time -
             <span className="ml-1 font-semibold text-cyan-600 dark:text-cyan-400">
               {format(
                 new Date(usageSummary.cycle_period.end_date),
-                'dd MMM yyyy'
+                'dd MMM yyyy, hh:mm a'
               )}
             </span>
           </p>
