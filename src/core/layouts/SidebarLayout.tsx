@@ -1,7 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import {
   Cable,
-  DollarSign,
   FileCheck,
   FolderClosed,
   FolderHeart,
@@ -40,14 +39,6 @@ const platformItems: ISidebarItem[] = [
     },
     ping: 'success',
     icon: <Cable />,
-  },
-  {
-    title: 'Billings & Credits',
-    url: '/settings',
-    search: {
-      tabs: 'billing',
-    },
-    icon: <DollarSign />,
   },
 ]
 

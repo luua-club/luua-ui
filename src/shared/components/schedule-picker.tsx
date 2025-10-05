@@ -98,7 +98,7 @@ export function SchedulePicker({
             }}
           />
         </div>
-        <div className="scrollbar inset-y-0 right-0 flex max-h-72 w-full scroll-pb-6 flex-col gap-4 overflow-y-auto border-t p-6 md:absolute md:max-h-none md:w-48 md:border-t-0 md:border-l">
+        <div className="inset-y-0 right-0 flex max-h-72 w-full scroll-pb-6 flex-col gap-4 overflow-y-auto border-t p-6 md:absolute md:max-h-none md:w-48 md:border-t-0 md:border-l">
           <div className="grid gap-2">
             {timeSlots.map(time => (
               <Button

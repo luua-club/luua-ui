@@ -21,7 +21,7 @@ const SourcesDialog = ({
 }: ISourcesDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card scrollbar max-h-[80vh] p-6">
+      <DialogContent className="bg-card max-h-[80vh] p-6">
         <DialogHeader>
           <DialogTitle className="text-card-foreground text-center text-lg font-semibold">
             Sources{' '}
