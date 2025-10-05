@@ -18,7 +18,7 @@ class InspirationApi extends BaseApiService {
   ) {
     const { limit, offset } = req
 
-    return this.get<InspirationResponse>('/', {
+    return this.get<InspirationResponse>(undefined, {
       params: { limit, offset, sort_order: 'desc' },
       signal,
     })
