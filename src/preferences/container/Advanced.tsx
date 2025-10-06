@@ -12,8 +12,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleFileCapture from '../../core/components/StyleFileCapture'
 import StyleTextCapture from '../../core/components/StyleTextCapture'
+import { tabValue } from '../Preferences'
 
-const Advanced = () => {
+const Advanced = ({
+  setActiveTab,
+}: {
+  setActiveTab: (tab: string) => void
+}) => {
   const queryClient = useQueryClient()
   const user = useUserState()
   const router = useRouter()
@@ -57,7 +62,24 @@ const Advanced = () => {
               />
             </TabsContent>
             <TabsContent value="fileSample">
-              <StyleFileCapture submitVariant="secondary" />
+              <StyleFileCapture
+                submitVariant="secondary"
+                maxFiles={5}
+                maxSize={10 * 1024 * 1024}
+                description={
+                  <span className="font-base text-muted-foreground">
+                    Could upload up to 5 files upto 10MB each.
+                  </span>
+                }
+                accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                isLoading={setAdvancedUserStyleMutation.isPending}
+                onSubmit={fileIds => {
+                  setAdvancedUserStyleMutation.mutate({
+                    gcp_storage_doc_ids: fileIds,
+                  })
+                  setActiveTab(tabValue[0])
+                }}
+              />
             </TabsContent>
           </Tabs>
         </div>

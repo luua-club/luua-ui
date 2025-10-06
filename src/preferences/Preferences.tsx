@@ -97,7 +97,7 @@ const Preferences = () => {
             you naturally communicate - your word choices, humor, and tone - to
             create content that genuinely sounds like you.
           </p>
-          <Advanced />
+          <Advanced setActiveTab={setActiveTab} />
         </TabsContent>
       </Tabs>
     </div>
