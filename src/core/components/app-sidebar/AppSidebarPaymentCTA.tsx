@@ -1,6 +1,6 @@
 import { useRouter } from '@tanstack/react-router'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Box } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
 import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'

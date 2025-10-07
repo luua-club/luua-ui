@@ -1,56 +1,71 @@
 # Luua UI
 
-Minimal React + Vite + TypeScript UI for Luua.
+**Testing URL:** https://dev.luua.club/
+**Local Development URL:** http://localhost:3000/
 
-Testing URL: https://luua-ui.onrender.com/login
+---
 
 ## Prerequisites
+
+Docker (optional, for dev in container)
+
+---
+
+OR
+
+---
 
 - Node: 22.14.0 (see `.nvmrc` / `.node-version`)
 - pnpm: 10.x (repo uses `packageManager: pnpm@10.12.4`)
 - Only pnpm is allowed (`preinstall` uses `only-allow`)
 
-## Install & Run
+---
+
+## Environment Variables
+
+### Local Development (`.env`)
+
+Create a `.env` file in the project root (ignored in Git):
 
 ```bash
-# install deps
-pnpm install
+# Google OAuth client ID
+VITE_GOOGLE_CLIENT_ID=<your_key>
 
-# start dev server (Vite on http://localhost:3000)
-pnpm dev
+# API backend URL
+VITE_LUUA_BACKEND_URL=https://api-dev.luua.club/
 
-# type-check + build for production
-pnpm build
+# Optional environment name
+VITE_LUUA_LS_USER=luua-user
 
-# preview production build locally
-pnpm preview
-
-# lint and format
-pnpm lint
-pnpm format
+# Optional PostHog analytics key (for dev)
+VITE_PUBLIC_POSTHOG_KEY=<posthog_key>
+VITE_PUBLIC_POSTHOG_HOST=<posthog_host>
 ```
 
-## Project Scripts (`package.json`)
+## Install & Run
 
-- `dev`: Vite dev server
-- `build`: TypeScript build + Vite build
-- `preview`: Vite preview
-- `lint` / `lint:fix`: ESLint
-- `format` / `format:check`: Prettier (+ ESLint fix)
-- `prepare`: Husky install (git hooks)
+Local Development (with Docker, Recommended)
 
-## Tech Stack
+```bash
+docker compose up --build
+```
 
-- React 19, React DOM 19
-- Vite 6, TypeScript ~5.8
-- Tailwind CSS v4
-- TanStack Router and Query
-- Redux Toolkit
-- React Hook Form + Zod
-- Radix UI Primitives
+Local Development (without Docker)
 
-## Notes
+```bash
+pnpm install
+pnpm dev
+```
 
-- Dev server runs on port `3000` (`vite.config.ts`).
-- Commit hooks via Husky and formatting via lint-staged are enabled.
-- If Node version issues arise, use `nvm use` (reads `.nvmrc`).
+## Stop containers
+
+```bash
+docker compose down
+```
+
+### Notes
+
+1. Dev server runs on port localhost:3000
+2. Docker dev container supports hot reload with mounted volumes
+3. Commit hooks via Husky and formatting via lint-staged are enabled
+4. Use nvm use if Node version issues arise (reads .nvmrc)

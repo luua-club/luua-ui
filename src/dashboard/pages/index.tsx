@@ -1,6 +1,6 @@
 import { createLazyRoute, useLocation, useRouter } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
 import { Loader } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
 import Logo from '@/assets/images/luua-black-icon.svg?react'
@@ -110,6 +110,7 @@ const Dashboard = () => {
           {userState?.name && (
             <span>
               Hi {capitalize(userState?.name.split(' ')[0] || '')}, how are you?
+              thank i
             </span>
           )}
         </motion.h1>

@@ -1,0 +1,17 @@
+services:
+  react-app:
+    container_name: react-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3000:3000' # Map container → host
+    volumes:
+      - .:/app # Mount your local source
+      - /app/node_modules # Prevent overwriting node_modules
+    env_file:
+      - .env # Load local environment variables
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true # Ensures hot reload works reliably
+    restart: unless-stopped
