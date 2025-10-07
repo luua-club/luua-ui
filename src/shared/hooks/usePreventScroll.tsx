@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { useEffect, useLayoutEffect } from 'react'
 
 function isMac(): boolean | undefined {
@@ -37,8 +38,8 @@ interface PreventScrollOptions {
   focusCallback?: () => void
 }
 
-function chain(...callbacks: any[]): (...args: any[]) => void {
-  return (...args: any[]) => {
+function chain(...callbacks: unknown[]): (...args: unknown[]) => void {
+  return (...args: unknown[]) => {
     for (const callback of callbacks) {
       if (typeof callback === 'function') {
         callback(...args)
@@ -313,7 +314,7 @@ function setStyle(
 function addEvent<K extends keyof GlobalEventHandlersEventMap>(
   target: EventTarget,
   event: K,
-  handler: (this: Document, ev: GlobalEventHandlersEventMap[K]) => any,
+  handler: (this: Document, ev: GlobalEventHandlersEventMap[K]) => unknown,
   options?: boolean | AddEventListenerOptions
 ) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

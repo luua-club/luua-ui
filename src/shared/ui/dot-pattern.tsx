@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { motion } from 'motion/react'
 import React, { useEffect, useId, useRef, useState } from 'react'
 

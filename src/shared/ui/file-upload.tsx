@@ -519,6 +519,7 @@ function FileUploadRoot(props: FileUploadRootProps) {
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       store,
       isControlled,
