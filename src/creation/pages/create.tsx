@@ -1,12 +1,13 @@
 import { createLazyRoute, useLocation } from '@tanstack/react-router'
 import { HistoryIcon, Loader, PenLine } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppDispatch, useAppSelector } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
+import { IPost } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
 import { clearPrompt } from '@/core/store/prompt-slice'
 import { isSocialConnected } from '@/core/utils/social.utils'
@@ -50,6 +51,11 @@ function Create() {
     }
   }
 
+  // --- Ref ---
+  const latestGeneratedPostsRef = useRef<
+    Pick<IPost, 'id' | 'channel' | 'content'>[]
+  >([])
+
   // ---- Hooks & Selectors ----
   const dispatch = useAppDispatch()
   const location = useLocation()
@@ -80,7 +86,7 @@ function Create() {
 
     // Utilities
     getSharePosts,
-  } = useCreateDraft()
+  } = useCreateDraft({ latestGeneratedPosts: latestGeneratedPostsRef.current })
 
   const {
     // State
@@ -153,6 +159,8 @@ function Create() {
     generatedPostContent.forEach(post => {
       handleContentChange(post.content, post.channel)
     })
+
+    latestGeneratedPostsRef.current = generatedPostContent
   }, [generatedPostContent, handleContentChange])
 
   // ---- Main Functions ----

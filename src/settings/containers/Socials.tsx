@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { Box, Loader, LockIcon, PlugZap } from 'lucide-react'
+import posthog from 'posthog-js'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -50,6 +51,7 @@ const Socials = ({ user }: { user: UserState }) => {
 
       // Backend returns the authorization URL, redirect to it
       if (response.data) {
+        posthog.capture('socials:connect_clicked', { platform })
         window.location.href = response.data.authorization_url
       }
     } catch {
@@ -66,6 +68,7 @@ const Socials = ({ user }: { user: UserState }) => {
       return payload
     },
     onSuccess: (payload: channelType) => {
+      posthog.capture('socials:disconnected', { platform: payload })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
       toast.success(`Disconnected from ${payload}`)
     },

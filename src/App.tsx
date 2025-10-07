@@ -1,6 +1,9 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { Outlet, RouterProvider, useLocation } from '@tanstack/react-router'
+import { AxiosError } from 'axios'
+import posthog, { PostHogConfig } from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { toast } from 'sonner'
@@ -8,7 +11,11 @@ import { toast } from 'sonner'
 import { Toaster } from '@/shared/ui/sonner'
 
 import { userApi } from './core/api/user.api'
-import { LUUA_USER_KEY, QUERY_KEYS } from './core/config/constant'
+import {
+  API_CONSTANTS,
+  LUUA_USER_KEY,
+  QUERY_KEYS,
+} from './core/config/constant'
 import { queryClient } from './core/config/global.config'
 import { useAppDispatch } from './core/hooks/global-state.hook'
 import { LoginResponse } from './core/models/auth.model'
@@ -38,6 +45,7 @@ export function AppContent() {
     data: userData,
     isError,
     isEnabled,
+    error,
   } = useQuery({
     queryKey: [QUERY_KEYS.user],
     queryFn: () => userApi.getUser(),
@@ -53,6 +61,16 @@ export function AppContent() {
 
     if (UserSchema.safeParse(userData.data).success) {
       dispatch(setUser(userData.data))
+
+      // Add user to posthog
+      posthog.identify(`${userData.data.email}`, {
+        name: userData.data.name,
+        email: userData.data.email,
+        plan: userData.data.plan,
+        linkedin_connected: userData.data.connected_channels.linkedin.connected,
+        twitter_connected: userData.data.connected_channels.twitter.connected,
+        theme: localStorage.getItem(THEME_LOCAL_STORAGE_KEY),
+      })
     } else {
       toast.error('Something went wrong, Please try again !')
       logout()
@@ -64,9 +82,19 @@ export function AppContent() {
   // so to avoid conflicts and race condition it is used
   useEffect(() => {
     if (isError && isEnabled) {
+      const err = error as AxiosError
+
+      if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
+        posthog.captureException(error)
+        toast.error(
+          'Some error has occurred, please try again later, if the problem persists, please contact support.'
+        )
+        return
+      }
+
       logout()
     }
-  }, [isError, isEnabled])
+  }, [isError, isEnabled, error])
 
   return (
     <>
@@ -76,20 +104,32 @@ export function AppContent() {
 }
 
 function App() {
+  const options: Partial<PostHogConfig> = {
+    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+    defaults: '2025-05-24',
+    person_profiles: 'always',
+    capture_exceptions: true,
+  }
+
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      {/* Google Auth provider */}
-      <QueryClientProvider client={queryClient}>
-        {/* Query client provider */}
-        <Provider store={store}>
-          <ThemeProvider storageKey={THEME_LOCAL_STORAGE_KEY}>
-            {/* Redux provider */}
-            <RouterProvider router={router} /> {/* Router provider */}
-            <Toaster expand={true} />
-          </ThemeProvider>
-        </Provider>
-      </QueryClientProvider>
-    </GoogleOAuthProvider>
+    <PostHogProvider
+      apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
+      options={options}
+    >
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        {/* Google Auth provider */}
+        <QueryClientProvider client={queryClient}>
+          {/* Query client provider */}
+          <Provider store={store}>
+            <ThemeProvider storageKey={THEME_LOCAL_STORAGE_KEY}>
+              {/* Redux provider */}
+              <RouterProvider router={router} /> {/* Router provider */}
+              <Toaster expand={true} />
+            </ThemeProvider>
+          </Provider>
+        </QueryClientProvider>
+      </GoogleOAuthProvider>
+    </PostHogProvider>
   )
 }
 

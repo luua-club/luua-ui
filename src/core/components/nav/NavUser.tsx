@@ -84,7 +84,9 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
           <DropdownMenuGroup>
             <DropdownMenuItem className="cursor-pointer">
               <LucideSparkles />
-              <Link to="/payments">Go Pro</Link>
+              <Link to="/payments" className="w-full">
+                Go Pro
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
@@ -95,11 +97,13 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
       <DropdownMenuGroup>
         <DropdownMenuItem className="cursor-pointer">
           <UserCog />
-          <Link to="/settings">Account</Link>
+          <Link to="/settings" className="w-full">
+            Account
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer">
           <Receipt />
-          <Link to="/settings" search={{ tabs: 'billing' }}>
+          <Link to="/settings" search={{ tabs: 'billing' }} className="w-full">
             Subscription
           </Link>
         </DropdownMenuItem>
@@ -114,6 +118,7 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
             href={EXTERNAL_URLS.contactUs}
             target="_blank"
             rel="noopener noreferrer"
+            className="w-full"
           >
             Contact Us
           </a>
@@ -126,6 +131,7 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
             href={EXTERNAL_URLS.contactUs}
             target="_blank"
             rel="noopener noreferrer"
+            className="w-full"
           >
             Download Chrome Extension
           </a>

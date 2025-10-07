@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
+import posthog from 'posthog-js'
 import { useState } from 'react'
 
 import { Button } from '@/shared/ui/button'
@@ -121,7 +122,13 @@ function IntroDisclosure({
             <Button
               className="w-fit"
               variant="link"
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                posthog.capture('intro:skipped', {
+                  title: title,
+                  at_step: activeStep,
+                })
+                onOpenChange(false)
+              }}
             >
               Skip All
             </Button>

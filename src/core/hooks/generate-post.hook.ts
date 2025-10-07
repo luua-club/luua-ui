@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import posthog from 'posthog-js'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -96,6 +97,7 @@ export const useGeneratePosts = (
    */
   useEffect(() => {
     if (query.error) {
+      posthog.captureException(query.error)
       toast.error('Something went wrong, Please try again !')
     }
   }, [query.error])
@@ -139,6 +141,14 @@ export const useGeneratePosts = (
         content: query.data.data.generated_twitter_post.content,
       })
     }
+
+    posthog.capture('posts:generated', {
+      posts_count: postsResult.length,
+      linkedin_content: postsResult.find(p => p.channel === 'LinkedIn')
+        ?.content,
+      twitter_content: postsResult.find(p => p.channel === 'Twitter')?.content,
+      original_prompt: query.data.data.original_prompt,
+    })
 
     // Only update ref if we have new posts
     if (postsResult.length > 0) {

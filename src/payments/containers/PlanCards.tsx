@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { Check, Flame, Flower, Sprout, X } from 'lucide-react'
+import posthog from 'posthog-js'
 import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
@@ -19,6 +20,9 @@ function PlanCards() {
       const { payment_link } = data
 
       if (payment_link) {
+        posthog.capture('payments:checkout_started', {
+          current_plan: user?.plan,
+        })
         window.location.href = payment_link
         return
       }
@@ -26,6 +30,7 @@ function PlanCards() {
       toast.error('Unable to open checkout link. Please try again later.')
     },
     onError: () => {
+      posthog.captureException(createPaymentLinkMutation.error)
       toast.error('Failed to start checkout. Please try again.')
     },
   })
@@ -38,6 +43,7 @@ function PlanCards() {
    * Handle upgrade click
    */
   const handleUpgradeClick = () => {
+    posthog.capture('payments:upgrade_clicked', { current_plan: user?.plan })
     createPaymentLinkMutation.mutate()
   }
 

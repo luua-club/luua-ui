@@ -1,3 +1,5 @@
+import posthog from 'posthog-js'
+
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
 
 import { LUUA_USER_KEY } from '../config/constant'
@@ -7,6 +9,7 @@ import { LUUA_USER_KEY } from '../config/constant'
  * this redirection will also clear all state in redux store and cancel all pending requests
  */
 const logout = () => {
+  posthog.reset()
   removeLocalStorageItem(LUUA_USER_KEY)
   window.location.href = '/login'
 }
