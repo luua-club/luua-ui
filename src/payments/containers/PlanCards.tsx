@@ -20,6 +20,9 @@ function PlanCards() {
       const { payment_link } = data
 
       if (payment_link) {
+        posthog.capture('payments:checkout_started', {
+          current_plan: user?.plan,
+        })
         window.location.href = payment_link
         return
       }
@@ -40,6 +43,7 @@ function PlanCards() {
    * Handle upgrade click
    */
   const handleUpgradeClick = () => {
+    posthog.capture('payments:upgrade_clicked', { current_plan: user?.plan })
     createPaymentLinkMutation.mutate()
   }
 

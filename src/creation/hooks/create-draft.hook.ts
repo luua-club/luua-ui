@@ -20,13 +20,17 @@ import {
   IDraftRequest,
   PostItem,
 } from '@/core/models/draft.model'
+import { IPost } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
 
 export type PostDraftsType = Partial<
   Record<channelType, WithOptional<PostItem, 'id'>>
 >
+interface Props {
+  latestGeneratedPosts: Pick<IPost, 'id' | 'channel' | 'content'>[]
+}
 
-export const useCreateDraft = () => {
+export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
   // ----- State -----
   const [postDrafts, setPostDrafts] = useState<PostDraftsType>(
     {} as PostDraftsType
@@ -160,6 +164,22 @@ export const useCreateDraft = () => {
   const saveDraftMutation = useMutation({
     mutationFn: (payload: IDraftRequest) => draftsApi.postDraft(payload),
     onSuccess: response => {
+      posthog.capture('drafts:saved', {
+        draft_id: response.data.draft.id,
+        posts_count: response.data.draft.posts.length,
+        linkedin_content: response.data.draft.posts.find(
+          p => p.channel === 'LinkedIn'
+        )?.content,
+        twitter_content: response.data.draft.posts.find(
+          p => p.channel === 'Twitter'
+        )?.content,
+        latest_generated_posts_linkedin: latestGeneratedPosts.find(
+          p => p.channel === 'LinkedIn'
+        )?.content,
+        latest_generated_posts_twitter: latestGeneratedPosts.find(
+          p => p.channel === 'Twitter'
+        )?.content,
+      })
       toast.success('Draft saved successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
       // Ensure navigation is not blocked after save
@@ -288,7 +308,24 @@ export const useCreateDraft = () => {
           scheduleDate,
         },
         {
-          onSuccess: () => {
+          onSuccess: res => {
+            posthog.capture('posts:scheduled', {
+              draft_id: res?.draftId,
+              posts_count: finalPayload.posts.length,
+              linkedin_content: res?.draft?.posts.find(
+                p => p.channel === 'LinkedIn'
+              )?.content,
+              twitter_content: res?.draft?.posts.find(
+                p => p.channel === 'Twitter'
+              )?.content,
+              latest_generated_posts_linkedin: latestGeneratedPosts.find(
+                p => p.channel === 'LinkedIn'
+              )?.content,
+              latest_generated_posts_twitter: latestGeneratedPosts.find(
+                p => p.channel === 'Twitter'
+              )?.content,
+              schedule_date: scheduleDate,
+            })
             setIsShareModalOpen({ open: false, schedule: false })
             toast.success('Draft scheduled successfully')
             queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
@@ -308,7 +345,22 @@ export const useCreateDraft = () => {
 
     // Call api
     publishDraft.mutate(finalPayload, {
-      onSuccess: () => {
+      onSuccess: res => {
+        posthog.capture('posts:published', {
+          draft_id: res?.draftId,
+          posts_count: finalPayload.posts.length,
+          linkedin_content: res?.draft?.posts.find(
+            p => p.channel === 'LinkedIn'
+          )?.content,
+          twitter_content: res?.draft?.posts.find(p => p.channel === 'Twitter')
+            ?.content,
+          latest_generated_posts_linkedin: latestGeneratedPosts.find(
+            p => p.channel === 'LinkedIn'
+          )?.content,
+          latest_generated_posts_twitter: latestGeneratedPosts.find(
+            p => p.channel === 'Twitter'
+          )?.content,
+        })
         setIsShareModalOpen({ open: false, schedule: false })
         toast.success('Post are published successfully')
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })

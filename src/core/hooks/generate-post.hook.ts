@@ -142,6 +142,14 @@ export const useGeneratePosts = (
       })
     }
 
+    posthog.capture('posts:generated', {
+      posts_count: postsResult.length,
+      linkedin_content: postsResult.find(p => p.channel === 'LinkedIn')
+        ?.content,
+      twitter_content: postsResult.find(p => p.channel === 'Twitter')?.content,
+      original_prompt: query.data.data.original_prompt,
+    })
+
     // Only update ref if we have new posts
     if (postsResult.length > 0) {
       previousPostsRef.current = postsResult

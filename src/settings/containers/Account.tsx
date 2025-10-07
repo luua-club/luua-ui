@@ -31,6 +31,7 @@ const Account = ({ user }: { user: UserState }) => {
           {
             icon: null,
             duration: 8000,
+            closeButton: true,
           }
         )
         return

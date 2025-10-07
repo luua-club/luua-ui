@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight, PencilRuler } from 'lucide-react'
 import { motion } from 'motion/react'
+import posthog from 'posthog-js'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -102,6 +103,24 @@ function OnBoarding() {
 
       if (promises.length > 0) {
         await Promise.all([...promises])
+      }
+
+      if (values.role || values.industry || values.goal) {
+        posthog.capture('onboarding:completed', {
+          role: values.role,
+          industry: values.industry,
+          goal: values.goal,
+        })
+      } else {
+        posthog.capture('onboarding:skipped')
+      }
+
+      if (styles.length > 0) {
+        posthog.capture('onboarding:styles_completed', {
+          styles: styles,
+        })
+      } else {
+        posthog.capture('onboarding:styles_skipped')
       }
     } catch {
       toast.error('Something Went Wrong')
