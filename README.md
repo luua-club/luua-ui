@@ -1,29 +1,22 @@
 # Luua UI
 
 **Testing URL:** https://dev.luua.club/
-**Local Development URL:** http://localhost:3000/
 
----
+**Local Development URL:** http://localhost:3000/
 
 ## Prerequisites
 
 Docker (optional, for dev in container)
 
----
-
 OR
 
----
+Node: 22.14.0 (see `.nvmrc` / `.node-version`)
 
-- Node: 22.14.0 (see `.nvmrc` / `.node-version`)
-- pnpm: 10.x (repo uses `packageManager: pnpm@10.12.4`)
-- Only pnpm is allowed (`preinstall` uses `only-allow`)
+pnpm: 10.x (repo uses `packageManager: pnpm@10.12.4`)
 
----
+Only pnpm is allowed (`preinstall` uses `only-allow`)
 
 ## Environment Variables
-
-### Local Development (`.env`)
 
 Create a `.env` file in the project root (ignored in Git):
 
