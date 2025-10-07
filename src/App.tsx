@@ -1,6 +1,7 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { Outlet, RouterProvider, useLocation } from '@tanstack/react-router'
+import { AxiosError } from 'axios'
 import posthog, { PostHogConfig } from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useEffect } from 'react'
@@ -10,7 +11,11 @@ import { toast } from 'sonner'
 import { Toaster } from '@/shared/ui/sonner'
 
 import { userApi } from './core/api/user.api'
-import { LUUA_USER_KEY, QUERY_KEYS } from './core/config/constant'
+import {
+  API_CONSTANTS,
+  LUUA_USER_KEY,
+  QUERY_KEYS,
+} from './core/config/constant'
 import { queryClient } from './core/config/global.config'
 import { useAppDispatch } from './core/hooks/global-state.hook'
 import { LoginResponse } from './core/models/auth.model'
@@ -40,6 +45,7 @@ export function AppContent() {
     data: userData,
     isError,
     isEnabled,
+    error,
   } = useQuery({
     queryKey: [QUERY_KEYS.user],
     queryFn: () => userApi.getUser(),
@@ -76,9 +82,19 @@ export function AppContent() {
   // so to avoid conflicts and race condition it is used
   useEffect(() => {
     if (isError && isEnabled) {
+      const err = error as AxiosError
+
+      if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
+        posthog.captureException(error)
+        toast.error(
+          'Some error has occurred, please try again later, if the problem persists, please contact support.'
+        )
+        return
+      }
+
       logout()
     }
-  }, [isError, isEnabled])
+  }, [isError, isEnabled, error])
 
   return (
     <>

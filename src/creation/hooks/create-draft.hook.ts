@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useBlocker, useLocation, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
 import confetti from 'canvas-confetti'
+import posthog from 'posthog-js'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -297,6 +298,7 @@ export const useCreateDraft = () => {
           },
           onError: () => {
             setIsShareModalOpen({ open: false, schedule: false })
+            posthog.captureException(scheduleDraft.error)
             toast.error('Failed to schedule draft')
           },
         }
@@ -347,6 +349,8 @@ export const useCreateDraft = () => {
         navigate({ to: '/dashboard' })
       },
       onError: () => {
+        setIsShareModalOpen({ open: false, schedule: false })
+        posthog.captureException(publishDraft.error)
         toast.error('Failed to publish posts')
       },
     })

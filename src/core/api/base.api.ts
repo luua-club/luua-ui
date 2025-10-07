@@ -7,7 +7,7 @@ import axios, {
 } from 'axios'
 import { toast } from 'sonner'
 
-import { BASE_API_URL } from '../config/constant'
+import { API_CONSTANTS, BASE_API_URL } from '../config/constant'
 import { authInterceptor } from '../interceptors/auth.interceptor'
 import { ApiError, ApiResponse } from '../models/api.model'
 import { logout } from '../utils/common.util'
@@ -212,14 +212,14 @@ export class BaseApiService {
     /**
      * Auto-logout on 401 (unauthorized)
      */
-    if (status === 401) {
+    if (status === API_CONSTANTS.statusCode.unauthorized) {
       logout()
     }
 
     /**
      * Limit reached on 403
      */
-    if (status === 403) {
+    if (status === API_CONSTANTS.statusCode.forbidden) {
       toast.error('You Have Reached Your Current Plan Limit')
     }
 

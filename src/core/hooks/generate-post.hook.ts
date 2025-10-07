@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import posthog from 'posthog-js'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -96,6 +97,7 @@ export const useGeneratePosts = (
    */
   useEffect(() => {
     if (query.error) {
+      posthog.captureException(query.error)
       toast.error('Something went wrong, Please try again !')
     }
   }, [query.error])
