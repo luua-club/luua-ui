@@ -1,6 +1,8 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { Outlet, RouterProvider, useLocation } from '@tanstack/react-router'
+import posthog, { PostHogConfig } from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { toast } from 'sonner'
@@ -53,6 +55,16 @@ export function AppContent() {
 
     if (UserSchema.safeParse(userData.data).success) {
       dispatch(setUser(userData.data))
+
+      // Add user to posthog
+      posthog.identify(`${userData.data.email}`, {
+        name: userData.data.name,
+        email: userData.data.email,
+        plan: userData.data.plan,
+        linkedin_connected: userData.data.connected_channels.linkedin.connected,
+        twitter_connected: userData.data.connected_channels.twitter.connected,
+        theme: localStorage.getItem(THEME_LOCAL_STORAGE_KEY),
+      })
     } else {
       toast.error('Something went wrong, Please try again !')
       logout()
@@ -76,20 +88,32 @@ export function AppContent() {
 }
 
 function App() {
+  const options: Partial<PostHogConfig> = {
+    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+    defaults: '2025-05-24',
+    person_profiles: 'always',
+    capture_exceptions: true,
+  }
+
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      {/* Google Auth provider */}
-      <QueryClientProvider client={queryClient}>
-        {/* Query client provider */}
-        <Provider store={store}>
-          <ThemeProvider storageKey={THEME_LOCAL_STORAGE_KEY}>
-            {/* Redux provider */}
-            <RouterProvider router={router} /> {/* Router provider */}
-            <Toaster expand={true} />
-          </ThemeProvider>
-        </Provider>
-      </QueryClientProvider>
-    </GoogleOAuthProvider>
+    <PostHogProvider
+      apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
+      options={options}
+    >
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        {/* Google Auth provider */}
+        <QueryClientProvider client={queryClient}>
+          {/* Query client provider */}
+          <Provider store={store}>
+            <ThemeProvider storageKey={THEME_LOCAL_STORAGE_KEY}>
+              {/* Redux provider */}
+              <RouterProvider router={router} /> {/* Router provider */}
+              <Toaster expand={true} />
+            </ThemeProvider>
+          </Provider>
+        </QueryClientProvider>
+      </GoogleOAuthProvider>
+    </PostHogProvider>
   )
 }
 
