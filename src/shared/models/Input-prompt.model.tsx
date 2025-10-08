@@ -1,9 +1,9 @@
-import { Icon, IconProps } from '@tabler/icons-react'
+import { LucideIcon } from 'lucide-react'
 
 import { SOCIAL_STATUS } from '../config/constant'
 
 export interface InputPromptSocial {
-  icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
+  icon: LucideIcon
   text: string
   status: SOCIAL_STATUS
   tooltip: string

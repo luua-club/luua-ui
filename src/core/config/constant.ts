@@ -1,4 +1,5 @@
-import { IconBrandLinkedin, IconBrandX } from '@tabler/icons-react'
+import BrandLinkedIn from '@/assets/images/brand-linkedin.svg?react'
+import BrandX from '@/assets/images/brand-x.svg?react'
 
 import { channelType, ISocialChannel } from '../models/social.model'
 
@@ -30,12 +31,12 @@ export const SUGGESTED_PROMPT_TEXT = [
 export const SOCIAL_PLATFORM: ISocialChannel[] = [
   {
     name: 'Twitter',
-    logo: IconBrandX,
+    logo: BrandX,
     tooltip: 'Twitter / X.com',
   },
   {
     name: 'LinkedIn',
-    logo: IconBrandLinkedin,
+    logo: BrandLinkedIn,
     tooltip: 'Linkedin',
   },
 ]

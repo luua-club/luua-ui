@@ -17,7 +17,6 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",
-    "@tabler/icons-react": "^3.34.0",
     "@tanstack/react-query": "^5.84.1",
     "@tanstack/react-router": "^1.121.34",
     "@types/canvas-confetti": "^1.9.0",

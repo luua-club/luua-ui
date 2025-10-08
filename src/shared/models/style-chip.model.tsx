@@ -1,4 +1,4 @@
-import { Icon, IconProps } from '@tabler/icons-react'
+import { LucideIcon } from 'lucide-react'
 
 export interface WritingStyleChip {
   id: string
@@ -6,5 +6,5 @@ export interface WritingStyleChip {
   description: string
   llm_info: string
   color: string
-  icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
+  icon: LucideIcon
 }
