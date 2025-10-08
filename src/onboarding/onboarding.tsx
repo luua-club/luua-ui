@@ -28,14 +28,13 @@ import {
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
 
-import Goal from '../components/Goal'
-import RoleAndIndustry from '../components/RolesAndIndustry'
+import Goal from './components/goals'
+import RoleAndIndustry from './components/role-industry'
+import { GOALS, INDUSTRIES } from './config/constant'
 import {
-  GOALS,
-  INDUSTRIES,
   ONBOARDING_FORM_SCHEMA,
   OnboardingFormValues,
-} from '../config/onboarding.config'
+} from './models/forms.model'
 
 function OnBoarding() {
   // ---- State ----

@@ -64,7 +64,6 @@ function Dashboard() {
     if (pro === 'true') {
       setIsProWelcomeBannerOpen(true)
       removeQueryParams(params, ['pro'])
-      return
     }
 
     if (welcome === 'true') {

@@ -1,5 +1,3 @@
-import z from 'zod'
-
 /**
  * Industries for onboarding
  */
@@ -24,18 +22,3 @@ export const GOALS = [
   'Share company updates and news.',
   'Recruit talent & grow my network.',
 ]
-
-/**
- * Zod schema for onboarding form
- */
-export const ONBOARDING_FORM_SCHEMA = z.object({
-  role: z
-    .union([
-      z.string().min(2, 'Please enter at least 2 characters.'),
-      z.literal(''),
-    ])
-    .optional(),
-  industry: z.enum(INDUSTRIES).optional(),
-  goal: z.enum(GOALS).optional(),
-})
-export type OnboardingFormValues = z.infer<typeof ONBOARDING_FORM_SCHEMA>

@@ -10,7 +10,7 @@ import {
   Paintbrush,
   PencilRuler,
 } from 'lucide-react'
-import { Suspense, useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar'
 import GlobalLoader from '@/shared/components/global-loader'
@@ -95,7 +95,24 @@ const SidebarContent = () => {
   // --- Hooks ---
   const { toggleSidebar } = useSidebar()
   const user = useUserState()
-  const isLoading = useRouterState({ select: s => s.status === 'pending' })
+  const routerState = useRouterState()
+
+  // --- Refs ---
+  // Track the current pathname to detect actual route changes vs query param changes
+  const previousPathnameRef = useRef(routerState.location.pathname)
+
+  // --- Computed Variables ---
+  // Only show loader if we're navigating to a different route (pathname change)
+  // Not for query param changes on the same route
+  const isRoutePending = routerState.status === 'pending'
+  const isPathnameChanging =
+    previousPathnameRef.current !== routerState.location.pathname
+  const shouldShowLoader = isRoutePending && isPathnameChanging
+
+  // Update ref when pathname actually changes
+  if (routerState.status !== 'pending') {
+    previousPathnameRef.current = routerState.location.pathname
+  }
 
   // --- Memoized Variables ---
   /**
@@ -137,15 +154,7 @@ const SidebarContent = () => {
       />
       <div className="w-full">
         <Nav handleSidebar={toggleSidebar} />
-        <main>
-          {isLoading ? (
-            <GlobalLoader />
-          ) : (
-            <Suspense fallback={<GlobalLoader />}>
-              <Outlet />
-            </Suspense>
-          )}
-        </main>
+        <main>{shouldShowLoader ? <GlobalLoader /> : <Outlet />}</main>
       </div>
     </>
   )
