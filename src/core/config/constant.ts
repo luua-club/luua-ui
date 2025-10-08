@@ -61,8 +61,8 @@ export const QUERY_KEYS = {
  * Constants for tanstack query options
  */
 export const QUERY_CONSTANTS = {
-  staleTime: 5 * 60 * 1000, // 5 minutes
-  gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  staleTime: 1 * 60 * 1000, // 1 minute
+  gcTime: 1 * 60 * 1000, // 1 minute (formerly cacheTime)
 }
 
 /**

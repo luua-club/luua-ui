@@ -70,7 +70,7 @@ export function NavUser({ user }: INavUserProps) {
 }
 
 const NavUserDropdownContent = ({ user }: { user: UserState }) => {
-  const isProPlan = user.plan === 'Pro'
+  const isFreePlan = user.plan === 'Free'
 
   return (
     <DropdownMenuContent
@@ -79,7 +79,7 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
       align="end"
     >
       {/* Plan Benefits */}
-      {isProPlan && (
+      {isFreePlan && (
         <>
           <DropdownMenuGroup>
             <DropdownMenuItem className="cursor-pointer">
