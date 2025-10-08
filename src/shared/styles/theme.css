@@ -83,6 +83,8 @@
       background-position: calc(100% + var(--shiny-width)) 0;
     }
   }
+
+  --spacing-nav-height: 3.5rem;
 }
 
 @layer base {
@@ -91,5 +93,16 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .page-fade-in {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }

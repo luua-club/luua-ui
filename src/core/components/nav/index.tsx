@@ -23,7 +23,7 @@ function Nav({ handleSidebar }: INavProps) {
   const currentPageTitle = getCurrentPageTitle(pathname)
 
   return (
-    <nav className="flex h-14 justify-between border-b-1 p-2">
+    <nav className="h-nav-height flex justify-between border-b-1 p-2">
       <div className="flex items-center gap-2">
         {/* Sidebar toggle */}
         <Tooltip>

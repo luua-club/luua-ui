@@ -97,9 +97,9 @@ export function AppContent() {
   }, [isError, isEnabled, error])
 
   return (
-    <>
+    <div className="page-fade-in">
       <Outlet />
-    </>
+    </div>
   )
 }
 

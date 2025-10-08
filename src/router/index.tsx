@@ -16,6 +16,7 @@ import preferencesRoute from '@/preferences/router'
 import publishedRoute from '@/published/router'
 import scheduleRoute from '@/schedule/router'
 import settingsRouteTree from '@/settings/router'
+import GlobalLoader from '@/shared/components/global-loader'
 
 import { AuthGuard } from './guards'
 
@@ -49,6 +50,7 @@ const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   scrollRestoration: true,
+  defaultPendingComponent: () => <GlobalLoader />,
 })
 
 declare module '@tanstack/react-router' {

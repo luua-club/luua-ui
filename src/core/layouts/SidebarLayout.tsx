@@ -1,4 +1,4 @@
-import { Outlet } from '@tanstack/react-router'
+import { Outlet, useRouterState } from '@tanstack/react-router'
 import {
   Cable,
   FileCheck,
@@ -10,9 +10,10 @@ import {
   Paintbrush,
   PencilRuler,
 } from 'lucide-react'
-import { useMemo } from 'react'
+import { Suspense, useMemo } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar'
+import GlobalLoader from '@/shared/components/global-loader'
 import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
 
 import Nav from '../components/nav'
@@ -94,6 +95,7 @@ const SidebarContent = () => {
   // --- Hooks ---
   const { toggleSidebar } = useSidebar()
   const user = useUserState()
+  const isLoading = useRouterState({ select: s => s.status === 'pending' })
 
   // --- Memoized Variables ---
   /**
@@ -136,7 +138,13 @@ const SidebarContent = () => {
       <div className="w-full">
         <Nav handleSidebar={toggleSidebar} />
         <main>
-          <Outlet />
+          {isLoading ? (
+            <GlobalLoader />
+          ) : (
+            <Suspense fallback={<GlobalLoader />}>
+              <Outlet />
+            </Suspense>
+          )}
         </main>
       </div>
     </>
