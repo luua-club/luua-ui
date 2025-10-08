@@ -10,8 +10,8 @@ import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
-import StyleFileCapture from '../../core/components/StyleFileCapture'
 import StyleTextCapture from '../../core/components/StyleTextCapture'
+import StyleFileCapture from '../../core/containers/StyleFileCapture'
 import { tabValue } from '../Preferences'
 
 const Advanced = ({
