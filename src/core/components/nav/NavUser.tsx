@@ -1,6 +1,6 @@
-import { IconBrandChrome } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import {
+  Chrome,
   LucideChevronsUpDown,
   LucideLogOut,
   LucideSparkles,
@@ -126,7 +126,7 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
 
         {/* TODO: Add link for  Chrome Extension */}
         <DropdownMenuItem className="cursor-pointer">
-          <IconBrandChrome />
+          <Chrome />
           <a
             href={EXTERNAL_URLS.contactUs}
             target="_blank"

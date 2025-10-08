@@ -1,9 +1,9 @@
-import { Icon, IconProps } from '@tabler/icons-react'
+import React from 'react'
 
 import { SOCIAL_STATUS } from '../config/constant'
 
 export interface InputPromptSocial {
-  icon: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   text: string
   status: SOCIAL_STATUS
   tooltip: string

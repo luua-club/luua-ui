@@ -1,4 +1,3 @@
-import { Icon, IconProps } from '@tabler/icons-react'
 import React from 'react'
 import z from 'zod'
 
@@ -6,7 +5,7 @@ export type channelType = 'Twitter' | 'LinkedIn'
 
 export interface ISocialChannel {
   name: channelType
-  logo: React.ForwardRefExoticComponent<IconProps & React.RefAttributes<Icon>>
+  logo: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
   tooltip: string
 }
 

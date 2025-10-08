@@ -1,10 +1,4 @@
-import {
-  IconBooks,
-  IconCampfire,
-  IconEyeDollar,
-  IconFlask,
-  IconSchool,
-} from '@tabler/icons-react'
+import { BookOpen, Eye, Flame, FlaskConical, GraduationCap } from 'lucide-react'
 
 import { WritingStyleChip } from '@/shared/models/style-chip.model'
 
@@ -14,7 +8,7 @@ export const writingStyles: WritingStyleChip[] = [
     title: 'The Expert',
     description: 'Authoritative, insightful, and confident',
     llm_info: 'Uses more data, assumes a knowledgeable audience',
-    icon: IconSchool,
+    icon: GraduationCap,
     color: 'bg-yellow-200 dark:bg-yellow-400',
   },
   {
@@ -22,7 +16,7 @@ export const writingStyles: WritingStyleChip[] = [
     title: 'The Friendly Guide',
     description: 'Approachable, helpful, and clear',
     llm_info: 'Breaks down complex topics, uses simpler language',
-    icon: IconBooks,
+    icon: BookOpen,
     color: 'bg-green-200 dark:bg-green-400',
   },
   {
@@ -30,7 +24,7 @@ export const writingStyles: WritingStyleChip[] = [
     title: 'The Visionary',
     description: 'Inspiring, bold, and forward-looking',
     llm_info: 'Focuses on trends, ideas, and storytelling',
-    icon: IconEyeDollar,
+    icon: Eye,
     color: 'bg-red-200 dark:bg-red-400',
   },
   {
@@ -38,7 +32,7 @@ export const writingStyles: WritingStyleChip[] = [
     title: 'The Analyst',
     description: 'Data-driven, precise, and objective',
     llm_info: 'Uses numbers, facts, and logical reasoning',
-    icon: IconFlask,
+    icon: FlaskConical,
     color: 'bg-blue-200 dark:bg-blue-400',
   },
   {
@@ -46,7 +40,7 @@ export const writingStyles: WritingStyleChip[] = [
     title: 'The Challenger',
     description: 'Provocative, opinionated, and direct',
     llm_info: 'Designed to spark debate and strong reactions',
-    icon: IconCampfire,
+    icon: Flame,
     color: 'bg-orange-200 dark:bg-orange-400',
   },
 ]
