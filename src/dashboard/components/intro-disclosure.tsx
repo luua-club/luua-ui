@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
-import posthog from 'posthog-js'
 import { useState } from 'react'
 
+import { postHogIntroCapture } from '@/core/config/posthog.config'
 import { Button } from '@/shared/ui/button'
 import { Checkbox } from '@/shared/ui/checkbox'
 import {
@@ -17,56 +17,45 @@ import { Separator } from '@/shared/ui/separator'
 import { WobbleCard } from '@/shared/ui/wobble-card'
 import { cn } from '@/shared/utils'
 
-export interface Step {
-  title: string
-  description: string
-  longDescription: string
-  color?: string
-  image?: React.ReactNode
-  customAction?: React.ReactNode
-}
+import { IntroStep } from '../models/intro-step.model'
 
 interface IntroDisclosureProps {
   title: string
-  stepsData: Step[]
+  stepsData: IntroStep[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-function IntroDisclosure({
-  title,
-  stepsData,
-  open,
-  onOpenChange,
-}: IntroDisclosureProps) {
+function IntroDisclosure(props: IntroDisclosureProps) {
   // ---- States ----
   const [activeStep, setActiveStep] = useState(0)
 
-  // ---- Variables ----
-  const totalSteps = stepsData.length
+  // ---- Computed Variables ----
+  const totalSteps = props.stepsData.length
   const checkedCount = activeStep + 1
   const progress = (checkedCount / totalSteps) * 100
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={props.open} onOpenChange={props.onOpenChange}>
       {/** Trigger Automatic */}
       <DrawerTrigger asChild>
         <div />
       </DrawerTrigger>
 
+      {/** Content */}
       <DrawerContent className="!h-[90vh] !max-h-[90vh] focus:!outline-none">
         <div className="mx-auto w-full flex-1 overflow-y-auto px-2 sm:max-w-xl lg:max-w-2xl">
           {/** Progress Bar */}
           <DrawerHeader className="space-y-4 px-2">
             <Progress value={progress} className="mb-4" />
             <DrawerTitle className="text-left text-lg font-semibold">
-              {title}
+              {props.title}
             </DrawerTitle>
           </DrawerHeader>
 
           {/** Steps Chips */}
           <div className="-mt-1 grid grid-cols-2 sm:gap-4 sm:p-2">
-            {stepsData.map((step, index) => (
+            {props.stepsData.map((step, index) => (
               <Step
                 key={step.title}
                 title={step.title}
@@ -80,17 +69,17 @@ function IntroDisclosure({
 
           {/** Step Content */}
           <WobbleCard
-            containerClassName={`${stepsData[activeStep]?.color} mt-4 p-2`}
+            containerClassName={`${props.stepsData[activeStep]?.color} mt-4 p-2`}
           >
             {/** Left Side */}
             <div className="flex max-w-xs flex-col justify-between">
               <h2 className="text-left text-base font-semibold tracking-[-0.015em] text-balance text-white lg:text-2xl">
-                {stepsData[activeStep]?.description}
+                {props.stepsData[activeStep]?.description}
               </h2>
               <p className="mt-4 text-left text-sm font-medium text-balance text-neutral-200">
-                {stepsData[activeStep]?.longDescription}
+                {props.stepsData[activeStep]?.longDescription}
               </p>
-              {stepsData[activeStep]?.customAction}
+              {props.stepsData[activeStep]?.customAction}
             </div>
 
             {/** Right Side */}
@@ -107,7 +96,7 @@ function IntroDisclosure({
                   ease: [0.4, 0, 0.2, 1],
                 }}
               >
-                {stepsData[activeStep]?.image}
+                {props.stepsData[activeStep]?.image}
               </motion.div>
             </AnimatePresence>
           </WobbleCard>
@@ -123,11 +112,8 @@ function IntroDisclosure({
               className="w-fit"
               variant="link"
               onClick={() => {
-                posthog.capture('intro:skipped', {
-                  title: title,
-                  at_step: activeStep,
-                })
-                onOpenChange(false)
+                postHogIntroCapture(props.title, activeStep)
+                props.onOpenChange(false)
               }}
             >
               Skip All
@@ -149,7 +135,7 @@ function IntroDisclosure({
             className="w-fit"
             onClick={() => {
               if (activeStep === totalSteps - 1) {
-                onOpenChange(false)
+                props.onOpenChange(false)
               } else {
                 setActiveStep(prev => Math.min(totalSteps - 1, prev + 1))
               }
@@ -173,34 +159,33 @@ interface StepProps {
   isChecked: boolean
   onClick: () => void
 }
-const Step = ({
-  title,
-  description,
-  active,
-  isChecked,
-  onClick,
-}: StepProps) => {
+const Step = (props: StepProps) => {
   return (
     <div
       className={cn(
         'hover:bg-muted cursor-pointer space-y-2 rounded-lg border border-transparent p-2 transition-all duration-200 sm:px-4 sm:py-3',
-        active && 'border-border bg-muted'
+        props.active && 'border-border bg-muted'
       )}
-      onClick={onClick}
+      onClick={props.onClick}
     >
       <div className="flex items-center justify-between">
+        {/** Title */}
         <p className="text-sm font-medium text-balance sm:text-sm dark:font-light">
-          {title}
+          {props.title}
         </p>
-        {isChecked && (
+
+        {/** Checkbox */}
+        {props.isChecked && (
           <Checkbox
             className="hidden size-4 rounded-full sm:block"
             checked={true}
           />
         )}
       </div>
+
+      {/** Description */}
       <p className="text-muted-foreground text-xs font-light text-balance dark:font-extralight">
-        {description}
+        {props.description}
       </p>
     </div>
   )

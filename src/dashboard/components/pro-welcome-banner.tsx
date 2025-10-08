@@ -1,10 +1,12 @@
 import { useRouter } from '@tanstack/react-router'
 import { Calendar, HardDriveUpload, Network, PlugZap } from 'lucide-react'
 
-import IntroDisclosure, { Step } from '@/core/components/IntroDisclosure'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/utils'
+
+import { IntroStep } from '../models/intro-step.model'
+import IntroDisclosure from './intro-disclosure'
 
 interface ProWelcomeBannerProps {
   open: boolean
@@ -12,8 +14,11 @@ interface ProWelcomeBannerProps {
 }
 
 function ProWelcomeBanner({ open, onOpenChange }: ProWelcomeBannerProps) {
+  //--- Hooks ---
   const router = useRouter()
-  const stepsData: Step[] = [
+
+  //--- Variables ---
+  const stepsData: IntroStep[] = [
     {
       title: 'Power Unlocked',
       description: 'Unlimited Scheduling, More AI Credits',
@@ -44,14 +49,14 @@ function ProWelcomeBanner({ open, onOpenChange }: ProWelcomeBannerProps) {
       title: 'Unlimited Auto Gen',
       description: 'Run Auto Gen Without Any Limits',
       longDescription:
-        "Generate as many automated posts as you want with Luua's Auto Gen, ensuring your content calendar never runs empty.",
+        'Generate as many automated posts as you want with Luua Auto Gen, ensuring your content calendar never runs empty.',
       color: 'bg-purple-800',
       image: (
         <img
           src="/images/autogen.webp"
           width={500}
           height={500}
-          alt="autogen"
+          alt="autoGen"
           className={cn(
             'absolute rounded-2xl object-contain filter',
             `-right-4`,

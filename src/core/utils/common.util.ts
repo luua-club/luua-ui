@@ -1,3 +1,4 @@
+import confetti from 'canvas-confetti'
 import posthog from 'posthog-js'
 
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
@@ -48,4 +49,58 @@ const extractUserInitial = (name: string) => {
     .join('')
 }
 
-export { extractUserInitial, logout, toStartOfDayIso }
+/**
+ * Removes query parameters from the current URL
+ *
+ * @param params The URLSearchParams object containing the query parameters
+ * @param keysToRemove The array of keys to remove from the URLSearchParams object
+ */
+const removeQueryParams = (params: URLSearchParams, keysToRemove: string[]) => {
+  keysToRemove.forEach(key => params.delete(key))
+  const newSearch = params.toString()
+
+  if (newSearch) {
+    window.history.replaceState(null, '', `${location.pathname}?${newSearch}`)
+  } else {
+    window.history.replaceState(null, '', location.pathname)
+  }
+}
+
+/**
+ * Show a confetti when called
+ */
+const showConfetti = () => {
+  const end = Date.now() + 500 // 500 ms
+  const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
+
+  const frame = () => {
+    if (Date.now() > end) return
+    confetti({
+      particleCount: 2,
+      angle: 60,
+      spread: 55,
+      startVelocity: 60,
+      origin: { x: 0, y: 0.5 },
+      colors: colors,
+    })
+    confetti({
+      particleCount: 2,
+      angle: 120,
+      spread: 55,
+      startVelocity: 60,
+      origin: { x: 1, y: 0.5 },
+      colors: colors,
+    })
+
+    requestAnimationFrame(frame)
+  }
+  frame()
+}
+
+export {
+  extractUserInitial,
+  logout,
+  removeQueryParams,
+  showConfetti,
+  toStartOfDayIso,
+}
