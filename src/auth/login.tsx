@@ -13,6 +13,7 @@ import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY, QUERY_KEYS } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { LoginResponse } from '@/core/models/auth.model'
+import { clearUser, setUser } from '@/core/store/auth-slice'
 import { cn } from '@/shared/utils'
 import {
   getLocalStorageItem,
@@ -20,10 +21,12 @@ import {
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
 
-import { clearUser, setUser } from '../../core/store/auth-slice'
-import LoginPanel from '../components/LoginPanel'
+import LoginPanel from './components/login-panel'
 
 function Login() {
+  // ---- States ----
+  const [mounted, setMounted] = useState(false)
+
   // ---- Variables ----
   const key = useMemo(() => LUUA_USER_KEY, [])
 
@@ -31,7 +34,6 @@ function Login() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-  const [mounted, setMounted] = useState(false)
   const loginMutation = useMutation({
     mutationFn: (token: string) =>
       authApi.login({
@@ -47,13 +49,17 @@ function Login() {
   const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
 
   // ---- Effects ----
+  /**
+   * Clear user and local storage on mount
+   */
   useEffect(() => {
-    // Clear user and local storage on mount
     dispatch(clearUser())
     removeLocalStorageItem(key)
   }, [dispatch, key])
 
-  // Defer animations until after first mount to avoid flash
+  /**
+   * Defer animations until after first mount to avoid flash
+   */
   useEffect(() => {
     setMounted(true)
   }, [])

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import LuuaLogo from '@/assets/images/luua-full-black.svg?react'
-import { Highlighter } from '@/shared/ui/highlighter'
 
 interface LoginPanelProps {
   isLoading: boolean
@@ -18,6 +17,9 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
   const buttonRef = useRef<HTMLDivElement | null>(null)
 
   // ---- Hooks ----
+  /**
+   * Show the Google button only after its iframe is present to avoid snap
+   */
   useEffect(() => {
     if (isLoading) return
 
@@ -61,31 +63,29 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
   }, [isLoading])
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-6 p-5">
-      <div className="flex flex-col items-center gap-4">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-8">
+      <div className="flex flex-col items-center gap-6">
         {/** Logo */}
-        <LuuaLogo className="w-72 lg:w-96 xl:h-[120px] xl:w-[500px]" />
+        <LuuaLogo className="w-72 sm:w-96 xl:h-[120px] xl:w-[500px]" />
 
         {/** Tagline */}
-        <Highlighter action="underline" color="var(--brand-accent-yellow)">
-          <p className="text-base font-bold text-black lg:text-2xl">
-            For strategically lazy people.
-          </p>
-        </Highlighter>
+        <p className="text-xl font-bold text-black sm:text-2xl">
+          For strategically lazy people.
+        </p>
       </div>
 
       {/** Description */}
-      <div className="mt-8 flex flex-col items-center gap-8 md:mt-6">
-        <p className="text-center text-base font-medium text-gray-600 md:text-lg">
+      <div className="flex flex-col items-center gap-10">
+        <p className="text-center text-base font-medium text-balance text-gray-600 sm:text-lg">
           From idea to post, everything is automated,
-          <br className="hidden lg:block" />
+          <br className="hidden sm:block" />
           making brand-building effortless with Luua.
         </p>
 
         {/** Login Button (reserve space and fade-in when iframe is ready) */}
         <div className="relative flex h-[44px] w-[280px] items-center justify-center">
           {isLoading ? (
-            <Loader className="h-10 w-10 animate-spin" color="black" />
+            <Loader className="size-6 animate-spin" color="black" />
           ) : (
             <div
               ref={buttonRef}
