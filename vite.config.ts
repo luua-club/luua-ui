@@ -12,6 +12,15 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'lucide-icons': ['lucide-react'],
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
     host: true,

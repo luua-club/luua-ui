@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import './shared/styles/colors.css';
 @import './shared/styles/theme.css';
-@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
