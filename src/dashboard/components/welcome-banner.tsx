@@ -1,4 +1,4 @@
-import { useLocation, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { Box, Download, PencilRuler, PlugZap } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 
@@ -18,7 +18,6 @@ interface WelcomeBannerProps {
 function WelcomeBanner({ open, onOpenChange }: WelcomeBannerProps) {
   //--- Hooks ---
   const router = useRouter()
-  const location = useLocation()
 
   //--- Variables ---
   const stepsData: IntroStep[] = useMemo(
