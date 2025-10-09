@@ -8,6 +8,7 @@ import { SourceChip } from '@/shared/components/sources-card'
 
 import { generateApi } from '../api/generate-post.api'
 import { QUERY_KEYS } from '../config/constant'
+import { postHogGenerationCapture } from '../config/posthog.config'
 import { IPost } from '../models/post.model'
 import { channelType } from '../models/social.model'
 
@@ -142,13 +143,13 @@ export const useGeneratePosts = (
       })
     }
 
-    posthog.capture('posts:generated', {
-      posts_count: postsResult.length,
-      linkedin_content: postsResult.find(p => p.channel === 'LinkedIn')
-        ?.content,
-      twitter_content: postsResult.find(p => p.channel === 'Twitter')?.content,
-      original_prompt: query.data.data.original_prompt,
-    })
+    // Posthog event
+    postHogGenerationCapture(
+      postsResult.length,
+      query.data.data.original_prompt,
+      postsResult.find(p => p.channel === 'LinkedIn')?.content,
+      postsResult.find(p => p.channel === 'Twitter')?.content
+    )
 
     // Only update ref if we have new posts
     if (postsResult.length > 0) {

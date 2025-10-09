@@ -8,9 +8,9 @@ export const OnboardingGuard = () => {
   const loginResponse = getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
   const isNewUser = !!loginResponse?.new_user
 
-  if (!isNewUser) {
-    throw redirect({ to: '/dashboard' })
-  }
+  // if (!isNewUser) {
+  //   throw redirect({ to: '/dashboard' })
+  // }
 
   return {}
 }

@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query'
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight, PencilRuler } from 'lucide-react'
 import { motion } from 'motion/react'
-import posthog from 'posthog-js'
 import { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -12,6 +11,12 @@ import Logo from '@/assets/images/luua-black-icon.svg?react'
 import LogoDark from '@/assets/images/luua-white-icon.svg?react'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_USER_KEY } from '@/core/config/constant'
+import {
+  postHogOnboardingCompleted,
+  postHogOnboardingSkipped,
+  postHogOnboardingStylesCompleted,
+  postHogOnboardingStylesSkipped,
+} from '@/core/config/posthog.config'
 import UserStyles from '@/core/containers/UserStyles'
 import { LoginResponse } from '@/core/models/auth.model'
 import {
@@ -53,15 +58,13 @@ function OnBoarding() {
     mode: 'onTouched',
     defaultValues: {
       role: '',
-      industry: undefined,
-      goal: undefined,
+      industry: '',
+      goal: '',
     },
   })
-
   const setUserStyleMutation = useMutation({
     mutationFn: (payload: IUserStyleRequest) => userApi.setUserStyle(payload),
   })
-
   const userOnboardingMutation = useMutation({
     mutationFn: (payload: UserOnboardingRequest) => userApi.onboarding(payload),
   })
@@ -86,7 +89,9 @@ function OnBoarding() {
    */
   const onSubmit = async (values: OnboardingFormValues) => {
     try {
+      // Add Promises to run in parallel
       const promises: Promise<unknown>[] = []
+
       promises.push(
         userOnboardingMutation.mutateAsync({
           role: values.role,
@@ -94,6 +99,7 @@ function OnBoarding() {
           goal: values.goal,
         })
       )
+
       if (styles.length > 0) {
         promises.push(
           setUserStyleMutation.mutateAsync({ writing_style: styles })
@@ -104,22 +110,18 @@ function OnBoarding() {
         await Promise.all([...promises])
       }
 
+      // Posthog event onboarding form
       if (values.role || values.industry || values.goal) {
-        posthog.capture('onboarding:completed', {
-          role: values.role,
-          industry: values.industry,
-          goal: values.goal,
-        })
+        postHogOnboardingCompleted(values.role, values.industry, values.goal)
       } else {
-        posthog.capture('onboarding:skipped')
+        postHogOnboardingSkipped()
       }
 
+      // Posthog event onboarding styles
       if (styles.length > 0) {
-        posthog.capture('onboarding:styles_completed', {
-          styles: styles,
-        })
+        postHogOnboardingStylesCompleted(styles)
       } else {
-        posthog.capture('onboarding:styles_skipped')
+        postHogOnboardingStylesSkipped()
       }
     } catch {
       toast.error('Something Went Wrong')
@@ -170,6 +172,7 @@ function OnBoarding() {
 
   return (
     <div className="flex h-screen w-screen flex-col sm:items-center">
+      {/** Background Dot DotPattern */}
       <div className="absolute inset-0 flex w-full flex-col items-center justify-center overflow-hidden">
         <DotPattern
           glow={true}
@@ -179,12 +182,15 @@ function OnBoarding() {
         />
       </div>
 
+      {/** Form Header */}
       <div className="flex flex-col items-center justify-center gap-4 p-5 text-center sm:z-10">
+        {/** Logo */}
         <span className="rounded-full border-2 border-dashed p-4">
           <Logo className="size-12 dark:hidden" />
           <LogoDark className="hidden size-12 dark:block" />
         </span>
-        {/* Header */}
+
+        {/* Text and description */}
         <h1 className="text-xl font-semibold sm:text-3xl">
           Let&apos;s get you in the club!
         </h1>
