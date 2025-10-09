@@ -2,7 +2,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { Outlet, RouterProvider, useLocation } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
-import posthog, { PostHogConfig } from 'posthog-js'
+import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
@@ -27,6 +27,13 @@ import router from './router'
 import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
 import { ThemeProvider } from './shared/provider/theme-provider'
 import { getLocalStorageItem } from './shared/utils/localstorage.util'
+
+// Initialize PostHog
+posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
+  api_host: import.meta.env.VITE_PUBLIC_REVERSE_PROXY_URL,
+  person_profiles: 'always',
+  capture_exceptions: true,
+})
 
 export function AppContent() {
   // ---- Variables ----
@@ -104,18 +111,8 @@ export function AppContent() {
 }
 
 function App() {
-  const options: Partial<PostHogConfig> = {
-    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-    defaults: '2025-05-24',
-    person_profiles: 'always',
-    capture_exceptions: true,
-  }
-
   return (
-    <PostHogProvider
-      apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
-      options={options}
-    >
+    <PostHogProvider client={posthog}>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         {/* Google Auth provider */}
         <QueryClientProvider client={queryClient}>
