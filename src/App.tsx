@@ -111,6 +111,18 @@ function App() {
     capture_exceptions: true,
   }
 
+  // Hide the initial HTML loader when React app mounts
+  useEffect(() => {
+    const loader = document.getElementById('app-loader')
+    if (loader) {
+      loader.classList.add('fade-out')
+      // Remove from DOM after fade animation completes
+      setTimeout(() => {
+        loader.remove()
+      }, 400) // Match the CSS transition duration
+    }
+  }, [])
+
   return (
     <PostHogProvider
       apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY}
