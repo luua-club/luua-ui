@@ -1,64 +1,113 @@
 # Luua UI
 
-**Testing URL:** https://dev.luua.club/
+A modern web application built with React and TypeScript.
 
-**Local Development URL:** http://localhost:3000/
+## 🌐 Environments
 
-## Prerequisites
+- **Development:** https://dev.luua.club/
+- **Local:** http://localhost:3000/
 
-Docker (optional, for dev in container)
+## 📋 Prerequisites
 
-OR
+Choose one of the following setups:
 
-Node: 22.14.0 (see `.nvmrc` / `.node-version`)
+### Option 1: Docker (Recommended)
 
-pnpm: 10.x (repo uses `packageManager: pnpm@10.12.4`)
+- Docker and Docker Compose
 
-Only pnpm is allowed (`preinstall` uses `only-allow`)
+### Option 2: Local Environment
 
-## Environment Variables
+- **Node.js:** `22.14.0` (see `.nvmrc` / `.node-version`)
+- **pnpm:** `10.x` (this repo uses `pnpm@10.12.4`)
 
-Create a `.env` file in the project root (ignored in Git):
+> **Note:** Only pnpm is allowed as the package manager (`preinstall` script enforces this via `only-allow`)
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the project root (already ignored in Git). You can use `.env.example` as a template:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
 
 ```bash
 # Google OAuth client ID
 VITE_GOOGLE_CLIENT_ID=<your_key>
 
 # API backend URL
-VITE_LUUA_BACKEND_URL=https://api-dev.luua.club/
+VITE_LUUA_BACKEND_URL=https://api-dev.luua.club/api/v1
 
-# Optional environment name
+# LocalStorage key for user data
 VITE_LUUA_LS_USER=luua-user
 
-# Optional PostHog analytics key (for dev)
+# PostHog analytics (optional for development)
 VITE_PUBLIC_POSTHOG_KEY=<posthog_key>
 VITE_PUBLIC_POSTHOG_HOST=<posthog_host>
+VITE_PUBLIC_REVERSE_PROXY_URL=<reverse_proxy_url>
 ```
 
-## Install & Run
+## 🚀 Getting Started
 
-Local Development (with Docker, Recommended)
+### Using Docker (Recommended)
+
+Build and start the development server:
 
 ```bash
 docker compose up --build
 ```
 
-Local Development (without Docker)
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+### Using Local Environment
+
+Install dependencies and start the development server:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Stop containers
+> **Tip:** If you encounter Node version issues, run `nvm use` to switch to the correct version (reads from `.nvmrc`)
+
+## 📝 Development Notes
+
+- **Port:** Development server runs on `localhost:3000`
+- **Hot Reload:** Docker development container supports hot reload with mounted volumes
+- **Code Quality:** Commit hooks via Husky and formatting via lint-staged are automatically enabled
+- **Node Version Management:** Use `nvm use` if Node version issues arise
+
+## 🛠️ Available Scripts
 
 ```bash
-docker compose down
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Preview production build
+pnpm preview
+
+# Run linter
+pnpm lint
+
+# Run tests
+pnpm test
 ```
 
-### Notes
+## 📦 Tech Stack
 
-1. Dev server runs on port localhost:3000
-2. Docker dev container supports hot reload with mounted volumes
-3. Commit hooks via Husky and formatting via lint-staged are enabled
-4. Use nvm use if Node version issues arise (reads .nvmrc)
+- React
+- TypeScript
+- Vite
+- PostHog Analytics
+- Google OAuth
