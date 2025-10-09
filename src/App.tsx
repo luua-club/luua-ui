@@ -87,12 +87,12 @@ export function AppContent() {
       if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
         posthog.captureException(error)
         toast.error(
-          'Some error has occurred, please try again later, if the problem persists, please contact support.'
+          'Some error has occurred, please try again later, if the problem persists, please contact support, loggin out..'
         )
-        return
+        setTimeout(() => logout(), 3000)
+      } else {
+        logout()
       }
-
-      logout()
     }
   }, [isError, isEnabled, error])
 
