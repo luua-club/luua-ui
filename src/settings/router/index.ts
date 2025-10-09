@@ -1,10 +1,8 @@
-import { createRoute } from '@tanstack/react-router'
+import { type AnyRoute, createRoute } from '@tanstack/react-router'
 
-import { privateRoute } from '@/router'
-
-const settingsRoute = createRoute({
-  getParentRoute: () => privateRoute,
-  path: '/settings',
-}).lazy(() => import('../pages').then(d => d.Route))
-
-export default settingsRoute
+export default function getSettingsRoute(privateRoute: AnyRoute) {
+  return createRoute({
+    getParentRoute: () => privateRoute,
+    path: '/settings',
+  }).lazy(() => import('../pages').then(d => d.Route))
+}

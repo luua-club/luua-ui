@@ -1,13 +1,11 @@
-import { createRoute } from '@tanstack/react-router'
-
-import { rootRoute } from '@/router'
+import { type AnyRoute, createRoute } from '@tanstack/react-router'
 
 import { OnboardingGuard } from './guard.ts'
 
-const onboardingRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/onboarding',
-  loader: () => OnboardingGuard(),
-}).lazy(() => import('./onboarding').then(d => d.Route))
-
-export default onboardingRoute
+export default function getOnboardingRoute(rootRoute: AnyRoute) {
+  return createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/onboarding',
+    loader: () => OnboardingGuard(),
+  }).lazy(() => import('./onboarding').then(d => d.Route))
+}

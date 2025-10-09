@@ -1,16 +1,14 @@
-import { createRoute } from '@tanstack/react-router'
-
-import { rootRoute } from '@/router'
+import { type AnyRoute, createRoute } from '@tanstack/react-router'
 
 import Login from './login'
 
 /**
  * Auth Route
  */
-const authRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/login',
-  component: Login,
-})
-
-export default authRoute
+export default function getAuthRoute(rootRoute: AnyRoute) {
+  return createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/login',
+    component: Login,
+  })
+}

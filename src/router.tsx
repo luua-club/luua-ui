@@ -5,17 +5,17 @@ import {
 } from '@tanstack/react-router'
 
 import { AppContent } from '@/App'
-import authRoute from '@/auth/router'
-import autoGenRouteTree from '@/auto-gen/router'
+import getAuthRoute from '@/auth/router'
+import getAutoGenRouteTree from '@/auto-gen/router'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
-import creationRouteTree from '@/creation/router'
-import dashboardRoute from '@/dashboard/router'
-import onboardingRoute from '@/onboarding/router'
-import paymentsRoute from '@/payments/router'
-import preferencesRoute from '@/preferences/router'
-import publishedRoute from '@/published/router'
-import scheduleRoute from '@/schedule/router'
-import settingsRouteTree from '@/settings/router'
+import getCreationRouteTree from '@/creation/router'
+import getDashboardRoute from '@/dashboard/router'
+import getOnboardingRoute from '@/onboarding/router'
+import getPaymentsRoute from '@/payments/router'
+import getPreferencesRoute from '@/preferences/router'
+import getPublishedRoute from '@/published/router'
+import getScheduleRoute from '@/schedule/router'
+import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
 
 import { AuthGuard } from './guards'
@@ -30,6 +30,17 @@ export const privateRoute = createRoute({
   path: '/',
   component: SidebarLayout,
 })
+
+const authRoute = getAuthRoute(rootRoute)
+const onboardingRoute = getOnboardingRoute(rootRoute)
+const dashboardRoute = getDashboardRoute(privateRoute)
+const scheduleRoute = getScheduleRoute(privateRoute)
+const settingsRouteTree = getSettingsRouteTree(privateRoute)
+const creationRouteTree = getCreationRouteTree(privateRoute)
+const publishedRoute = getPublishedRoute(privateRoute)
+const preferencesRoute = getPreferencesRoute(privateRoute)
+const autoGenRouteTree = getAutoGenRouteTree(privateRoute)
+const paymentsRoute = getPaymentsRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
