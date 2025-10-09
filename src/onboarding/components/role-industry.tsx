@@ -53,7 +53,6 @@ function RoleAndIndustry({ industries }: RoleAndIndustryProps) {
             </FormLabel>
             <Select
               onValueChange={field.onChange}
-              defaultValue={field.value as string | undefined}
               value={field.value as string | undefined}
             >
               <FormControl>

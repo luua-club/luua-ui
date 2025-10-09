@@ -5,6 +5,10 @@ import posthog from 'posthog-js'
 import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
+import {
+  postHogCheckoutCapture,
+  postHogUpgradeCapture,
+} from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -20,9 +24,7 @@ function PlanCards() {
       const { payment_link } = data
 
       if (payment_link) {
-        posthog.capture('payments:checkout_started', {
-          current_plan: user?.plan,
-        })
+        postHogCheckoutCapture(user?.plan)
         window.location.href = payment_link
         return
       }
@@ -43,7 +45,7 @@ function PlanCards() {
    * Handle upgrade click
    */
   const handleUpgradeClick = () => {
-    posthog.capture('payments:upgrade_clicked', { current_plan: user?.plan })
+    postHogUpgradeCapture(user?.plan)
     createPaymentLinkMutation.mutate()
   }
 

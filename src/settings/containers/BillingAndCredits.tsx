@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Trash2 } from 'lucide-react'
-import posthog from 'posthog-js'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { postHogCancelledPlanCapture } from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { ConfirmDialog } from '@/shared/components/confirm-dialog'
 import { Button } from '@/shared/ui/button'
@@ -38,7 +38,7 @@ function BillingAndCredits() {
   const cancelSubscriptionMutation = useMutation({
     mutationFn: () => paymentApi.cancelSubscription(),
     onSuccess: () => {
-      posthog.capture('payments:subscription_cancelled')
+      postHogCancelledPlanCapture()
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.subscriptionDetails],
       })

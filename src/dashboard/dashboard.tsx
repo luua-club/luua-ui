@@ -13,6 +13,7 @@ import { setPrompt } from '@/core/store/prompt-slice'
 import { removeQueryParams } from '@/core/utils/common.util'
 import { ProPlanChip } from '@/shared/components/pro-plan-chip'
 import { UpgradePlanBtn } from '@/shared/components/upgrade-plan-btn'
+import { Button } from '@/shared/ui/button'
 import { capitalize } from '@/shared/utils'
 
 import ProWelcomeBanner from './components/pro-welcome-banner'
@@ -87,6 +88,16 @@ function Dashboard() {
   //--- Render ---
   return (
     <div className="relative m-auto min-h-[calc(100vh-3.5rem)] max-w-7xl">
+      <div className="flex justify-end p-4">
+        <Button
+          variant={'outline'}
+          className="text-muted-foreground size-8 rounded-full"
+          onClick={() => setIsWelcomeBannerOpen(true)}
+        >
+          ?
+        </Button>
+      </div>
+
       <div className="absolute top-[40%] left-1/2 flex w-full -translate-x-1/2 -translate-y-1/2 transform flex-col gap-6 p-5 lg:max-w-[60%]">
         {/** Floating Chip */}
         <div className="w-fit cursor-pointer self-center">
