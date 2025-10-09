@@ -9,7 +9,7 @@ import { channelType, ISocialChannel } from '../models/social.model'
  * @default 'luua-user'
  */
 export const LUUA_USER_KEY: string =
-  import.meta.env.LUUA_USER_KEY || 'luua-user'
+  import.meta.env.VITE_LUUA_LS_USER || 'luua-user'
 
 /**
  * Base URL for the API
