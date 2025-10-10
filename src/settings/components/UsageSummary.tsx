@@ -66,7 +66,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="space-y-4 p-4">
             <p className="text-muted-foreground text-sm font-medium">
-              Remaining Credits
+              Consumed Credits
             </p>
             <p
               className={cn(

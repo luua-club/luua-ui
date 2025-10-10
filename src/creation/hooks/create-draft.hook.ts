@@ -3,7 +3,7 @@ import { useBlocker, useLocation, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
 import confetti from 'canvas-confetti'
 import posthog from 'posthog-js'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
@@ -46,8 +46,8 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
       schedule: false,
     }
   )
-  // Navigation guard state
-  const [allowLeave, setAllowLeave] = useState(false)
+  // Navigation guard state - using ref for synchronous updates
+  const allowLeaveRef = useRef(false)
   const [blockerEnabled, setBlockerEnabled] = useState(false)
 
   // ----- Hooks -----
@@ -62,7 +62,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
   const draftEnabled = Boolean(draftId)
   // ---- Internal navigation blocker (custom modal is handled in page via resolver) ----
   const navBlocker = useBlocker({
-    shouldBlockFn: () => !allowLeave,
+    shouldBlockFn: () => !allowLeaveRef.current,
     withResolver: true,
     enableBeforeUnload: false,
     disabled: !blockerEnabled,
@@ -157,8 +157,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
         toast.error('Something went wrong')
       }
 
-      // Bypass blocker for programmatic redirect
-      setAllowLeave(true)
+      allowLeaveRef.current = true
       navigate({ to: '/creation/create' })
     }
   }, [draftQuery.isError, draftQuery.error, navigate])
@@ -180,8 +179,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
 
       toast.success('Draft saved successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-      // Ensure navigation is not blocked after save
-      setAllowLeave(true)
+      allowLeaveRef.current = true
       navigate({
         to: '/creation/create',
         search: { draftId: response.data.draft.id },
@@ -219,6 +217,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
    */
   const handleContentChange = useCallback(
     (val: string, name: channelType) => {
+      allowLeaveRef.current = false
       setPostDrafts(prev => ({
         ...prev,
         [name]: {
@@ -317,11 +316,9 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
               scheduleDate
             )
 
-            setIsShareModalOpen({ open: false, schedule: false })
             toast.success('Draft scheduled successfully')
             queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-            // Bypass blocker for programmatic navigation
-            setAllowLeave(true)
+            allowLeaveRef.current = true
             navigate({ to: '/schedule' })
           },
           onError: () => {
@@ -345,7 +342,6 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
           latestGeneratedPosts.find(p => p.channel === 'LinkedIn')?.content,
           latestGeneratedPosts.find(p => p.channel === 'Twitter')?.content
         )
-        setIsShareModalOpen({ open: false, schedule: false })
         toast.success('Post are published successfully')
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
@@ -380,8 +376,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
         }
 
         handleClick()
-        // Bypass blocker for programmatic navigation
-        setAllowLeave(true)
+        allowLeaveRef.current = true
         navigate({ to: '/dashboard' })
       },
       onError: () => {
@@ -475,9 +470,6 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
 
     // ----- Utilities -----
     getSharePosts,
-
-    // ----- Navigation guard controls -----
-    setAllowLeave,
     navBlocker,
   }
 }
