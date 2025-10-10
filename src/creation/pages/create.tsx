@@ -66,7 +66,6 @@ function Create() {
     postDrafts,
     isShareModalOpen,
     setIsShareModalOpen,
-    setAllowLeave,
     navBlocker,
 
     // Variables
@@ -177,17 +176,12 @@ function Create() {
     return (
       <DraftActions
         handlePublishDraft={() => {
-          setAllowLeave(true)
           setIsShareModalOpen({ open: true, schedule: false })
         }}
         handleScheduleDraft={() => {
-          setAllowLeave(true)
           setIsShareModalOpen({ open: true, schedule: true })
         }}
-        handleSaveDraft={() => {
-          setAllowLeave(true)
-          handleSaveDraft()
-        }}
+        handleSaveDraft={handleSaveDraft}
         isLoading={
           saveDraftMutation.isPending ||
           isGenerationDataFetching ||
@@ -281,9 +275,6 @@ function Create() {
         isLoading={isDraftActionsDisabled()}
         onOpenChange={open => {
           setIsShareModalOpen(open)
-          if (!open.open) {
-            setAllowLeave(false)
-          }
         }}
         onSubmit={handleSubmitDraft}
       />
