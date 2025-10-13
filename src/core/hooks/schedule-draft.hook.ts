@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { draftsApi } from '../api/drafts.api'
 import { postsApi } from '../api/posts.api'
 import { type IDraftRequest } from '../models/draft.model'
+import { channelType } from '../models/social.model'
 
 /**
  * useScheduleDraft
@@ -18,6 +19,7 @@ import { type IDraftRequest } from '../models/draft.model'
 export function useScheduleDraft() {
   type Params = {
     draftRequest: IDraftRequest
+    forChannel: channelType[]
     /** ISO string date to apply to all created posts */
     scheduleDate: string
   }
@@ -36,7 +38,12 @@ export function useScheduleDraft() {
       const draftRes = await draftsApi.postDraft(draftPayload)
 
       const draftId = draftRes.data.draft.id
-      const postIds = draftRes.data.draft.posts.map(post => post.id)
+
+      // Filter postIds based on forChannel
+      const forChannelSet = new Set(params.forChannel)
+      const postIds = draftRes.data.draft.posts
+        .filter(post => forChannelSet.has(post.channel))
+        .map(post => post.id)
 
       // Step 2: Schedule draft
       const schedules = Object.fromEntries(

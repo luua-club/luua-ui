@@ -111,8 +111,8 @@ export function SharePostModal({
   const PostModalContent = () => {
     if (visiblePosts.length === 0) {
       return (
-        <div className="mt-4">
-          <p className="text-muted-foreground text-center font-semibold">
+        <div className="my-8">
+          <p className="text-muted-foreground text-center font-semibold text-balance">
             No posts to share, Please connect your social accounts to share
             posts
           </p>
