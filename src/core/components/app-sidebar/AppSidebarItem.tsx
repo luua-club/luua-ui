@@ -89,7 +89,7 @@ const ItemWithIcon = ({ item }: IItemWithIconProps) => {
             <span
               className={cn(
                 'size-1.5 animate-pulse rounded-full',
-                item.ping === 'success' ? 'bg-green-500' : 'bg-red-500'
+                item.ping === 'success' ? 'bg-green-500' : 'bg-yellow-400'
               )}
             ></span>
           )}

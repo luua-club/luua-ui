@@ -60,7 +60,7 @@ const StyleTextCapture = ({
               <FormControl>
                 <Textarea
                   placeholder="Enter your sample text here"
-                  className="min-h-28 resize-none shadow-none"
+                  className="max-h-96 min-h-28 resize-none shadow-none"
                   rows={4}
                   {...field}
                 />
