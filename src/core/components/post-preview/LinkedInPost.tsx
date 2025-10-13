@@ -1,4 +1,3 @@
-import { useRouter } from '@tanstack/react-router'
 import {
   Dot,
   Ellipsis,
@@ -8,7 +7,7 @@ import {
   Send,
   Smile,
   ThumbsUp,
-  Unplug,
+  TriangleAlert,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -21,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Textarea } from '@/shared/ui/textarea'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { useUserState } from '../../hooks/user-state.hook'
@@ -30,7 +30,6 @@ import PostImagePreview from './PostImagePreview'
 
 const LinkedInPost = (props: PostPreviewProps) => {
   const user = useUserState()
-  const router = useRouter()
 
   const {
     content,
@@ -70,32 +69,23 @@ const LinkedInPost = (props: PostPreviewProps) => {
   const isLong = raw.length > MAX_CHARS
   const displayText =
     expanded || !isLong ? raw : raw.slice(0, MAX_CHARS).trimEnd() + '...'
-  const overlayClassNames =
-    'bg-background/10 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[7px]'
 
   return (
     <div className="relative">
       {!user_social.connected && (
-        <div className={overlayClassNames}>
-          <p className="font-bold">
-            Please connect your linkedIn account to post content
-          </p>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() =>
-              router.navigate({
-                to: '/settings',
-                search: { tabs: 'socials' },
-              })
-            }
-          >
-            <Unplug /> Connect
-          </Button>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="bg-card absolute -top-3 -right-2 z-20 animate-pulse rounded-full border-1 p-1 text-yellow-500">
+              <TriangleAlert className="size-4" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>LinkedIn not connected</p>
+          </TooltipContent>
+        </Tooltip>
       )}
 
-      {!props.notEditable && user_social.connected && (
+      {!props.notEditable && (
         <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
           {!props.isActionLoading && (
             <div className="lg:absolute lg:top-0 lg:-right-10">

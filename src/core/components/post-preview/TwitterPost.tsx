@@ -11,7 +11,7 @@ import {
   MessageCircle,
   Repeat2,
   Share,
-  Unplug,
+  TriangleAlert,
 } from 'lucide-react'
 import { useEffect } from 'react'
 
@@ -98,23 +98,16 @@ const TwitterPost = (props: PostPreviewProps) => {
       )}
 
       {!user_social.connected && isProPlan && (
-        <div className={overlayClassNames}>
-          <p className="font-semibold">
-            Please connect your twitter account to post content
-          </p>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() =>
-              router.navigate({
-                to: '/settings',
-                search: { tabs: 'socials' },
-              })
-            }
-          >
-            <Unplug /> Connect
-          </Button>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="bg-card absolute -top-3 -right-2 z-20 animate-pulse rounded-full border-1 p-1 text-yellow-500">
+              <TriangleAlert className="size-4" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Twitter not connected</p>
+          </TooltipContent>
+        </Tooltip>
       )}
 
       {!props.notEditable && user_social.connected && (

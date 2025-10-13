@@ -166,8 +166,9 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
    * POST draft
    */
   const saveDraftMutation = useMutation({
-    mutationFn: (payload: IDraftRequest) => draftsApi.postDraft(payload),
-    onSuccess: response => {
+    mutationFn: (payload: { request: IDraftRequest; callback?: () => void }) =>
+      draftsApi.postDraft(payload.request),
+    onSuccess: (response, variables) => {
       postHogDraftCapture(
         response.data.draft.id,
         response.data.draft.posts.length,
@@ -192,6 +193,13 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
 
       toast.success('Draft saved successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+
+      // Call callback if provided
+      if (variables.callback) {
+        variables.callback()
+        return
+      }
+
       allowLeaveRef.current = true
       navigate({
         to: '/creation/create',
@@ -261,12 +269,12 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
   /**
    * Save drafts
    */
-  const handleSaveDraft = () => {
+  const handleSaveDraft = (callback?: () => void) => {
     const postPayload = getDraftRequestPayload()
     if (postPayload.posts.length === 0) return
 
     // Call api
-    saveDraftMutation.mutate(postPayload)
+    saveDraftMutation.mutate({ request: postPayload, callback })
   }
 
   /**
@@ -407,6 +415,9 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
     // ----- Variables -----
     draftEnabled,
     draftId,
+
+    // ----- Refs -----
+    allowLeaveRef,
 
     // ----- Query/Mutation -----
     draftQuery,

@@ -1,5 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { createLazyRoute, useLocation } from '@tanstack/react-router'
+import {
+  createLazyRoute,
+  useLocation,
+  useNavigate,
+} from '@tanstack/react-router'
 import { HistoryIcon, Loader, PenLine } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -64,6 +68,7 @@ function Create() {
   const queryClient = useQueryClient()
   const preUserPromptState = useAppSelector(state => state.promptState)
   const user = useUserState()
+  const navigate = useNavigate()
   const {
     // State
     postDrafts,
@@ -73,6 +78,9 @@ function Create() {
 
     // Variables
     draftEnabled,
+
+    // Refs
+    allowLeaveRef,
 
     // Query/Mutation
     draftQuery,
@@ -111,6 +119,7 @@ function Create() {
 
   // ---- Variables ----
   const isGenerationDataFetching = isGenerationLoading || isGenerationFetching
+  const isProPlan = user?.plan === 'Pro'
 
   // ---- Effects ----
   /**
@@ -194,6 +203,7 @@ function Create() {
 
     return (
       <DraftActions
+        user={user}
         handlePublishDraft={() => {
           setIsShareModalOpen({ open: true, schedule: false })
         }}
@@ -201,6 +211,28 @@ function Create() {
           setIsShareModalOpen({ open: true, schedule: true })
         }}
         handleSaveDraft={handleSaveDraft}
+        isSocialCallLoading={
+          saveDraftMutation.isPending || isGenerationDataFetching
+        }
+        handleConnectSocials={() => {
+          const callback = () =>
+            navigate({
+              to: '/settings',
+              search: { tabs: 'socials' },
+            })
+
+          allowLeaveRef.current = true
+
+          if (
+            !postDrafts['LinkedIn']?.content &&
+            !postDrafts['Twitter']?.content
+          ) {
+            setTimeout(() => callback(), 0)
+            return
+          }
+
+          setTimeout(() => handleSaveDraft(callback), 0)
+        }}
         isLoading={
           saveDraftMutation.isPending ||
           isGenerationDataFetching ||
@@ -298,8 +330,10 @@ function Create() {
 
       {/** Floating Prompt Input */}
       {user &&
-        isSocialConnected(activeSocialTab, user) &&
-        activeTab === TabValue.CREATED_POST && (
+        activeTab === TabValue.CREATED_POST &&
+        (!isProPlan && activeSocialTab === 'Twitter'
+          ? isSocialConnected('Twitter', user)
+          : true) && (
           <FloatingPromptInput
             activeChannel={activeSocialTab}
             onChange={(
