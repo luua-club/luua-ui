@@ -74,13 +74,11 @@ function Create() {
     // Query/Mutation
     draftQuery,
     saveDraftMutation,
-    deletePostMutation,
 
     // Handlers
     handleContentChange,
     handleSaveDraft,
     handleSubmitDraft,
-    handleDeletePost,
     isDraftActionsDisabled,
 
     // Utilities
@@ -121,6 +119,15 @@ function Create() {
       dispatch(clearPrompt())
     }
   }, [dispatch])
+
+  /**
+   * Set active social tab based on pre-user prompt state, i.e dashboard
+   */
+  useEffect(() => {
+    if (preUserPromptState.channel) {
+      setActiveSocialTab(preUserPromptState.channel)
+    }
+  }, [preUserPromptState.channel])
 
   /**
    * Handle `source` query param to trigger generation and then remove it
@@ -235,8 +242,6 @@ function Create() {
                 loading:
                   (draftEnabled && draftQuery.isPending) ||
                   isGenerationDataFetching,
-                isActionLoading: deletePostMutation.isPending,
-                handlePostDelete: (postId?: string) => handleDeletePost(postId),
               }}
             />
 

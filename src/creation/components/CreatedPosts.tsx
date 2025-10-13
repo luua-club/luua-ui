@@ -12,8 +12,6 @@ interface PostProps {
   handleContentChange: (val: string, name: channelType) => void
   postDrafts: PostDraftsType
   loading: boolean
-  isActionLoading: boolean
-  handlePostDelete: (postId?: string) => void
 }
 
 // Create tab content props
@@ -71,10 +69,7 @@ function CreatedPosts({
                 }
                 initialContent={post.postDrafts[activeTab]?.content}
                 loading={post.loading}
-                isActionLoading={post.isActionLoading}
-                handlePostDelete={() =>
-                  post.handlePostDelete(post.postDrafts[activeTab]?.id)
-                }
+                hideDelete
               />
             </div>
           </TabsContent>

@@ -18,23 +18,30 @@ import {
 interface IPostActionsProps {
   onEmojiSelect: (emoji: string) => void
   onDelete: () => void
+  hideDelete?: boolean
 }
 
 //TODO: REFACTOR THIS, FILE UPLOAD WILL HAPPEN TO SERVER
-const PostActions = ({ onEmojiSelect, onDelete }: IPostActionsProps) => {
+const PostActions = ({
+  onEmojiSelect,
+  onDelete,
+  hideDelete = false,
+}: IPostActionsProps) => {
   const [open, setOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
     <div className="flex gap-2 lg:flex-col">
-      <Button
-        variant="destructive"
-        className="size-7"
-        aria-label="Delete post"
-        onClick={() => setConfirmOpen(true)}
-      >
-        <Trash2 className="size-3" />
-      </Button>
+      {!hideDelete && (
+        <Button
+          variant="destructive"
+          className="size-7"
+          aria-label="Delete post"
+          onClick={() => setConfirmOpen(true)}
+        >
+          <Trash2 className="size-3" />
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="inline-flex size-7">

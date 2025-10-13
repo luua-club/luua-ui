@@ -190,24 +190,6 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
     },
   })
 
-  /**
-   * DELETE post from draft
-   */
-  const deletePostMutation = useMutation({
-    mutationFn: ({ draftId, postId }: { draftId: string; postId: string }) =>
-      draftsApi.deletePost(draftId, postId),
-    onSuccess: () => {
-      toast.success('Post deleted successfully')
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.drafts],
-      })
-      draftQuery.refetch()
-    },
-    onError: () => {
-      toast.error('Failed to delete post')
-    },
-  })
-
   // ----- Helper Functions -----
   /**
    * Call when a post in a draft is updated
@@ -397,8 +379,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
       saveDraftMutation.isPending ||
       (draftEnabled && draftQuery.isPending) ||
       publishDraft.isPending ||
-      scheduleDraft.isPending ||
-      deletePostMutation.isPending
+      scheduleDraft.isPending
     ) {
       return true
     }
@@ -408,17 +389,6 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
     }
 
     return false
-  }
-
-  /**
-   * Delete post from draft
-   *
-   * @param postId - Post id
-   */
-  const handleDeletePost = (postId?: string) => {
-    if (!postId || !draftId) return
-
-    deletePostMutation.mutate({ draftId, postId })
   }
 
   const getSharePosts = () => {
@@ -457,7 +427,6 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
     // ----- Query/Mutation -----
     draftQuery,
     saveDraftMutation,
-    deletePostMutation,
     publishDraft,
     scheduleDraft,
 
@@ -465,7 +434,6 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
     handleContentChange,
     handleSaveDraft,
     handleSubmitDraft,
-    handleDeletePost,
     isDraftActionsDisabled,
 
     // ----- Utilities -----

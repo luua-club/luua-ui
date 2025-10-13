@@ -106,6 +106,7 @@ const LinkedInPost = (props: PostPreviewProps) => {
                   props.onContentChange?.('')
                   props.handlePostDelete?.()
                 }}
+                hideDelete={props.hideDelete}
               />
             </div>
           )}

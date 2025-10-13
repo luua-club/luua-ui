@@ -21,4 +21,5 @@ export interface PostPreviewProps {
   isActionLoading?: boolean
   onContentChange?: (content: string) => void
   handlePostDelete?: () => void
+  hideDelete?: boolean
 }
