@@ -195,8 +195,8 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
       // Call callback if provided
-      if (variables.callback) {
-        variables.callback()
+      if (variables?.callback) {
+        variables?.callback()
         return
       }
 

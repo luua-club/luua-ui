@@ -12,7 +12,7 @@ import SourcesDialog from './SourcesDialog'
 
 interface IDraftActionsProps {
   user: UserState | null
-  handleSaveDraft: () => void
+  handleSaveDraft: (callback?: () => void) => void
   handlePublishDraft: () => void
   handleScheduleDraft: () => void
   handleConnectSocials: () => void
@@ -81,7 +81,7 @@ const DraftActions = ({
             <Button
               variant="outline"
               className="text-xs"
-              onClick={handleSaveDraft}
+              onClick={() => handleSaveDraft()}
               disabled={isLoading}
             >
               <Save className="size-4" />
