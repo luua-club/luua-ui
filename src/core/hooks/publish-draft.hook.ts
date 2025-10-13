@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { draftsApi } from '../api/drafts.api'
 import { postsApi } from '../api/posts.api'
 import { type IDraftRequest } from '../models/draft.model'
+import { channelType } from '../models/social.model'
 
 /**
  * usePublishDraft
@@ -16,21 +17,31 @@ import { type IDraftRequest } from '../models/draft.model'
  * publishDraft.mutate({ posts: [...], id: 'draftId' })
  */
 export function usePublishDraft() {
+  type Params = {
+    draftRequest: IDraftRequest
+    forChannel: channelType[]
+  }
+
   const mutation = useMutation({
-    mutationFn: async (params: IDraftRequest) => {
+    mutationFn: async (params: Params) => {
       const draftPayload: IDraftRequest = {
-        posts: params.posts,
+        posts: params.draftRequest.posts,
       }
 
-      if (params.id) {
-        draftPayload.id = params.id
+      if (params.draftRequest.id) {
+        draftPayload.id = params.draftRequest.id
       }
 
       // Step 1: Create/Update draft
       const draftRes = await draftsApi.postDraft(draftPayload)
 
       const draftId = draftRes.data.draft.id
-      const postIds = draftRes.data.draft.posts.map(post => post.id)
+
+      // Filter postIds based on forChannel
+      const forChannelSet = new Set(params.forChannel)
+      const postIds = draftRes.data.draft.posts
+        .filter(post => forChannelSet.has(post.channel))
+        .map(post => post.id)
 
       // Step 2: Publish draft
       const publishRes = await postsApi.publishDraft({

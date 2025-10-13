@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useBlocker, useLocation, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
-import confetti from 'canvas-confetti'
 import posthog from 'posthog-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -27,6 +26,7 @@ import {
 } from '@/core/models/draft.model'
 import { IPost } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
+import { showConfetti } from '@/core/utils/common.util'
 
 export type PostDraftsType = Partial<
   Record<channelType, WithOptional<PostItem, 'id'>>
@@ -177,6 +177,19 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
         latestGeneratedPosts.find(p => p.channel === 'Twitter')?.content
       )
 
+      // Rehydrate local state with response data
+      const postDraft = {} as PostDraftsType
+      response.data.draft.posts.forEach((p: PostItem) => {
+        postDraft[p.channel] = p
+      })
+      setPostDrafts(postDraft)
+
+      // Update query cache with the new draft data
+      queryClient.setQueryData(
+        [QUERY_KEYS.draft, response.data.draft.id],
+        response.data.draft
+      )
+
       toast.success('Draft saved successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
       allowLeaveRef.current = true
@@ -275,22 +288,18 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
       return postIds.includes(p.channel)
     })
 
-    const finalPayload = {
-      ...postPayload,
-      posts: filteredPosts,
-    }
-
     if (schedule && scheduleDate) {
       scheduleDraft.mutate(
         {
-          draftRequest: finalPayload,
+          draftRequest: postPayload,
+          forChannel: [...filteredPosts.map(p => p.channel)],
           scheduleDate,
         },
         {
           onSuccess: res => {
             postHogScheduleCapture(
               res?.draftId,
-              finalPayload.posts.length,
+              filteredPosts.length,
               res?.draft?.posts.find(p => p.channel === 'LinkedIn')?.content,
               res?.draft?.posts.find(p => p.channel === 'Twitter')?.content,
               latestGeneratedPosts.find(p => p.channel === 'LinkedIn')?.content,
@@ -314,59 +323,34 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
     }
 
     // Call api
-    publishDraft.mutate(finalPayload, {
-      onSuccess: res => {
-        postHogPublishCapture(
-          res?.draftId,
-          finalPayload.posts.length,
-          res?.draft?.posts.find(p => p.channel === 'LinkedIn')?.content,
-          res?.draft?.posts.find(p => p.channel === 'Twitter')?.content,
-          latestGeneratedPosts.find(p => p.channel === 'LinkedIn')?.content,
-          latestGeneratedPosts.find(p => p.channel === 'Twitter')?.content
-        )
-        toast.success('Post are published successfully')
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
-
-        const handleClick = () => {
-          const end = Date.now() + 500 // 500 ms
-          const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
-
-          const frame = () => {
-            if (Date.now() > end) return
-
-            confetti({
-              particleCount: 2,
-              angle: 60,
-              spread: 55,
-              startVelocity: 60,
-              origin: { x: 0, y: 0.5 },
-              colors: colors,
-            })
-            confetti({
-              particleCount: 2,
-              angle: 120,
-              spread: 55,
-              startVelocity: 60,
-              origin: { x: 1, y: 0.5 },
-              colors: colors,
-            })
-
-            requestAnimationFrame(frame)
-          }
-
-          frame()
-        }
-
-        handleClick()
-        allowLeaveRef.current = true
-        navigate({ to: '/dashboard' })
+    publishDraft.mutate(
+      {
+        draftRequest: postPayload,
+        forChannel: [...filteredPosts.map(p => p.channel)],
       },
-      onError: () => {
-        setIsShareModalOpen({ open: false, schedule: false })
-        posthog.captureException(publishDraft.error)
-        toast.error('Failed to publish posts')
-      },
-    })
+      {
+        onSuccess: res => {
+          postHogPublishCapture(
+            res?.draftId,
+            filteredPosts.length,
+            res?.draft?.posts.find(p => p.channel === 'LinkedIn')?.content,
+            res?.draft?.posts.find(p => p.channel === 'Twitter')?.content,
+            latestGeneratedPosts.find(p => p.channel === 'LinkedIn')?.content,
+            latestGeneratedPosts.find(p => p.channel === 'Twitter')?.content
+          )
+          toast.success('Post are published successfully')
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+          showConfetti()
+          allowLeaveRef.current = true
+          navigate({ to: '/dashboard' })
+        },
+        onError: () => {
+          setIsShareModalOpen({ open: false, schedule: false })
+          posthog.captureException(publishDraft.error)
+          toast.error('Failed to publish posts')
+        },
+      }
+    )
   }
 
   /**

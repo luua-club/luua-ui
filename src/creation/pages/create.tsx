@@ -1,9 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { createLazyRoute, useLocation } from '@tanstack/react-router'
 import { HistoryIcon, Loader, PenLine } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
+import { QUERY_KEYS } from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppDispatch, useAppSelector } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -59,6 +61,7 @@ function Create() {
   // ---- Hooks & Selectors ----
   const dispatch = useAppDispatch()
   const location = useLocation()
+  const queryClient = useQueryClient()
   const preUserPromptState = useAppSelector(state => state.promptState)
   const user = useUserState()
   const {
@@ -119,6 +122,15 @@ function Create() {
       dispatch(clearPrompt())
     }
   }, [dispatch])
+
+  /**
+   * Invalidate draft query on component unmount to ensure fresh data on next mount
+   */
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.draft] })
+    }
+  }, [queryClient])
 
   /**
    * Set active social tab based on pre-user prompt state, i.e dashboard
