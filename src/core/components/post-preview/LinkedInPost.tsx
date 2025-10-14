@@ -1,6 +1,5 @@
 import {
   Dot,
-  Ellipsis,
   Heart,
   MessageCircleMore,
   Repeat2,
@@ -72,19 +71,6 @@ const LinkedInPost = (props: PostPreviewProps) => {
 
   return (
     <div className="relative">
-      {!user_social.connected && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="bg-card absolute -top-3 -right-2 z-20 animate-pulse rounded-full border-1 p-1 text-yellow-500">
-              <TriangleAlert className="size-4" />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>LinkedIn not connected</p>
-          </TooltipContent>
-        </Tooltip>
-      )}
-
       {!props.notEditable && (
         <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
           {!props.isActionLoading && (
@@ -110,7 +96,10 @@ const LinkedInPost = (props: PostPreviewProps) => {
         )}
       >
         {/* Header */}
-        <LinkedInPostHeader user={user_social} />
+        <LinkedInPostHeader
+          user={user_social}
+          notConnected={!user_social.connected}
+        />
 
         {/* Content */}
         {props.notEditable ? (
@@ -174,7 +163,13 @@ const LinkedInPost = (props: PostPreviewProps) => {
   )
 }
 
-const LinkedInPostHeader = ({ user }: { user: UserSocial }) => {
+const LinkedInPostHeader = ({
+  user,
+  notConnected,
+}: {
+  user: UserSocial
+  notConnected: boolean
+}) => {
   return (
     <div className="flex items-start justify-between px-4 py-2">
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
@@ -194,9 +189,16 @@ const LinkedInPostHeader = ({ user }: { user: UserSocial }) => {
           </p>
         </div>
       </div>
-      <div className="flex gap-4 text-gray-400 dark:text-gray-300">
-        <Ellipsis className="size-5" />
-      </div>
+      {notConnected && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <TriangleAlert className="size-4 animate-pulse text-yellow-500" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>LinkedIn not connected</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
     </div>
   )
 }

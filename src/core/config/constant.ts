@@ -106,5 +106,5 @@ export const POST_WORD_COUNT: { [key in channelType]: number } = {
  * External URLs
  */
 export const EXTERNAL_URLS = {
-  contactUs: 'https://luua.club/contact-us',
+  contactUs: 'https://luua.club/contact',
 }

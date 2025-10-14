@@ -6,7 +6,6 @@ import {
   ChartNoAxesColumn,
   CirclePlus,
   Dot,
-  Ellipsis,
   Heart,
   MessageCircle,
   Repeat2,
@@ -97,19 +96,6 @@ const TwitterPost = (props: PostPreviewProps) => {
         </div>
       )}
 
-      {!user_social.connected && isProPlan && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="bg-card absolute -top-3 -right-2 z-20 animate-pulse rounded-full border-1 p-1 text-yellow-500">
-              <TriangleAlert className="size-4" />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Twitter not connected</p>
-          </TooltipContent>
-        </Tooltip>
-      )}
-
       {!props.notEditable && user_social.connected && (
         <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
           {!props.isActionLoading && (
@@ -144,7 +130,10 @@ const TwitterPost = (props: PostPreviewProps) => {
         </Avatar>
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
-          <TwitterPostHeader user={user_social} />
+          <TwitterPostHeader
+            user={user_social}
+            notConnected={!user_social.connected && isProPlan}
+          />
 
           {/* Content */}
           {props.notEditable ? (
@@ -202,7 +191,13 @@ const TwitterPost = (props: PostPreviewProps) => {
   )
 }
 
-const TwitterPostHeader = ({ user }: { user: UserSocial }) => {
+const TwitterPostHeader = ({
+  user,
+  notConnected,
+}: {
+  user: UserSocial
+  notConnected: boolean
+}) => {
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="flex w-fit min-w-0 items-center text-sm sm:text-base">
@@ -217,9 +212,16 @@ const TwitterPostHeader = ({ user }: { user: UserSocial }) => {
           {format(new Date(), 'MMM d')}
         </span>
       </div>
-      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-        <Ellipsis className="size-4" />
-      </div>
+      {notConnected && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <TriangleAlert className="size-4 animate-pulse text-yellow-500" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Twitter not connected</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
     </div>
   )
 }

@@ -133,7 +133,10 @@ function PlanCards() {
           <CardTitle className="mt-4 text-2xl">Pro Plan</CardTitle>
           <p className="mt-2">Advanced tools for serious growth</p>
           <p className="mt-2 text-4xl font-bold">
-            $10
+            $12{' '}
+            <span className="text-muted-foreground text-xl font-normal line-through">
+              15
+            </span>
             <span className="text-muted-foreground ml-1 text-base font-normal">
               /month
             </span>
