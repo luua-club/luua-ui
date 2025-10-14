@@ -171,7 +171,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
               href="mailto:support@luua.club"
               className="text-primary hover:underline"
             >
-              support@luua.club
+              connect@luua.club
             </a>
           </p>
         </>

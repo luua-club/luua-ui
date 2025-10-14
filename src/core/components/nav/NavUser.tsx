@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
 interface INavUserProps {
   user: UserState | null
@@ -126,15 +127,13 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
 
         {/* TODO: Add link for  Chrome Extension */}
         <DropdownMenuItem className="cursor-pointer">
-          <Chrome />
-          <a
-            href={EXTERNAL_URLS.contactUs}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full"
-          >
-            Download Chrome Extension
-          </a>
+          <Tooltip>
+            <TooltipTrigger className="text-muted-foreground flex items-center gap-2">
+              <Chrome />
+              <span>Download Chrome Extension</span>
+            </TooltipTrigger>
+            <TooltipContent side="top">coming soon</TooltipContent>
+          </Tooltip>
         </DropdownMenuItem>
       </DropdownMenuGroup>
 

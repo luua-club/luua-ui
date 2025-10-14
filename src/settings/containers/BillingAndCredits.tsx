@@ -1,24 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+// TODO: UNCOMMENT ON NOV 1 RELEASE
+import { useQuery } from '@tanstack/react-query'
 
 import { paymentApi } from '@/core/api/payment.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { postHogCancelledPlanCapture } from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import { ConfirmDialog } from '@/shared/components/confirm-dialog'
-import { Button } from '@/shared/ui/button'
-import { Separator } from '@/shared/ui/separator'
 
 import Subscription from '../components/Subscription'
 import UsageSummary from '../components/UsageSummary'
 
 function BillingAndCredits() {
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [showCancelSubscription, setShowCancelSubscription] = useState(false)
+  // const [confirmOpen, setConfirmOpen] = useState(false)
+  // const [showCancelSubscription, setShowCancelSubscription] = useState(false)
   const user = useUserState()
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   const { data: subscriptionDetails } = useQuery({
     queryKey: [QUERY_KEYS.subscriptionDetails],
@@ -35,45 +29,45 @@ function BillingAndCredits() {
     refetchOnMount: 'always',
   })
 
-  const cancelSubscriptionMutation = useMutation({
-    mutationFn: () => paymentApi.cancelSubscription(),
-    onSuccess: () => {
-      postHogCancelledPlanCapture()
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.subscriptionDetails],
-      })
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.user],
-      })
-      toast.success('Subscription cancelled successfully')
-    },
-    onError: () => {
-      toast.error('Failed to cancel subscription')
-    },
-    onSettled: () => {
-      setConfirmOpen(false)
-    },
-  })
+  // const cancelSubscriptionMutation = useMutation({
+  //   mutationFn: () => paymentApi.cancelSubscription(),
+  //   onSuccess: () => {
+  //     postHogCancelledPlanCapture()
+  //     queryClient.invalidateQueries({
+  //       queryKey: [QUERY_KEYS.subscriptionDetails],
+  //     })
+  //     queryClient.invalidateQueries({
+  //       queryKey: [QUERY_KEYS.user],
+  //     })
+  //     toast.success('Subscription cancelled successfully')
+  //   },
+  //   onError: () => {
+  //     toast.error('Failed to cancel subscription')
+  //   },
+  //   onSettled: () => {
+  //     setConfirmOpen(false)
+  //   },
+  // })
 
-  useEffect(() => {
-    if (
-      subscriptionDetails?.data?.subscriptions.some(
-        subscription => subscription.status === 'active'
-      )
-    ) {
-      setShowCancelSubscription(true)
-    } else {
-      setShowCancelSubscription(false)
-    }
-  }, [subscriptionDetails?.data?.subscriptions])
+  // useEffect(() => {
+  //   if (
+  //     subscriptionDetails?.data?.subscriptions.some(
+  //       subscription => subscription.status === 'active'
+  //     )
+  //   ) {
+  //     setShowCancelSubscription(true)
+  //   } else {
+  //     setShowCancelSubscription(false)
+  //   }
+  // }, [subscriptionDetails?.data?.subscriptions])
 
   if (!user) {
     return null
   }
 
-  const handleCancelSubscription = () => {
-    cancelSubscriptionMutation.mutate()
-  }
+  // const handleCancelSubscription = () => {
+  //   cancelSubscriptionMutation.mutate()
+  // }
 
   return (
     <>
@@ -86,7 +80,7 @@ function BillingAndCredits() {
         />
       </div>
 
-      {showCancelSubscription && (
+      {/*{showCancelSubscription && (
         <div className="mt-8 space-y-3">
           <h1 className="font-bold">Cancel Subscription</h1>
           <Separator />
@@ -104,10 +98,10 @@ function BillingAndCredits() {
             </Button>
           </div>
         </div>
-      )}
+      )}*/}
 
       {/* Cancel Subscription Dialog */}
-      <ConfirmDialog
+      {/*<ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Cancel subscription?"
@@ -118,7 +112,7 @@ function BillingAndCredits() {
         onConfirm={() => {
           handleCancelSubscription()
         }}
-      />
+      />*/}
     </>
   )
 }
