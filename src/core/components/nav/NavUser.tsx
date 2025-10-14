@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import {
-  Chrome,
+  Download,
   LucideChevronsUpDown,
   LucideLogOut,
   LucideSparkles,
@@ -128,9 +128,9 @@ const NavUserDropdownContent = ({ user }: { user: UserState }) => {
         {/* TODO: Add link for  Chrome Extension */}
         <DropdownMenuItem className="cursor-pointer">
           <Tooltip>
-            <TooltipTrigger className="text-muted-foreground flex items-center gap-2">
-              <Chrome />
-              <span>Download Chrome Extension</span>
+            <TooltipTrigger className="text-muted-foreground inline-flex items-center gap-2 text-left">
+              <Download />
+              Chrome Extension
             </TooltipTrigger>
             <TooltipContent side="top">coming soon</TooltipContent>
           </Tooltip>

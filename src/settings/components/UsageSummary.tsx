@@ -38,18 +38,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
         <Card className="gap-2 rounded-md p-3 shadow-none">
           <CardHeader className="flex items-center gap-1 px-2">
             <Flower className="size-4" />
-            <p className="font-semibold">
-              {isProPlan ? 'Pro' : 'Free'}
-              {isProPlan ? (
-                <span className="text-muted-foreground ml-2 text-xs">
-                  10$/month
-                </span>
-              ) : (
-                <span className="text-muted-foreground ml-2 text-xs">
-                  0$/month
-                </span>
-              )}
-            </p>
+            <p className="font-semibold">{isProPlan ? 'Pro' : 'Free'}</p>
           </CardHeader>
 
           <CardContent className="px-2">
