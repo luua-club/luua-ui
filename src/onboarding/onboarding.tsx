@@ -132,7 +132,8 @@ function OnBoarding() {
       })
       router.navigate({
         to: '/dashboard',
-        search: { welcome: 'true' },
+        //TODO: Not sure what to do
+        //search: { welcome: 'true' },
       })
     }
   }
