@@ -91,10 +91,10 @@ function Dashboard() {
       <div className="flex justify-end p-4">
         <Button
           variant={'outline'}
-          className="text-muted-foreground size-8 rounded-full"
+          className="text-muted-foreground rounded-full text-sm"
           onClick={() => setIsWelcomeBannerOpen(true)}
         >
-          ?
+          What its all about ?
         </Button>
       </div>
 

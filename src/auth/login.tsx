@@ -97,7 +97,9 @@ function Login() {
         user: response.data,
       })
 
-      router.navigate({ to: res.new_user ? '/onboarding' : '/dashboard' })
+      //TODO: Redirect to dashboard temporary untill we have a better solution
+      //router.navigate({ to: res.new_user ? '/onboarding' : '/dashboard' })
+      router.navigate({ to: '/dashboard' })
     } catch {
       removeLocalStorageItem(key)
       toast.error('Something went wrong, Please try again !')

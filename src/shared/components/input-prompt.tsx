@@ -1,12 +1,4 @@
-import { Link } from '@tanstack/react-router'
-import {
-  CircleCheckBig,
-  Globe,
-  Loader,
-  Lock,
-  Send,
-  TriangleAlert,
-} from 'lucide-react'
+import { CircleCheckBig, Globe, Loader, Lock, Send } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SOCIAL_STATUS } from '../config/constant'
@@ -283,7 +275,8 @@ const PromptControls: React.FC<PromptControlsProps> = ({
                       </TooltipContent>
                     </Tooltip>
                   )}
-                  {!isLocked && social.status === SOCIAL_STATUS.WARNING && (
+                  {/* TODO: Removing this for now, as it's not clear how to handle this */}
+                  {/*{!isLocked && social.status === SOCIAL_STATUS.WARNING && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span className="inline-flex">
@@ -294,7 +287,8 @@ const PromptControls: React.FC<PromptControlsProps> = ({
                         <span>{social.tooltip} not connected</span>
                       </TooltipContent>
                     </Tooltip>
-                  )}
+                  )}*/}
+
                   {!isLocked && social.status === SOCIAL_STATUS.OK && (
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -343,8 +337,8 @@ const PromptInfo = ({
     'mx-auto w-[96%] rounded-b-md border-1 border-t-0 px-2 py-1 text-xs inline-flex items-center gap-1'
   const successClassNames =
     'bg-brand-background-success border-brand-border-success text-brand-text-success'
-  const warningClassNames =
-    'bg-brand-background-warning border-brand-border-warning text-brand-text-warning'
+  // const warningClassNames =
+  //   'bg-brand-background-warning border-brand-border-warning text-brand-text-warning'
 
   if (socials.length === 0) return null
 
@@ -368,18 +362,20 @@ const PromptInfo = ({
       )
     }
 
+    // TODO: Removing this for now, as it's not clear how to handle this
     // If selected social is not connected
-    return (
-      <div className={cn(commonClassNames, warningClassNames)}>
-        <TriangleAlert className="size-3 animate-pulse text-yellow-700" />
-        {social?.text} is not configured, please
-        <span className="font-semibold underline">
-          <Link to="/settings" search={{ tabs: 'socials' }}>
-            connect
-          </Link>
-        </span>
-      </div>
-    )
+    // return (
+    //   <div className={cn(commonClassNames, warningClassNames)}>
+    //     <TriangleAlert className="size-3 animate-pulse text-yellow-700" />
+    //     {social?.text} is not configured, please
+    //     <span className="font-semibold underline">
+    //       <Link to="/settings" search={{ tabs: 'socials' }}>
+    //         connect
+    //       </Link>
+    //     </span>
+    //   </div>
+    // )
+    return null
   }
 
   // If all socials are connected
@@ -392,14 +388,16 @@ const PromptInfo = ({
     )
   }
 
+  // TODO: Removing this for now, as it's not clear how to handle this
   // If some socials are not connected
-  return (
-    <div className={cn(commonClassNames, warningClassNames)}>
-      <TriangleAlert className="size-3 animate-pulse text-yellow-700" />
-      Some socials are not configured, please
-      <Link to="/settings" search={{ tabs: 'socials' }}>
-        <span className="font-semibold underline">connect</span>
-      </Link>
-    </div>
-  )
+  // return (
+  //   <div className={cn(commonClassNames, warningClassNames)}>
+  //     <TriangleAlert className="size-3 animate-pulse text-yellow-700" />
+  //     Some socials are not configured, please
+  //     <Link to="/settings" search={{ tabs: 'socials' }}>
+  //       <span className="font-semibold underline">connect</span>
+  //     </Link>
+  //   </div>
+  // )
+  return null
 }
