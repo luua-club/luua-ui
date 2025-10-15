@@ -1,12 +1,4 @@
-import { Link } from '@tanstack/react-router'
-import {
-  CircleCheckBig,
-  Globe,
-  Loader,
-  Lock,
-  Send,
-  TriangleAlert,
-} from 'lucide-react'
+import { CircleCheckBig, Globe, Loader, Lock, Send } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SOCIAL_STATUS } from '../config/constant'
