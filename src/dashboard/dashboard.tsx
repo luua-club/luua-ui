@@ -1,11 +1,17 @@
 import { createLazyRoute, useLocation, useRouter } from '@tanstack/react-router'
-import { Loader } from 'lucide-react'
+import { Dot, Loader } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
 import Logo from '@/assets/images/luua-black-icon.svg?react'
 import LogoDark from '@/assets/images/luua-white-icon.svg?react'
 import { PromptInput } from '@/core/components/PromptInput'
+import {
+  linkedinPrompts,
+  standardPrompts,
+  twitterPrompts,
+  youtubePrompts,
+} from '@/core/config/example-prompts.config'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { channelType } from '@/core/models/social.model'
@@ -17,12 +23,18 @@ import { Button } from '@/shared/ui/button'
 import { capitalize } from '@/shared/utils'
 
 import ProWelcomeBanner from './components/pro-welcome-banner'
+import PromptChip from './components/prompt-chip'
 import WelcomeBanner from './components/welcome-banner'
 
 function Dashboard() {
   //--- States ---
   const [isWelcomeBannerOpen, setIsWelcomeBannerOpen] = useState(false)
   const [isProWelcomeBannerOpen, setIsProWelcomeBannerOpen] = useState(false)
+  const [promptData, setPromptData] = useState<{
+    value: string
+    search: boolean
+    channel: channelType | null
+  } | null>(null)
 
   //--- Hooks ---
   const dispatch = useAppDispatch()
@@ -87,63 +99,101 @@ function Dashboard() {
 
   //--- Render ---
   return (
-    <div className="relative m-auto min-h-[calc(100vh-3.5rem)] max-w-7xl">
-      <div className="flex justify-end p-4">
-        <Button
-          variant={'outline'}
-          className="text-muted-foreground rounded-full text-sm"
-          onClick={() => setIsWelcomeBannerOpen(true)}
-        >
-          What its all about ?
-        </Button>
-      </div>
+    <>
+      <div className="m-auto flex min-h-[calc(100vh-var(--spacing-nav-height))] max-w-7xl flex-col items-center justify-center">
+        <div className="flex w-full flex-col gap-6 p-5 pb-[var(--spacing-nav-height)] lg:max-w-[60%]">
+          {/** Floating Chip */}
+          <div className="flex w-fit items-center gap-1 self-center">
+            {isProPlan ? (
+              <ProPlanChip
+                className="text-sm"
+                onClick={() => setIsProWelcomeBannerOpen(true)}
+              >
+                Pro Plan
+              </ProPlanChip>
+            ) : (
+              <UpgradePlanBtn
+                onClick={() => router.navigate({ to: '/payments' })}
+              />
+            )}
 
-      <div className="absolute top-[40%] left-1/2 flex w-full -translate-x-1/2 -translate-y-1/2 transform flex-col gap-6 p-5 lg:max-w-[60%]">
-        {/** Floating Chip */}
-        <div className="w-fit cursor-pointer self-center">
-          {isProPlan ? (
-            <ProPlanChip
-              className="text-sm"
-              onClick={() => setIsProWelcomeBannerOpen(true)}
+            <Dot className="text-muted-foreground size-4" />
+
+            <Button
+              variant="link"
+              className="text-muted-foreground p-0 text-sm dark:text-cyan-600"
+              onClick={() => setIsWelcomeBannerOpen(true)}
             >
-              Pro Plan
-            </ProPlanChip>
-          ) : (
-            <UpgradePlanBtn
-              onClick={() => router.navigate({ to: '/payments' })}
-            />
-          )}
-        </div>
+              Quick Tour ?
+            </Button>
+          </div>
 
-        {/** Welcome Message */}
-        <motion.h1
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="flex flex-col items-center justify-center gap-3 text-center font-serif text-3xl font-medium text-balance md:flex-row"
-        >
-          {/** Logo */}
-          <span className="rounded-full border-1 border-dashed p-3 dark:border-none">
-            <Logo className="size-7 dark:hidden" />
-            <LogoDark className="hidden size-7 dark:block" />
-          </span>
-
-          {/** Text */}
-          {userState?.name && (
-            <span>
-              Hi {capitalize(userState?.name.split(' ')[0] || '')}, how are you?
+          {/** Welcome Message */}
+          <motion.h1
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="flex flex-col items-center justify-center gap-3 text-center font-serif text-3xl font-medium text-balance md:flex-row"
+          >
+            {/** Logo */}
+            <span className="rounded-full border-1 border-dashed p-3 dark:border-none">
+              <Logo className="size-7 dark:hidden" />
+              <LogoDark className="hidden size-7 dark:block" />
             </span>
-          )}
-        </motion.h1>
 
-        {/** Main User Prompt Input */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-        >
-          <PromptInput onChange={handleUserPrompt} />
-        </motion.div>
+            {/** Text */}
+            {userState?.name && (
+              <span>
+                Hi {capitalize(userState?.name.split(' ')[0] || '')}, how are
+                you?
+              </span>
+            )}
+          </motion.h1>
+
+          {/** Main User Prompt Input */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+          >
+            <PromptInput
+              onChange={handleUserPrompt}
+              initialValue={promptData?.value}
+              initialSearch={promptData?.search}
+              activeChannel={promptData?.channel}
+            />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
+            className="flex flex-col gap-3 sm:mt-4"
+          >
+            <p className="text-muted-foreground text-center text-xs font-light">
+              Feeling lazy ? try our sample prompts...
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 sm:gap-4">
+              <PromptChip
+                data={standardPrompts[0]}
+                onChipClick={setPromptData}
+              />
+              <PromptChip
+                data={youtubePrompts[0]}
+                onChipClick={setPromptData}
+              />
+              <PromptChip
+                data={linkedinPrompts[0]}
+                onChipClick={setPromptData}
+              />
+              <PromptChip
+                data={twitterPrompts[0]}
+                onChipClick={setPromptData}
+              />
+            </div>
+          </motion.div>
+        </div>
       </div>
 
       {/** Modal Welcome, Open When User Logins First Time */}
@@ -161,7 +211,7 @@ function Dashboard() {
           onOpenChange={setIsProWelcomeBannerOpen}
         />
       )}
-    </div>
+    </>
   )
 }
 

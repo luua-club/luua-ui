@@ -25,6 +25,8 @@ interface InputPromptProps {
   activeChannel?: string | null
   className?: string
   lockedSocials?: string[] | null
+  initialValue?: string
+  initialSearch?: boolean
   onChange: (content: string, search: boolean, channel: string | null) => void
 }
 
@@ -37,12 +39,14 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   activeChannel = null,
   className,
   lockedSocials = null,
+  initialValue = '',
+  initialSearch = false,
   onChange,
 }) => {
   // --- State ---
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState(initialValue)
   const [selectedSocial, setSelectedSocial] = useState<string | null>(null)
-  const [searchEnabled, setSearchEnabled] = useState(false)
+  const [searchEnabled, setSearchEnabled] = useState(initialSearch)
 
   // --- Ref ---
   const divRef = useRef<HTMLDivElement>(null)
@@ -51,6 +55,17 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   useEffect(() => {
     setSelectedSocial(activeChannel)
   }, [activeChannel])
+
+  useEffect(() => {
+    if (initialValue && divRef.current) {
+      divRef.current.textContent = initialValue
+      setValue(initialValue)
+    }
+  }, [initialValue])
+
+  useEffect(() => {
+    setSearchEnabled(initialSearch)
+  }, [initialSearch])
 
   /**
    * Helper function to get default social (LinkedIn preferred)
