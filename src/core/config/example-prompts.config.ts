@@ -51,7 +51,7 @@ const youtubePrompts: ExamplePrompt = {
     'Watch this NASA highlights video of the SpaceX Crew-3 mission and write a post capturing the main insights and their significance: https://www.youtube.com/watch?v=UJQIMO7Lso0',
     'Create a post based on the key ideas from this Rails World 2025 keynote by David Heinemeier Hansson: https://www.youtube.com/watch?v=7z0ZrDdQ-6M',
     'Use this video on the top 17 new technology trends for 2026 to write an insightful post highlighting the most impactful trends: https://youtu.be/Otim2mDjsYM',
-  ]
+  ],
   iconData: {
     icon: BrandYoutube,
     className: 'text-red-500',
