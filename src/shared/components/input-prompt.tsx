@@ -1,4 +1,5 @@
 import { CircleCheckBig, Globe, Loader, Lock, Send } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { SOCIAL_STATUS } from '../config/constant'
@@ -25,8 +26,7 @@ interface InputPromptProps {
   activeChannel?: string | null
   className?: string
   lockedSocials?: string[] | null
-  initialValue?: string
-  initialSearch?: boolean
+  hoverPreview?: string | null
   onChange: (content: string, search: boolean, channel: string | null) => void
 }
 
@@ -39,33 +39,47 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   activeChannel = null,
   className,
   lockedSocials = null,
-  initialValue = '',
-  initialSearch = false,
+  hoverPreview = null,
   onChange,
 }) => {
   // --- State ---
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState('')
   const [selectedSocial, setSelectedSocial] = useState<string | null>(null)
-  const [searchEnabled, setSearchEnabled] = useState(initialSearch)
+  const [searchEnabled, setSearchEnabled] = useState(false)
+  const [showPlaceholder, setShowPlaceholder] = useState(true)
 
   // --- Ref ---
   const divRef = useRef<HTMLDivElement>(null)
+  const placeholderTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // --- Effect ---
   useEffect(() => {
     setSelectedSocial(activeChannel)
   }, [activeChannel])
 
+  // Handle placeholder visibility with delay
   useEffect(() => {
-    if (initialValue && divRef.current) {
-      divRef.current.textContent = initialValue
-      setValue(initialValue)
+    // Clear any existing timeout
+    if (placeholderTimeoutRef.current) {
+      clearTimeout(placeholderTimeoutRef.current)
     }
-  }, [initialValue])
 
-  useEffect(() => {
-    setSearchEnabled(initialSearch)
-  }, [initialSearch])
+    if (hoverPreview) {
+      // Immediately hide placeholder when preview appears
+      setShowPlaceholder(false)
+    } else {
+      // Delay showing placeholder when preview disappears (200ms)
+      placeholderTimeoutRef.current = setTimeout(() => {
+        setShowPlaceholder(true)
+      }, 200)
+    }
+
+    return () => {
+      if (placeholderTimeoutRef.current) {
+        clearTimeout(placeholderTimeoutRef.current)
+      }
+    }
+  }, [hoverPreview])
 
   /**
    * Helper function to get default social (LinkedIn preferred)
@@ -140,7 +154,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
       >
         {/* Input */}
         <div className="relative">
-          <div
+          <motion.div
             ref={divRef}
             contentEditable={true}
             role="textbox"
@@ -152,19 +166,58 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
             className={cn(
               'dark:text-card-foreground max-h-40 min-h-18 min-w-72 overflow-y-auto px-3 py-4 text-sm font-medium text-gray-600 outline-none'
             )}
+            animate={{
+              opacity: hoverPreview ? 0 : 1,
+            }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
             suppressContentEditableWarning
           />
-          {!value && (
-            <WordRotate
-              words={
-                loading
-                  ? ['Generating AI post...', 'Hold still...']
-                  : placeholder
-              }
-              duration={3000}
-              className="pointer-events-none absolute top-4 left-3 text-sm font-medium text-gray-600 select-none dark:text-gray-300"
-            />
-          )}
+          <AnimatePresence>
+            {!value && showPlaceholder && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+                className="pointer-events-none absolute top-4 left-3"
+              >
+                <WordRotate
+                  words={
+                    loading
+                      ? ['Generating AI post...', 'Hold still...']
+                      : placeholder
+                  }
+                  duration={3000}
+                  className="text-sm font-medium text-gray-600 select-none dark:text-gray-300"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {hoverPreview && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className={cn(
+                  'pointer-events-none absolute inset-0 px-3 py-4 text-sm font-medium select-none',
+                  'text-primary/70 dark:text-primary/60',
+                  'overflow-hidden'
+                )}
+                style={
+                  {
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as const,
+                    maxHeight: '3.5rem',
+                  } as React.CSSProperties
+                }
+              >
+                {hoverPreview}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Prompt Controls */}

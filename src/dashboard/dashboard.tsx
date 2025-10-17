@@ -30,11 +30,7 @@ function Dashboard() {
   //--- States ---
   const [isWelcomeBannerOpen, setIsWelcomeBannerOpen] = useState(false)
   const [isProWelcomeBannerOpen, setIsProWelcomeBannerOpen] = useState(false)
-  const [promptData, setPromptData] = useState<{
-    value: string
-    search: boolean
-    channel: channelType | null
-  } | null>(null)
+  const [hoverPreview, setHoverPreview] = useState<string | null>(null)
 
   //--- Hooks ---
   const dispatch = useAppDispatch()
@@ -121,7 +117,7 @@ function Dashboard() {
 
             <Button
               variant="link"
-              className="text-muted-foreground p-0 text-sm dark:text-cyan-600"
+              className="text-muted-foreground p-0 text-sm"
               onClick={() => setIsWelcomeBannerOpen(true)}
             >
               Quick Tour ?
@@ -158,9 +154,7 @@ function Dashboard() {
           >
             <PromptInput
               onChange={handleUserPrompt}
-              initialValue={promptData?.value}
-              initialSearch={promptData?.search}
-              activeChannel={promptData?.channel}
+              hoverPreview={hoverPreview}
             />
           </motion.div>
 
@@ -168,7 +162,7 @@ function Dashboard() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-            className="flex flex-col gap-3 sm:mt-4"
+            className="flex flex-col gap-3 sm:mt-2"
           >
             <p className="text-muted-foreground text-center text-xs font-light">
               Feeling lazy ? try our sample prompts...
@@ -176,20 +170,24 @@ function Dashboard() {
 
             <div className="grid grid-cols-2 gap-2 sm:gap-4">
               <PromptChip
-                data={standardPrompts[0]}
-                onChipClick={setPromptData}
+                data={standardPrompts}
+                onChipClick={handleUserPrompt}
+                onHoverPreview={setHoverPreview}
               />
               <PromptChip
-                data={youtubePrompts[0]}
-                onChipClick={setPromptData}
+                data={youtubePrompts}
+                onChipClick={handleUserPrompt}
+                onHoverPreview={setHoverPreview}
               />
               <PromptChip
-                data={linkedinPrompts[0]}
-                onChipClick={setPromptData}
+                data={linkedinPrompts}
+                onChipClick={handleUserPrompt}
+                onHoverPreview={setHoverPreview}
               />
               <PromptChip
-                data={twitterPrompts[0]}
-                onChipClick={setPromptData}
+                data={twitterPrompts}
+                onChipClick={handleUserPrompt}
+                onHoverPreview={setHoverPreview}
               />
             </div>
           </motion.div>
