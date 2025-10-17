@@ -14,7 +14,7 @@ export function ProPlanChip({
 }: IProPlanChipProps) {
   return (
     <div
-      className="group relative flex overflow-hidden rounded-xs"
+      className="group relative flex cursor-pointer overflow-hidden rounded-xs"
       onClick={onClick}
     >
       <div className="animate-gradient absolute inset-0 bg-gradient-to-r from-green-500/50 via-purple-600/50 to-green-500/50 bg-[length:300%_100%]" />

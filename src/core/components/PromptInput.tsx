@@ -15,6 +15,7 @@ interface PromptInputProps {
   activeChannel?: channelType | null
   className?: string
   hideAllSocial?: boolean
+  hoverPreview?: string | null
 }
 
 export const PromptInput = ({
@@ -24,6 +25,7 @@ export const PromptInput = ({
   activeChannel,
   className,
   hideAllSocial,
+  hoverPreview,
 }: PromptInputProps) => {
   const userState = useUserState()
 
@@ -74,6 +76,7 @@ export const PromptInput = ({
       activeChannel={activeChannel}
       className={cn(className)}
       hideAllSocial={isAllSocialsHidden}
+      hoverPreview={hoverPreview}
     />
   )
 }
