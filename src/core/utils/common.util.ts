@@ -97,8 +97,21 @@ const showConfetti = () => {
   frame()
 }
 
+/**
+ * Get a random integer between min and max (inclusive)
+ * @param min - Minimum value (inclusive)
+ * @param max - Maximum value (inclusive)
+ * @returns A random integer between min and max
+ */
+const getRandomInt = (min: number, max: number): number => {
+  const minVal = Math.ceil(min)
+  const maxVal = Math.floor(max)
+  return Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal
+}
+
 export {
   extractUserInitial,
+  getRandomInt,
   logout,
   removeQueryParams,
   showConfetti,
