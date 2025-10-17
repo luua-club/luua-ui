@@ -76,7 +76,7 @@ function PromptChip({ data, onChipClick, onHoverPreview }: PromptChipProps) {
             'text-muted-foreground group-hover:text-primary sm:break-word line-clamp-2 text-xs leading-5'
           )}
         >
-          {data.prompt}
+          {prompt}
         </p>
       </CardContent>
     </Card>
