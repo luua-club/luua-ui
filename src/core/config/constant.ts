@@ -107,4 +107,6 @@ export const POST_WORD_COUNT: { [key in channelType]: number } = {
  */
 export const EXTERNAL_URLS = {
   contactUs: 'https://luua.club/contact',
+  chromeExt:
+    'https://chromewebstore.google.com/detail/luua-inspiration-extensio/aolfcbppcakoomagjeiphibfokcjiogj?authuser=0&hl=en',
 }
