@@ -351,6 +351,7 @@ function Create() {
             }}
             loading={isGenerationDataFetching || saveDraftMutation.isPending}
             hidePromptInfo
+            submitButtonText={getCurrentState() ? 'Update Post' : 'Create Post'}
           >
             <div className="mb-2 flex justify-center gap-2 lg:hidden">
               {getDraftActions()}

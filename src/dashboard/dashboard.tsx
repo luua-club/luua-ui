@@ -139,7 +139,7 @@ function Dashboard() {
 
             {/** Text */}
             <span>
-              Hi, What are we posting today?
+              Hi, what are we posting today?
             </span>
           </motion.h1>
 

@@ -16,6 +16,7 @@ interface PromptInputProps {
   className?: string
   hideAllSocial?: boolean
   hoverPreview?: string | null
+  submitButtonText?: string
 }
 
 export const PromptInput = ({
@@ -26,6 +27,7 @@ export const PromptInput = ({
   className,
   hideAllSocial,
   hoverPreview,
+  submitButtonText,
 }: PromptInputProps) => {
   const userState = useUserState()
 
@@ -77,6 +79,7 @@ export const PromptInput = ({
       className={cn(className)}
       hideAllSocial={isAllSocialsHidden}
       hoverPreview={hoverPreview}
+      submitButtonText={submitButtonText}
     />
   )
 }
