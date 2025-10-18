@@ -381,7 +381,7 @@ const CreateTabList = ({ loading }: CreateTabListProps) => {
         className="px-2 py-4 text-xs"
         disabled={loading}
       >
-        <HistoryIcon className="size-3" /> Past Generated Posts
+        <HistoryIcon className="size-3" /> Post Iterations
       </TabsTrigger>
     </TabsList>
   )

@@ -184,9 +184,6 @@ const LinkedInPostHeader = ({
           <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">
             {user.user_name}
           </h6>
-          <p className="truncate text-xs font-medium text-gray-400 dark:text-gray-300">
-            CEO of Copy-Pasting Content
-          </p>
         </div>
       </div>
       {notConnected && (
