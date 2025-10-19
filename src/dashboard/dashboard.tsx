@@ -137,10 +137,11 @@ function Dashboard() {
               <LogoDark className="hidden size-7 dark:block" />
             </span>
 
-            {/** Text */}
-            <span>
-              Hi, what are we posting today?
-            </span>
+            {userState?.name && (
+              <span>
+                Hi {capitalize(userState?.name.split(' ')[0] || '')}, what are we posting today?
+              </span>
+            )}
           </motion.h1>
 
           {/** Main User Prompt Input */}
