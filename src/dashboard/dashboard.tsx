@@ -137,11 +137,9 @@ function Dashboard() {
               <LogoDark className="hidden size-7 dark:block" />
             </span>
 
-            {/** Text */}
             {userState?.name && (
               <span>
-                Hi {capitalize(userState?.name.split(' ')[0] || '')}, how are
-                you?
+                Hi {capitalize(userState?.name.split(' ')[0] || '')}, what are we posting today?
               </span>
             )}
           </motion.h1>
@@ -164,8 +162,8 @@ function Dashboard() {
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
             className="flex flex-col gap-3 sm:mt-2"
           >
-            <p className="text-muted-foreground text-center text-xs font-light">
-              Feeling lazy ? try our sample prompts...
+            <p className="text-foreground text-center text-sm font-medium">
+              Out of ideas? Steal one of ours 😎
             </p>
 
             <div className="grid grid-cols-2 gap-2 sm:gap-4">

@@ -179,7 +179,7 @@ export function SharePostModal({
           >
             {isLoading && <Loader className="mr-2 animate-spin" />}
             {selectedPosts.length
-              ? `${isOpen.schedule ? 'Schedule' : 'Publish'} (${selectedPosts.length})`
+              ? `${isOpen.schedule ? 'Select date & time' : 'Publish'} (${selectedPosts.length})`
               : 'Choose posts'}
           </Button>
         </div>
