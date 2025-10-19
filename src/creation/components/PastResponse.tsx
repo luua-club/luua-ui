@@ -20,7 +20,7 @@ function PastResponse({ history }: PastResponseProps) {
       {/* Heading */}
       <h2 className="mt-2 mb-4 flex items-center gap-2 text-xl font-semibold">
         <History />
-        Past Generated Posts
+        Post Iterations
       </h2>
 
       {/* No History */}

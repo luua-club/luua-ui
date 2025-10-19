@@ -1,4 +1,4 @@
-import { CircleCheckBig, Globe, Loader, Lock, Send } from 'lucide-react'
+import { CircleCheckBig, Globe, Loader, Lock, Sparkles } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -27,6 +27,7 @@ interface InputPromptProps {
   className?: string
   lockedSocials?: string[] | null
   hoverPreview?: string | null
+  submitButtonText?: string
   onChange: (content: string, search: boolean, channel: string | null) => void
 }
 
@@ -40,6 +41,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   className,
   lockedSocials = null,
   hoverPreview = null,
+  submitButtonText = 'Create Post',
   onChange,
 }) => {
   // --- State ---
@@ -232,6 +234,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
           hideAllSocial={hideAllSocial}
           getDefaultSocial={getDefaultSocial}
           lockedSocials={lockedSocials}
+          submitButtonText={submitButtonText}
         />
       </div>
 
@@ -254,6 +257,7 @@ interface PromptControlsProps {
   hideAllSocial: boolean
   getDefaultSocial: () => string | null
   lockedSocials: string[] | null
+  submitButtonText: string
 }
 
 const PromptControls: React.FC<PromptControlsProps> = ({
@@ -267,6 +271,7 @@ const PromptControls: React.FC<PromptControlsProps> = ({
   hideAllSocial,
   getDefaultSocial,
   lockedSocials,
+  submitButtonText,
 }) => {
   // Helper function to check if a social is locked
   const isSocialLocked = (socialText: string) => {
@@ -375,18 +380,15 @@ const PromptControls: React.FC<PromptControlsProps> = ({
           </SelectContent>
         </Select>
 
-        {/* Send Button */}
+        {/* Submit Button */}
         <Button
-          variant="default"
-          size="icon"
-          className={cn('h-8 text-xs')}
           onClick={handleGeneratePost}
         >
           {loading ? (
-            <Loader className="size-4 animate-spin" />
-          ) : (
-            <Send className="size-4" />
-          )}
+            <Loader className="animate-spin" />
+            ) :  <Sparkles />
+          }
+          {submitButtonText}
         </Button>
       </div>
     </div>

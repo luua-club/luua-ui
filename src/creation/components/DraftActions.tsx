@@ -1,4 +1,6 @@
-import { Calendar, Loader, PlugZap, Save, Send } from 'lucide-react'
+import { Calendar, Loader, PlugZap, Save, ListChecks
+  
+ } from 'lucide-react'
 import { useState } from 'react'
 
 import { UserState } from '@/core/models/user.model'
@@ -111,8 +113,8 @@ const DraftActions = ({
         disabled={isLoading}
         onClick={handlePublishDraft}
       >
-        <Send className="size-3" />
-        Publish
+        <ListChecks className="size-3" />
+        Review
       </Button>
     </>
   )

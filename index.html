@@ -98,11 +98,7 @@
         // Apply theme from localStorage before render
         ;(function () {
           const theme = localStorage.getItem('vite-ui-theme')
-          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-            .matches
-            ? 'dark'
-            : 'light'
-          const activeTheme = theme || systemTheme
+          const activeTheme = theme || 'light'
 
           if (activeTheme === 'dark') {
             document.documentElement.classList.add('dark-loader')
