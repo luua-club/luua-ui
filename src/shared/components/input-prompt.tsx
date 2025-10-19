@@ -382,19 +382,13 @@ const PromptControls: React.FC<PromptControlsProps> = ({
 
         {/* Submit Button */}
         <Button
-          variant="default"
-          size="sm"
-          className={cn('h-8 px-3 text-xs font-medium')}
           onClick={handleGeneratePost}
         >
           {loading ? (
-            <Loader className="size-4 animate-spin" />
-          ) : (
-            <>
-              <Sparkles className="size-4 mr-1.0" />
-              {submitButtonText}
-            </>
-          )}
+            <Loader className="animate-spin" />
+            ) :  <Sparkles />
+          }
+          {submitButtonText}
         </Button>
       </div>
     </div>
