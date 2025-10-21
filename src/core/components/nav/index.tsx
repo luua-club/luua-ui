@@ -4,7 +4,6 @@ import { LucidePanelRight } from 'lucide-react'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { urlType } from '@/core/models/urls.model'
 import ThemeToggle from '@/shared/components/theme-toggle'
-import { Badge } from '@/shared/ui/badge'
 import { Separator } from '@/shared/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
