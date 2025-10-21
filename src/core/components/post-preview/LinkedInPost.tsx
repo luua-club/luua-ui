@@ -125,7 +125,7 @@ const LinkedInPost = (props: PostPreviewProps) => {
               'focus:border-0 focus:shadow-none focus:ring-0 focus:outline-none',
               'focus-visible:border-transparent focus-visible:shadow-none focus-visible:ring-0'
             )}
-            placeholder="What's on your mind?"
+            placeholder="Your post starts here — type or ask AI to help"
             ref={textareaRef}
             value={content}
             maxLength={3000}

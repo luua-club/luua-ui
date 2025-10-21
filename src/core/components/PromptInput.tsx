@@ -4,7 +4,7 @@ import { InputPrompt } from '@/shared/components/input-prompt'
 import { SOCIAL_STATUS } from '@/shared/config/constant'
 import { cn } from '@/shared/utils'
 
-import { SOCIAL_PLATFORM, SUGGESTED_PROMPT_TEXT } from '../config/constant'
+import { SOCIAL_PLATFORM } from '../config/constant'
 import { useUserState } from '../hooks/user-state.hook'
 import { channelType } from '../models/social.model'
 
@@ -16,7 +16,8 @@ interface PromptInputProps {
   className?: string
   hideAllSocial?: boolean
   hoverPreview?: string | null
-  submitButtonText?: string
+  submitButtonText?: string,
+  placeholder?: string[]
 }
 
 export const PromptInput = ({
@@ -28,6 +29,7 @@ export const PromptInput = ({
   hideAllSocial,
   hoverPreview,
   submitButtonText,
+  placeholder
 }: PromptInputProps) => {
   const userState = useUserState()
 
@@ -63,7 +65,7 @@ export const PromptInput = ({
   return (
     <InputPrompt
       loading={loading}
-      placeholder={[...SUGGESTED_PROMPT_TEXT]}
+      placeholder={placeholder}
       socials={[
         ...connectedSocials.map(social => ({
           icon: social.logo,
