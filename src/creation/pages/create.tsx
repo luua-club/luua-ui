@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
-import { QUERY_KEYS } from '@/core/config/constant'
+import { EDIT_PROMPT_TEXT, QUERY_KEYS, SUGGESTED_PROMPT_TEXT } from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppDispatch, useAppSelector } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -352,6 +352,7 @@ function Create() {
             loading={isGenerationDataFetching || saveDraftMutation.isPending}
             hidePromptInfo
             submitButtonText={getCurrentState() ? 'Update Post' : 'Create Post'}
+            placeholder={getCurrentState() ? EDIT_PROMPT_TEXT : SUGGESTED_PROMPT_TEXT}
           >
             <div className="mb-2 flex justify-center gap-2 lg:hidden">
               {getDraftActions()}

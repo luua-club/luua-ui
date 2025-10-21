@@ -26,7 +26,7 @@ function PastResponse({ history }: PastResponseProps) {
       {/* No History */}
       {history.length === 0 && (
         <p className="text-muted-foreground text-sm">
-          No past response yet. Generate some posts to see them here.
+          No iterations yet — start creating to see variations.
         </p>
       )}
 

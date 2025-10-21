@@ -40,10 +40,6 @@ function Nav({ handleSidebar }: INavProps) {
 
         {/* Page title */}
         <h1 className="truncate text-sm font-medium">{currentPageTitle}</h1>
-
-        <Badge variant="secondary" className="hidden rounded-xs sm:block">
-          Beta
-        </Badge>
       </div>
       <div className="flex items-center">
         {/* Dark mode toggle */}

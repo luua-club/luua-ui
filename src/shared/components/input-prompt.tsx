@@ -2,6 +2,7 @@ import { CircleCheckBig, Globe, Loader, Lock, Sparkles } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
+
 import { SOCIAL_STATUS } from '../config/constant'
 import { InputPromptSocial } from '../models/Input-prompt.model'
 import { Button } from '../ui/button'
@@ -16,6 +17,7 @@ import { Switch } from '../ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { WordRotate } from '../ui/word-rotate'
 import { cn } from '../utils'
+import { SUGGESTED_PROMPT_TEXT } from '@/core/config/constant'
 
 interface InputPromptProps {
   loading?: boolean
@@ -33,7 +35,7 @@ interface InputPromptProps {
 
 export const InputPrompt: React.FC<InputPromptProps> = ({
   loading = false,
-  placeholder = [],
+  placeholder = SUGGESTED_PROMPT_TEXT,
   socials = [],
   hidePromptInfo = false,
   hideAllSocial = false,
@@ -190,7 +192,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
                       : placeholder
                   }
                   duration={3000}
-                  className="text-sm font-medium text-gray-600 select-none dark:text-gray-300"
+                  className="text-sm font-medium text-gray-400 select-none dark:text-gray-300"
                 />
               </motion.div>
             )}
