@@ -20,9 +20,19 @@ export const BASE_API_URL = import.meta.env.VITE_LUUA_BACKEND_URL
  * Suggested text that is shown inside prompt box
  */
 export const SUGGESTED_PROMPT_TEXT = [
-  'Start with a prompt: Announce our weekend sale...',
-  'Or paste a link to a tweet, or linkedin post you love',
-  'Let Luua handle the rest...',
+  'Drop a tweet, video, or article link',
+  'Got an idea? Turn it into a post',
+  'Type a thought — Luua makes it a post',
+  'Drop an idea or paste a link',
+  'Found something cool? Drop it here'
+]
+
+export const EDIT_PROMPT_TEXT = [
+  'Make it shorter and snappier',
+  'Add a hook at the start',
+  'Make it sound more professional',
+  'Add a call to action at the end',
+  'Add another example from this → [link]'
 ]
 
 /**
