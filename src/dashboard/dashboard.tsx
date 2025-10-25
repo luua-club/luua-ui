@@ -3,8 +3,8 @@ import { Dot, Loader } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
-import Logo from '@/assets/images/luua-black-icon.svg?react'
-import LogoDark from '@/assets/images/luua-white-icon.svg?react'
+import Logo from '@/assets/images/luua-icon-logo.svg?react'
+import LogoDark from '@/assets/images/luua-white-icon-logo.svg?react'
 import { PromptInput } from '@/core/components/PromptInput'
 import {
   linkedinPrompts,
@@ -139,7 +139,8 @@ function Dashboard() {
 
             {userState?.name && (
               <span>
-                Hi {capitalize(userState?.name.split(' ')[0] || '')}, what are we posting today?
+                Hi {capitalize(userState?.name.split(' ')[0] || '')}, what are
+                we posting today?
               </span>
             )}
           </motion.h1>

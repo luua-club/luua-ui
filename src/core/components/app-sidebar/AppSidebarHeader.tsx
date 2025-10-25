@@ -1,9 +1,5 @@
 import { Link } from '@tanstack/react-router'
 
-import LogoIconOnly from '@/assets/images/luua-black-icon.svg?react'
-import LogoTextOnly from '@/assets/images/luua-black-text.svg?react'
-import LogoIconOnlyDark from '@/assets/images/luua-white-icon.svg?react'
-import LogoTextOnlyDark from '@/assets/images/luua-white-text.svg?react'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import {
   SidebarMenu,
@@ -11,6 +7,8 @@ import {
   SidebarMenuItem,
 } from '@/shared/ui/sidebar'
 import { cn } from '@/shared/utils'
+
+import { AppIconLogo, AppTextLogo } from '../app-logo'
 
 function AppSidebarHeader() {
   const user = useUserState()
@@ -25,25 +23,12 @@ function AppSidebarHeader() {
         >
           <Link to="/dashboard">
             {/* Logo Icon */}
-            <LogoIconOnly aria-label="Icon" className="!size-5 dark:hidden" />
+            <AppIconLogo />
 
-            <LogoIconOnlyDark
-              aria-label="Icon"
-              className="hidden !size-5 dark:block"
-            />
-
-            {/* Logo Text */}
             <div className="flex w-full items-center justify-between">
+              {/* Logo Text */}
               <div className="flex items-center gap-1">
-                <LogoTextOnly
-                  aria-label="Text"
-                  className="!size-12 dark:hidden"
-                />
-
-                <LogoTextOnlyDark
-                  aria-label="Text"
-                  className="hidden !size-12 dark:block"
-                />
+                <AppTextLogo />
               </div>
 
               {isProPlan ? (

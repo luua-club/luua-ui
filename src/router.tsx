@@ -10,7 +10,6 @@ import getAutoGenRouteTree from '@/auto-gen/router'
 import SidebarLayout from '@/core/layouts/SidebarLayout'
 import getCreationRouteTree from '@/creation/router'
 import getDashboardRoute from '@/dashboard/router'
-import getOnboardingRoute from '@/onboarding/router'
 import getPaymentsRoute from '@/payments/router'
 import getPreferencesRoute from '@/preferences/router'
 import getPublishedRoute from '@/published/router'
@@ -32,7 +31,6 @@ export const privateRoute = createRoute({
 })
 
 const authRoute = getAuthRoute(rootRoute)
-const onboardingRoute = getOnboardingRoute(rootRoute)
 const dashboardRoute = getDashboardRoute(privateRoute)
 const scheduleRoute = getScheduleRoute(privateRoute)
 const settingsRouteTree = getSettingsRouteTree(privateRoute)
@@ -44,7 +42,6 @@ const paymentsRoute = getPaymentsRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
-  onboardingRoute,
   privateRoute.addChildren([
     dashboardRoute,
     scheduleRoute,
