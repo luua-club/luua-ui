@@ -99,9 +99,9 @@ const Socials = ({ user }: { user: UserState }) => {
       </div>
       <Separator />
       <p className="text-muted-foreground mt-4 text-sm text-balance lg:max-w-2xl">
-        Connect your LinkedIn or X/Twitter safely — we use official integrations and
-         never access your personal data. Every post goes live only 
-         after you approve it.
+        Connect your LinkedIn or X/Twitter safely — we use official integrations
+        and never access your personal data. Every post goes live only after you
+        approve it.
       </p>
       <div className="mt-8 grid grid-cols-1 gap-4 lg:max-w-2xl lg:grid-cols-2">
         <SocialCard

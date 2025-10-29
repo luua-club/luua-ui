@@ -24,7 +24,7 @@ export const SUGGESTED_PROMPT_TEXT = [
   'Got an idea? Turn it into a post',
   'Type a thought — Luua makes it a post',
   'Drop an idea or paste a link',
-  'Found something cool? Drop it here'
+  'Found something cool? Drop it here',
 ]
 
 export const EDIT_PROMPT_TEXT = [
@@ -32,7 +32,7 @@ export const EDIT_PROMPT_TEXT = [
   'Add a hook at the start',
   'Make it sound more professional',
   'Add a call to action at the end',
-  'Add another example from this → [link]'
+  'Add another example from this → [link]',
 ]
 
 /**
