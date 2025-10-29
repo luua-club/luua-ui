@@ -1,17 +1,20 @@
 import { Link } from '@tanstack/react-router'
 
 import { useUserState } from '@/core/hooks/user-state.hook'
+import ChipBadge from '@/shared/components/chip-badge'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/shared/ui/sidebar'
-import { cn } from '@/shared/utils'
 
 import { AppIconLogo, AppTextLogo } from '../app-logo'
 
 function AppSidebarHeader() {
+  // --- Hooks ---
   const user = useUserState()
+
+  // --- Computed Variables ---
   const isProPlan = user?.plan === 'Pro'
 
   return (
@@ -31,23 +34,11 @@ function AppSidebarHeader() {
                 <AppTextLogo />
               </div>
 
+              {/* Free or Pro */}
               {isProPlan ? (
-                <span
-                  className={cn(
-                    'bg-brand-accent-yellow truncate rounded-xs px-3 py-0.5 text-xs font-semibold text-black'
-                  )}
-                >
-                  Pro
-                </span>
+                <ChipBadge variant="hot">Pro</ChipBadge>
               ) : (
-                <span
-                  className={cn(
-                    'truncate rounded-xs border-1 border-gray-200 bg-white px-3 py-0.5 text-xs font-semibold',
-                    'dark:bg-accent dark:text-accent-foreground dark:border-transparent'
-                  )}
-                >
-                  Free
-                </span>
+                <ChipBadge variant="cold">Free</ChipBadge>
               )}
             </div>
           </Link>

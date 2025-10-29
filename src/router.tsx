@@ -7,7 +7,7 @@ import {
 import { AppContent } from '@/App'
 import getAuthRoute from '@/auth/router'
 import getAutoGenRouteTree from '@/auto-gen/router'
-import SidebarLayout from '@/core/layouts/SidebarLayout'
+import MainLayout from '@/core/layouts/main-layout'
 import getCreationRouteTree from '@/creation/router'
 import getDashboardRoute from '@/dashboard/router'
 import getPaymentsRoute from '@/payments/router'
@@ -27,7 +27,7 @@ export const rootRoute = createRootRoute({
 export const privateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: SidebarLayout,
+  component: MainLayout,
 })
 
 const authRoute = getAuthRoute(rootRoute)

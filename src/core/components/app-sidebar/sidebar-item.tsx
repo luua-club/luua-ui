@@ -79,9 +79,10 @@ interface IItemWithIconProps {
 }
 
 const ItemWithIcon = ({ item }: IItemWithIconProps) => {
+  const Icon = item.icon
   return (
     <>
-      {item.icon}
+      {Icon && <Icon />}
       <span>{item.title}</span>
       <Tooltip>
         <TooltipTrigger asChild>
