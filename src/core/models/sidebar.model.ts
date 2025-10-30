@@ -1,4 +1,5 @@
 import type { LinkProps } from '@tanstack/react-router'
+import type { LucideIcon } from 'lucide-react'
 
 import { urlType } from './urls.model'
 
@@ -10,7 +11,7 @@ export interface ISidebarItem {
   search?: LinkProps['search']
   tooltip?: string
   ping?: 'success' | 'error'
-  icon?: React.ReactNode
+  icon?: LucideIcon
   onlyOpen?: boolean
   children?: ISidebarItem[]
 }

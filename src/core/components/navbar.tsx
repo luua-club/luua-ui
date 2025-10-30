@@ -1,13 +1,8 @@
 import { useRouterState } from '@tanstack/react-router'
 import { LucidePanelRight } from 'lucide-react'
 
-import { useUserState } from '@/core/hooks/user-state.hook'
 import { urlType } from '@/core/models/urls.model'
-import ThemeToggle from '@/shared/components/theme-toggle'
-import { Separator } from '@/shared/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
-
-import { NavUser } from './NavUser'
 
 interface INavProps {
   handleSidebar: () => void
@@ -15,16 +10,15 @@ interface INavProps {
 
 function Nav({ handleSidebar }: INavProps) {
   const state = useRouterState()
-  const user = useUserState()
 
   // Variables
   const pathname = state.location.pathname as urlType
   const currentPageTitle = getCurrentPageTitle(pathname)
 
   return (
-    <nav className="h-nav-height flex justify-between border-b-1 p-2">
+    <nav className="flex justify-between p-2 pt-4">
+      {/* Left Side */}
       <div className="flex items-center gap-2">
-        {/* Sidebar toggle */}
         <Tooltip>
           <TooltipTrigger asChild>
             <LucidePanelRight
@@ -36,17 +30,11 @@ function Nav({ handleSidebar }: INavProps) {
             Expand / Collapse Sidebar, CTRL+B
           </TooltipContent>
         </Tooltip>
-
-        {/* Page title */}
         <h1 className="truncate text-sm font-medium">{currentPageTitle}</h1>
       </div>
-      <div className="flex items-center">
-        {/* Dark mode toggle */}
-        <ThemeToggle />
-        <Separator orientation="vertical" className="mr-1 ml-3 !h-7" />
-        {/* User info */}
-        <NavUser user={user} />
-      </div>
+
+      {/* Right Side */}
+      <div className="flex items-center">{/* TODO */}</div>
     </nav>
   )
 }
@@ -59,8 +47,8 @@ function Nav({ handleSidebar }: INavProps) {
  */
 const getCurrentPageTitle = (pathname: urlType) => {
   switch (pathname) {
-    case '/dashboard':
-      return 'Dashboard'
+    case '/welcome':
+      return 'Welcome'
     case '/settings':
       return 'User Settings'
     case '/creation/create':
@@ -80,7 +68,7 @@ const getCurrentPageTitle = (pathname: urlType) => {
     case '/payments':
       return 'Payments & Pricing'
     default:
-      return 'Dashboard'
+      return ''
   }
 }
 

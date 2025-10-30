@@ -9,7 +9,11 @@ import { useEffect, useRef, useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
 import { SharePostModal } from '@/core/components/SharePostModal'
-import { EDIT_PROMPT_TEXT, QUERY_KEYS, SUGGESTED_PROMPT_TEXT } from '@/core/config/constant'
+import {
+  EDIT_PROMPT_TEXT,
+  QUERY_KEYS,
+  SUGGESTED_PROMPT_TEXT,
+} from '@/core/config/constant'
 import { useGeneratePosts } from '@/core/hooks/generate-post.hook'
 import { useAppDispatch, useAppSelector } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -142,7 +146,7 @@ function Create() {
   }, [queryClient])
 
   /**
-   * Set active social tab based on pre-user prompt state, i.e dashboard
+   * Set active social tab based on pre-user prompt state, i.e welcome
    */
   useEffect(() => {
     if (preUserPromptState.channel) {
@@ -352,7 +356,9 @@ function Create() {
             loading={isGenerationDataFetching || saveDraftMutation.isPending}
             hidePromptInfo
             submitButtonText={getCurrentState() ? 'Update Post' : 'Create Post'}
-            placeholder={getCurrentState() ? EDIT_PROMPT_TEXT : SUGGESTED_PROMPT_TEXT}
+            placeholder={
+              getCurrentState() ? EDIT_PROMPT_TEXT : SUGGESTED_PROMPT_TEXT
+            }
           >
             <div className="mb-2 flex justify-center gap-2 lg:hidden">
               {getDraftActions()}

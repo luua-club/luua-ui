@@ -6,21 +6,21 @@ import {
   SidebarMenu,
 } from '@/shared/ui/sidebar'
 
-import AppSideBarItem from './AppSidebarItem'
+import AppSideBarItem from './sidebar-item'
 
-interface IAppSidebarPostsProps {
-  postsItems?: ISidebarItem[]
+interface IAppSidebarPlatformProps {
+  platformItems: ISidebarItem[]
 }
 
-function AppSidebarPosts({ postsItems }: IAppSidebarPostsProps) {
+function AppSidebarPlatform({ platformItems }: IAppSidebarPlatformProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
-        <span className="dark:text-white">Posts</span>
+        <span className="dark:text-white">Platform</span>
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {postsItems?.map(item => (
+          {platformItems.map(item => (
             <AppSideBarItem key={item.title} item={item} />
           ))}
         </SidebarMenu>
@@ -29,4 +29,4 @@ function AppSidebarPosts({ postsItems }: IAppSidebarPostsProps) {
   )
 }
 
-export default AppSidebarPosts
+export default AppSidebarPlatform

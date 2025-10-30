@@ -14,16 +14,16 @@ export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
     throw redirect({ to: '/login' })
   }
 
-  // If user is logged in and the current path is login, redirect to dashboard
+  // If user is logged in and the current path is login, redirect to welcome
   // Arises when user is logged in and tries to access the login page
   if (isLoggedIn && path === '/login') {
-    throw redirect({ to: '/dashboard' })
+    throw redirect({ to: '/welcome' })
   }
 
-  // If user is logged in and the current path is root, redirect to dashboard
+  // If user is logged in and the current path is root, redirect to welcome
   // Arises when user is logged in and enter our normal url
   if (isLoggedIn && path === '/') {
-    throw redirect({ to: '/dashboard' })
+    throw redirect({ to: '/welcome' })
   }
 
   return {}

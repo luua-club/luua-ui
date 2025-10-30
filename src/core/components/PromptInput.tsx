@@ -16,7 +16,7 @@ interface PromptInputProps {
   className?: string
   hideAllSocial?: boolean
   hoverPreview?: string | null
-  submitButtonText?: string,
+  submitButtonText?: string
   placeholder?: string[]
 }
 
@@ -29,7 +29,7 @@ export const PromptInput = ({
   hideAllSocial,
   hoverPreview,
   submitButtonText,
-  placeholder
+  placeholder,
 }: PromptInputProps) => {
   const userState = useUserState()
 

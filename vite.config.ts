@@ -56,8 +56,8 @@ export default defineConfig({
           if (id.includes('/src/auth/')) {
             return 'route-auth'
           }
-          if (id.includes('/src/dashboard/')) {
-            return 'route-dashboard'
+          if (id.includes('/src/welcome/')) {
+            return 'route-welcome'
           }
           if (id.includes('/src/settings/')) {
             return 'route-settings'
