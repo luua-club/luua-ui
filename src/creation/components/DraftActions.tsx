@@ -1,6 +1,4 @@
-import { Calendar, Loader, PlugZap, Save, ListChecks
-  
- } from 'lucide-react'
+import { Calendar, ListChecks, Loader, PlugZap, Save } from 'lucide-react'
 import { useState } from 'react'
 
 import { UserState } from '@/core/models/user.model'

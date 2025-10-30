@@ -28,12 +28,14 @@ import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
 import { ThemeProvider } from './shared/provider/theme-provider'
 import { getLocalStorageItem } from './shared/utils/localstorage.util'
 
-// Initialize PostHog
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
-  api_host: import.meta.env.VITE_PUBLIC_REVERSE_PROXY_URL,
-  person_profiles: 'always',
-  capture_exceptions: true,
-})
+// Initialize PostHog only in production
+if (import.meta.env.PROD) {
+  posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
+    api_host: import.meta.env.VITE_PUBLIC_REVERSE_PROXY_URL,
+    person_profiles: 'always',
+    capture_exceptions: true,
+  })
+}
 
 export function AppContent() {
   // ---- Variables ----

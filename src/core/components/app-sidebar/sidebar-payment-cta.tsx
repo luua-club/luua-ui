@@ -10,13 +10,18 @@ import { useSidebar } from '@/shared/ui/sidebar'
 import { cn } from '@/shared/utils'
 
 function AppSidebarPaymentCTA() {
-  const { state } = useSidebar()
-  const isExpanded = state === 'expanded'
+  // --- State  ---
   const [shouldRender, setShouldRender] = useState(false)
-  const router = useRouter()
 
+  // --- Hooks ---
+  const { state } = useSidebar()
+  const router = useRouter()
   const { isMobile, setOpenMobile } = useSidebar()
 
+  // --- Computed variables for effects ---
+  const isExpanded = state === 'expanded'
+
+  // --- Effects ---
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 

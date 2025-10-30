@@ -2,6 +2,7 @@ import { CircleCheckBig, Globe, Loader, Lock, Sparkles } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
+import { SUGGESTED_PROMPT_TEXT } from '@/core/config/constant'
 
 import { SOCIAL_STATUS } from '../config/constant'
 import { InputPromptSocial } from '../models/Input-prompt.model'
@@ -17,7 +18,6 @@ import { Switch } from '../ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { WordRotate } from '../ui/word-rotate'
 import { cn } from '../utils'
-import { SUGGESTED_PROMPT_TEXT } from '@/core/config/constant'
 
 interface InputPromptProps {
   loading?: boolean
@@ -383,13 +383,8 @@ const PromptControls: React.FC<PromptControlsProps> = ({
         </Select>
 
         {/* Submit Button */}
-        <Button
-          onClick={handleGeneratePost}
-        >
-          {loading ? (
-            <Loader className="animate-spin" />
-            ) :  <Sparkles />
-          }
+        <Button onClick={handleGeneratePost}>
+          {loading ? <Loader className="animate-spin" /> : <Sparkles />}
           {submitButtonText}
         </Button>
       </div>

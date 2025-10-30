@@ -6,21 +6,21 @@ import {
   SidebarMenu,
 } from '@/shared/ui/sidebar'
 
-import AppSideBarItem from './AppSidebarItem'
+import AppSideBarItem from './sidebar-item'
 
-interface IAppSidebarAutoGenProps {
-  autoGenItems?: ISidebarItem[]
+interface IAppSidebarCreationProps {
+  creationsItems: ISidebarItem[]
 }
 
-function AppSidebarAutoGen({ autoGenItems }: IAppSidebarAutoGenProps) {
+function AppSidebarCreation({ creationsItems }: IAppSidebarCreationProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>
-        <span className="dark:text-white">Auto Generation</span>
+        <span className="dark:text-white">Creations</span>
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {autoGenItems?.map(item => (
+          {creationsItems.map(item => (
             <AppSideBarItem key={item.title} item={item} />
           ))}
         </SidebarMenu>
@@ -29,4 +29,4 @@ function AppSidebarAutoGen({ autoGenItems }: IAppSidebarAutoGenProps) {
   )
 }
 
-export default AppSidebarAutoGen
+export default AppSidebarCreation
