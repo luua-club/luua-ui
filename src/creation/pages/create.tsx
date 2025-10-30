@@ -146,7 +146,7 @@ function Create() {
   }, [queryClient])
 
   /**
-   * Set active social tab based on pre-user prompt state, i.e dashboard
+   * Set active social tab based on pre-user prompt state, i.e welcome
    */
   useEffect(() => {
     if (preUserPromptState.channel) {

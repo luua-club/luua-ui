@@ -350,7 +350,7 @@ export const useCreateDraft = ({ latestGeneratedPosts }: Props) => {
           queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
           showConfetti()
           allowLeaveRef.current = true
-          navigate({ to: '/dashboard' })
+          navigate({ to: '/welcome' })
         },
         onError: () => {
           setIsShareModalOpen({ open: false, schedule: false })

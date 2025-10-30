@@ -47,8 +47,8 @@ function Nav({ handleSidebar }: INavProps) {
  */
 const getCurrentPageTitle = (pathname: urlType) => {
   switch (pathname) {
-    case '/dashboard':
-      return 'Dashboard'
+    case '/welcome':
+      return 'Welcome'
     case '/settings':
       return 'User Settings'
     case '/creation/create':
@@ -68,7 +68,7 @@ const getCurrentPageTitle = (pathname: urlType) => {
     case '/payments':
       return 'Payments & Pricing'
     default:
-      return 'Dashboard'
+      return ''
   }
 }
 

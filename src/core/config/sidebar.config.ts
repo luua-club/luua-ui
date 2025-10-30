@@ -13,8 +13,8 @@ import { ISidebarItem } from '../models/sidebar.model'
 
 export const platformItems: ISidebarItem[] = [
   {
-    title: 'Dashboard',
-    url: '/dashboard',
+    title: 'Welcome',
+    url: '/welcome',
     icon: House,
   },
   {

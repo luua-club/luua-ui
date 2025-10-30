@@ -24,7 +24,7 @@ function AppSidebarHeader() {
           asChild
           className="data-[slot=sidebar-menu-button]:!p-1.5"
         >
-          <Link to="/dashboard">
+          <Link to="/welcome">
             {/* Logo Icon */}
             <AppIconLogo />
 
