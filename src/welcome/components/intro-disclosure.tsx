@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { postHogIntroCapture } from '@/core/config/posthog.config'
+import { showConfetti } from '@/core/utils/common.util'
 import { Button } from '@/shared/ui/button'
 import { Checkbox } from '@/shared/ui/checkbox'
 import {
@@ -34,6 +35,16 @@ function IntroDisclosure(props: IntroDisclosureProps) {
   const totalSteps = props.stepsData.length
   const checkedCount = activeStep + 1
   const progress = (checkedCount / totalSteps) * 100
+
+  // ---- Effects ----
+  /**
+   * Show confetti when drawer opens
+   */
+  useEffect(() => {
+    if (props.open) {
+      showConfetti()
+    }
+  }, [props.open])
 
   return (
     <Drawer open={props.open} onOpenChange={props.onOpenChange}>
