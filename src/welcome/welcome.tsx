@@ -2,12 +2,18 @@ import { createLazyRoute, useLocation } from '@tanstack/react-router'
 import { LampDesk } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
+import {
+  clearNavbarRightComponent,
+  setNavbarRightComponent,
+} from '@/core/store/navbar-slice'
 import { removeQueryParams } from '@/core/utils/common.util'
 import GlobalLoader from '@/shared/components/global-loader'
 import FeaturesGrid from '@/welcome/components/features-grid'
 
 import ProWelcomeBanner from './components/pro-welcome-banner'
+import WelcomeNavRight from './components/welcome-nav-right'
 
 function Welcome() {
   // --- States ---
@@ -16,6 +22,7 @@ function Welcome() {
   // --- Hooks ---
   const location = useLocation()
   const user = useUserState()
+  const dispatch = useAppDispatch()
 
   //--- Effects ---
   /**
@@ -33,6 +40,17 @@ function Welcome() {
     }
   }, [location.search, location.pathname])
 
+  /**
+   * Set navbar right component on mount, clear on unmount
+   */
+  useEffect(() => {
+    dispatch(setNavbarRightComponent(<WelcomeNavRight />))
+
+    return () => {
+      dispatch(clearNavbarRightComponent())
+    }
+  }, [dispatch])
+
   // --- Early Return ---
   if (!user) {
     return <GlobalLoader />
@@ -41,8 +59,8 @@ function Welcome() {
   return (
     <>
       <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
-        <p className="flex items-center gap-2 font-semibold">
-          <LampDesk className="size-4.5" />
+        <p className="flex items-center gap-3 text-xl font-semibold text-balance">
+          <LampDesk className="hidden size-6 md:block" />
           Welcome to Luua — pick a feature to begin.
         </p>
 

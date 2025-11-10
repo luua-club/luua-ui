@@ -119,4 +119,8 @@ export const EXTERNAL_URLS = {
   contactUs: 'https://luua.club/contact',
   chromeExt:
     'https://chromewebstore.google.com/detail/luua-inspiration-extensio/aolfcbppcakoomagjeiphibfokcjiogj?authuser=0&hl=en',
+  discord: 'https://discord.gg/Q9DDvAsVmb',
+  x: 'https://x.com/luuaclub',
+  instagram:
+    'https://www.instagram.com/luua_club?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
 }
