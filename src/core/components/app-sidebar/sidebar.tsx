@@ -1,8 +1,7 @@
 import {
-  autoGenItems,
   creationItems,
-  platformItems,
   postsItems,
+  ungroupedItems,
 } from '@/core/config/sidebar.config'
 import { Separator } from '@/shared/ui/separator'
 import {
@@ -12,12 +11,11 @@ import {
   SidebarHeader,
 } from '@/shared/ui/sidebar'
 
-import AppSidebarAutoGen from './sidebar-autogen'
 import AppSidebarCreation from './sidebar-creation'
 import AppSidebarFooter from './sidebar-footer'
 import AppSidebarHeader from './sidebar-header'
-import AppSidebarPlatform from './sidebar-platform'
 import AppSidebarPosts from './sidebar-posts'
+import AppSidebarUngrouped from './sidebar-ungrouped'
 
 function AppSidebar() {
   return (
@@ -29,11 +27,10 @@ function AppSidebar() {
 
       {/* Content */}
       <SidebarContent>
-        <AppSidebarPlatform platformItems={platformItems} />
+        <AppSidebarUngrouped ungroupedItems={ungroupedItems} />
         <Separator />
         <AppSidebarCreation creationsItems={creationItems} />
         <AppSidebarPosts postsItems={postsItems} />
-        <AppSidebarAutoGen autoGenItems={autoGenItems} />
       </SidebarContent>
 
       {/* Footer */}

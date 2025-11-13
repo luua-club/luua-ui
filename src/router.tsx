@@ -17,6 +17,7 @@ import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
 import getWelcomeRoute from '@/welcome/router'
 
+import getBookmarksRoute from './bookmarks/router'
 import { AuthGuard } from './guards'
 
 export const rootRoute = createRootRoute({
@@ -39,6 +40,7 @@ const preferencesRoute = getPreferencesRoute(privateRoute)
 const autoGenRouteTree = getAutoGenRouteTree(privateRoute)
 const paymentsRoute = getPaymentsRoute(privateRoute)
 const welcomeRoute = getWelcomeRoute(privateRoute)
+const bookmarksRoute = getBookmarksRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -51,6 +53,7 @@ const routeTree = rootRoute.addChildren([
     autoGenRouteTree,
     paymentsRoute,
     welcomeRoute,
+    bookmarksRoute,
   ]),
 ])
 

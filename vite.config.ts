@@ -74,6 +74,9 @@ export default defineConfig({
           if (id.includes('/src/onboarding/')) {
             return 'route-onboarding'
           }
+          if (id.includes('/src/bookmarks/')) {
+            return 'route-bookmarks'
+          }
         },
       },
     },
