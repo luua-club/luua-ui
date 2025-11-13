@@ -40,7 +40,6 @@ function Bookmarks() {
         },
         signal
       )
-      res.data.inspirations.forEach(x => (x.utilized = true))
       return res.data as InspirationResponse
     },
     staleTime: 60_000,
@@ -129,7 +128,7 @@ function Bookmarks() {
 
     if (isEmptyData) {
       return (
-        <div className="col-span-full mx-auto mt-2 flex w-full items-center justify-center gap-2 rounded-md border-1 border-dashed p-5.5 text-sm font-semibold">
+        <div className="col-span-full mx-auto flex w-full items-center justify-center gap-2 rounded-md border-1 border-dashed p-5.5 text-sm font-semibold">
           <CircleSlash className="size-4" /> No bookmarks found
         </div>
       )
@@ -168,7 +167,7 @@ function Bookmarks() {
   return (
     <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
       {/* Header */}
-      <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+      <div className="flex items-center justify-between gap-4 text-center">
         <span className="flex items-center gap-2 text-lg font-bold">
           <BookMarked className="size-5" /> Bookmarks
         </span>

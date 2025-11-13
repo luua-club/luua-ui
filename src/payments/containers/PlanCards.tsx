@@ -154,7 +154,7 @@ function PlanCards() {
           <ul className="my-2 space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <Check className="size-4" />
-              Unlimited Auto Mode actions
+              Unlimited Autopilot actions
             </li>
             <li className="flex items-center gap-2">
               <Check className="size-4" />

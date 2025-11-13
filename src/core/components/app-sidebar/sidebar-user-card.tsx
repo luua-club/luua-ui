@@ -8,6 +8,7 @@ import {
   LucideSun,
   MessageCircleQuestionMark,
   Receipt,
+  Settings,
   UserCog,
 } from 'lucide-react'
 
@@ -101,15 +102,16 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
             </DropdownMenuItem>
           </DropdownMenuGroup>
 
-          {/* Option:3 - Accounts and billing */}
+          {/* Option:3 - Settings and billing */}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <Link to="/settings" className="w-full">
               <DropdownMenuItem className="cursor-pointer">
-                <UserCog />
-                Account
+                <Settings />
+                Settings
               </DropdownMenuItem>
             </Link>
+
             <Link
               to="/settings"
               search={{ tabs: 'billing' }}

@@ -60,7 +60,7 @@ function LinkContentCard({
 
       {/* Footer */}
       <CardFooter className="flex flex-col p-0 pt-2">
-        <div className="flex w-full items-center justify-between px-4 text-xs">
+        <div className="flex w-full flex-col justify-between gap-4 px-4 text-xs lg:flex-row lg:items-center">
           <p className="text-muted-foreground font-semibold">
             {format(new Date(createdAt), 'PPpp')}
           </p>
@@ -97,7 +97,7 @@ function LinkContentCard({
           size={'icon'}
           onClick={onDelete}
           disabled={isProcessing}
-          className="size-7 rounded-full text-red-500"
+          className="dark:bg-card dark:hover:bg-card size-7 rounded-full text-red-500"
         >
           <Trash2 />
         </Button>
