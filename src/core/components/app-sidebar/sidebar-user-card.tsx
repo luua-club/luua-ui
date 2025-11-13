@@ -9,7 +9,6 @@ import {
   MessageCircleQuestionMark,
   Receipt,
   Settings,
-  UserCog,
 } from 'lucide-react'
 
 import { EXTERNAL_URLS } from '@/core/config/constant'
