@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card'
-import { Separator } from '../ui/separator'
 import { cn } from '../utils'
 
 interface LinkContentCardProps {
