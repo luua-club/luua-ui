@@ -12,7 +12,6 @@ import { IUsageSummary } from '@/core/models/payment.model'
 import { Separator } from '@/shared/ui/separator'
 
 import AutoGenActions from '../container/AutoGenActions'
-import InspirationsCrud from '../container/InspirationsCrud'
 
 function Inspiration() {
   // --- State ---
@@ -109,9 +108,6 @@ function Inspiration() {
 
       {/* Separator */}
       <Separator className="my-4" />
-
-      {/* Inspirations CRUD */}
-      <InspirationsCrud />
 
       {/* Settings Modal */}
       <AutoGenSettingsModal
