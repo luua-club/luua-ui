@@ -12,7 +12,7 @@ import { Separator } from '@/shared/ui/separator'
 import { Switch } from '@/shared/ui/switch'
 import { cn } from '@/shared/utils'
 
-interface AutoGenActionsProps {
+interface AutopilotActions {
   checked: boolean
   setChecked: (checked: boolean) => void
   setIsSettingsOpen: (open: boolean) => void
@@ -20,13 +20,13 @@ interface AutoGenActionsProps {
   limitReached: boolean
 }
 
-function AutoGenActions({
+function AutopilotActions({
   checked,
   setChecked,
   setIsSettingsOpen,
   isLoading,
   limitReached,
-}: AutoGenActionsProps) {
+}: AutopilotActions) {
   // --- Hooks ---
   const queryClient = useQueryClient()
   const user = useUserState()
@@ -42,9 +42,7 @@ function AutoGenActions({
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.autopilotSettings],
       })
-      toast.success(
-        `Auto generation ${variables.enabled ? 'enabled' : 'disabled'}`
-      )
+      toast.success(`Autopilot ${variables.enabled ? 'enabled' : 'disabled'}`)
     },
     onError: () => {
       toast.error('Something went wrong!')
@@ -95,7 +93,6 @@ function AutoGenActions({
         variant="outline"
         size="sm"
         onClick={() => setIsSettingsOpen(true)}
-        aria-label="Open auto generation settings"
         className="!text-sm"
         disabled={!checked || isLoading || updateSettingsMutation.isPending}
       >
@@ -135,4 +132,4 @@ function AutoGenActions({
   )
 }
 
-export default AutoGenActions
+export default AutopilotActions

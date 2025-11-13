@@ -1,21 +1,31 @@
 import {
+  Bookmark,
   FileCheck,
   FolderClosed,
-  FolderHeart,
   House,
-  Lightbulb,
   LucideCalendar,
+  Network,
   Paintbrush,
   PencilRuler,
 } from 'lucide-react'
 
 import { ISidebarItem } from '../models/sidebar.model'
 
-export const platformItems: ISidebarItem[] = [
+export const ungroupedItems: ISidebarItem[] = [
   {
     title: 'Welcome',
     url: '/welcome',
     icon: House,
+  },
+  {
+    title: 'Bookmarks',
+    url: '/bookmarks',
+    icon: Bookmark,
+  },
+  {
+    title: 'Autopilot',
+    url: '/autopilot',
+    icon: Network,
   },
   {
     title: 'Your Styles',
@@ -47,18 +57,5 @@ export const postsItems: ISidebarItem[] = [
     title: 'Published',
     url: '/published',
     icon: FileCheck,
-  },
-]
-
-export const autoGenItems: ISidebarItem[] = [
-  {
-    title: 'Inspiration',
-    url: '/auto-gen/inspiration',
-    icon: Lightbulb,
-  },
-  {
-    title: 'AI Drafts',
-    url: '/auto-gen/drafts',
-    icon: FolderHeart,
   },
 ]

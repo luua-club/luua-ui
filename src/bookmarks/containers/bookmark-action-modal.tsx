@@ -25,12 +25,9 @@ import {
 import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 
-import {
-  InspirationFormValues,
-  InspirationSchema,
-} from '../models/inspiration.model'
+import { BookmarkFromValues, BookmarkSchema } from '../models/bookmark.model'
 
-type InspirationActionModalProps = {
+type BookmarkActionModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode?: 'create' | 'edit'
@@ -42,19 +39,17 @@ type InspirationActionModalProps = {
   disabled?: boolean
 }
 
-function InspirationActionModal({
+function BookmarkActionModal({
   open,
   onOpenChange,
   mode = 'create',
   initialData,
   disabled = false,
-}: InspirationActionModalProps) {
+}: BookmarkActionModalProps) {
   // --- Forms ---
-  const resolver = zodResolver(
-    InspirationSchema
-  ) as Resolver<InspirationFormValues>
+  const resolver = zodResolver(BookmarkSchema) as Resolver<BookmarkFromValues>
 
-  const form = useForm<InspirationFormValues>({
+  const form = useForm<BookmarkFromValues>({
     resolver,
     mode: 'onChange',
     defaultValues: {
@@ -82,13 +77,13 @@ function InspirationActionModal({
    * Create mutation
    */
   const createMutation = useMutation({
-    mutationFn: (values: InspirationFormValues) =>
+    mutationFn: (values: BookmarkFromValues) =>
       inspirationApi.createInspiration({
         link: values.url,
         additional_context: values.additional_context || null,
       }),
     onSuccess: () => {
-      toast.success('Inspiration added successfully')
+      toast.success('Bookmark added successfully')
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.inspirations],
       })
@@ -96,7 +91,7 @@ function InspirationActionModal({
       onOpenChange(false)
     },
     onError: () => {
-      toast.error('Failed to add inspiration')
+      toast.error('Failed to add bookmark')
     },
   })
 
@@ -104,13 +99,13 @@ function InspirationActionModal({
    * Update mutation
    */
   const updateMutation = useMutation({
-    mutationFn: (payload: { id: string; values: InspirationFormValues }) =>
+    mutationFn: (payload: { id: string; values: BookmarkFromValues }) =>
       inspirationApi.updateInspiration(payload.id, {
         link: payload.values.url,
         additional_context: payload.values.additional_context || '',
       }),
     onSuccess: () => {
-      toast.success('Inspiration updated successfully')
+      toast.success('Bookmark updated successfully')
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.inspirations],
       })
@@ -118,7 +113,7 @@ function InspirationActionModal({
       onOpenChange(false)
     },
     onError: () => {
-      toast.error('Failed to update inspiration')
+      toast.error('Failed to update bookmark')
     },
   })
 
@@ -128,7 +123,7 @@ function InspirationActionModal({
    *
    * @param _values - Form values
    */
-  const onSubmit = (values: InspirationFormValues) => {
+  const onSubmit = (values: BookmarkFromValues) => {
     if (mode === 'edit' && initialData?.id) {
       updateMutation.mutate({ id: initialData.id, values })
       return
@@ -227,4 +222,4 @@ function InspirationActionModal({
   )
 }
 
-export default InspirationActionModal
+export default BookmarkActionModal

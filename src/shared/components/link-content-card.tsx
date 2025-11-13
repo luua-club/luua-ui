@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, PencilRuler, Trash2 } from 'lucide-react'
 
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card'
-import { Separator } from '../ui/separator'
+import { cn } from '../utils'
 
 interface LinkContentCardProps {
   createdAt: string
@@ -33,10 +33,10 @@ function LinkContentCard({
 }: LinkContentCardProps) {
   return (
     <Card
-      className={`flex flex-col gap-4 rounded-sm py-4 shadow-none ${isProcessing ? 'opacity-50' : ''}`}
+      className={`flex flex-col gap-2 rounded-sm p-0 shadow-none ${isProcessing ? 'opacity-50' : ''} relative`}
     >
       {/* Header */}
-      <CardHeader className="flex items-start justify-between gap-2 px-4">
+      <CardHeader className="flex items-start justify-between gap-2 px-4 pt-4">
         {/* Title */}
         <CardTitle className="min-w-0 flex-1">
           <a
@@ -48,19 +48,7 @@ function LinkContentCard({
             {link}
           </a>
         </CardTitle>
-
-        {/* Utilized Badge */}
-        {utilized && (
-          <Badge
-            variant="outline"
-            className="rounded-xs border-orange-600 font-semibold text-orange-600 dark:border-orange-400 dark:text-orange-400"
-          >
-            UTILIZED
-          </Badge>
-        )}
       </CardHeader>
-
-      {description && <Separator />}
 
       {/* Content */}
       <CardContent className="line-clamp-3 flex-1 px-4">
@@ -71,34 +59,49 @@ function LinkContentCard({
       </CardContent>
 
       {/* Footer */}
-      <CardFooter className="flex items-center justify-between gap-2 px-4 text-xs">
-        {/* Created At */}
-        <p className="text-muted-foreground font-semibold">
-          {format(new Date(createdAt), 'PPpp')}
-        </p>
+      <CardFooter className="flex flex-col p-0 pt-2">
+        <div className="flex w-full items-center justify-between px-4 text-xs">
+          <p className="text-muted-foreground font-semibold">
+            {format(new Date(createdAt), 'PPpp')}
+          </p>
+
+          <Badge
+            variant="outline"
+            className={cn(
+              'rounded-xs border-orange-600 text-xs font-semibold text-orange-600 opacity-0 dark:border-orange-400 dark:text-orange-400',
+              utilized && 'opacity-100'
+            )}
+          >
+            Consumed by Autopilot
+          </Badge>
+        </div>
 
         {/** Actions */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-7"
-            onClick={onEdit}
-            disabled={isProcessing}
-          >
-            <Edit2 />
+        <div className="mt-4 grid w-full grid-cols-2 gap-4 border-t-1 px-4 py-4">
+          <Button variant="default" className="w-full">
+            <PencilRuler /> Create
           </Button>
           <Button
-            variant="destructive"
-            size="icon"
-            className="size-7"
-            onClick={onDelete}
+            variant="outline"
+            onClick={onEdit}
             disabled={isProcessing}
+            className="w-full"
           >
-            <Trash2 />
+            <Edit2 /> Edit
           </Button>
         </div>
       </CardFooter>
+      <div className="absolute -top-2.5 -right-2.5">
+        <Button
+          variant="outline"
+          size={'icon'}
+          onClick={onDelete}
+          disabled={isProcessing}
+          className="size-7 rounded-full text-red-500"
+        >
+          <Trash2 />
+        </Button>
+      </div>
     </Card>
   )
 }

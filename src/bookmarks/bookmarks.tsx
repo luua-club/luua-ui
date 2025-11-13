@@ -1,18 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CircleSlash, Loader, SquarePlus } from 'lucide-react'
+import { createLazyRoute } from '@tanstack/react-router'
+import { BookMarked, CircleSlash, Loader, SquarePlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { inspirationApi } from '@/core/api/inspiration.api'
-import { QUERY_KEYS } from '@/core/config/constant'
-import type { InspirationResponse } from '@/core/models/inspiration.model'
+import { EXTERNAL_URLS, QUERY_KEYS } from '@/core/config/constant'
+import { InspirationResponse } from '@/core/models/inspiration.model'
 import LinkContentCard from '@/shared/components/link-content-card'
 import PaginationList from '@/shared/components/pagination-list'
 import { Button } from '@/shared/ui/button'
+import { Separator } from '@/shared/ui/separator'
 
-import InspirationActionModal from './InspirationActionModal'
+import ExtentionCallout from './components/extention-callout'
+import BookmarkActionModal from './containers/bookmark-action-modal'
 
-function InspirationsCrud() {
+function Bookmarks() {
   // --- State & Variables ---
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
@@ -37,6 +40,7 @@ function InspirationsCrud() {
         },
         signal
       )
+      res.data.inspirations.forEach(x => (x.utilized = true))
       return res.data as InspirationResponse
     },
     staleTime: 60_000,
@@ -99,6 +103,9 @@ function InspirationsCrud() {
     }
   }, [data, limit, offset])
 
+  // --- Computed Variables ---
+  const isEmptyData = !data || data.inspirations.length === 0
+
   // --- Functions ---
   /**
    * Renders the body of the inspirations list
@@ -114,17 +121,17 @@ function InspirationsCrud() {
 
     if (isError) {
       return (
-        <div className="text-sm font-semibold text-red-500">
-          Failed to load inspirations
+        <div className="col-span-full mx-auto mt-2 flex w-full items-center justify-center gap-2 rounded-md border-1 border-dashed border-red-500 p-5.5 text-sm font-semibold text-red-500">
+          <CircleSlash className="size-4" /> Failed to load bookmarks
         </div>
       )
     }
 
-    if (!data || data.inspirations.length === 0) {
+    if (isEmptyData) {
       return (
-        <p className="col-span-full mx-auto mt-8 flex items-center gap-2 text-sm font-semibold">
-          <CircleSlash className="size-4" /> No inspirations found
-        </p>
+        <div className="col-span-full mx-auto mt-2 flex w-full items-center justify-center gap-2 rounded-md border-1 border-dashed p-5.5 text-sm font-semibold">
+          <CircleSlash className="size-4" /> No bookmarks found
+        </div>
       )
     }
 
@@ -159,30 +166,49 @@ function InspirationsCrud() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
       {/* Header */}
       <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
-        <p className="font-medium">
-          These are list of inspirations, you can add, update and delete them
-          here.
-        </p>
-        {/* Actions */}
+        <span className="flex items-center gap-2 text-lg font-bold">
+          <BookMarked className="size-5" /> Bookmarks
+        </span>
         <Button
           onClick={() => {
             setEditData(null)
             setIsModalOpen(true)
           }}
-          variant="outline"
           size="sm"
           disabled={isLoading}
         >
           <SquarePlus className="size-4" />
-          Add Inspiration
+          Add Manually
         </Button>
       </div>
+      <Separator />
+
+      {/* Description */}
+      <p>
+        Access your saved bookmarks from the{' '}
+        <a
+          href={EXTERNAL_URLS.chromeExt}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium hover:underline"
+        >
+          Luua Chrome extension
+        </a>{' '}
+        or add them manually. They serve as{' '}
+        <span className="font-medium">inspiration for Autopilot</span> to
+        generate posts. You can also consume any bookmark instantly by tapping{' '}
+        <span className="font-medium">&quot;Create&quot;</span> button to
+        generate a post based on that content.
+      </p>
+
+      {/* Callout */}
+      <ExtentionCallout />
 
       {/* Body */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         {renderBody()}
       </div>
 
@@ -199,7 +225,7 @@ function InspirationsCrud() {
       )}
 
       {/** Modal */}
-      <InspirationActionModal
+      <BookmarkActionModal
         open={isModalOpen}
         onOpenChange={open => {
           setIsModalOpen(open)
@@ -216,4 +242,9 @@ function InspirationsCrud() {
   )
 }
 
-export default InspirationsCrud
+//--- Lazy Route ---
+export const Route = createLazyRoute('/bookmarks')({
+  component: Bookmarks,
+})
+
+export default Bookmarks

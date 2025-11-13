@@ -2,25 +2,21 @@ import { ISidebarItem } from '@/core/models/sidebar.model'
 import {
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
 } from '@/shared/ui/sidebar'
 
 import AppSideBarItem from './sidebar-item'
 
-interface IAppSidebarPlatformProps {
-  platformItems: ISidebarItem[]
+interface IAppSidebarUngroupedProps {
+  ungroupedItems: ISidebarItem[]
 }
 
-function AppSidebarPlatform({ platformItems }: IAppSidebarPlatformProps) {
+function AppSidebarUngrouped({ ungroupedItems }: IAppSidebarUngroupedProps) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>
-        <span className="dark:text-white">Platform</span>
-      </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {platformItems.map(item => (
+          {ungroupedItems.map(item => (
             <AppSideBarItem key={item.title} item={item} />
           ))}
         </SidebarMenu>
@@ -29,4 +25,4 @@ function AppSidebarPlatform({ platformItems }: IAppSidebarPlatformProps) {
   )
 }
 
-export default AppSidebarPlatform
+export default AppSidebarUngrouped

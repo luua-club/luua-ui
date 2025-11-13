@@ -29,16 +29,17 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
+import { cn } from '@/shared/utils'
 
 import ListControls from '../../core/components/ListControls'
 import PaginationList from '../../shared/components/pagination-list'
 import { useDraftList } from '../hooks/draft-list.hook'
 
 interface DraftsProps {
-  showOnlyAutoGen?: boolean
+  showOnlyAutoPilot?: boolean
 }
 
-const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
+const Drafts = ({ showOnlyAutoPilot = false }: DraftsProps) => {
   // --- Hooks ---
   const {
     dateRange,
@@ -61,7 +62,7 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
     pendingDeletePost,
     deletingIds,
     isDeleting,
-  } = useDraftList(showOnlyAutoGen)
+  } = useDraftList(showOnlyAutoPilot)
   const navigate = useNavigate()
 
   // --- Handlers ---
@@ -72,12 +73,17 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
   }
 
   return (
-    <div className="m-auto flex max-w-4xl flex-col p-5">
+    <div
+      className={cn(
+        'm-auto flex max-w-4xl flex-col p-5',
+        showOnlyAutoPilot && 'p-0'
+      )}
+    >
       {/* --- Header --- */}
       <h1 className="text-lg font-bold">
-        {showOnlyAutoGen ? (
+        {showOnlyAutoPilot ? (
           <span className="flex items-center gap-2">
-            <FolderHeart className="size-5" /> Your Generated AI Drafts
+            <FolderHeart className="size-5" /> Generated Autopilot Drafts
           </span>
         ) : (
           <span className="flex items-center gap-2">
@@ -134,13 +140,13 @@ const Drafts = ({ showOnlyAutoGen = false }: DraftsProps) => {
                               className="rounded-xs border-orange-600 font-semibold text-orange-600 dark:border-orange-400 dark:text-orange-400"
                             >
                               <Bot className="!size-3.5" />
-                              Auto Gen
+                              Autopilot
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
                             <span>
                               This draft was generated automatically <br /> by
-                              Luua through Auto Gen Feature
+                              Luua through Autopilot Feature
                             </span>
                           </TooltipContent>
                         </Tooltip>
