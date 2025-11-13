@@ -36,11 +36,11 @@ import { Input } from '@/shared/ui/input'
 import { Textarea } from '@/shared/ui/textarea'
 
 import {
-  AutoGenSettingsFormValues,
-  autoGenSettingsSchema,
-} from '../models/auto-gen-settings.model'
+  AutopilotSettingsFromValues,
+  autopilotSettingsSchema,
+} from '../models/autopilot-settings.model'
 
-type AutoGenSettingsModalProps = {
+type AutopilotSettingsModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   defaultBasePrompt?: string
@@ -48,13 +48,13 @@ type AutoGenSettingsModalProps = {
   defaultChannels?: channelType[]
 }
 
-function AutoGenSettingsModal({
+function AutopilotSettingsModal({
   open,
   onOpenChange,
   defaultBasePrompt,
   defaultFrequencyDays,
   defaultChannels,
-}: AutoGenSettingsModalProps) {
+}: AutopilotSettingsModalProps) {
   const user = useUserState()
   const baseChannels = useMemo<channelType[]>(
     () => (user?.plan === 'Pro' ? ['Twitter', 'LinkedIn'] : ['LinkedIn']),
@@ -63,9 +63,9 @@ function AutoGenSettingsModal({
 
   // --- Form ---
   const resolver = zodResolver(
-    autoGenSettingsSchema
-  ) as Resolver<AutoGenSettingsFormValues>
-  const form = useForm<AutoGenSettingsFormValues>({
+    autopilotSettingsSchema
+  ) as Resolver<AutopilotSettingsFromValues>
+  const form = useForm<AutopilotSettingsFromValues>({
     resolver,
     mode: 'onChange',
     defaultValues: {
@@ -84,11 +84,11 @@ function AutoGenSettingsModal({
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.autopilotSettings],
       })
-      toast.success('Auto generation settings saved')
+      toast.success('Auto pilot settings saved')
       onOpenChange(false)
     },
     onError: () => {
-      toast.error('Failed to save auto generation settings')
+      toast.error('Failed to save auto pilot settings')
     },
   })
 
@@ -118,7 +118,7 @@ function AutoGenSettingsModal({
    *
    * @param _values Form values
    */
-  const onSubmit: SubmitHandler<AutoGenSettingsFormValues> = _values => {
+  const onSubmit: SubmitHandler<AutopilotSettingsFromValues> = _values => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     const payload: AutopilotSettings = {
       enabled: true,
@@ -137,7 +137,7 @@ function AutoGenSettingsModal({
         <DialogHeader>
           <DialogTitle className="text-card-foreground flex items-center gap-2">
             <Settings2 className="size-5" />
-            Auto Generation Settings
+            Auto Pilot Settings
           </DialogTitle>
         </DialogHeader>
 
@@ -192,7 +192,7 @@ function AutoGenSettingsModal({
 }
 
 interface FormFieldProps {
-  formControl: Control<AutoGenSettingsFormValues>
+  formControl: Control<AutopilotSettingsFromValues>
 }
 
 const BasePromptField = ({ formControl }: FormFieldProps) => {
@@ -312,4 +312,4 @@ const ChannelsField = ({
   )
 }
 
-export default AutoGenSettingsModal
+export default AutopilotSettingsModal

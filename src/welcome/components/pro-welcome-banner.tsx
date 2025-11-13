@@ -46,10 +46,10 @@ function ProWelcomeBanner({ open, onOpenChange }: ProWelcomeBannerProps) {
       ),
     },
     {
-      title: 'Unlimited Auto Gen',
-      description: 'Run Auto Gen Without Any Limits',
+      title: 'Unlimited Autopilot',
+      description: 'Run Autopilot Without Any Limits',
       longDescription:
-        'Generate as many automated posts as you want with Luua Auto Gen, ensuring your content calendar never runs empty.',
+        'Generate as many automated posts as you want with Luua Autopilot, ensuring your content calendar never runs empty.',
       color: 'bg-purple-800',
       image: (
         <img

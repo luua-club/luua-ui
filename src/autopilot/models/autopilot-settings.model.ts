@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { channelType } from '@/core/models/social.model'
 
-export const autoGenSettingsSchema = z.object({
+export const autopilotSettingsSchema = z.object({
   // Optional, but if provided must be 1 to 10,000 characters
   base_prompt: z
     .string()
@@ -20,4 +20,6 @@ export const autoGenSettingsSchema = z.object({
     .min(1, 'Select at least one channel'),
 })
 
-export type AutoGenSettingsFormValues = z.infer<typeof autoGenSettingsSchema>
+export type AutopilotSettingsFromValues = z.infer<
+  typeof autopilotSettingsSchema
+>

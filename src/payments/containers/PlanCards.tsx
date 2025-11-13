@@ -80,7 +80,7 @@ function PlanCards() {
           <h2 className="text-sm font-semibold">Operational Features</h2>
           <ul className="my-2 space-y-2 text-sm">
             <li className="flex items-center gap-2">
-              <Check className="size-4" />5 Auto Gen actions per month
+              <Check className="size-4" />5 Autopilot actions per month
             </li>
             <li className="flex items-center gap-2">
               <Check className="size-4" />

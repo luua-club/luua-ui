@@ -24,7 +24,7 @@ export const ungroupedItems: ISidebarItem[] = [
   },
   {
     title: 'Autopilot',
-    url: '/auto-gen/inspiration',
+    url: '/autopilot',
     icon: Network,
   },
   {

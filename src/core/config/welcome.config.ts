@@ -40,7 +40,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       'Creates social media posts from your bookmarks in background.',
     className: 'md:col-span-1',
     icon: Network,
-    route: '/auto-gen/inspiration',
+    route: '/autopilot',
   },
   {
     title: 'Download Chrome Extension',

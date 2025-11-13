@@ -6,7 +6,6 @@ import {
 
 import { AppContent } from '@/App'
 import getAuthRoute from '@/auth/router'
-import getAutoGenRouteTree from '@/auto-gen/router'
 import MainLayout from '@/core/layouts/main-layout'
 import getCreationRouteTree from '@/creation/router'
 import getPaymentsRoute from '@/payments/router'
@@ -17,6 +16,7 @@ import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
 import getWelcomeRoute from '@/welcome/router'
 
+import getAutoPilotRoute from './autopilot/router'
 import getBookmarksRoute from './bookmarks/router'
 import { AuthGuard } from './guards'
 
@@ -37,10 +37,10 @@ const settingsRouteTree = getSettingsRouteTree(privateRoute)
 const creationRouteTree = getCreationRouteTree(privateRoute)
 const publishedRoute = getPublishedRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
-const autoGenRouteTree = getAutoGenRouteTree(privateRoute)
 const paymentsRoute = getPaymentsRoute(privateRoute)
 const welcomeRoute = getWelcomeRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
+const autopilotRoute = getAutoPilotRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -50,10 +50,10 @@ const routeTree = rootRoute.addChildren([
     creationRouteTree,
     publishedRoute,
     preferencesRoute,
-    autoGenRouteTree,
     paymentsRoute,
     welcomeRoute,
     bookmarksRoute,
+    autopilotRoute,
   ]),
 ])
 

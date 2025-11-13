@@ -65,8 +65,8 @@ export default defineConfig({
           if (id.includes('/src/creation/')) {
             return 'route-creation'
           }
-          if (id.includes('/src/auto-gen/')) {
-            return 'route-autogen'
+          if (id.includes('/src/autopilot/')) {
+            return 'route-autopilot'
           }
           if (id.includes('/src/payments/')) {
             return 'route-payments'
