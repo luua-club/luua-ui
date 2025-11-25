@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
-import { Loader } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
