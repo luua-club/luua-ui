@@ -11,7 +11,11 @@ class OAuthApi extends BaseApiService {
    * @returns A promise resolving to the LinkedIn authorization URL.
    */
   async linkedinAuthorize() {
-    return this.get<{ authorization_url: string }>('/linkedin/authorize')
+    return this.get<{ authorization_url: string }>('/linkedin/authorize', {
+      params: {
+        redirect_to: window.location.href,
+      },
+    })
   }
 
   /**
@@ -20,7 +24,11 @@ class OAuthApi extends BaseApiService {
    * @returns A promise resolving to the Twitter authorization URL.
    */
   async twitterAuthorize() {
-    return this.get<{ authorization_url: string }>('/twitter/authorize')
+    return this.get<{ authorization_url: string }>('/twitter/authorize', {
+      params: {
+        redirect_to: window.location.href,
+      },
+    })
   }
 }
 

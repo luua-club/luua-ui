@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
 function WelcomeNavRight() {
   return (
-    <div className="mr-2 flex items-center gap-3 rounded-lg border-1 border-dashed p-2">
+    <div className="mr-2 flex items-center gap-3 rounded-full border-1 border-dashed px-2">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button

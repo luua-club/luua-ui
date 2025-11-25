@@ -14,10 +14,11 @@ export default function getCreationRouteTree(privateRoute: AnyRoute) {
     },
   })
 
+  //TODO: REMOVE TEMP ROUTE
   const createPageRoute = createRoute({
     getParentRoute: () => creationRoute,
     path: 'create',
-  }).lazy(() => import('./pages/create').then(d => d.Route))
+  }).lazy(() => import('./pages/create-new').then(d => d.Route))
 
   const draftsPageRoute = createRoute({
     getParentRoute: () => creationRoute,

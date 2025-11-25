@@ -2,15 +2,20 @@ import { cn } from '@/shared/utils'
 
 import { AnimatedGradientText } from '../ui/animated-gradient-text'
 
-interface IUpgradePlanBtnProps {
+interface IGradientBtnProps {
+  text: string
+  classname?: string
   onClick?: () => void
 }
 
-export function UpgradePlanBtn({ onClick }: IUpgradePlanBtnProps) {
+function GradientBtn({ onClick, text, classname }: IGradientBtnProps) {
   return (
     <div
       onClick={onClick}
-      className="group relative mx-auto flex cursor-pointer items-center justify-center rounded-full px-4 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]"
+      className={cn(
+        'group relative mx-auto flex cursor-pointer items-center justify-center rounded-full px-4 py-1.5 shadow-[inset_0_-8px_10px_#8fdfff1f] transition-shadow duration-500 ease-out hover:shadow-[inset_0_-5px_10px_#8fdfff3f]',
+        classname
+      )}
     >
       <span
         className={cn(
@@ -26,8 +31,10 @@ export function UpgradePlanBtn({ onClick }: IUpgradePlanBtnProps) {
         }}
       />
       <AnimatedGradientText className="text-sm font-medium">
-        Upgrade Plan ✨
+        {text}
       </AnimatedGradientText>
     </div>
   )
 }
+
+export default GradientBtn
