@@ -8,7 +8,6 @@ import { HistoryIcon, Loader, PenLine } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { FloatingPromptInput } from '@/core/components/PromptInput'
-import { SharePostModal } from '@/core/components/SharePostModal'
 import {
   EDIT_PROMPT_TEXT,
   QUERY_KEYS,
@@ -76,7 +75,6 @@ function Create() {
   const {
     // State
     postDrafts,
-    isShareModalOpen,
     setIsShareModalOpen,
     navBlocker,
 
@@ -93,11 +91,9 @@ function Create() {
     // Handlers
     handleContentChange,
     handleSaveDraft,
-    handleSubmitDraft,
     isDraftActionsDisabled,
 
     // Utilities
-    getSharePosts,
   } = useCreateDraft({ latestGeneratedPosts: latestGeneratedPostsRef.current })
 
   const {
@@ -322,7 +318,7 @@ function Create() {
       </div>
 
       {/* Share Post Modal */}
-      <SharePostModal
+      {/* <SharePostModal
         isOpen={isShareModalOpen}
         posts={getSharePosts()}
         isLoading={isDraftActionsDisabled()}
@@ -330,7 +326,7 @@ function Create() {
           setIsShareModalOpen(open)
         }}
         onSubmit={handleSubmitDraft}
-      />
+      /> */}
 
       {/** Floating Prompt Input */}
       {user &&
