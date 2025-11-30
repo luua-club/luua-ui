@@ -11,6 +11,7 @@ import getCreationRouteTree from '@/creation/router'
 import getPaymentsRoute from '@/payments/router'
 import getPreferencesRoute from '@/preferences/router'
 import getPublishedRoute from '@/published/router'
+import getReviewRoute from '@/review/router'
 import getScheduleRoute from '@/schedule/router'
 import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
@@ -41,6 +42,7 @@ const paymentsRoute = getPaymentsRoute(privateRoute)
 const welcomeRoute = getWelcomeRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
+const reviewRoute = getReviewRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -54,6 +56,7 @@ const routeTree = rootRoute.addChildren([
     welcomeRoute,
     bookmarksRoute,
     autopilotRoute,
+    reviewRoute,
   ]),
 ])
 

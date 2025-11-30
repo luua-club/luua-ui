@@ -1,11 +1,9 @@
-import { TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
@@ -97,16 +95,6 @@ function Post({
           <div className="flex min-w-0 flex-col">
             <div className="flex min-w-0 items-center gap-2 text-sm font-medium sm:text-base">
               <h6 className="truncate">{user.name}</h6>
-              {!channelUser.connected && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <span>{platform?.name} account not connected</span>
-                  </TooltipContent>
-                </Tooltip>
-              )}
             </div>
             <p className="truncate text-xs font-medium text-zinc-400">
               {user.username}

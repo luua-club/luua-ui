@@ -77,6 +77,9 @@ export default defineConfig({
           if (id.includes('/src/bookmarks/')) {
             return 'route-bookmarks'
           }
+          if (id.includes('/src/review/')) {
+            return 'route-review'
+          }
         },
       },
     },

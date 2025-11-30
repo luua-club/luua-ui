@@ -1,28 +1,22 @@
 import {
   addYears,
   endOfYear,
-  format,
   isAfter,
   isSameDay,
   set,
   startOfToday,
 } from 'date-fns'
-import { Calendar1, Loader } from 'lucide-react'
 import * as React from 'react'
 
 import { Button } from '../ui/button'
 import { Calendar } from '../ui/calendar'
-import { Card, CardContent, CardFooter } from '../ui/card'
+import { Card, CardContent } from '../ui/card'
 import { getTimeSlots } from '../utils/time'
 
 export function SchedulePicker({
   onChange,
-  onSubmit,
-  isLoading,
 }: {
   onChange?: (value: { date: Date; time: string }) => void
-  onSubmit?: (value: { date: Date; time: string }) => void
-  isLoading?: boolean
 }) {
   const [date, setDate] = React.useState<Date | undefined>(new Date())
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null)
@@ -114,45 +108,6 @@ export function SchedulePicker({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-4 border-t px-6 !py-5 md:flex-row">
-        <div className="text-sm">
-          {date && selectedTime ? (
-            <>
-              Post will be scheduled on
-              <span className="font-semibold">
-                {' '}
-                {date?.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                })}{' '}
-              </span>
-              at{' '}
-              <span className="font-semibold">
-                {selectedTime
-                  ? selectedTime
-                  : date
-                    ? format(date, 'HH:mm')
-                    : ''}
-              </span>
-              .
-            </>
-          ) : (
-            <>Select a date and time for your meeting.</>
-          )}
-        </div>
-        <Button
-          disabled={
-            !date || isAfter(date, toMonth) || !selectedTime || isLoading
-          }
-          className="w-full md:ml-auto md:w-auto"
-          variant="brandAccent"
-          onClick={() => onSubmit?.({ date: date!, time: selectedTime! })}
-        >
-          {isLoading ? <Loader className="mr-2 animate-spin" /> : <Calendar1 />}
-          Schedule
-        </Button>
-      </CardFooter>
     </Card>
   )
 }

@@ -6,14 +6,18 @@ import { ProgressiveBlur } from '@/shared/ui/progressive-blur'
 
 interface DraftFooterActionsProps {
   loading?: boolean
-  saveDisabled?: boolean
+  disabled?: boolean
   onSaveDraft: () => void
+  onReviewAndShare: () => void
+  onScheduleClick: () => void
 }
 
 function DraftFooterActions({
   loading,
   onSaveDraft,
-  saveDisabled = false,
+  disabled = false,
+  onReviewAndShare,
+  onScheduleClick,
 }: DraftFooterActionsProps) {
   return (
     <AnimatePresence>
@@ -32,18 +36,29 @@ function DraftFooterActions({
               size="sm"
               className="text-xs"
               onClick={onSaveDraft}
-              disabled={saveDisabled}
+              disabled={disabled}
             >
               <Save className="size-3" /> Save
             </Button>
 
             {/** Action Buttons */}
             <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" className="flex-1 text-xs">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1 text-xs"
+                disabled={disabled}
+                onClick={onScheduleClick}
+              >
                 <Calendar1 className="size-4" /> Schedule
               </Button>
 
-              <Button size="sm" className="flex-1 text-xs">
+              <Button
+                size="sm"
+                className="flex-1 text-xs"
+                disabled={disabled}
+                onClick={onReviewAndShare}
+              >
                 <FileCheck className="size-4" /> Review & Share
                 <ChevronRight className="size-4" />
               </Button>
