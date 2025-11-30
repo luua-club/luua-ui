@@ -9,7 +9,8 @@
   "iconLibrary": "lucide",
   "registries": {
     "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
-    "@magicui": "https://magicui.design/r/{name}.json"
+    "@magicui": "https://magicui.design/r/{name}.json",
+    "@reui": "https://reui.io/r/{name}.json"
   },
   "rsc": false,
   "style": "new-york",

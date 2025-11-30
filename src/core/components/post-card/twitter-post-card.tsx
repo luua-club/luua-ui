@@ -1,8 +1,11 @@
+import { useRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
+import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostCardComposer } from '@/core/hooks/post-card-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { extractUserInitial } from '@/core/utils/common.util'
+import UpgradePlanCta from '@/shared/components/upgrade-plan-cta'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
@@ -30,6 +33,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   const user = useUserState()
   const { content, setContent, textareaRef, updateSelectionRef, addEmoji } =
     usePostCardComposer()
+  const router = useRouter()
 
   // --- Effects ---
   /**
@@ -52,9 +56,27 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   user_social.user_id = user_social.user_id || user.email
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
+  const overlayClassNames =
+    'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
+  const isProPlan = user.plan === 'Pro'
 
   return (
     <div className="relative">
+      {!isProPlan && (
+        <div className={overlayClassNames}>
+          <p className="font-semibold">
+            Upgrade plan to post content for Twitter/X
+          </p>
+          <UpgradePlanCta
+            onClick={() =>
+              router.navigate({
+                to: '/payments',
+              })
+            }
+          />
+        </div>
+      )}
+
       {/* Actions */}
       {!props.isActionLoading && (
         <div className="lg:absolute lg:top-0 lg:-right-9">
@@ -90,8 +112,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
               className={cn(
                 'min-h-52 resize-none text-sm md:min-h-28',
                 'border-1 border-dashed',
-                'caret-primary selection:bg-black selection:text-white',
-                'dark:selection:bg-white dark:selection:text-black',
+                'caret-primary selection:bg-brand-accent-yellow selection:text-black',
                 'transition-colors duration-200',
                 'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
                 'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
@@ -100,7 +121,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
               ref={textareaRef}
               autoFocus
               value={content}
-              maxLength={3000}
+              maxLength={POST_WORD_COUNT.Twitter}
               onChange={e => {
                 const val = e.target.value
                 setContent(val)

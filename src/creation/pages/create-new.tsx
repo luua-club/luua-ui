@@ -72,9 +72,11 @@ function Create() {
   })
 
   const saveDraftMutation = useMutation({
-    mutationFn: (payload: { request: IDraftRequest; callback?: () => void }) =>
-      draftsApi.postDraft(payload.request),
-    onSuccess: response => {
+    mutationFn: (payload: {
+      request: IDraftRequest
+      callback?: (id: string) => void
+    }) => draftsApi.postDraft(payload.request),
+    onSuccess: (response, variables) => {
       // Rehydrate local state with response data
       const postDraft = {} as PostDraftsType
       response.data.draft.posts.forEach((p: PostItem) => {
@@ -88,9 +90,14 @@ function Create() {
         response.data.draft
       )
 
-      toast.success('Draft saved successfully')
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
+      if (variables && variables.callback) {
+        variables.callback(response.data.draft.id)
+        return
+      }
+
+      toast.success('Draft saved successfully')
       navigate({
         to: '/creation/create',
         search: { draftId: response.data.draft.id },
@@ -199,12 +206,24 @@ function Create() {
     }
   }, [setGenerationUserPrompt, setGenerationUserSearch])
 
-  const handleSaveDraft = (callback?: () => void) => {
+  const handleSaveDraft = (callback?: (id: string) => void) => {
     const postPayload = getDraftRequestPayload()
     if (postPayload.posts.length === 0) return
 
     // Call api
     saveDraftMutation.mutate({ request: postPayload, callback })
+  }
+
+  const handleReviewAndShare = () => {
+    handleSaveDraft(id => {
+      navigate({ to: `/review/${id}` })
+    })
+  }
+
+  const handleScheduleClick = () => {
+    handleSaveDraft(id => {
+      navigate({ to: `/review/${id}?schedule="true"` })
+    })
   }
 
   return (
@@ -290,9 +309,11 @@ function Create() {
         </Tabs>
       </div>
       <DraftFooterActions
-        loading={isGenerationDataFetching}
+        loading={isGenerationDataFetching || !getCurrentState()}
         onSaveDraft={handleSaveDraft}
-        saveDisabled={saveDraftMutation.isPending}
+        disabled={saveDraftMutation.isPending}
+        onReviewAndShare={handleReviewAndShare}
+        onScheduleClick={handleScheduleClick}
       />
     </>
   )

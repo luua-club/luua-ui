@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 
+import { POST_WORD_COUNT } from '@/core/config/constant'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
@@ -76,8 +77,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
             className={cn(
               'min-h-52 resize-none text-sm md:min-h-28',
               'border-1 border-dashed',
-              'caret-primary selection:bg-black selection:text-white',
-              'dark:selection:bg-white dark:selection:text-black',
+              'caret-primary selection:bg-brand-accent-yellow selection:text-black',
               'transition-colors duration-200',
               'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
               'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
@@ -86,7 +86,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
             ref={textareaRef}
             autoFocus
             value={content}
-            maxLength={3000}
+            maxLength={POST_WORD_COUNT.LinkedIn}
             onChange={e => {
               const val = e.target.value
               setContent(val)
