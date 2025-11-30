@@ -274,7 +274,7 @@ function StepperNavigation({
 
         <div className="flex gap-4">
           {selectedUTCDate && currentStepId === 'schedule' && (
-            <div className="flex items-center text-sm">
+            <div className="hidden items-center text-sm md:flex">
               Post will be scheduled on&nbsp;
               <span className="font-semibold">
                 {new Date(selectedUTCDate).toLocaleDateString('en-US', {

@@ -47,7 +47,7 @@ export function ReviewStepperNav({
                   Step {index + 1}
                 </div>
 
-                <StepperTitle className="group-data-[state=inactive]/step:text-muted-foreground text-start text-base font-semibold">
+                <StepperTitle className="group-data-[state=inactive]/step:text-muted-foreground text-start text-xs font-semibold md:text-base">
                   {step.title}
                 </StepperTitle>
 
