@@ -105,9 +105,6 @@ function SocialCard({
                 <p className="dark:text-card-foreground text-sm font-semibold text-gray-900">
                   {userChannel.user_name}
                 </p>
-                {userChannel.user_id && platform.name !== 'LinkedIn' && (
-                  <p className="text-xs text-gray-400">{userChannel.user_id}</p>
-                )}
               </div>
             </div>
 

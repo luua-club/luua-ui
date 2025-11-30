@@ -91,16 +91,20 @@ function Create() {
 
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
-      if (variables && variables.callback) {
-        variables.callback(response.data.draft.id)
-        return
+      if (variables?.callback && typeof variables.callback === 'function') {
+        try {
+          variables.callback(response.data.draft.id)
+        } catch (error) {
+          console.error('Callback error:', error)
+          toast.error('Navigation failed')
+        }
+      } else {
+        toast.success('Draft saved successfully')
+        navigate({
+          to: '/creation/create',
+          search: { draftId: response.data.draft.id },
+        })
       }
-
-      toast.success('Draft saved successfully')
-      navigate({
-        to: '/creation/create',
-        search: { draftId: response.data.draft.id },
-      })
     },
     onError: () => {
       toast.error('Failed to save draft')
@@ -215,13 +219,17 @@ function Create() {
 
   const handleReviewAndShare = () => {
     handleSaveDraft(id => {
-      navigate({ to: `/review/${id}` })
+      navigate({ to: '/review/$draftId', params: { draftId: id } })
     })
   }
 
   const handleScheduleClick = () => {
     handleSaveDraft(id => {
-      navigate({ to: `/review/${id}?schedule="true"` })
+      navigate({
+        to: '/review/$draftId',
+        params: { draftId: id },
+        search: { schedule: 'true' },
+      })
     })
   }
 

@@ -6,7 +6,7 @@ import {
   useSearch,
 } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { Check, LoaderCircleIcon } from 'lucide-react'
+import { Check, ChevronLeft, LoaderCircleIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -17,9 +17,9 @@ import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { DraftItem, PostItem } from '@/core/models/draft.model'
 import { showConfetti } from '@/core/utils/common.util'
+import { isSocialConnected } from '@/core/utils/social.utils'
 import GlobalLoader from '@/shared/components/global-loader'
 import { Button } from '@/shared/ui/button'
-import { Separator } from '@/shared/ui/separator'
 import { Stepper, StepperContent, StepperPanel } from '@/shared/ui/stepper'
 import { cn } from '@/shared/utils'
 
@@ -89,23 +89,18 @@ function Review() {
   const postViewSteps =
     search.schedule === 'true' ? schedulePostSteps : publishPostSteps
 
-  const selectedChannel = (() => {
-    const uniqueChannels = Array.from(
-      new Set(selectedPosts.map(p => p.channel))
-    )
-    return uniqueChannels.length === 1 ? uniqueChannels[0] : undefined
-  })()
+  const selectedChannels = Array.from(
+    new Set(selectedPosts.map(p => p.channel))
+  )
 
-  const isChannelConnected = selectedChannel
-    ? userState?.connected_channels[
-        selectedChannel.toLowerCase() as 'linkedin' | 'twitter'
-      ]?.connected
+  const allChannelsConnected = userState
+    ? selectedChannels.every(channel => isSocialConnected(channel, userState))
     : false
 
   const isPublishDisabled =
     currentStep > postViewSteps.length ||
     selectedPosts.length === 0 ||
-    (currentStep >= postViewSteps.length && !isChannelConnected)
+    (currentStep >= postViewSteps.length && !allChannelsConnected)
 
   // Early return
   if (!userState) {
@@ -113,7 +108,18 @@ function Review() {
   }
 
   return (
-    <div className="mx-auto mt-4 max-w-4xl px-4 pb-20">
+    <div className="mx-auto max-w-4xl px-4 pb-10">
+      <Button
+        size="sm"
+        variant={'outline'}
+        className="h-6 !px-1 text-xs"
+        onClick={() =>
+          navigate({ to: '/creation/create', search: { draftId } })
+        }
+      >
+        <ChevronLeft className="size-3.5" />
+        Back to editing
+      </Button>
       <Stepper
         value={currentStep}
         onValueChange={setCurrentStep}
@@ -121,7 +127,7 @@ function Review() {
           completed: <Check className="size-4" />,
           loading: <LoaderCircleIcon className="size-4 animate-spin" />,
         }}
-        className="space-y-8"
+        className="mt-4 space-y-8"
       >
         {/* Stepper Header */}
         <ReviewStepperNav
@@ -148,12 +154,17 @@ function Review() {
                 />
               )}
 
-              {step.id === 'publish' && (
-                <ConnectPublish user={userState} channel={selectedChannel} />
-              )}
-
               {step.id === 'schedule' && (
                 <SchedulePost setSelectedUTCDate={setSelectedUTCDate} />
+              )}
+
+              {step.id === 'publish' && (
+                <ConnectPublish
+                  user={userState}
+                  channels={selectedChannels}
+                  hideQuickShare={!!search.schedule || allChannelsConnected}
+                  selectedPosts={selectedPosts}
+                />
               )}
             </StepperContent>
           ))}
@@ -170,6 +181,7 @@ function Review() {
           publishDraft={publishDraft}
           selectedPosts={selectedPosts}
           draftId={draftId}
+          isSchedule={!!search.schedule}
           selectedUTCDate={selectedUTCDate}
           currentStepId={postViewSteps[currentStep - 1]?.id}
           scheduleDraft={scheduleDraft}
@@ -194,6 +206,7 @@ interface StepperNavigationProps {
   selectedPosts: PostItem[]
   draftId: string
   selectedUTCDate: string | null
+  isSchedule: boolean
   currentStepId?: Step['id']
   scheduleDraft: ReturnType<typeof useScheduleDraft>['mutation']
 }
@@ -209,10 +222,20 @@ function StepperNavigation({
   selectedPosts,
   draftId,
   selectedUTCDate,
+  isSchedule,
   currentStepId,
   scheduleDraft,
 }: StepperNavigationProps) {
   const navigate = useNavigate()
+
+  const getButtonText = () => {
+    if (publishDraft.isPending) return 'Publishing...'
+    if (scheduleDraft.isPending) return 'Scheduling...'
+    if (currentStep >= totalSteps) {
+      return isSchedule ? 'Schedule' : 'Publish Now'
+    }
+    return 'Next'
+  }
 
   const handleNext = async () => {
     // If we're on the final step, publish or schedule the draft
@@ -223,7 +246,7 @@ function StepperNavigation({
           new Set(selectedPosts.map(post => post.channel))
         )
 
-        if (selectedUTCDate) {
+        if (isSchedule && selectedUTCDate) {
           await scheduleDraft.mutateAsync({
             draftRequest: {
               posts: selectedPosts,
@@ -250,9 +273,7 @@ function StepperNavigation({
         navigate({ to: '/published' })
       } catch {
         toast.error(
-          selectedUTCDate
-            ? 'Failed to schedule posts'
-            : 'Failed to publish posts'
+          isSchedule ? 'Failed to schedule posts' : 'Failed to publish posts'
         )
       }
     } else {
@@ -262,7 +283,6 @@ function StepperNavigation({
   }
   return (
     <div className="flex flex-col gap-4">
-      <Separator />
       <div className={cn('flex justify-between gap-4', isLoading && 'hidden')}>
         <Button
           variant="outline"
@@ -273,7 +293,7 @@ function StepperNavigation({
         </Button>
 
         <div className="flex gap-4">
-          {selectedUTCDate && currentStepId === 'schedule' && (
+          {isSchedule && selectedUTCDate && currentStepId === 'schedule' && (
             <div className="hidden items-center text-sm md:flex">
               Post will be scheduled on&nbsp;
               <span className="font-semibold">
@@ -297,18 +317,13 @@ function StepperNavigation({
             disabled={
               isPublishDisabled ||
               publishDraft.isPending ||
-              scheduleDraft.isPending
+              scheduleDraft.isPending ||
+              (isSchedule &&
+                !selectedUTCDate &&
+                (currentStepId === 'schedule' || currentStep >= totalSteps))
             }
           >
-            {publishDraft.isPending
-              ? 'Publishing...'
-              : scheduleDraft.isPending
-                ? 'Scheduling...'
-                : currentStep >= totalSteps
-                  ? selectedUTCDate
-                    ? 'Schedule'
-                    : 'Publish Now'
-                  : 'Next'}
+            {getButtonText()}
           </Button>
         </div>
       </div>

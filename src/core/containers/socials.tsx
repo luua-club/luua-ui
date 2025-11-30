@@ -15,10 +15,10 @@ import { UserState } from '@/core/models/user.model'
 
 const Socials = ({
   user,
-  channel,
+  channels,
 }: {
   user: UserState
-  channel?: channelType
+  channels?: channelType[]
 }) => {
   const queryClient = useQueryClient()
   const [loadingStates, setLoadingStates] = useState<
@@ -82,7 +82,7 @@ const Socials = ({
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {(!channel || channel === 'LinkedIn') && (
+      {(!channels || channels.includes('LinkedIn')) && (
         <SocialCard
           platform={linkedin}
           userChannel={user?.connected_channels?.linkedin}
@@ -92,7 +92,7 @@ const Socials = ({
         />
       )}
 
-      {(!channel || channel === 'Twitter') && (
+      {(!channels || channels.includes('Twitter')) && (
         <SocialCard
           platform={twitter}
           userChannel={user?.connected_channels?.twitter}
