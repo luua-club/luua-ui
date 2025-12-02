@@ -2,6 +2,7 @@ import { useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
+import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { usePostCardComposer } from '@/core/hooks/post-card-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { extractUserInitial } from '@/core/utils/common.util'
@@ -83,6 +84,10 @@ function TwitterPostCard(props: TwitterPostCardProps) {
     'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
   const isProPlan = user.plan === 'Pro'
 
+  // Calculate remaining upload slots
+  const maxAllowedFiles = UPLOAD_CONFIGS.Twitter.maxFiles
+  const remainingSlots = Math.max(0, maxAllowedFiles - imagePreviews.length)
+
   return (
     <div className="relative">
       {!isProPlan && (
@@ -106,6 +111,10 @@ function TwitterPostCard(props: TwitterPostCardProps) {
           <PostCardActions
             onEmojiSelect={addEmoji}
             onFilesUploaded={handleFilesUploaded}
+            uploadConfig={{
+              ...UPLOAD_CONFIGS.Twitter,
+              maxFiles: remainingSlots,
+            }}
           />
         </div>
       )}

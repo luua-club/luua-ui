@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
+import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
@@ -76,6 +77,10 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
 
+  // Calculate remaining upload slots
+  const maxAllowedFiles = UPLOAD_CONFIGS.LinkedIn.maxFiles
+  const remainingSlots = Math.max(0, maxAllowedFiles - imagePreviews.length)
+
   return (
     <div className="relative">
       {/* Actions */}
@@ -84,6 +89,10 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
           <PostCardActions
             onEmojiSelect={addEmoji}
             onFilesUploaded={handleFilesUploaded}
+            uploadConfig={{
+              ...UPLOAD_CONFIGS.LinkedIn,
+              maxFiles: remainingSlots,
+            }}
           />
         </div>
       )}

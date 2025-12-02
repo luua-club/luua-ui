@@ -26,19 +26,27 @@ import {
   FileUploadTrigger,
 } from '@/shared/ui/file-upload'
 
+export interface UploadConfig {
+  maxFiles: number // Maximum number of files allowed
+  maxSizePerFile: number // Maximum size per file in bytes
+}
+
 interface IPostCardActionsProps {
   onEmojiSelect: (emoji: string) => void
   onFilesUploaded?: (fileUrls: string[]) => void
+  uploadConfig?: UploadConfig
 }
 
 function PostCardActions({
   onEmojiSelect,
   onFilesUploaded,
+  uploadConfig = { maxFiles: 5, maxSizePerFile: 5 * 1024 * 1024 }, // Default: 5 files, 5MB each
 }: IPostCardActionsProps) {
   // --- State ---
   const [open, setOpen] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string>('')
 
   const uploadFileMutation = useMutation({
     mutationFn: (file: File) =>
@@ -95,9 +103,11 @@ function PostCardActions({
       toast.success('Files uploaded successfully')
       onFilesUploaded?.(fileUrls)
       setFiles([])
+      setUploadError('')
       setOpen(false)
     } catch (error) {
-      toast.error('Failed to upload one or more files')
+      const errorMessage = 'Failed to upload one or more files'
+      setUploadError(errorMessage)
       console.error('Upload error:', error)
     } finally {
       setIsUploading(false)
@@ -109,7 +119,11 @@ function PostCardActions({
       {/* Upload Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="inline-flex size-7">
-          <Button asChild variant="outline">
+          <Button
+            asChild
+            variant="outline"
+            disabled={uploadConfig.maxFiles === 0}
+          >
             <span className="inline-flex h-full w-full items-center justify-center">
               <Paperclip className="size-3" />
             </span>
@@ -120,19 +134,29 @@ function PostCardActions({
           <DialogHeader className="mb-4">
             <DialogTitle>Upload files</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Drag and drop images or PDFs, or choose files to upload.
+              {uploadConfig.maxFiles === 0 ? (
+                <span className="text-destructive font-medium">
+                  Maximum file limit reached. Remove existing files to upload
+                  more.
+                </span>
+              ) : (
+                `You can upload up to ${uploadConfig.maxFiles} files of size ${(uploadConfig.maxSizePerFile / 1024 / 1024).toFixed(0)}MB each.`
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 pt-2">
             <FileUpload
               value={files}
-              disabled={isUploading}
-              onValueChange={setFiles}
+              disabled={isUploading || uploadConfig.maxFiles === 0}
+              onValueChange={newFiles => {
+                setFiles(newFiles)
+                setUploadError('') // Clear error when files change
+              }}
               accept="image/*,application/pdf"
-              maxFiles={5}
-              maxSize={5 * 1024 * 1024}
+              maxFiles={uploadConfig.maxFiles}
+              maxSize={uploadConfig.maxSizePerFile}
               onFileReject={(_, message) => {
-                toast.error(message)
+                setUploadError(message)
               }}
               multiple
             >
@@ -146,6 +170,14 @@ function PostCardActions({
                 </FileUploadTrigger>
                 to upload
               </FileUploadDropzone>
+
+              {/* Error Message */}
+              {uploadError && (
+                <p className="text-destructive text-sm font-medium">
+                  {uploadError}
+                </p>
+              )}
+
               <FileUploadList>
                 {files.map((file, index) => (
                   <FileUploadItem key={index} value={file}>

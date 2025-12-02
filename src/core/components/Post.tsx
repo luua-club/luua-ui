@@ -140,7 +140,12 @@ function Post({
           ))}
 
         {attached_media && attached_media.length > 0 && (
-          <div className="flex flex-col gap-2 p-4 pt-0">
+          <div
+            className={cn(
+              'flex flex-col gap-2 p-4',
+              content.length > 0 && 'pt-0'
+            )}
+          >
             <p className="text-xs font-bold">
               Attachments ({attached_media.length})
             </p>
