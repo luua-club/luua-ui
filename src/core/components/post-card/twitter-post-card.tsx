@@ -42,26 +42,18 @@ function TwitterPostCard(props: TwitterPostCardProps) {
 
   // --- Effects ---
   /**
-   * Sets initial content if provided
+   * Syncs content with initialContent prop (including clearing when undefined)
    */
   useEffect(() => {
-    if (typeof props.initialContent === 'string') {
-      setContent(props.initialContent)
-    }
+    setContent(props.initialContent ?? '')
   }, [props.initialContent, setContent])
 
   /**
-   * Sets initial images if provided (only on first mount or when local state is empty)
+   * Syncs images with initialImages prop (including clearing when undefined/empty)
    */
   useEffect(() => {
-    if (
-      props.initialImages &&
-      props.initialImages.length > 0 &&
-      imagePreviews.length === 0
-    ) {
-      setImagePreviews(props.initialImages)
-    }
-  }, [props.initialImages, imagePreviews.length])
+    setImagePreviews(props.initialImages ?? [])
+  }, [props.initialImages])
 
   // --- Handlers ---
   const handleFilesUploaded = (fileUrls: string[]) => {

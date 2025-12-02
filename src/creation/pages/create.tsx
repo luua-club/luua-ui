@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createLazyRoute, useNavigate } from '@tanstack/react-router'
+import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -74,10 +74,12 @@ function Create() {
     [setPostDrafts]
   )
 
-  const draftId = new URLSearchParams(location.search).get('draftId')
-  const draftEnabled = Boolean(draftId)
-
   const navigate = useNavigate()
+  const search: { draftId?: string; source?: string } = useSearch({
+    from: '/creation/create',
+  })
+  const draftId = search.draftId
+  const draftEnabled = Boolean(draftId)
   const draftQuery = useQuery<DraftItem>({
     queryKey: [QUERY_KEYS.draft, draftId],
     queryFn: async () => {
@@ -130,6 +132,13 @@ function Create() {
       toast.error('Failed to save draft')
     },
   })
+
+  // Reset state when navigating to /create without a draftId
+  useEffect(() => {
+    if (!draftId) {
+      setPostDrafts({} as postDraftsType)
+    }
+  }, [draftId])
 
   useEffect(() => {
     if (!draftQuery.data) {
@@ -220,21 +229,25 @@ function Create() {
    * Handle `source` query param to trigger generation and then remove it
    */
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const source = params.get('source')
+    const source = search.source
     if (!source) return
 
     setGenerationUserPrompt(source)
     setGenerationUserSearch(false)
 
-    params.delete('source')
-    const newSearch = params.toString()
-    if (newSearch) {
-      window.history.replaceState(null, '', `${location.pathname}?${newSearch}`)
-    } else {
-      window.history.replaceState(null, '', location.pathname)
-    }
-  }, [setGenerationUserPrompt, setGenerationUserSearch])
+    // Remove source param after using it
+    navigate({
+      to: '/creation/create',
+      search: { draftId: search.draftId },
+      replace: true,
+    })
+  }, [
+    search.source,
+    search.draftId,
+    setGenerationUserPrompt,
+    setGenerationUserSearch,
+    navigate,
+  ])
 
   const handleSaveDraft = (callback?: (id: string) => void) => {
     const postPayload = getDraftRequestPayload()
@@ -317,6 +330,7 @@ function Create() {
             className="data-[state=inactive]:hidden"
           >
             <LinkedInPostCard
+              key={`linkedin-${draftId || 'new'}`}
               loading={
                 (draftEnabled && draftQuery.isPending) ||
                 isGenerationDataFetching
@@ -334,6 +348,7 @@ function Create() {
             className="data-[state=inactive]:hidden"
           >
             <TwitterPostCard
+              key={`twitter-${draftId || 'new'}`}
               loading={
                 (draftEnabled && draftQuery.isPending) ||
                 isGenerationDataFetching
