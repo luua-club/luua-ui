@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { Textarea } from '@/shared/ui/textarea'
@@ -6,6 +6,7 @@ import { cn } from '@/shared/utils'
 
 import { usePostCardComposer } from '../../hooks/post-card-composer.hook'
 import { useUserState } from '../../hooks/user-state.hook'
+import PostImagePreview from '../post-preview/PostImagePreview'
 import {
   LinkedInPostCardFooter,
   LinkedInPostCardFooterActions,
@@ -17,7 +18,8 @@ import PostCardActions from './post-card-actions'
 export interface LinkedInPostCardProps {
   // Content
   initialContent?: string
-  onContentChange?: (content: string) => void
+  initialImages?: string[]
+  onPostDataChange?: (data: { content?: string; images?: string[] }) => void
 
   // Loading states
   loading: boolean
@@ -30,6 +32,9 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
   const { content, setContent, textareaRef, updateSelectionRef, addEmoji } =
     usePostCardComposer()
 
+  // --- State ---
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+
   // --- Effects ---
   /**
    * Sets initial content if provided
@@ -39,6 +44,32 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
       setContent(props.initialContent)
     }
   }, [props.initialContent, setContent])
+
+  /**
+   * Sets initial images if provided (only on first mount or when local state is empty)
+   */
+  useEffect(() => {
+    if (
+      props.initialImages &&
+      props.initialImages.length > 0 &&
+      imagePreviews.length === 0
+    ) {
+      setImagePreviews(props.initialImages)
+    }
+  }, [props.initialImages, imagePreviews.length])
+
+  // --- Handlers ---
+  const handleFilesUploaded = (fileUrls: string[]) => {
+    const newImages = [...imagePreviews, ...fileUrls]
+    setImagePreviews(newImages)
+    props.onPostDataChange?.({ images: newImages })
+  }
+
+  const removeImageAt = (index: number) => {
+    const newImages = imagePreviews.filter((_, i) => i !== index)
+    setImagePreviews(newImages)
+    props.onPostDataChange?.({ images: newImages })
+  }
 
   // --- Early Returns ---
   if (!user || props.loading) {
@@ -57,7 +88,10 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
       {/* Actions */}
       {!props.isActionLoading && (
         <div className="absolute top-2 right-2 z-2 lg:top-0 lg:-right-9">
-          <PostCardActions onEmojiSelect={addEmoji} />
+          <PostCardActions
+            onEmojiSelect={addEmoji}
+            onFilesUploaded={handleFilesUploaded}
+          />
         </div>
       )}
 
@@ -90,7 +124,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
             onChange={e => {
               const val = e.target.value
               setContent(val)
-              props.onContentChange?.(val)
+              props.onPostDataChange?.({ content: val })
             }}
             onSelect={updateSelectionRef}
             onKeyUp={updateSelectionRef}
@@ -98,6 +132,16 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
             disabled={props.isActionLoading}
           />
         </div>
+
+        {/* Image Preview */}
+        {imagePreviews.length > 0 && (
+          <div className="mt-2">
+            <PostImagePreview
+              imagePreviews={imagePreviews}
+              onRemove={props.isActionLoading ? undefined : removeImageAt}
+            />
+          </div>
+        )}
 
         {/* Cosmetic Footer */}
         <LinkedInPostCardFooter />

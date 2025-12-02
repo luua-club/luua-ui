@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostCardComposer } from '@/core/hooks/post-card-composer.hook'
@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
+import PostImagePreview from '../post-preview/PostImagePreview'
 import PostCardActions from './post-card-actions'
 import {
   TwitterPostCardFooter,
@@ -21,7 +22,8 @@ import TwitterPostCardSkeleton from './twitter-post-card-skeleton'
 export interface TwitterPostCardProps {
   // Content
   initialContent?: string
-  onContentChange?: (content: string) => void
+  initialImages?: string[]
+  onPostDataChange?: (data: { content?: string; images?: string[] }) => void
 
   // Loading states
   loading: boolean
@@ -35,6 +37,9 @@ function TwitterPostCard(props: TwitterPostCardProps) {
     usePostCardComposer()
   const router = useRouter()
 
+  // --- State ---
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+
   // --- Effects ---
   /**
    * Sets initial content if provided
@@ -44,6 +49,32 @@ function TwitterPostCard(props: TwitterPostCardProps) {
       setContent(props.initialContent)
     }
   }, [props.initialContent, setContent])
+
+  /**
+   * Sets initial images if provided (only on first mount or when local state is empty)
+   */
+  useEffect(() => {
+    if (
+      props.initialImages &&
+      props.initialImages.length > 0 &&
+      imagePreviews.length === 0
+    ) {
+      setImagePreviews(props.initialImages)
+    }
+  }, [props.initialImages, imagePreviews.length])
+
+  // --- Handlers ---
+  const handleFilesUploaded = (fileUrls: string[]) => {
+    const newImages = [...imagePreviews, ...fileUrls]
+    setImagePreviews(newImages)
+    props.onPostDataChange?.({ images: newImages })
+  }
+
+  const removeImageAt = (index: number) => {
+    const newImages = imagePreviews.filter((_, i) => i !== index)
+    setImagePreviews(newImages)
+    props.onPostDataChange?.({ images: newImages })
+  }
 
   // --- Early Returns ---
   if (!user || props.loading) {
@@ -79,8 +110,11 @@ function TwitterPostCard(props: TwitterPostCardProps) {
 
       {/* Actions */}
       {!props.isActionLoading && (
-        <div className="lg:absolute lg:top-0 lg:-right-9">
-          <PostCardActions onEmojiSelect={addEmoji} />
+        <div className="absolute top-2 right-2 z-2 lg:top-0 lg:-right-9">
+          <PostCardActions
+            onEmojiSelect={addEmoji}
+            onFilesUploaded={handleFilesUploaded}
+          />
         </div>
       )}
 
@@ -125,7 +159,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
               onChange={e => {
                 const val = e.target.value
                 setContent(val)
-                props.onContentChange?.(val)
+                props.onPostDataChange?.({ content: val })
               }}
               onSelect={updateSelectionRef}
               onKeyUp={updateSelectionRef}
@@ -133,6 +167,16 @@ function TwitterPostCard(props: TwitterPostCardProps) {
               disabled={props.isActionLoading}
             />
           </div>
+
+          {/* Image Preview */}
+          {imagePreviews.length > 0 && (
+            <div className="my-2 overflow-hidden rounded-2xl">
+              <PostImagePreview
+                imagePreviews={imagePreviews}
+                onRemove={props.isActionLoading ? undefined : removeImageAt}
+              />
+            </div>
+          )}
 
           {/* Cosmetic Footer */}
           <TwitterPostCardFooter />

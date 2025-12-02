@@ -7,7 +7,9 @@ import { toast } from 'sonner'
 import { draftsApi } from '@/core/api/drafts.api'
 import PopoverPrompt from '@/core/components/popover-prompt'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
+import LinkedInPostCardSkeleton from '@/core/components/post-card/linkedin-post-card-skeleton'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
+import TwitterPostCardSkeleton from '@/core/components/post-card/twitter-post-card-skeleton'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
 import { WithOptional } from '@/core/models/common.model'
@@ -31,7 +33,14 @@ function Create() {
   )
 
   const getCurrentState = () => {
-    if (!postDrafts.LinkedIn?.content && !postDrafts.Twitter?.content) {
+    const hasLinkedInContent =
+      postDrafts.LinkedIn?.content ||
+      (postDrafts.LinkedIn?.attached_media?.length ?? 0) > 0
+    const hasTwitterContent =
+      postDrafts.Twitter?.content ||
+      (postDrafts.Twitter?.attached_media?.length ?? 0) > 0
+
+    if (!hasLinkedInContent && !hasTwitterContent) {
       return null
     }
 
@@ -42,12 +51,13 @@ function Create() {
   }
 
   const handleContentChange = useCallback(
-    (val: string, name: channelType) => {
+    (data: { content?: string; images?: string[] }, name: channelType) => {
       setPostDrafts(prev => ({
         ...prev,
         [name]: {
           ...(prev[name] ?? { channel: name }),
-          content: val,
+          ...(data.content !== undefined && { content: data.content }),
+          ...(data.images !== undefined && { attached_media: data.images }),
         },
       }))
     },
@@ -156,7 +166,7 @@ function Create() {
     }
 
     generatedPostContent.forEach(post => {
-      handleContentChange(post.content, post.channel)
+      handleContentChange({ content: post.content }, post.channel)
     })
   }, [generatedPostContent, handleContentChange])
 
@@ -172,17 +182,24 @@ function Create() {
     const linkedinObj = postDrafts['LinkedIn']
     const twitterObj = postDrafts['Twitter']
 
-    if (linkedinObj?.content) {
+    const hasLinkedInContent =
+      linkedinObj?.content || (linkedinObj?.attached_media?.length ?? 0) > 0
+    const hasTwitterContent =
+      twitterObj?.content || (twitterObj?.attached_media?.length ?? 0) > 0
+
+    if (hasLinkedInContent) {
       draftPayload.posts.push({
         ...linkedinObj,
         channel: 'LinkedIn',
+        content: linkedinObj?.content ?? '',
       })
     }
 
-    if (twitterObj?.content) {
+    if (hasTwitterContent) {
       draftPayload.posts.push({
         ...twitterObj,
         channel: 'Twitter',
+        content: twitterObj?.content ?? '',
       })
     }
 
@@ -284,35 +301,46 @@ function Create() {
             })}
           </TabsList>
 
-          {SOCIAL_TABS.map(tab => {
-            return (
-              <TabsContent key={tab} value={tab} className="mt-2">
-                {tab === 'LinkedIn' ? (
-                  <LinkedInPostCard
-                    loading={
-                      (draftEnabled && draftQuery.isPending) ||
-                      isGenerationDataFetching
-                    }
-                    isActionLoading={saveDraftMutation.isPending}
-                    initialContent={postDrafts?.LinkedIn?.content}
-                    onContentChange={val =>
-                      handleContentChange(val, 'LinkedIn')
-                    }
-                  />
-                ) : (
-                  <TwitterPostCard
-                    loading={
-                      (draftEnabled && draftQuery.isPending) ||
-                      isGenerationDataFetching
-                    }
-                    isActionLoading={saveDraftMutation.isPending}
-                    initialContent={postDrafts?.Twitter?.content}
-                    onContentChange={val => handleContentChange(val, 'Twitter')}
-                  />
-                )}
-              </TabsContent>
-            )
-          })}
+          <TabsContent
+            value="LinkedIn"
+            forceMount
+            className="data-[state=inactive]:hidden"
+          >
+            {postDrafts?.LinkedIn ? (
+              <LinkedInPostCard
+                loading={
+                  (draftEnabled && draftQuery.isPending) ||
+                  isGenerationDataFetching
+                }
+                isActionLoading={saveDraftMutation.isPending}
+                initialContent={postDrafts?.LinkedIn?.content}
+                initialImages={postDrafts?.LinkedIn?.attached_media}
+                onPostDataChange={data => handleContentChange(data, 'LinkedIn')}
+              />
+            ) : (
+              <LinkedInPostCardSkeleton />
+            )}
+          </TabsContent>
+          <TabsContent
+            value="Twitter"
+            forceMount
+            className="data-[state=inactive]:hidden"
+          >
+            {postDrafts?.Twitter ? (
+              <TwitterPostCard
+                loading={
+                  (draftEnabled && draftQuery.isPending) ||
+                  isGenerationDataFetching
+                }
+                isActionLoading={saveDraftMutation.isPending}
+                initialContent={postDrafts?.Twitter?.content}
+                initialImages={postDrafts?.Twitter?.attached_media}
+                onPostDataChange={data => handleContentChange(data, 'Twitter')}
+              />
+            ) : (
+              <TwitterPostCardSkeleton />
+            )}
+          </TabsContent>
         </Tabs>
       </div>
       <DraftFooterActions
