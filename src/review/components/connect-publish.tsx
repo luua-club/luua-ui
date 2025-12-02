@@ -5,7 +5,6 @@ import Socials from '@/core/containers/socials'
 import { PostItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
 import { UserState } from '@/core/models/user.model'
-import { isSocialConnected } from '@/core/utils/social.utils'
 import QuickShareCallout from '@/shared/components/quickshare-callout'
 import { Button } from '@/shared/ui/button'
 
@@ -50,12 +49,7 @@ function ConnectPublish({
         <div className="max-w-xl">
           <QuickShareCallout>
             <div className="flex items-center gap-3">
-              {SOCIAL_PLATFORM.filter(
-                platform =>
-                  (!channels ||
-                    channels.includes(platform.name as channelType)) &&
-                  !isSocialConnected(platform.name, user)
-              ).map(platform => {
+              {SOCIAL_PLATFORM.map(platform => {
                 const Icon = platform.logo
                 return (
                   <Button
