@@ -23,8 +23,8 @@ export interface TwitterPostCardProps {
   // Content
   initialContent?: string
   initialImages?: string[]
-  onPostDataChange?: (data: { content?: string; images?: string[] }) => void
-
+  onContentChange: (content: string) => void
+  onImagesChange: (images: string[]) => void
   // Loading states
   loading: boolean
   isActionLoading?: boolean
@@ -67,13 +67,13 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   const handleFilesUploaded = (fileUrls: string[]) => {
     const newImages = [...imagePreviews, ...fileUrls]
     setImagePreviews(newImages)
-    props.onPostDataChange?.({ images: newImages })
+    props.onImagesChange(newImages)
   }
 
   const removeImageAt = (index: number) => {
     const newImages = imagePreviews.filter((_, i) => i !== index)
     setImagePreviews(newImages)
-    props.onPostDataChange?.({ images: newImages })
+    props.onImagesChange(newImages)
   }
 
   // --- Early Returns ---
@@ -159,7 +159,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
               onChange={e => {
                 const val = e.target.value
                 setContent(val)
-                props.onPostDataChange?.({ content: val })
+                props.onContentChange(val)
               }}
               onSelect={updateSelectionRef}
               onKeyUp={updateSelectionRef}

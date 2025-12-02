@@ -7,9 +7,7 @@ import { toast } from 'sonner'
 import { draftsApi } from '@/core/api/drafts.api'
 import PopoverPrompt from '@/core/components/popover-prompt'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
-import LinkedInPostCardSkeleton from '@/core/components/post-card/linkedin-post-card-skeleton'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
-import TwitterPostCardSkeleton from '@/core/components/post-card/twitter-post-card-skeleton'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
 import { WithOptional } from '@/core/models/common.model'
@@ -51,13 +49,25 @@ function Create() {
   }
 
   const handleContentChange = useCallback(
-    (data: { content?: string; images?: string[] }, name: channelType) => {
+    (val: string, name: channelType) => {
       setPostDrafts(prev => ({
         ...prev,
         [name]: {
           ...(prev[name] ?? { channel: name }),
-          ...(data.content !== undefined && { content: data.content }),
-          ...(data.images !== undefined && { attached_media: data.images }),
+          content: val,
+        },
+      }))
+    },
+    [setPostDrafts]
+  )
+
+  const handleImagesChange = useCallback(
+    (images: string[], name: channelType) => {
+      setPostDrafts(prev => ({
+        ...prev,
+        [name]: {
+          ...(prev[name] ?? { channel: name }),
+          attached_media: images,
         },
       }))
     },
@@ -166,7 +176,7 @@ function Create() {
     }
 
     generatedPostContent.forEach(post => {
-      handleContentChange({ content: post.content }, post.channel)
+      handleContentChange(post.content, post.channel)
     })
   }, [generatedPostContent, handleContentChange])
 
@@ -306,40 +316,34 @@ function Create() {
             forceMount
             className="data-[state=inactive]:hidden"
           >
-            {postDrafts?.LinkedIn ? (
-              <LinkedInPostCard
-                loading={
-                  (draftEnabled && draftQuery.isPending) ||
-                  isGenerationDataFetching
-                }
-                isActionLoading={saveDraftMutation.isPending}
-                initialContent={postDrafts?.LinkedIn?.content}
-                initialImages={postDrafts?.LinkedIn?.attached_media}
-                onPostDataChange={data => handleContentChange(data, 'LinkedIn')}
-              />
-            ) : (
-              <LinkedInPostCardSkeleton />
-            )}
+            <LinkedInPostCard
+              loading={
+                (draftEnabled && draftQuery.isPending) ||
+                isGenerationDataFetching
+              }
+              isActionLoading={saveDraftMutation.isPending}
+              initialContent={postDrafts?.LinkedIn?.content}
+              initialImages={postDrafts?.LinkedIn?.attached_media}
+              onContentChange={val => handleContentChange(val, 'LinkedIn')}
+              onImagesChange={images => handleImagesChange(images, 'LinkedIn')}
+            />
           </TabsContent>
           <TabsContent
             value="Twitter"
             forceMount
             className="data-[state=inactive]:hidden"
           >
-            {postDrafts?.Twitter ? (
-              <TwitterPostCard
-                loading={
-                  (draftEnabled && draftQuery.isPending) ||
-                  isGenerationDataFetching
-                }
-                isActionLoading={saveDraftMutation.isPending}
-                initialContent={postDrafts?.Twitter?.content}
-                initialImages={postDrafts?.Twitter?.attached_media}
-                onPostDataChange={data => handleContentChange(data, 'Twitter')}
-              />
-            ) : (
-              <TwitterPostCardSkeleton />
-            )}
+            <TwitterPostCard
+              loading={
+                (draftEnabled && draftQuery.isPending) ||
+                isGenerationDataFetching
+              }
+              isActionLoading={saveDraftMutation.isPending}
+              initialContent={postDrafts?.Twitter?.content}
+              initialImages={postDrafts?.Twitter?.attached_media}
+              onContentChange={val => handleContentChange(val, 'Twitter')}
+              onImagesChange={images => handleImagesChange(images, 'Twitter')}
+            />
           </TabsContent>
         </Tabs>
       </div>
