@@ -74,6 +74,7 @@ function ReviewPostView({
                 id={post.id}
                 channel={post.channel}
                 content={post.content}
+                attached_media={post.attached_media}
                 maintainFormatting
               />
             </div>

@@ -307,6 +307,7 @@ const getPost = (
           id={`${id}`}
           channel={item.channel}
           content={item.content}
+          attached_media={item.attached_media}
           maintainFormatting
         />
       </div>
