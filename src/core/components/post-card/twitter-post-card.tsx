@@ -75,7 +75,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   }
 
   // --- Computed Variables ---
-  const user_social = { ...user.connected_channels.linkedin }
+  const user_social = { ...user.connected_channels.twitter }
   user_social.user_name = user_social.user_name || user.name
   user_social.user_id = user_social.user_id || user.email
   user_social.user_profile_picture =

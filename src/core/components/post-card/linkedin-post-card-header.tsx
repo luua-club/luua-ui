@@ -25,6 +25,7 @@ function LinkedInPostCardHeader({ user }: LinkedInPostCardHeaderProps) {
           <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">
             {user.user_name}
           </h6>
+          <p className="text-muted-foreground text-xs">{user.user_id}</p>
         </div>
       </div>
     </div>

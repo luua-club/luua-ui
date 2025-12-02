@@ -73,7 +73,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
   // --- Computed Variables ---
   const user_social = { ...user.connected_channels.linkedin }
   user_social.user_name = user_social.user_name || user.name
-  user_social.user_id = user_social.user_id || user.email
+  user_social.user_id = user_social.user_email || user.email
   user_social.user_profile_picture =
     user_social.user_profile_picture || user.profile_image
 
