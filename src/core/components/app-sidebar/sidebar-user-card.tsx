@@ -37,7 +37,7 @@ interface UserSidebarCardProps {
 
 export function UserSidebarCard({ user }: UserSidebarCardProps) {
   // --- Hook ---
-  const { isMobile } = useSidebar()
+  const { isMobile, toggleSidebar } = useSidebar()
   const { theme, setTheme } = useTheme()
 
   // --- Early return ---
@@ -84,7 +84,10 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
               <>
                 <DropdownMenuGroup>
                   <Link to="/payments" className="w-full">
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => isMobile && toggleSidebar()}
+                    >
                       <LucideSparkles />
                       Go Pro
                     </DropdownMenuItem>
@@ -105,7 +108,10 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <Link to="/settings" className="w-full">
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => isMobile && toggleSidebar()}
+              >
                 <Settings />
                 Settings
               </DropdownMenuItem>
@@ -116,7 +122,10 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
               search={{ tabs: 'billing' }}
               className="w-full"
             >
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => isMobile && toggleSidebar()}
+              >
                 <Receipt />
                 Subscription
               </DropdownMenuItem>

@@ -1,4 +1,3 @@
-import confetti from 'canvas-confetti'
 import posthog from 'posthog-js'
 
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
@@ -67,37 +66,6 @@ const removeQueryParams = (params: URLSearchParams, keysToRemove: string[]) => {
 }
 
 /**
- * Show a confetti when called
- */
-const showConfetti = () => {
-  const end = Date.now() + 500 // 500 ms
-  const colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
-
-  const frame = () => {
-    if (Date.now() > end) return
-    confetti({
-      particleCount: 2,
-      angle: 60,
-      spread: 55,
-      startVelocity: 60,
-      origin: { x: 0, y: 0.5 },
-      colors: colors,
-    })
-    confetti({
-      particleCount: 2,
-      angle: 120,
-      spread: 55,
-      startVelocity: 60,
-      origin: { x: 1, y: 0.5 },
-      colors: colors,
-    })
-
-    requestAnimationFrame(frame)
-  }
-  frame()
-}
-
-/**
  * Get a random integer between min and max (inclusive)
  * @param min - Minimum value (inclusive)
  * @param max - Maximum value (inclusive)
@@ -114,6 +82,5 @@ export {
   getRandomInt,
   logout,
   removeQueryParams,
-  showConfetti,
   toStartOfDayIso,
 }

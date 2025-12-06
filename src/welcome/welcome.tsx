@@ -13,7 +13,6 @@ import GlobalLoader from '@/shared/components/global-loader'
 import FeaturesGrid from '@/welcome/components/features-grid'
 
 import ProWelcomeBanner from './components/pro-welcome-banner'
-import WelcomeNavRight from './components/welcome-nav-right'
 
 function Welcome() {
   // --- States ---
@@ -31,10 +30,10 @@ function Welcome() {
   useEffect(() => {
     // query parameters
     const params = new URLSearchParams(location.search)
-    const pro = params.get('pro')
+    const pro = Boolean(params.get('pro'))
 
     // query parameters - Pro
-    if (pro === 'true') {
+    if (pro) {
       setIsProWelcomeBannerOpen(true)
       removeQueryParams(params, ['pro'])
     }
@@ -44,7 +43,7 @@ function Welcome() {
    * Set navbar right component on mount, clear on unmount
    */
   useEffect(() => {
-    dispatch(setNavbarRightComponent(<WelcomeNavRight />))
+    dispatch(setNavbarRightComponent('welcome'))
 
     return () => {
       dispatch(clearNavbarRightComponent())

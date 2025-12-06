@@ -7,7 +7,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 
 function WelcomeNavRight() {
   return (
-    <div className="mr-2 flex items-center gap-3 rounded-full border-1 border-dashed px-2">
+    <div className="mr-2 flex items-center gap-3">
+      {/* Discord Btn */}
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
@@ -24,22 +25,7 @@ function WelcomeNavRight() {
         <TooltipContent side="bottom">Join our Discord</TooltipContent>
       </Tooltip>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              window.open(EXTERNAL_URLS.x, '_blank')
-            }}
-            className="size-4 p-0"
-          >
-            <BrandX className="size-4.5" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">Follow us on X</TooltipContent>
-      </Tooltip>
-
+      {/* Instagram Btn */}
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
@@ -54,6 +40,23 @@ function WelcomeNavRight() {
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">Follow us on Instagram</TooltipContent>
+      </Tooltip>
+
+      {/* X Btn */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              window.open(EXTERNAL_URLS.x, '_blank')
+            }}
+            className="size-4 p-0"
+          >
+            <BrandX className="size-4.5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Follow us on X</TooltipContent>
       </Tooltip>
     </div>
   )
