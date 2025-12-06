@@ -11,7 +11,7 @@ import * as React from 'react'
 import { Button } from '../ui/button'
 import { Calendar } from '../ui/calendar'
 import { Card, CardContent } from '../ui/card'
-import { getTimeSlots } from '../utils/time'
+import { getTimeSlots } from '../utils/time.util'
 
 export function SchedulePicker({
   onChange,
