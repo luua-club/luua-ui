@@ -30,7 +30,7 @@ function FeaturesGrid() {
     return {
       title: <BentoTitle>{item.title}</BentoTitle>,
       description: item.description,
-      header: <BentoImage />,
+      header: <BentoImage src={item.imageSrc} />,
       className: item.className,
       icon: <Icon className="h-4 w-4 text-neutral-500" />,
       onClick: () => handleClick(item),

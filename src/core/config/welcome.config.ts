@@ -14,6 +14,7 @@ export type BentoItemConfig = {
   className?: string
   icon: LucideIcon
   route?: string
+  imageSrc?: string
   externalUrl?: string
 }
 
