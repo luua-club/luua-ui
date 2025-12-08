@@ -57,9 +57,7 @@ export function AppContent() {
     error,
   } = useQuery({
     queryKey: [QUERY_KEYS.user],
-    queryFn: () =>
-      // TODO: REMOVE THIS PRO
-      userApi.getUser(),
+    queryFn: () => userApi.getUser(),
     enabled: !!isLoggedIn && !isLoginRoute,
   })
 

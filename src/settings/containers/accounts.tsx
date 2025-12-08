@@ -13,15 +13,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 
-const Account = ({ user }: { user: UserState }) => {
-  // --- State & Props ---
+function Account({ user }: { user: UserState }) {
+  // --- State ---
   const [confirmOpen, setConfirmOpen] = useState(false)
+
+  // --- Mutation ---
+  /**
+   * Handle account deletion with subscription validation
+   */
   const deleteAccountMutation = useMutation({
     mutationFn: () => userApi.deleteAccount(),
     onSuccess: () => {
       user.logout()
     },
     onError: (error: ApiError) => {
+      // Check if user has active subscription and show appropriate error
       if (
         error.detail?.error_code ===
         API_CONSTANTS.errorCode.activeSubscriptionFound
@@ -46,7 +52,7 @@ const Account = ({ user }: { user: UserState }) => {
 
   // --- Functions ---
   /**
-   * Handle delete account
+   * Handle account deletion
    */
   const handleDeleteAccount = () => {
     deleteAccountMutation.mutate()
@@ -54,13 +60,13 @@ const Account = ({ user }: { user: UserState }) => {
 
   return (
     <>
-      {/* Heading */}
+      {/* Profile Section Header */}
       <div className="py-4">
         <h1 className="text-lg font-medium">My Profile</h1>
       </div>
       <Separator />
 
-      {/* User Profile */}
+      {/* User Profile Display */}
       <div className="py-8">
         <div className="flex items-center gap-4">
           <Avatar className="size-12">
@@ -76,12 +82,13 @@ const Account = ({ user }: { user: UserState }) => {
         </div>
       </div>
 
-      {/* Heading */}
+      {/* Account Management Section Header */}
       <div className="py-4">
         <h1 className="text-lg font-medium">Account</h1>
       </div>
       <Separator />
 
+      {/* Sign Out Option */}
       <div className="flex items-center justify-between py-3">
         <div>
           <h3 className="font-medium">Sign Out</h3>
@@ -95,7 +102,7 @@ const Account = ({ user }: { user: UserState }) => {
         </Button>
       </div>
 
-      {/* Delete Account */}
+      {/* Delete Account Option (requires no active subscription) */}
       <div className="flex items-center justify-between py-3">
         <div>
           <h3 className="font-medium">Delete my account</h3>
@@ -109,7 +116,7 @@ const Account = ({ user }: { user: UserState }) => {
         </Button>
       </div>
 
-      {/* Delete Account Dialog */}
+      {/* Confirmation Dialog for Account Deletion */}
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}

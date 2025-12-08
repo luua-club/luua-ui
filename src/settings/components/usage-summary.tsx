@@ -12,15 +12,20 @@ interface IUsageSummaryProps {
 }
 
 function UsageSummary({ usageSummary }: IUsageSummaryProps) {
+  // --- Hooks ---
   const user = useUserState()
+
+  // --- Variables ---
   const isProPlan = user?.plan === 'Pro'
 
+  // --- Early Return ---
   if (!usageSummary) {
     return <UsageSummarySkeleton />
   }
 
   return (
     <>
+      {/* Header Section: Plan name and cycle reset date */}
       <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="space-y-2">
           <p className="text-3xl font-semibold">Current Plan</p>
@@ -51,8 +56,10 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
         </Card>
       </div>
 
+      {/* Usage Metrics: Credits, Auto Pilot Posts, and Scheduled Posts */}
       <Card className="bg-background mt-4 mb-10 rounded-2xl border p-0 shadow-none">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {/* Credits Usage */}
           <div className="space-y-4 p-4">
             <p className="text-muted-foreground text-sm font-medium">
               Consumed Credits
@@ -71,6 +78,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             </p>
           </div>
 
+          {/* Auto Pilot Posts Usage (Unlimited for Pro) */}
           <div className="space-y-4 p-4 sm:border-r-2 sm:border-l-2 sm:border-dashed">
             <p className="text-muted-foreground text-sm font-medium">
               Auto Pilot Posts
@@ -97,6 +105,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             </p>
           </div>
 
+          {/* Scheduled Posts Usage (Unlimited for Pro) */}
           <div className="space-y-4 p-4">
             <p className="text-muted-foreground text-sm font-medium">
               Scheduled Posts
@@ -128,6 +137,10 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
   )
 }
 
+/**
+ * Loading skeleton for usage summary
+ * Displays placeholder content while data is being fetched
+ */
 function UsageSummarySkeleton() {
   return (
     <>

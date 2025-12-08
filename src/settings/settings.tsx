@@ -4,34 +4,51 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import { CableIcon, CircleUser, DollarSign, Loader } from 'lucide-react'
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 
 import Socials from '@/core/containers/socials'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { Separator } from '@/shared/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
-import Account from '../containers/Account'
-import BillingAndCredits from '../containers/BillingAndCredits'
+// Lazy load container components for better performance
+const Account = lazy(() => import('./containers/accounts'))
+const BillingAndCredits = lazy(() => import('./containers/billing-and-credits'))
 
+// Define available tab values for navigation
 const tabValue = ['account', 'socials', 'billing']
 
+/**
+ * Settings component - Main settings page with tabbed interface
+ * Manages account, social platforms, and billing settings
+ */
 const Settings = () => {
+  // --- Hooks ---
   const navigate = useNavigate()
   const location = useLocation()
+  const user = useUserState()
+
+  // --- State Management ---
+  // Parse URL search parameters for tab navigation
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
   )
   const [activeTab, setActiveTab] = useState<string>(tabValue[0])
 
+  // --- Effects ---
+  /**
+   * Sync active tab with URL query parameter
+   */
   useEffect(() => {
     let query = searchParams.get('tabs')
 
+    // Default to first tab if no query parameter
     if (!query) {
       query = tabValue[0]
     }
 
+    // Validate query parameter and fallback to default if invalid
     if (!tabValue.includes(query)) {
       query = tabValue[0]
     }
@@ -39,8 +56,7 @@ const Settings = () => {
     setActiveTab(query)
   }, [searchParams])
 
-  const user = useUserState()
-
+  // --- Early Returns ---
   if (!user) {
     return (
       <div className="flex h-50 items-center justify-center">
@@ -51,10 +67,12 @@ const Settings = () => {
 
   return (
     <div className="m-auto flex max-w-4xl flex-col p-5">
+      {/* Tab navigation with URL sync */}
       <Tabs
         className="w-full"
         value={activeTab}
         onValueChange={(value: string) => {
+          // Update URL when tab changes
           navigate({ to: '/settings', search: { tabs: value }, replace: true })
         }}
       >
@@ -69,11 +87,15 @@ const Settings = () => {
             <DollarSign /> Billing & Credits
           </TabsTrigger>
         </TabsList>
+
+        {/* Account Tab */}
         <TabsContent value={tabValue[0]}>
           <SettingLazySubPages>
             <Account user={user} />
           </SettingLazySubPages>
         </TabsContent>
+
+        {/* Socials Tab */}
         <TabsContent value={tabValue[1]}>
           <SettingLazySubPages>
             <div className="py-4">
@@ -88,6 +110,8 @@ const Settings = () => {
             <Socials user={user} />
           </SettingLazySubPages>
         </TabsContent>
+
+        {/* Billing & Credits Tab */}
         <TabsContent value={tabValue[2]}>
           <SettingLazySubPages>
             <BillingAndCredits />
@@ -98,6 +122,10 @@ const Settings = () => {
   )
 }
 
+/**
+ * Wrapper component for lazy-loaded tab content
+ * Shows loading spinner while content is being loaded
+ */
 const SettingLazySubPages = ({ children }: { children: React.ReactNode }) => {
   return (
     <Suspense

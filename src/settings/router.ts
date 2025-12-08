@@ -4,5 +4,5 @@ export default function getSettingsRoute(privateRoute: AnyRoute) {
   return createRoute({
     getParentRoute: () => privateRoute,
     path: '/settings',
-  }).lazy(() => import('../pages').then(d => d.Route))
+  }).lazy(() => import('./settings').then(d => d.Route))
 }
