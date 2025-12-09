@@ -6,8 +6,8 @@ import { useState } from 'react'
 import { userApi } from '@/core/api/user.api'
 import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
 import UserStyles from '@/core/containers/UserStyles'
-import Advanced from '@/preferences/container/advance'
-import Summary from '@/preferences/container/summaries'
+import Advanced from '@/preferences/container/advanced'
+import Summary from '@/preferences/container/summary'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 export const tabValue = ['styles', 'advanced']
