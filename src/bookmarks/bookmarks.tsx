@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createLazyRoute } from '@tanstack/react-router'
+import { createLazyRoute, useNavigate } from '@tanstack/react-router'
 import { BookMarked, CircleSlash, Loader, SquarePlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -29,6 +29,7 @@ function Bookmarks() {
   const limit = 10
 
   // --- Hooks ---
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data, isLoading, isError } = useQuery<InspirationResponse>({
     queryKey: [QUERY_KEYS.inspirations, { offset, limit }],
@@ -144,6 +145,17 @@ function Bookmarks() {
             createdAt={insp.created_at}
             utilized={insp.utilized}
             isProcessing={deletingIds.has(insp.id)}
+            onCreate={() => {
+              // Navigate to create page with inspiration link and context to trigger AI generation
+              const sourceContent = insp.additional_context
+                ? `${insp.link} ${insp.additional_context}`
+                : insp.link
+
+              navigate({
+                to: '/creation/create',
+                search: { source: sourceContent },
+              })
+            }}
             onEdit={() => {
               // Ensure modal is closed before reopening to avoid showModal timing issues
               setIsModalOpen(false)
@@ -235,7 +247,6 @@ function Bookmarks() {
         }}
         mode={editData ? 'edit' : 'create'}
         initialData={editData ?? undefined}
-        disabled={editData?.utilized}
       />
     </div>
   )
