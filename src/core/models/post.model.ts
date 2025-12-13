@@ -13,6 +13,7 @@ export interface IPost {
   content: string
   status?: postStatusType
   attached_media?: MediaObject[]
+  external_id?: string
   scheduled_at?: string
   published_at?: string
   created_at?: string
