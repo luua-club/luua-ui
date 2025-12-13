@@ -16,7 +16,7 @@ class PostsApi extends BaseApiService {
   }
 
   async publishDraft(req: IPublishDraftRequest) {
-    return this.post(req, '/publish-draft')
+    return this.post(req, '/publish-drafts')
   }
 
   async scheduleDraft(req: IScheduleDraftRequest) {
