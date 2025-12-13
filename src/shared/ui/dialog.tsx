@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useRef } from 'react'
 import { useId } from 'react'
 import { createPortal } from 'react-dom'
 
-import { usePreventScroll } from '@/shared/hooks/usePreventScroll'
+import { usePreventScroll } from '@/shared/hooks/use-prevent-scroll'
 import { cn } from '@/shared/utils/index'
 
 const DialogContext = createContext<{

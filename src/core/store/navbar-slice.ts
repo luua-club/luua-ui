@@ -1,23 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ReactNode } from 'react'
+
+export type NavbarRightComponentKey = 'welcome' | null
 
 interface INavbarState {
-  rightSideComponent: ReactNode | null
+  rightSideComponentKey: NavbarRightComponentKey
 }
 
 const initialState: INavbarState = {
-  rightSideComponent: null,
+  rightSideComponentKey: null,
 }
 
 const navbarSlice = createSlice({
   name: 'navbar',
   initialState,
   reducers: {
-    setNavbarRightComponent: (state, action: PayloadAction<ReactNode>) => {
-      state.rightSideComponent = action.payload
+    setNavbarRightComponent: (
+      state,
+      action: PayloadAction<NavbarRightComponentKey>
+    ) => {
+      state.rightSideComponentKey = action.payload
     },
     clearNavbarRightComponent: state => {
-      state.rightSideComponent = null
+      state.rightSideComponentKey = null
     },
   },
 })

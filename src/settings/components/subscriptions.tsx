@@ -23,9 +23,14 @@ interface ISubscriptionProps {
 }
 
 function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
+  // --- Hooks ---
   const router = useRouter()
+
+  // --- Variables ---
   const isFreePlan = user.plan === 'Free'
 
+  // --- Early Return ---
+  // Show skeleton while subscription data is loading
   if (!subscriptionDetails) {
     return (
       <>
@@ -83,6 +88,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
 
   return (
     <>
+      {/* Subscription Overview Header */}
       <div className="space-y-3 py-4">
         <h1 className="font-bold">Subscription Overview</h1>
         <Separator />
@@ -92,6 +98,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
         </p>
       </div>
 
+      {/* Show upgrade prompt for free plan users with no subscription history */}
       {isFreePlan && subscriptionDetails.length === 0 ? (
         <div className="mt-1 rounded-md border">
           <Table>
@@ -132,6 +139,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
           </Table>
         </div>
       ) : (
+        /* Display subscription history table for users with active/past subscriptions */
         <>
           <div className="mt-1 rounded-md border">
             <Table>
@@ -145,6 +153,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {/* Render each subscription entry */}
                 {subscriptionDetails.map((subscription, index) => (
                   <TableRow key={subscription.id}>
                     <TableCell className="font-medium">{index + 1}</TableCell>
@@ -165,6 +174,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
               </TableBody>
             </Table>
           </div>
+          {/* Support contact information */}
           <p className="text-muted-foreground px-1 py-4 text-xs font-medium">
             Facing issues? please contact us at{' '}
             <a

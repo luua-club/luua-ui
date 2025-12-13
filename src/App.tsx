@@ -57,11 +57,7 @@ export function AppContent() {
     error,
   } = useQuery({
     queryKey: [QUERY_KEYS.user],
-    queryFn: () =>
-      userApi.getUser().then(x => {
-        x.data.plan = 'Pro'
-        return x
-      }),
+    queryFn: () => userApi.getUser(),
     enabled: !!isLoggedIn && !isLoginRoute,
   })
 
@@ -74,16 +70,6 @@ export function AppContent() {
 
     if (UserSchema.safeParse(userData.data).success) {
       dispatch(setUser(userData.data))
-
-      // Add user to posthog
-      posthog.identify(`${userData.data.email}`, {
-        name: userData.data.name,
-        email: userData.data.email,
-        plan: userData.data.plan,
-        linkedin_connected: userData.data.connected_channels.linkedin.connected,
-        twitter_connected: userData.data.connected_channels.twitter.connected,
-        theme: localStorage.getItem(THEME_LOCAL_STORAGE_KEY),
-      })
     } else {
       toast.error('Something went wrong, Please try again !')
       logout()
@@ -98,7 +84,6 @@ export function AppContent() {
       const err = error as AxiosError
 
       if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
-        posthog.captureException(error)
         toast.error(
           'Some error has occurred, please try again later, if the problem persists, please contact support, loggin out..'
         )

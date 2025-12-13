@@ -152,7 +152,7 @@ function Post({
               {attached_media.map((image, index) => (
                 <ThumbnailImage
                   key={index}
-                  src={image}
+                  src={image.thumbnail || image.url}
                   alt={`attachment-${index}`}
                   className="h-12 w-12 flex-shrink-0"
                 />

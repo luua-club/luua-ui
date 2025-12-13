@@ -19,6 +19,7 @@ interface LinkContentCardProps {
   link: string
   onDelete?: () => void
   onEdit?: () => void
+  onCreate?: () => void
   utilized?: boolean
 }
 
@@ -29,6 +30,7 @@ function LinkContentCard({
   utilized = false,
   onEdit,
   onDelete,
+  onCreate,
   isProcessing = false,
 }: LinkContentCardProps) {
   return (
@@ -78,7 +80,7 @@ function LinkContentCard({
 
         {/** Actions */}
         <div className="mt-4 grid w-full grid-cols-2 gap-4 border-t-1 px-4 py-4">
-          <Button variant="default" className="w-full">
+          <Button variant="default" className="w-full" onClick={onCreate}>
             <PencilRuler /> Create
           </Button>
           <Button

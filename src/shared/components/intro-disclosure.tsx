@@ -1,8 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
-import { postHogIntroCapture } from '@/core/config/posthog.config'
-import { showConfetti } from '@/core/utils/common.util'
 import { Button } from '@/shared/ui/button'
 import { Checkbox } from '@/shared/ui/checkbox'
 import {
@@ -16,7 +14,7 @@ import {
 import { Progress } from '@/shared/ui/progress'
 import { Separator } from '@/shared/ui/separator'
 import { WobbleCard } from '@/shared/ui/wobble-card'
-import { cn } from '@/shared/utils'
+import { cn, showConfetti } from '@/shared/utils'
 
 import { IntroStep } from '../models/intro-step.model'
 
@@ -123,7 +121,6 @@ function IntroDisclosure(props: IntroDisclosureProps) {
               className="w-fit"
               variant="link"
               onClick={() => {
-                postHogIntroCapture(props.title, activeStep)
                 props.onOpenChange(false)
               }}
             >

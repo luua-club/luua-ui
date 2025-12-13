@@ -4,7 +4,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
+import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -126,5 +126,10 @@ function Login() {
     </div>
   )
 }
+
+//--- Lazy Route ---
+export const Route = createLazyRoute('/login')({
+  component: Login,
+})
 
 export default Login

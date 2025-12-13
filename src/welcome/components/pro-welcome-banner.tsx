@@ -5,8 +5,8 @@ import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/utils'
 
-import { IntroStep } from '../models/intro-step.model'
-import IntroDisclosure from './intro-disclosure'
+import IntroDisclosure from '../../shared/components/intro-disclosure'
+import { IntroStep } from '../../shared/models/intro-step.model'
 
 interface ProWelcomeBannerProps {
   open: boolean

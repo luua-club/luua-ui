@@ -6,8 +6,14 @@ import { BENTO_ITEMS, BentoItemConfig } from '@/core/config/welcome.config'
 import { BentoGrid, BentoGridItem } from '@/shared/components/bento-grid'
 
 function FeaturesGrid() {
+  // --- Hooks ---
   const router = useRouter()
 
+  // --- Functions ---
+  /**
+   * Handles click events on bento grid items
+   * @param item - The bento item configuration
+   */
   const handleClick = (item: BentoItemConfig) => {
     if (item.externalUrl) {
       window.open(item.externalUrl, '_blank')
@@ -16,12 +22,15 @@ function FeaturesGrid() {
     }
   }
 
+  /**
+   * Transforms BENTO_ITEMS config into BentoGridItem-compatible format
+   */
   const items = BENTO_ITEMS.map(item => {
     const Icon = item.icon
     return {
       title: <BentoTitle>{item.title}</BentoTitle>,
       description: item.description,
-      header: <BentoImage />,
+      header: <BentoImage src={item.imageSrc} />,
       className: item.className,
       icon: <Icon className="h-4 w-4 text-neutral-500" />,
       onClick: () => handleClick(item),
@@ -45,6 +54,12 @@ function FeaturesGrid() {
 
 export default FeaturesGrid
 
+/**
+ * Renders a bento grid item title with a chevron icon
+ *
+ * @param children - The title text to display
+ * @returns A paragraph element with the title and chevron icon
+ */
 const BentoTitle = ({ children }: { children: string }) => (
   <p className="flex items-center gap-1">
     {children}
@@ -52,6 +67,12 @@ const BentoTitle = ({ children }: { children: string }) => (
   </p>
 )
 
+/**
+ * Renders a bento grid item image or gradient placeholder
+ *
+ * @param src - Optional image source URL; shows gradient if not provided
+ * @returns An image element or gradient div placeholder
+ */
 const BentoImage = ({ src }: { src?: string }) => {
   const baseClasses = 'flex h-full min-h-[6rem] w-full flex-1 rounded-xl'
 

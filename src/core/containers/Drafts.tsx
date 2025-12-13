@@ -181,10 +181,9 @@ const Drafts = ({ showOnlyAutoPilot = false }: DraftsProps) => {
                           <DropdownMenuItem
                             onClick={() =>
                               navigate({
-                                to: `/creation/create`,
-                                search: {
+                                to: '/review/$draftId',
+                                params: {
                                   draftId: draft.id,
-                                  publish: true,
                                 },
                               })
                             }
@@ -195,10 +194,12 @@ const Drafts = ({ showOnlyAutoPilot = false }: DraftsProps) => {
                           <DropdownMenuItem
                             onClick={() =>
                               navigate({
-                                to: `/creation/create`,
-                                search: {
+                                to: '/review/$draftId',
+                                params: {
                                   draftId: draft.id,
-                                  schedule: true,
+                                },
+                                search: {
+                                  schedule: 'true',
                                 },
                               })
                             }

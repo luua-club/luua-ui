@@ -6,6 +6,7 @@ import {
   CircleCheck,
   CircleX,
   ClipboardCheck,
+  ExternalLink,
   FolderOpen,
   PlusCircle,
   RotateCcw,
@@ -17,6 +18,7 @@ import Post from '@/core/components/Post'
 import { QUERY_KEYS } from '@/core/config/constant'
 import PostListViewLayout from '@/core/layouts/PostListViewLayout'
 import { postStatusType } from '@/core/models/post.model'
+import { channelType } from '@/core/models/social.model'
 import ErrorBanner from '@/shared/components/error-banner'
 import PaginationList from '@/shared/components/pagination-list'
 import { Button } from '@/shared/ui/button'
@@ -77,11 +79,28 @@ const Published = () => {
         return (
           <>
             <ClipboardCheck className="size-3" />
-            Queued
+            Refresh in a bit, don&apos;t worry.
           </>
         )
       default:
         return 'Scheduled'
+    }
+  }
+
+  const handlePostClick = (channel: channelType, id?: string) => {
+    if (!id) return
+
+    switch (channel) {
+      case 'Twitter':
+        window.open(`https://x.com/i/status/${id}`, '_blank')
+        break
+
+      case 'LinkedIn':
+        window.open(`https://www.linkedin.com/feed/update/${id}`, '_blank')
+        break
+
+      default:
+        break
     }
   }
 
@@ -130,7 +149,7 @@ const Published = () => {
               <p className="flex items-center gap-2 text-xs font-medium">
                 <span
                   className={cn(
-                    'flex items-center gap-1 font-semibold text-zinc-600 dark:text-zinc-300',
+                    'flex items-center justify-center gap-2 font-semibold text-zinc-600 dark:text-zinc-300',
                     post.status === 'Failed' &&
                       'text-red-600 dark:text-red-400',
                     post.status === 'Queued' &&
@@ -141,6 +160,18 @@ const Published = () => {
                 >
                   {getPostStatus(post.status)}
                 </span>
+                {post.external_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 rounded-sm p-1 px-2 text-xs"
+                    onClick={() =>
+                      handlePostClick(post.channel, post.external_id)
+                    }
+                  >
+                    view post <ExternalLink className="size-3" />
+                  </Button>
+                )}
               </p>
 
               <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">

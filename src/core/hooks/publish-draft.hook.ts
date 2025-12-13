@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 
 import { draftsApi } from '../api/drafts.api'
 import { postsApi } from '../api/posts.api'
-import { type IDraftRequest } from '../models/draft.model'
+import { type DraftItem, type IDraftRequest } from '../models/draft.model'
 import { channelType } from '../models/social.model'
 
 /**
@@ -24,24 +24,36 @@ export function usePublishDraft() {
 
   const mutation = useMutation({
     mutationFn: async (params: Params) => {
-      const draftPayload: IDraftRequest = {
-        posts: params.draftRequest.posts,
-      }
+      let draftId: string
+      let postIds: string[]
+      let draftData: DraftItem | IDraftRequest
 
       if (params.draftRequest.id) {
-        draftPayload.id = params.draftRequest.id
+        draftId = params.draftRequest.id
+        draftData = params.draftRequest
+
+        // Filter postIds based on forChannel
+        const forChannelSet = new Set(params.forChannel)
+        postIds = params.draftRequest.posts
+          .filter(post => forChannelSet.has(post.channel) && post.id)
+          .map(post => post.id!)
+      } else {
+        const draftPayload: IDraftRequest = {
+          posts: params.draftRequest.posts,
+        }
+
+        // Step 1: Create/Update draft
+        const draftRes = await draftsApi.postDraft(draftPayload)
+
+        draftId = draftRes.data.draft.id
+        draftData = draftRes.data.draft
+
+        // Filter postIds based on forChannel
+        const forChannelSet = new Set(params.forChannel)
+        postIds = draftRes.data.draft.posts
+          .filter(post => forChannelSet.has(post.channel))
+          .map(post => post.id)
       }
-
-      // Step 1: Create/Update draft
-      const draftRes = await draftsApi.postDraft(draftPayload)
-
-      const draftId = draftRes.data.draft.id
-
-      // Filter postIds based on forChannel
-      const forChannelSet = new Set(params.forChannel)
-      const postIds = draftRes.data.draft.posts
-        .filter(post => forChannelSet.has(post.channel))
-        .map(post => post.id)
 
       // Step 2: Publish draft
       const publishRes = await postsApi.publishDraft({
@@ -51,7 +63,7 @@ export function usePublishDraft() {
 
       return {
         draftId,
-        draft: draftRes.data.draft,
+        draft: draftData,
         publish: publishRes.data,
       }
     },

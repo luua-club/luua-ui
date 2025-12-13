@@ -12,6 +12,7 @@ import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
 import { WithOptional } from '@/core/models/common.model'
 import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
+import { MediaObject } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { WordRotate } from '@/shared/ui/word-rotate'
@@ -62,7 +63,7 @@ function Create() {
   )
 
   const handleImagesChange = useCallback(
-    (images: string[], name: channelType) => {
+    (images: MediaObject[], name: channelType) => {
       setPostDrafts(prev => ({
         ...prev,
         [name]: {
@@ -211,6 +212,7 @@ function Create() {
         ...linkedinObj,
         channel: 'LinkedIn',
         content: linkedinObj?.content ?? '',
+        attached_media: linkedinObj?.attached_media?.map(m => ({ url: m.url })),
       })
     }
 
@@ -219,6 +221,7 @@ function Create() {
         ...twitterObj,
         channel: 'Twitter',
         content: twitterObj?.content ?? '',
+        attached_media: twitterObj?.attached_media?.map(m => ({ url: m.url })),
       })
     }
 

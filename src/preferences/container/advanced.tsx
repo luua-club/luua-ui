@@ -12,13 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleTextCapture from '../../core/components/StyleTextCapture'
 import StyleFileCapture from '../../core/containers/StyleFileCapture'
-import { tabValue } from '../Preferences'
+import { tabValue } from '../preferences'
 
-const Advanced = ({
-  setActiveTab,
-}: {
-  setActiveTab: (tab: string) => void
-}) => {
+function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   const queryClient = useQueryClient()
   const user = useUserState()
   const router = useRouter()
