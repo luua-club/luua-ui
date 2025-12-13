@@ -5,6 +5,7 @@ import { POST_WORD_COUNT } from '@/core/config/constant'
 import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { usePostCardComposer } from '@/core/hooks/post-card-composer.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
+import { MediaObject } from '@/core/models/post.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import UpgradePlanCta from '@/shared/components/upgrade-plan-cta'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
@@ -23,9 +24,9 @@ import TwitterPostCardSkeleton from './twitter-post-card-skeleton'
 export interface TwitterPostCardProps {
   // Content
   initialContent?: string
-  initialImages?: string[]
+  initialImages?: MediaObject[]
   onContentChange: (content: string) => void
-  onImagesChange: (images: string[]) => void
+  onImagesChange: (images: MediaObject[]) => void
   // Loading states
   loading: boolean
   isActionLoading?: boolean
@@ -39,7 +40,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   const router = useRouter()
 
   // --- State ---
-  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [imagePreviews, setImagePreviews] = useState<MediaObject[]>([])
 
   // --- Effects ---
   /**
@@ -58,7 +59,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
 
   // --- Handlers ---
   const handleFilesUploaded = (fileUrls: string[]) => {
-    const newImages = [...imagePreviews, ...fileUrls]
+    const newImages = [...imagePreviews, ...fileUrls.map(url => ({ url }))]
     setImagePreviews(newImages)
     props.onImagesChange(newImages)
   }
@@ -173,7 +174,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
           {imagePreviews.length > 0 && (
             <div className="my-2 overflow-hidden rounded-2xl">
               <PostImagePreview
-                imagePreviews={imagePreviews}
+                imagePreviews={imagePreviews.map(img => img.url)}
                 onRemove={props.isActionLoading ? undefined : removeImageAt}
               />
             </div>

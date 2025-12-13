@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
+import { MediaObject } from '@/core/models/post.model'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
@@ -19,9 +20,9 @@ import PostCardActions from './post-card-actions'
 export interface LinkedInPostCardProps {
   // Content
   initialContent?: string
-  initialImages?: string[]
+  initialImages?: MediaObject[]
   onContentChange: (content: string) => void
-  onImagesChange: (images: string[]) => void
+  onImagesChange: (images: MediaObject[]) => void
 
   // Loading states
   loading: boolean
@@ -35,7 +36,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
     usePostCardComposer()
 
   // --- State ---
-  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [imagePreviews, setImagePreviews] = useState<MediaObject[]>([])
 
   // --- Effects ---
   /**
@@ -54,7 +55,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
 
   // --- Handlers ---
   const handleFilesUploaded = (fileUrls: string[]) => {
-    const newImages = [...imagePreviews, ...fileUrls]
+    const newImages = [...imagePreviews, ...fileUrls.map(url => ({ url }))]
     setImagePreviews(newImages)
     props.onImagesChange(newImages)
   }
@@ -139,7 +140,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
         {imagePreviews.length > 0 && (
           <div className="mt-2">
             <PostImagePreview
-              imagePreviews={imagePreviews}
+              imagePreviews={imagePreviews.map(img => img.url)}
               onRemove={props.isActionLoading ? undefined : removeImageAt}
             />
           </div>
