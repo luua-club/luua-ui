@@ -107,8 +107,8 @@ function PopoverPrompt(props: PopoverPromptProps) {
                     props.loading
                       ? ['Generating AI post...', 'Hold still...']
                       : props.isUserAgainGenerating
-                        ? EDIT_PROMPT_TEXT
-                        : SUGGESTED_PROMPT_TEXT
+                        ? SUGGESTED_PROMPT_TEXT
+                        : EDIT_PROMPT_TEXT
                   }
                   duration={3000}
                   className="text-sm text-gray-400 select-none dark:text-gray-300"

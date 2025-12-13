@@ -1,6 +1,7 @@
 import {
   Bookmark,
   ChartNoAxesColumn,
+  CirclePlus,
   Heart,
   MessageCircle,
   Repeat2,
@@ -9,6 +10,9 @@ import {
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { AnimatedCircularProgressBar } from '@/shared/ui/animated-circular-progress-bar'
+import { Button } from '@/shared/ui/button'
+import { Separator } from '@/shared/ui/separator'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 function TwitterPostCardFooter() {
@@ -107,6 +111,20 @@ function TwitterPostCardFooterActions({ content }: { content: string }) {
       <p className={cn('text-xs', textColor)}>
         {usedChars}/{maxChars}
       </p>
+
+      <div className="flex items-center gap-1">
+        <Separator orientation="vertical" className="!h-4" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="size-6">
+              <CirclePlus />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            <p>Threads coming soon !</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
     </div>
   )
 }
