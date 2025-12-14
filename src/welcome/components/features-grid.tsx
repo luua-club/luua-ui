@@ -2,7 +2,11 @@ import { useRouter } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 
-import { BENTO_ITEMS, BentoItemConfig } from '@/core/config/welcome.config'
+import {
+  BENTO_ITEMS,
+  BentoImageData,
+  BentoItemConfig,
+} from '@/core/config/welcome.config'
 import { BentoGrid, BentoGridItem } from '@/shared/components/bento-grid'
 
 function FeaturesGrid() {
@@ -30,7 +34,13 @@ function FeaturesGrid() {
     return {
       title: <BentoTitle>{item.title}</BentoTitle>,
       description: item.description,
-      header: <BentoImage src={item.imageSrc} />,
+      header: (
+        <BentoImage
+          src={item.imageData?.src}
+          ratio={item.imageData?.ratio}
+          objectFit={item.imageData?.objectFit}
+        />
+      ),
       className: item.className,
       icon: <Icon className="h-4 w-4 text-neutral-500" />,
       onClick: () => handleClick(item),
@@ -73,8 +83,12 @@ const BentoTitle = ({ children }: { children: string }) => (
  * @param src - Optional image source URL; shows gradient if not provided
  * @returns An image element or gradient div placeholder
  */
-const BentoImage = ({ src }: { src?: string }) => {
-  const baseClasses = 'flex h-full min-h-[6rem] w-full flex-1 rounded-xl'
+const BentoImage = ({
+  src,
+  ratio = 'aspect-[3/2]',
+  objectFit = 'object-top',
+}: BentoImageData) => {
+  const baseClasses = `relative w-full overflow-hidden rounded-xl ${ratio}`
 
   if (!src) {
     return (
@@ -86,7 +100,12 @@ const BentoImage = ({ src }: { src?: string }) => {
 
   return (
     <div className={baseClasses}>
-      <img src={src} alt="" className="h-full w-full rounded-xl object-cover" />
+      <img
+        src={src}
+        alt=""
+        className={`h-full w-full object-cover ${objectFit} opacity-70 grayscale transition-all duration-300 group-hover/bento:opacity-100 group-hover/bento:grayscale-0`}
+        loading="lazy"
+      />
     </div>
   )
 }
