@@ -37,6 +37,7 @@ function FeaturesGrid() {
       header: (
         <BentoImage
           src={item.imageData?.src}
+          srcDark={item.imageData?.srcDark}
           ratio={item.imageData?.ratio}
           objectFit={item.imageData?.objectFit}
         />
@@ -85,10 +86,13 @@ const BentoTitle = ({ children }: { children: string }) => (
  */
 const BentoImage = ({
   src,
+  srcDark,
   ratio = 'aspect-[3/2]',
   objectFit = 'object-top',
 }: BentoImageData) => {
   const baseClasses = `relative w-full overflow-hidden rounded-xl ${ratio}`
+  const greyScale =
+    'opacity-80 grayscale transition-all duration-300 group-hover/bento:opacity-100 group-hover/bento:grayscale-0'
 
   if (!src) {
     return (
@@ -103,7 +107,14 @@ const BentoImage = ({
       <img
         src={src}
         alt=""
-        className={`h-full w-full object-cover ${objectFit} opacity-70 grayscale transition-all duration-300 group-hover/bento:opacity-100 group-hover/bento:grayscale-0`}
+        className={`h-full w-full object-cover ${objectFit} dark:hidden ${greyScale}`}
+        loading="lazy"
+      />
+
+      <img
+        src={srcDark}
+        alt=""
+        className={`h-full w-full object-cover ${objectFit} hidden dark:block ${greyScale}`}
         loading="lazy"
       />
     </div>

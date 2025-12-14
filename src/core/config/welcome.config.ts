@@ -6,15 +6,20 @@ import {
   PencilRuler,
 } from 'lucide-react'
 
-import autopilotPreview from '@/assets/images/autopilot-preview.png'
-import bookmarkPreview from '@/assets/images/bookmark-preview.png'
-import createPostPreview from '@/assets/images/create-post-preview.png'
-import stylesPreview from '@/assets/images/styles-preview.png'
+import autopilotPreviewLight from '@/assets/images/autopilot-preview.png'
+import autopilotPreviewDark from '@/assets/images/autopilot-preview-dark.png'
+import bookmarkPreviewLight from '@/assets/images/bookmark-preview.png'
+import bookmarkPreviewDark from '@/assets/images/bookmark-preview-dark.png'
+import createPostPreviewLight from '@/assets/images/create-post-preview.png'
+import createPostPreviewDark from '@/assets/images/create-post-preview-dark.png'
+import stylesPreviewLight from '@/assets/images/styles-preview.png'
+import stylesPreviewDark from '@/assets/images/styles-preview-dark.png'
 
 import { EXTERNAL_URLS } from './constant'
 
 export type BentoImageData = {
   src?: string
+  srcDark?: string
   ratio?: 'aspect-[3/2]' | 'aspect-square'
   objectFit?: 'object-top-left' | 'object-top'
 }
@@ -37,7 +42,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
     className: 'md:col-span-2',
     icon: Download,
     imageData: {
-      src: bookmarkPreview,
+      src: bookmarkPreviewLight,
+      srcDark: bookmarkPreviewDark,
       ratio: 'aspect-[3/2]',
       objectFit: 'object-top',
     },
@@ -50,7 +56,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
     className: 'md:col-span-1',
     icon: Network,
     imageData: {
-      src: autopilotPreview,
+      src: autopilotPreviewLight,
+      srcDark: autopilotPreviewDark,
       ratio: 'aspect-square',
       objectFit: 'object-top-left',
     },
@@ -63,7 +70,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
     className: 'md:col-span-1',
     icon: Paintbrush,
     imageData: {
-      src: stylesPreview,
+      src: stylesPreviewLight,
+      srcDark: stylesPreviewDark,
       ratio: 'aspect-square',
       objectFit: 'object-top-left',
     },
@@ -77,7 +85,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
     icon: PencilRuler,
     route: '/creation/create',
     imageData: {
-      src: createPostPreview,
+      src: createPostPreviewLight,
+      srcDark: createPostPreviewDark,
       ratio: 'aspect-[3/2]',
       objectFit: 'object-top-left',
     },
