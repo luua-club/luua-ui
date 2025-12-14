@@ -50,7 +50,7 @@ function PopoverPrompt(props: PopoverPromptProps) {
       {/** Trigger for popover */}
       <PopoverTrigger asChild>
         <RainbowButton
-          variant={'outline'}
+          variant={'default'}
           size="sm"
           className="rounded-sm"
           disabled={props.disabled}

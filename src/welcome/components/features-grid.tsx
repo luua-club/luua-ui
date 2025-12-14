@@ -91,8 +91,6 @@ const BentoImage = ({
   objectFit = 'object-top',
 }: BentoImageData) => {
   const baseClasses = `relative w-full overflow-hidden rounded-xl ${ratio}`
-  const greyScale =
-    'opacity-80 grayscale transition-all duration-300 group-hover/bento:opacity-100 group-hover/bento:grayscale-0'
 
   if (!src) {
     return (
@@ -109,7 +107,7 @@ const BentoImage = ({
         alt=""
         width={ratio === 'aspect-[3/2]' ? 1200 : 800}
         height={ratio === 'aspect-[3/2]' ? 800 : 800}
-        className={`h-full w-full object-cover ${objectFit} dark:hidden ${greyScale}`}
+        className={`h-full w-full object-cover ${objectFit} dark:hidden`}
         loading="lazy"
         decoding="async"
       />
@@ -119,10 +117,11 @@ const BentoImage = ({
         alt=""
         width={ratio === 'aspect-[3/2]' ? 1200 : 800}
         height={ratio === 'aspect-[3/2]' ? 800 : 800}
-        className={`h-full w-full object-cover ${objectFit} hidden dark:block ${greyScale}`}
+        className={`h-full w-full object-cover ${objectFit} hidden dark:block`}
         loading="lazy"
         decoding="async"
       />
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-white via-white/20 to-transparent dark:from-black dark:via-black/20" />
     </div>
   )
 }
