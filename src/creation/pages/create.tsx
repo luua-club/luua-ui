@@ -10,6 +10,7 @@ import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { WithOptional } from '@/core/models/common.model'
 import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
 import { MediaObject } from '@/core/models/post.model'
@@ -26,6 +27,7 @@ type postDraftsType = Partial<Record<channelType, WithOptional<PostItem, 'id'>>>
 const SOCIAL_TABS: channelType[] = [...SOCIAL_PLATFORM.map(s => s.name)]
 
 function Create() {
+  const user = useUserState()
   const [activeTab, setActiveTab] = useState<channelType>(SOCIAL_TABS[0])
   const [postDrafts, setPostDrafts] = useState<postDraftsType>(
     {} as postDraftsType
@@ -216,7 +218,7 @@ function Create() {
       })
     }
 
-    if (hasTwitterContent) {
+    if (hasTwitterContent && user?.plan !== 'Free') {
       draftPayload.posts.push({
         ...twitterObj,
         channel: 'Twitter',
