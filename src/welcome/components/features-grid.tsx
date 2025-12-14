@@ -107,15 +107,21 @@ const BentoImage = ({
       <img
         src={src}
         alt=""
+        width={ratio === 'aspect-[3/2]' ? 1200 : 800}
+        height={ratio === 'aspect-[3/2]' ? 800 : 800}
         className={`h-full w-full object-cover ${objectFit} dark:hidden ${greyScale}`}
         loading="lazy"
+        decoding="async"
       />
 
       <img
         src={srcDark}
         alt=""
+        width={ratio === 'aspect-[3/2]' ? 1200 : 800}
+        height={ratio === 'aspect-[3/2]' ? 800 : 800}
         className={`h-full w-full object-cover ${objectFit} hidden dark:block ${greyScale}`}
         loading="lazy"
+        decoding="async"
       />
     </div>
   )
