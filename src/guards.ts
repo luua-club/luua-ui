@@ -8,6 +8,10 @@ export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
 
   const path = location.pathname
 
+  // Check if this is an extension login request
+  const searchParams = location.search as Record<string, unknown>
+  const isExtensionLogin = searchParams.source === 'extension'
+
   // If user is not logged in and the current path is not login, redirect to login
   // Arises when user is not logged in and tries to access a protected route
   if (!isLoggedIn && path !== '/login') {
@@ -15,8 +19,8 @@ export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
   }
 
   // If user is logged in and the current path is login, redirect to welcome
-  // Arises when user is logged in and tries to access the login page
-  if (isLoggedIn && path === '/login') {
+  // UNLESS it's an extension login request (allow extension login flow)
+  if (isLoggedIn && path === '/login' && !isExtensionLogin) {
     throw redirect({ to: '/welcome' })
   }
 

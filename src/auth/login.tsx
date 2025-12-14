@@ -10,9 +10,15 @@ import { toast } from 'sonner'
 
 import { authApi } from '@/core/api/auth.api'
 import { userApi } from '@/core/api/user.api'
-import { LUUA_USER_KEY, QUERY_KEYS } from '@/core/config/constant'
+import {
+  LUUA_EXTENSION_ID_KEY,
+  LUUA_EXTENSION_LOGIN_KEY,
+  LUUA_USER_KEY,
+  QUERY_KEYS,
+} from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { LoginResponse } from '@/core/models/auth.model'
+import { User } from '@/core/models/user.model'
 import { clearUser, setUser } from '@/core/store/auth-slice'
 import { cn } from '@/shared/utils'
 import {
@@ -20,6 +26,11 @@ import {
   removeLocalStorageItem,
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
+import {
+  getSessionStorageItem,
+  removeSessionStorageItem,
+  setSessionStorageItem,
+} from '@/shared/utils/sessionstorage.util'
 
 import LoginPanel from './components/login-panel'
 
@@ -29,6 +40,9 @@ function Login() {
 
   // ---- Variables ----
   const key = useMemo(() => LUUA_USER_KEY, [])
+  const urlParams = new URLSearchParams(window.location.search)
+  const isExtensionLogin = urlParams.get('source') === 'extension'
+  const extensionId = urlParams.get('extensionId')
 
   // ---- Hooks ----
   const router = useRouter()
@@ -50,12 +64,47 @@ function Login() {
 
   // ---- Effects ----
   /**
-   * Clear user and local storage on mount
+   * Store extension info and handle already logged in case
    */
   useEffect(() => {
+    if (isExtensionLogin && extensionId) {
+      setSessionStorageItem(LUUA_EXTENSION_ID_KEY, extensionId)
+      setSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY, 'true')
+
+      // Check if user is already logged in
+      const existingAuth = getLocalStorageItem<LoginResponse & { user?: User }>(
+        key
+      )
+      if (existingAuth?.access_token && existingAuth?.user) {
+        // Build extension redirect URL with existing credentials
+        const extensionRedirectUrl = `chrome-extension://${extensionId}/auth.html?token=${encodeURIComponent(existingAuth.access_token)}&userId=${encodeURIComponent(existingAuth.user.email)}&email=${encodeURIComponent(existingAuth.user.email)}`
+
+        // Clear extension flags
+        removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
+        removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+
+        // Redirect to extension
+        window.location.href = extensionRedirectUrl
+        return
+      }
+    }
+  }, [isExtensionLogin, extensionId, key])
+
+  /**
+   * Clear user and local storage on mount (only if not extension login or not already logged in)
+   */
+  useEffect(() => {
+    // Don't clear if extension login and already has auth
+    const existingAuth = getLocalStorageItem<LoginResponse & { user?: User }>(
+      key
+    )
+    if (isExtensionLogin && existingAuth?.access_token) {
+      return // Skip clearing, we're redirecting
+    }
+
     dispatch(clearUser())
     removeLocalStorageItem(key)
-  }, [dispatch, key])
+  }, [dispatch, key, isExtensionLogin])
 
   /**
    * Defer animations until after first mount to avoid flash
@@ -76,7 +125,7 @@ function Login() {
   }
 
   /**
-   * Updates the store and redirects to the dashboard
+   * Updates the store and redirects to the dashboard or extension
    *
    * @param res - The login response
    */
@@ -97,6 +146,27 @@ function Login() {
         user: response.data,
       })
 
+      // Check if this login came from the extension
+      const storedExtensionId = getSessionStorageItem<string>(
+        LUUA_EXTENSION_ID_KEY
+      )
+      const isFromExtension =
+        getSessionStorageItem<string>(LUUA_EXTENSION_LOGIN_KEY) === 'true'
+
+      if (isFromExtension && storedExtensionId && res.access_token) {
+        // Clear storage
+        removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
+        removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+
+        // Build extension redirect URL
+        const extensionRedirectUrl = `chrome-extension://${storedExtensionId}/auth.html?token=${encodeURIComponent(res.access_token)}&userId=${encodeURIComponent(response.data.email)}&email=${encodeURIComponent(response.data.email)}`
+
+        // Redirect to extension
+        window.location.href = extensionRedirectUrl
+        return
+      }
+
+      // Normal web app redirect
       router.navigate({ to: '/welcome' })
     } catch {
       removeLocalStorageItem(key)

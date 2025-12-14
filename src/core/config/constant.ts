@@ -12,6 +12,20 @@ export const LUUA_USER_KEY: string =
   import.meta.env.VITE_LUUA_LS_USER || 'luua-user'
 
 /**
+ * The key to store the extension id in session storage
+ *
+ * @default 'extensionId'
+ */
+export const LUUA_EXTENSION_ID_KEY: string = 'extensionId'
+
+/**
+ * The key to store the extension login flag in session storage
+ *
+ * @default 'isExtensionLogin'
+ */
+export const LUUA_EXTENSION_LOGIN_KEY: string = 'isExtensionLogin'
+
+/**
  * Base URL for the API
  */
 export const BASE_API_URL = import.meta.env.VITE_LUUA_BACKEND_URL
