@@ -68,6 +68,7 @@ function Login() {
    */
   useEffect(() => {
     if (isExtensionLogin && extensionId) {
+      // Store extension context in session storage
       setSessionStorageItem(LUUA_EXTENSION_ID_KEY, extensionId)
       setSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY, 'true')
 
@@ -75,7 +76,7 @@ function Login() {
       const existingAuth = getLocalStorageItem<LoginResponse & { user?: User }>(
         key
       )
-      if (existingAuth?.access_token && existingAuth?.user) {
+      if (existingAuth?.access_token && existingAuth?.user?.email) {
         // Build extension redirect URL with existing credentials
         const extensionRedirectUrl = `chrome-extension://${extensionId}/auth.html?token=${encodeURIComponent(existingAuth.access_token)}&userId=${encodeURIComponent(existingAuth.user.email)}&email=${encodeURIComponent(existingAuth.user.email)}`
 
@@ -94,14 +95,16 @@ function Login() {
    * Clear user and local storage on mount (only if not extension login or not already logged in)
    */
   useEffect(() => {
-    // Don't clear if extension login and already has auth
-    const existingAuth = getLocalStorageItem<LoginResponse & { user?: User }>(
-      key
-    )
-    if (isExtensionLogin && existingAuth?.access_token) {
-      return // Skip clearing, we're redirecting
+    // Skip everything if this is an extension login
+    if (isExtensionLogin) {
+      return
     }
 
+    // Clear any stale extension session storage if this is NOT an extension login
+    removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
+    removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+
+    // Clear user and auth data for fresh login
     dispatch(clearUser())
     removeLocalStorageItem(key)
   }, [dispatch, key, isExtensionLogin])
@@ -150,10 +153,18 @@ function Login() {
       const storedExtensionId = getSessionStorageItem<string>(
         LUUA_EXTENSION_ID_KEY
       )
+      const extensionLoginFlag = getSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+      // Handle both boolean true and string 'true' (JSON.parse converts "true" to true)
       const isFromExtension =
-        getSessionStorageItem<string>(LUUA_EXTENSION_LOGIN_KEY) === 'true'
+        extensionLoginFlag === 'true' ||
+        (typeof extensionLoginFlag === 'boolean' && extensionLoginFlag === true)
 
-      if (isFromExtension && storedExtensionId && res.access_token) {
+      if (
+        isFromExtension &&
+        storedExtensionId &&
+        res.access_token &&
+        response.data.email
+      ) {
         // Clear storage
         removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
         removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
@@ -166,8 +177,8 @@ function Login() {
         return
       }
 
-      // Normal web app redirect
-      router.navigate({ to: '/welcome' })
+      // Normal web app redirect (clear query params)
+      router.navigate({ to: '/welcome', search: {} })
     } catch {
       removeLocalStorageItem(key)
       toast.error('Something went wrong, Please try again !')
