@@ -47,7 +47,6 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead className="w-[100px]">Sno.</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead className="text-right">Started At</TableHead>
@@ -104,7 +103,6 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
           <Table>
             <TableHeader className="bg-muted">
               <TableRow>
-                <TableHead className="w-[100px]">Sno.</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead className="text-right">Started At</TableHead>
@@ -145,7 +143,6 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
             <Table>
               <TableHeader className="bg-muted">
                 <TableRow>
-                  <TableHead className="w-[20px] sm:w-[100px]">Sno.</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Plan</TableHead>
                   <TableHead className="text-right">Started At</TableHead>
@@ -156,7 +153,6 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
                 {/* Render each subscription entry */}
                 {subscriptionDetails.map((subscription, index) => (
                   <TableRow key={subscription.id}>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell>
                       <Badge variant="destructive" className="rounded-sm">
                         {subscription.status.toUpperCase()}

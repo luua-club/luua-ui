@@ -64,17 +64,17 @@ function LinkContentCard({
       <CardFooter className="flex flex-col p-0 pt-2">
         <div className="flex w-full flex-col justify-between gap-4 px-4 text-xs lg:flex-row lg:items-center">
           <p className="text-muted-foreground font-semibold">
-            {format(new Date(createdAt), 'PPpp')}
+            {format(new Date(createdAt), 'PP')}
           </p>
 
           <Badge
-            variant="outline"
+            variant="default" 
             className={cn(
-              'rounded-xs border-orange-600 text-xs font-semibold text-orange-600 opacity-0 dark:border-orange-400 dark:text-orange-400',
+              'rounded-sm bg-slate-100 border-slate-600 text-xs font-semibold text-slate-600 opacity-0 dark:bg-slate-800 dark:border-slate-400 dark:text-slate-400',
               utilized && 'opacity-100'
             )}
           >
-            Consumed by Autopilot
+            Processed
           </Badge>
         </div>
 

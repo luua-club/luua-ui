@@ -78,7 +78,7 @@ function AutoPilot() {
           {/* Header */}
           <h1 className="flex items-center gap-3 text-xl font-medium md:text-base">
             <Network className="size-5" />
-            Auto Pilot
+            Autopilot
           </h1>
 
           {/* Actions */}

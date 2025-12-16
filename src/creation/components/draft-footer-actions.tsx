@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { Calendar1, ChevronRight, FileCheck, Save } from 'lucide-react'
 
 import { Button } from '@/shared/ui/button'

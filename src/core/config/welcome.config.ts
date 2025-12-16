@@ -36,9 +36,9 @@ export type BentoItemConfig = {
 
 export const BENTO_ITEMS: BentoItemConfig[] = [
   {
-    title: 'Download Chrome Extension',
+    title: 'Add extension to Chrome',
     description:
-      'Integrates with X and LinkedIn to let you bookmark or reimagine posts instantly. Reimagine or save content from any website or a YouTube video.',
+      'Capture ideas, repurpose tweets, and save inspiration without ever leaving your current tab.',
     className: 'md:col-span-2',
     icon: Download,
     imageData: {
@@ -52,7 +52,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
   {
     title: 'Autopilot content creation',
     description:
-      'Creates social media posts from your bookmarks in background.',
+      'Turn your saved bookmarks into fresh drafts automatically!',
     className: 'md:col-span-1',
     icon: Network,
     imageData: {
@@ -78,9 +78,9 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
     route: '/preferences',
   },
   {
-    title: 'Create and schedule social media posts',
+    title: 'Create and schedule',
     description:
-      'Write or AI-generate posts for LinkedIn and X in one place. Publish instantly or schedule ahead to stay consistent and save time.',
+      'Your focused writing studio. Polish your drafts, add media, and schedule to X & LinkedIn in one flow.',
     className: 'md:col-span-2',
     icon: PencilRuler,
     route: '/creation/create',

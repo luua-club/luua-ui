@@ -34,7 +34,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <span className="ml-1 font-semibold text-cyan-600 dark:text-cyan-400">
               {format(
                 new Date(usageSummary.cycle_period.end_date),
-                'dd MMM yyyy, hh:mm a'
+                'dd MMM yyyy'
               )}
             </span>
           </p>
@@ -81,7 +81,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
           {/* Auto Pilot Posts Usage (Unlimited for Pro) */}
           <div className="space-y-4 p-4 sm:border-r-2 sm:border-l-2 sm:border-dashed">
             <p className="text-muted-foreground text-sm font-medium">
-              Auto Pilot Posts
+              Autopilot Posts
             </p>
             <p
               className={cn(

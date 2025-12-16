@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronRight, Loader, TestTubeDiagonal } from 'lucide-react'
+import { ChevronRight, Loader, WandSparkles } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -59,7 +59,7 @@ const StyleTextCapture = ({
             <FormItem>
               <FormControl>
                 <Textarea
-                  placeholder="Enter your sample text here"
+                  placeholder="Add atleast 3–5 of your strongest posts for better tuning..."
                   className="max-h-96 min-h-28 resize-none shadow-none"
                   rows={4}
                   {...field}
@@ -78,9 +78,9 @@ const StyleTextCapture = ({
           {isLoading ? (
             <Loader className="animate-spin" />
           ) : (
-            <TestTubeDiagonal />
+            <WandSparkles />
           )}
-          Analyze sample text
+          Create style
           <ChevronRight />
         </Button>
       </form>
