@@ -60,7 +60,7 @@ function Welcome() {
       <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
         <p className="flex items-center gap-3 text-xl font-semibold text-balance">
           <LampDesk className="hidden size-6 md:block" />
-          Welcome to Luua — pick a feature to begin.
+          Welcome. What’s the focus today?
         </p>
 
         <FeaturesGrid />

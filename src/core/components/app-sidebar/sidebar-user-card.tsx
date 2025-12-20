@@ -127,7 +127,7 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
                 onClick={() => isMobile && toggleSidebar()}
               >
                 <Receipt />
-                Subscription
+                Billing
               </DropdownMenuItem>
             </Link>
           </DropdownMenuGroup>

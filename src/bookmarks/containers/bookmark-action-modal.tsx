@@ -154,7 +154,7 @@ function BookmarkActionModal({
               name="url"
               render={({ field }) => (
                 <FormItem className="text-card-foreground">
-                  <FormLabel>URL</FormLabel>
+                  <FormLabel>Drop a link</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
@@ -173,10 +173,10 @@ function BookmarkActionModal({
               name="additional_context"
               render={({ field }) => (
                 <FormItem className="text-card-foreground">
-                  <FormLabel>Additional Content</FormLabel>
+                  <FormLabel>Add a note</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Add any extra context for this inspiration..."
+                      placeholder="Type note here..."
                       className="min-h-20"
                       {...field}
                     />

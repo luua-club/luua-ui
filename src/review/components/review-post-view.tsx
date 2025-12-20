@@ -33,9 +33,7 @@ function ReviewPostView({
           Select your posts <ChevronRight className="size-5" />
         </h2>
         <p className="text-muted-foreground text-sm font-medium text-balance">
-          Here&apos;s your final post preview. Select the posts you want to
-          publish, only the selected ones will go live. The rest (if any) will
-          stay in your drafts.
+          Check how your posts will look on the feed. Uncheck any platforms you want to skip for now.
         </p>
       </div>
 

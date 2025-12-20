@@ -81,7 +81,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
           {/* Auto Pilot Posts Usage (Unlimited for Pro) */}
           <div className="space-y-4 p-4 sm:border-r-2 sm:border-l-2 sm:border-dashed">
             <p className="text-muted-foreground text-sm font-medium">
-              Auto Pilot Posts
+              Autopilot Posts
             </p>
             <p
               className={cn(

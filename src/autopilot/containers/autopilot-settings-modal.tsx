@@ -137,7 +137,7 @@ function AutopilotSettingsModal({
         <DialogHeader>
           <DialogTitle className="text-card-foreground flex items-center gap-2">
             <Settings2 className="size-5" />
-            Auto Pilot Settings
+            Autopilot Settings
           </DialogTitle>
         </DialogHeader>
 
@@ -203,16 +203,15 @@ const BasePromptField = ({ formControl }: FormFieldProps) => {
       render={({ field }) => (
         <FormItem className="text-card-foreground">
           <FormLabel>
-            Base Prompt
+            Global Instructions
             <span className="text-muted-foreground text-xs">(optional)</span>
           </FormLabel>
           <FormDescription className="text-balance">
-            Additional context for generating posts, Every time Luua generate a
-            AI post this prompt will be utilized along with the inspiration.
+            These instructions apply to every draft Luua generates.
           </FormDescription>
           <FormControl>
             <Textarea
-              placeholder="Your answer..."
+              placeholder="Keep paragraphs short, bullet points style etc..."
               className="min-h-18"
               maxLength={10000}
               {...field}
