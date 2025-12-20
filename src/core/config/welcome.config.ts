@@ -38,7 +38,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
   {
     title: 'Add extension to Chrome',
     description:
-      'Capture ideas, repurpose tweets, and save inspiration without ever leaving your current tab.',
+      'One-click bookmarking and reimagining for X and LinkedIn, with support for content from any website or YouTube video.',
     className: 'md:col-span-2',
     icon: Download,
     imageData: {
@@ -80,7 +80,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
   {
     title: 'Create and schedule',
     description:
-      'Your focused writing studio. Polish your drafts, add media, and schedule to X & LinkedIn in one flow.',
+      'Draft posts yourself or let AI generate them for LinkedIn and X. Publish now or schedule ahead.',
     className: 'md:col-span-2',
     icon: PencilRuler,
     route: '/creation/create',

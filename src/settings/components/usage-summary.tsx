@@ -34,7 +34,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
             <span className="ml-1 font-semibold text-cyan-600 dark:text-cyan-400">
               {format(
                 new Date(usageSummary.cycle_period.end_date),
-                'dd MMM yyyy'
+                'dd MMM yyyy, hh:mm a'
               )}
             </span>
           </p>

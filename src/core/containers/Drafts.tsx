@@ -230,7 +230,7 @@ const Drafts = ({ showOnlyAutoPilot = false }: DraftsProps) => {
 
                     {getPost(
                       `${draft.id}-${idx + 1}`,
-                      'X/Twitter',
+                      'Twitter',
                       draft,
                       postId => openDeletePost(draft.id, postId)
                     )}

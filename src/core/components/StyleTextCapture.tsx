@@ -71,7 +71,7 @@ const StyleTextCapture = ({
         />
         <Button
           type="submit"
-          variant="secondary"
+          variant="default"
           className="mt-4 w-fit"
           disabled={isLoading}
         >

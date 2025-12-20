@@ -74,7 +74,7 @@ function LinkContentCard({
               utilized && 'opacity-100'
             )}
           >
-            Processed
+            Drafted by Autopilot
           </Badge>
         </div>
 
