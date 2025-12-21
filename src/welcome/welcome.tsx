@@ -1,7 +1,8 @@
 import { createLazyRoute, useLocation } from '@tanstack/react-router'
-import { LampDesk } from 'lucide-react'
+import { LampDesk, Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import { EXTERNAL_URLS } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import {
@@ -10,6 +11,8 @@ import {
 } from '@/core/store/navbar-slice'
 import { removeQueryParams } from '@/core/utils/common.util'
 import GlobalLoader from '@/shared/components/global-loader'
+import { Button } from '@/shared/ui/button'
+import { HeroVideoDialog } from '@/shared/ui/hero-video-dialog'
 import FeaturesGrid from '@/welcome/components/features-grid'
 
 import ProWelcomeBanner from './components/pro-welcome-banner'
@@ -57,11 +60,19 @@ function Welcome() {
 
   return (
     <>
-      <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
-        <p className="flex items-center gap-3 text-xl font-semibold text-balance">
-          <LampDesk className="hidden size-6 md:block" />
-          Welcome. What’s the focus today?
-        </p>
+      <div className="m-auto flex max-w-4xl flex-col gap-3 p-5">
+        <div className="flex items-end justify-between">
+          <p className="flex items-center gap-3 text-xl font-semibold text-balance">
+            <LampDesk className="hidden size-6 md:block" /> Welcome. What’s the
+            focus today?
+          </p>
+
+          <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtubeAutopilot}>
+            <Button size="sm" className="text-xs">
+              <Lightbulb className="size-3.5" /> How it works ?
+            </Button>
+          </HeroVideoDialog>
+        </div>
 
         <FeaturesGrid />
       </div>

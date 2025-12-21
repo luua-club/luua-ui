@@ -1,5 +1,6 @@
 import BrandDiscord from '@/assets/images/brand-discord.svg?react'
 import BrandInstagram from '@/assets/images/brand-instagram.svg?react'
+import BrandLinkedIn from '@/assets/images/brand-linkedin.svg?react'
 import BrandX from '@/assets/images/brand-x.svg?react'
 import { EXTERNAL_URLS } from '@/core/config/constant'
 import { Button } from '@/shared/ui/button'
@@ -57,6 +58,23 @@ function WelcomeNavRight() {
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">Follow us on X</TooltipContent>
+      </Tooltip>
+
+      {/* LinkedIn Btn */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              window.open(EXTERNAL_URLS.linkedIn, '_blank')
+            }}
+            className="size-4 p-0"
+          >
+            <BrandLinkedIn className="size-4.5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Follow us on LinkedIn</TooltipContent>
       </Tooltip>
     </div>
   )
