@@ -60,13 +60,17 @@ function Welcome() {
 
   return (
     <>
+      {/** Main Content */}
       <div className="m-auto flex max-w-4xl flex-col gap-3 p-5">
+        {/** Header */}
         <div className="flex items-end justify-between">
+          {/** Title */}
           <p className="flex items-center gap-3 text-xl font-semibold text-balance">
             <LampDesk className="hidden size-6 md:block" /> Welcome. What’s the
             focus today?
           </p>
 
+          {/** Video */}
           <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtubeAutopilot}>
             <Button size="sm" className="text-xs">
               <Lightbulb className="size-3.5" /> How it works ?
@@ -74,6 +78,7 @@ function Welcome() {
           </HeroVideoDialog>
         </div>
 
+        {/** Bento Grid */}
         <FeaturesGrid />
       </div>
 

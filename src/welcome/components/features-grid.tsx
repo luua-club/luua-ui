@@ -90,7 +90,7 @@ const BentoImage = ({
   ratio = 'aspect-[3/2]',
   objectFit = 'object-top',
 }: BentoImageData) => {
-  const baseClasses = `relative w-full overflow-hidden rounded-xl ${ratio}`
+  const baseClasses = `relative w-full overflow-hidden rounded-lg ${ratio}`
 
   if (!src) {
     return (
