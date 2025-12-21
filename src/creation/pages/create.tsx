@@ -9,12 +9,19 @@ import PopoverPrompt from '@/core/components/popover-prompt'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import {
+  linkedinPrompts,
+  standardPrompts,
+  twitterPrompts,
+  youtubePrompts,
+} from '@/core/config/example-prompts.config'
 import { queryClient } from '@/core/config/global.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { WithOptional } from '@/core/models/common.model'
 import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
 import { MediaObject } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
+import PromptChip from '@/shared/components/prompt-chip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { WordRotate } from '@/shared/ui/word-rotate'
 import { cn } from '@/shared/utils'
@@ -278,6 +285,30 @@ function Create() {
     })
   }
 
+  const handleSuggestionsClick = (value: string) => {
+    setGenerationUserPrompt(value)
+    setGenerationUserSearch(false)
+    setGenerationUserChannel(activeTab)
+  }
+
+  const isSuggestionsVisible = () => {
+    if (activeTab === 'LinkedIn') {
+      return !(
+        postDrafts.LinkedIn?.content ||
+        (postDrafts.LinkedIn?.attached_media?.length ?? 0) > 0
+      )
+    }
+
+    if (activeTab === 'Twitter') {
+      return !(
+        postDrafts.Twitter?.content ||
+        (postDrafts.Twitter?.attached_media?.length ?? 0) > 0
+      )
+    }
+
+    return false
+  }
+
   return (
     <>
       <div className="mx-auto mt-4 max-w-2xl px-4 pb-20">
@@ -366,6 +397,33 @@ function Create() {
             />
           </TabsContent>
         </Tabs>
+
+        {isSuggestionsVisible() && (
+          <div className="flex flex-col gap-4 pt-6">
+            <p className="text-sm font-medium">
+              Out of ideas? Steal one of ours 😎
+            </p>
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <PromptChip
+                data={standardPrompts}
+                onChipClick={handleSuggestionsClick}
+              />
+              <PromptChip
+                data={youtubePrompts}
+                onChipClick={handleSuggestionsClick}
+              />
+              <PromptChip
+                data={linkedinPrompts}
+                onChipClick={handleSuggestionsClick}
+              />
+              <PromptChip
+                data={twitterPrompts}
+                onChipClick={handleSuggestionsClick}
+              />
+            </div>
+          </div>
+        )}
       </div>
       <DraftFooterActions
         loading={isGenerationDataFetching || !getCurrentState()}
@@ -377,6 +435,7 @@ function Create() {
     </>
   )
 }
+
 export const Route = createLazyRoute('/creation/create')({
   component: Create,
 })

@@ -2,7 +2,6 @@ import { Globe, Loader2, Sparkles } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 
-import PromptChip from '@/shared/components/prompt-chip'
 import { Button } from '@/shared/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
 import { RainbowButton } from '@/shared/ui/rainbow-button'
@@ -12,12 +11,6 @@ import { WordRotate } from '@/shared/ui/word-rotate'
 import { cn } from '@/shared/utils'
 
 import { EDIT_PROMPT_TEXT, SUGGESTED_PROMPT_TEXT } from '../config/constant'
-import {
-  linkedinPrompts,
-  standardPrompts,
-  twitterPrompts,
-  youtubePrompts,
-} from '../config/example-prompts.config'
 
 interface PopoverPromptProps {
   disabled?: boolean
@@ -180,8 +173,8 @@ function PopoverPrompt(props: PopoverPromptProps) {
         {/** Divider */}
         <hr />
 
-        {/** Example Prompts */}
-        <p className="text-foreground px-3 pt-3 text-xs font-medium">
+        {/** TODO: Commenting for now, Example Prompts */}
+        {/*<p className="text-foreground px-3 pt-3 text-xs font-medium">
           Out of ideas? Steal one of ours 😎
         </p>
 
@@ -206,7 +199,7 @@ function PopoverPrompt(props: PopoverPromptProps) {
             onChipClick={value => handleSubmit(value)}
             onHoverPreview={setHoverPreview}
           />
-        </div>
+        </div>*/}
       </PopoverContent>
     </Popover>
   )
