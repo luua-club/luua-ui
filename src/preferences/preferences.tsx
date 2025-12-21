@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createLazyRoute } from '@tanstack/react-router'
-import { Frown, UserRoundPen, List } from 'lucide-react'
+import { Frown, List, UserRoundPen } from 'lucide-react'
 import { useState } from 'react'
 
 import { userApi } from '@/core/api/user.api'
@@ -75,7 +75,8 @@ function Preferences() {
         {/* --- Tabs Content: Styles --- */}
         <TabsContent value={tabValue[0]}>
           <p className="text-card-foreground mt-2 mb-8 text-base">
-            Choose the style that fits your goal. Luua shapes the tone and flow to deliver the impact you’re aiming for.
+            Choose the style that fits your goal. Luua shapes the tone and flow
+            to deliver the impact you’re aiming for.
           </p>
 
           <UserStyles
@@ -89,7 +90,8 @@ function Preferences() {
         {/* --- Tabs Content: Advanced --- */}
         <TabsContent value={tabValue[1]}>
           <p className="text-card-foreground mt-2 mb-8 text-base">
-            Share your writing samples, and Luua will learn your tone and style to create content that sounds like you.
+            Share your writing samples, and Luua will learn your tone and style
+            to create content that sounds like you.
           </p>
           <Advanced setActiveTab={setActiveTab} />
         </TabsContent>

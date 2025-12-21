@@ -75,11 +75,7 @@ const StyleTextCapture = ({
           className="mt-4 w-fit"
           disabled={isLoading}
         >
-          {isLoading ? (
-            <Loader className="animate-spin" />
-          ) : (
-            <WandSparkles />
-          )}
+          {isLoading ? <Loader className="animate-spin" /> : <WandSparkles />}
           Create style
           <ChevronRight />
         </Button>

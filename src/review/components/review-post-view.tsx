@@ -33,7 +33,8 @@ function ReviewPostView({
           Select your posts <ChevronRight className="size-5" />
         </h2>
         <p className="text-muted-foreground text-sm font-medium text-balance">
-          Check how your posts will look on the feed. Uncheck any platforms you want to skip for now.
+          Check how your posts will look on the feed. Uncheck any platforms you
+          want to skip for now.
         </p>
       </div>
 

@@ -68,9 +68,9 @@ function LinkContentCard({
           </p>
 
           <Badge
-            variant="default" 
+            variant="default"
             className={cn(
-              'rounded-sm bg-slate-100 border-slate-600 text-xs font-semibold text-slate-600 opacity-0 dark:bg-slate-800 dark:border-slate-400 dark:text-slate-400',
+              'rounded-sm border-slate-600 bg-slate-100 text-xs font-semibold text-slate-600 opacity-0 dark:border-slate-400 dark:bg-slate-800 dark:text-slate-400',
               utilized && 'opacity-100'
             )}
           >

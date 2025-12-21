@@ -123,7 +123,7 @@ function UserStyles({
           handleSelection,
           initialGridCol
         )}
-        
+
         {!onChange && (
           <Button
             type="button"

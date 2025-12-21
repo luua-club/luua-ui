@@ -51,8 +51,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
   },
   {
     title: 'Autopilot content creation',
-    description:
-      'Turn your saved bookmarks into fresh drafts automatically!',
+    description: 'Turn your saved bookmarks into fresh drafts automatically!',
     className: 'md:col-span-1',
     icon: Network,
     imageData: {

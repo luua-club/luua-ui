@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'motion/react'
 import { Calendar1, ChevronRight, FileCheck, Save } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 
 import { Button } from '@/shared/ui/button'
 import { ProgressiveBlur } from '@/shared/ui/progressive-blur'

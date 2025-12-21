@@ -1,6 +1,6 @@
 import { useRouter } from '@tanstack/react-router'
-import { motion } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
+import { motion } from 'motion/react'
 
 import {
   BENTO_ITEMS,

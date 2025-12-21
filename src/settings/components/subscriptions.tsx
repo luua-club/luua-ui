@@ -151,7 +151,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
               </TableHeader>
               <TableBody>
                 {/* Render each subscription entry */}
-                {subscriptionDetails.map((subscription, index) => (
+                {subscriptionDetails.map(subscription => (
                   <TableRow key={subscription.id}>
                     <TableCell>
                       <Badge variant="destructive" className="rounded-sm">

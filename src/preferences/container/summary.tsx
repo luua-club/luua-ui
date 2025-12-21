@@ -65,23 +65,28 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
     if (characterCount < 500) {
       return {
         level: 'Low',
-        color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900',
+        color:
+          'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900',
         showMessage: true,
-        message: 'Add more content or sources to improve strength and quality of your style analysis.'
+        message:
+          'Add more content or sources to improve strength and quality of your style analysis.',
       }
     } else if (characterCount >= 1000) {
       return {
         level: 'Good',
-        color: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-900',
+        color:
+          'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-900',
         showMessage: false,
-        message: ''
+        message: '',
       }
     } else {
       return {
         level: 'Medium',
-        color: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-900',
+        color:
+          'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-900',
         showMessage: true,
-        message: 'Consider adding more content or sources to improve the strength and quality of your style analysis.'
+        message:
+          'Consider adding more content or sources to improve the strength and quality of your style analysis.',
       }
     }
   }
@@ -112,21 +117,24 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
       <div className="flex items-center justify-between py-4">
         <div className="flex flex-col gap-2">
           <h1 className="text-lg font-medium">Analysis Summary</h1>
-          {status !== UserStyleStatus.INITIAL && status !== UserStyleStatus.IN_PROGRESS && (
-            <>
-              <span className={cn(
-                'inline-flex w-fit items-center rounded-md border px-2 py-0.5 text-xs font-medium',
-                getAnalysisStrength(characters).color
-              )}>
-                Style Strength: {getAnalysisStrength(characters).level}
-              </span>
-              {getAnalysisStrength(characters).showMessage && (
-                <p className="text-xs text-muted-foreground">
-                  {getAnalysisStrength(characters).message}
-                </p>
-              )}
-            </>
-          )}
+          {status !== UserStyleStatus.INITIAL &&
+            status !== UserStyleStatus.IN_PROGRESS && (
+              <>
+                <span
+                  className={cn(
+                    'inline-flex w-fit items-center rounded-md border px-2 py-0.5 text-xs font-medium',
+                    getAnalysisStrength(characters).color
+                  )}
+                >
+                  Style Strength: {getAnalysisStrength(characters).level}
+                </span>
+                {getAnalysisStrength(characters).showMessage && (
+                  <p className="text-muted-foreground text-xs">
+                    {getAnalysisStrength(characters).message}
+                  </p>
+                )}
+              </>
+            )}
         </div>
         <Button
           variant="outline"
