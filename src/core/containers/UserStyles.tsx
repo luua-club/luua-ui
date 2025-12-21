@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import SelectionChip from '@/shared/components/selection-chip'
 import { WritingStyleChip } from '@/shared/models/style-chip.model'
+import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { cn } from '@/shared/utils'
 
@@ -120,9 +121,24 @@ function UserStyles({
           writingStyles,
           isLoading || setUserStyleMutation.isPending,
           handleSelection,
-          submitSelectedStyles,
-          initialGridCol,
-          Boolean(onChange)
+          initialGridCol
+        )}
+        
+        {!onChange && (
+          <Button
+            type="button"
+            variant="default"
+            className="mt-4 w-fit"
+            disabled={isLoading || setUserStyleMutation.isPending}
+            onClick={submitSelectedStyles}
+          >
+            {isLoading || setUserStyleMutation.isPending ? (
+              <Loader className="animate-spin" />
+            ) : (
+              <Save className="size-4" />
+            )}
+            Save
+          </Button>
         )}
       </div>
     </>
@@ -137,9 +153,7 @@ const UserStylesChips = (
   items: WritingStyleChip[],
   isLoading: boolean,
   onSelect: (item: WritingStyleChip) => void,
-  onSubmit: () => void,
-  initialGridCol?: number,
-  hideSaveButton?: boolean
+  initialGridCol?: number
 ) => {
   return (
     <div
@@ -157,22 +171,6 @@ const UserStylesChips = (
           onSelect={() => onSelect(item)}
         />
       ))}
-      {!hideSaveButton && (
-        <div
-          className={cn(
-            'bg-card flex cursor-pointer items-center justify-center gap-2 rounded-lg border-1 text-lg font-medium hover:bg-gray-100 dark:hover:bg-black',
-            isLoading && 'cursor-not-allowed'
-          )}
-          onClick={!isLoading ? onSubmit : undefined}
-        >
-          Save
-          {isLoading ? (
-            <Loader className="mr-2 animate-spin" />
-          ) : (
-            <Save className="size-5" />
-          )}
-        </div>
-      )}
     </div>
   )
 }

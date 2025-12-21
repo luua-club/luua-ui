@@ -64,7 +64,7 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
                 maxSize={10 * 1024 * 1024}
                 description={
                   <span className="font-base text-muted-foreground">
-                    Could upload up to 5 files upto 10MB each.
+                    Upload up to 5 files (10MB each).
                   </span>
                 }
                 accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -83,7 +83,7 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
         {!isProPlan && (
           <div className={overlayClassNames}>
             <p className="font-semibold">
-              Upgrade plan to access advanced styles
+              Upgrade plan to create your own style
             </p>
             <Button
               variant="default"

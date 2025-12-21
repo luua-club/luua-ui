@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createLazyRoute } from '@tanstack/react-router'
-import { Frown, UserRoundPen, Zap } from 'lucide-react'
+import { Frown, UserRoundPen, List } from 'lucide-react'
 import { useState } from 'react'
 
 import { userApi } from '@/core/api/user.api'
@@ -59,7 +59,7 @@ function Preferences() {
       >
         <TabsList className="w-full px-2 py-6 lg:w-fit">
           <TabsTrigger value={tabValue[0]} className="px-2 py-4 text-sm">
-            <UserRoundPen /> Basic Styles
+            <List /> Presets
           </TabsTrigger>
           <TabsTrigger
             value={tabValue[1]}
@@ -68,16 +68,14 @@ function Preferences() {
               data?.data.style_gen_state === UserStyleStatus.IN_PROGRESS
             }
           >
-            <Zap /> Enhanced Styles
+            <UserRoundPen /> My Voice
           </TabsTrigger>
         </TabsList>
 
         {/* --- Tabs Content: Styles --- */}
         <TabsContent value={tabValue[0]}>
           <p className="text-card-foreground mt-2 mb-8 text-base">
-            Choose the style that best matches your objective. Luua AI will
-            adjust its tone, depth, and structure to craft posts that truly
-            reflect your voice and connect with your audience.
+            Choose the style that fits your goal. Luua shapes the tone and flow to deliver the impact you’re aiming for.
           </p>
 
           <UserStyles
@@ -91,10 +89,7 @@ function Preferences() {
         {/* --- Tabs Content: Advanced --- */}
         <TabsContent value={tabValue[1]}>
           <p className="text-card-foreground mt-2 mb-8 text-base">
-            Help Luua learn your unique writing style! Share your writing
-            samples by pasting text or uploading files. Luua will analyze how
-            you naturally communicate - your word choices, humor, and tone - to
-            create content that genuinely sounds like you.
+            Share your writing samples, and Luua will learn your tone and style to create content that sounds like you.
           </p>
           <Advanced setActiveTab={setActiveTab} />
         </TabsContent>

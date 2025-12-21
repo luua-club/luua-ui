@@ -75,9 +75,6 @@ function Nav({ handleSidebar }: INavProps) {
             Expand / Collapse Sidebar, CTRL+B
           </TooltipContent>
         </Tooltip>
-        <p className="text-sm font-semibold">
-          {getCurrentPageTitle(state.location.pathname as urlType)}
-        </p>
       </div>
 
       {/* Right Side */}
