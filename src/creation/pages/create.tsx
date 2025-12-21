@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -292,6 +293,15 @@ function Create() {
   }
 
   const isSuggestionsVisible = () => {
+    if (
+      (draftEnabled && draftQuery.isPending) ||
+      isGenerationDataFetching ||
+      saveDraftMutation.isPending ||
+      !user
+    ) {
+      return false
+    }
+
     if (activeTab === 'LinkedIn') {
       return !(
         postDrafts.LinkedIn?.content ||
@@ -398,32 +408,40 @@ function Create() {
           </TabsContent>
         </Tabs>
 
-        {isSuggestionsVisible() && (
-          <div className="flex flex-col gap-4 pt-6">
-            <p className="text-sm font-medium">
-              Out of ideas? Steal one of ours 😎
-            </p>
+        <AnimatePresence>
+          {isSuggestionsVisible() && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              className="flex flex-col gap-4 pt-6"
+            >
+              <p className="text-sm font-medium">
+                Out of ideas? Steal one of ours 😎
+              </p>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <PromptChip
-                data={standardPrompts}
-                onChipClick={handleSuggestionsClick}
-              />
-              <PromptChip
-                data={youtubePrompts}
-                onChipClick={handleSuggestionsClick}
-              />
-              <PromptChip
-                data={linkedinPrompts}
-                onChipClick={handleSuggestionsClick}
-              />
-              <PromptChip
-                data={twitterPrompts}
-                onChipClick={handleSuggestionsClick}
-              />
-            </div>
-          </div>
-        )}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <PromptChip
+                  data={standardPrompts}
+                  onChipClick={handleSuggestionsClick}
+                />
+                <PromptChip
+                  data={youtubePrompts}
+                  onChipClick={handleSuggestionsClick}
+                />
+                <PromptChip
+                  data={linkedinPrompts}
+                  onChipClick={handleSuggestionsClick}
+                />
+                <PromptChip
+                  data={twitterPrompts}
+                  onChipClick={handleSuggestionsClick}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <DraftFooterActions
         loading={isGenerationDataFetching || !getCurrentState()}
