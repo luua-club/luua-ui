@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 
 import { draftsApi } from '../api/drafts.api'
 import { postsApi } from '../api/posts.api'
+import { postHogScheduleCapture } from '../config/posthog.config'
 import { type DraftItem, type IDraftRequest } from '../models/draft.model'
 import { channelType } from '../models/social.model'
 
@@ -66,6 +67,10 @@ export function useScheduleDraft() {
         draft_id: draftId,
         schedules,
       })
+
+      // POSTHOG
+      postHogScheduleCapture(draftId, postIds, draftData)
+      // END POSTHOG
 
       return {
         draftId,

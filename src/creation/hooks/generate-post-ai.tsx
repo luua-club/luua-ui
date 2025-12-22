@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import posthog from 'posthog-js'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { generateApi } from '@/core/api/generate-post.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { postHogGenerationCapture } from '@/core/config/posthog.config'
+import {
+  postHogErrorCapture,
+  postHogGenerationCapture,
+} from '@/core/config/posthog.config'
 import { IPost } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
 import { SourceChip } from '@/shared/components/sources-card'
@@ -98,7 +100,10 @@ export const useGeneratePosts = (
    */
   useEffect(() => {
     if (query.error) {
-      posthog.captureException(query.error)
+      // POSTHOG
+      postHogErrorCapture(query.error)
+      // END POSTHOG
+
       toast.error('Something went wrong, Please try again !')
     }
   }, [query.error])
@@ -146,13 +151,14 @@ export const useGeneratePosts = (
       })
     }
 
-    // Posthog event
+    // POSTHOG
     postHogGenerationCapture(
       postsResult.length,
       query.data.data.original_prompt,
       postsResult.find(p => p.channel === 'LinkedIn')?.content,
       postsResult.find(p => p.channel === 'Twitter')?.content
     )
+    // END POSTHOG
 
     // Only update ref if we have new posts
     if (postsResult.length > 0) {

@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { postHogStyleEnhancedCapture } from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
 import { Button } from '@/shared/ui/button'
@@ -21,9 +22,16 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   const setAdvancedUserStyleMutation = useMutation({
     mutationFn: (payload: IUserAdvancedStyleRequest) =>
       stylesApi.setUserAdvancedStyle(payload),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userStyle] })
       toast.success('Advanced user style updated successfully')
+
+      // POSTHOG
+      postHogStyleEnhancedCapture(
+        variables.style_text,
+        variables.gcp_storage_doc_ids
+      )
+      // END POSTHOG
     },
     onError: () => {
       toast.error('Failed to update advanced user style')

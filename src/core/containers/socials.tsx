@@ -6,10 +6,6 @@ import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
 import SocialCard from '@/core/components/social-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
-import {
-  postHogConnectSocialCapture,
-  postHogDisconnectSocialCapture,
-} from '@/core/config/posthog.config'
 import { channelType } from '@/core/models/social.model'
 import { UserState } from '@/core/models/user.model'
 
@@ -43,7 +39,6 @@ const Socials = ({
 
       // Backend returns the authorization URL, redirect to it
       if (response.data) {
-        postHogConnectSocialCapture(platform)
         window.location.href = response.data.authorization_url
       }
     } catch {
@@ -60,7 +55,6 @@ const Socials = ({
       return payload
     },
     onSuccess: (payload: channelType) => {
-      postHogDisconnectSocialCapture(payload)
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
       toast.success(`Disconnected from ${payload}`)
     },

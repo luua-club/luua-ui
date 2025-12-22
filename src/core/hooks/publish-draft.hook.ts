@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 
 import { draftsApi } from '../api/drafts.api'
 import { postsApi } from '../api/posts.api'
+import { postHogPublishCapture } from '../config/posthog.config'
 import { type DraftItem, type IDraftRequest } from '../models/draft.model'
 import { channelType } from '../models/social.model'
 
@@ -60,6 +61,10 @@ export function usePublishDraft() {
         draft_id: draftId,
         post_ids: postIds,
       })
+
+      // POSTHOG
+      postHogPublishCapture(draftId, postIds, draftData)
+      // END POSTHOG
 
       return {
         draftId,
