@@ -1,5 +1,5 @@
-import BrandLinkedIn from '@/assets/images/brand-linkedin.svg?react'
-import BrandX from '@/assets/images/brand-x.svg?react'
+import BrandLinkedIn from '@/assets/icons/brand-linkedin.svg?react'
+import BrandX from '@/assets/icons/brand-x.svg?react'
 
 import { channelType, ISocialChannel } from '../models/social.model'
 

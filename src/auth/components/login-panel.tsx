@@ -3,8 +3,8 @@ import { Loader } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import LuuaLogo from '@/assets/images/luua-full.svg?react'
-import LuuaLogoDark from '@/assets/images/luua-full-black.svg?react'
+import LuuaLogo from '@/assets/logos/luua-full.svg?react'
+import LuuaLogoDark from '@/assets/logos/luua-full-black.svg?react'
 import { Highlighter } from '@/shared/ui/highlighter'
 
 interface LoginPanelProps {

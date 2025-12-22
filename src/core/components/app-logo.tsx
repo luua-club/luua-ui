@@ -1,7 +1,7 @@
-import LogoIconOnly from '@/assets/images/luua-icon-logo.svg?react'
-import LogoTextOnly from '@/assets/images/luua-text-logo.svg?react'
-import LogoWhiteIconOnly from '@/assets/images/luua-white-icon-logo.svg?react'
-import LogoWhiteTextOnly from '@/assets/images/luua-white-text-logo.svg?react'
+import LogoIconOnly from '@/assets/logos/luua-icon-logo.svg?react'
+import LogoTextOnly from '@/assets/logos/luua-text-logo.svg?react'
+import LogoWhiteIconOnly from '@/assets/logos/luua-white-icon-logo.svg?react'
+import LogoWhiteTextOnly from '@/assets/logos/luua-white-text-logo.svg?react'
 import { cn } from '@/shared/utils'
 
 /*
