@@ -3,7 +3,9 @@ import { Loader } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import LuuaLogo from '@/assets/images/luua-full-black.svg?react'
+import LuuaLogo from '@/assets/images/luua-full.svg?react'
+import LuuaLogoDark from '@/assets/images/luua-full-black.svg?react'
+import { Highlighter } from '@/shared/ui/highlighter'
 
 interface LoginPanelProps {
   isLoading: boolean
@@ -63,29 +65,40 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
   }, [isLoading])
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-8">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-12">
       <div className="flex flex-col items-center gap-6">
         {/** Logo */}
-        <LuuaLogo className="w-72 sm:w-96 xl:h-[120px] xl:w-[500px]" />
+        <LuuaLogo className="hidden w-72 sm:w-96 xl:h-[120px] xl:w-[500px] dark:block" />
+
+        {/** Logo Dark */}
+        <LuuaLogoDark className="w-72 sm:w-96 xl:h-[120px] xl:w-[500px] dark:hidden" />
 
         {/** Tagline */}
-        <p className="text-xl font-bold text-black sm:text-2xl">
-          For strategically lazy people.
-        </p>
+        <Highlighter
+          action="underline"
+          color="#FF9800"
+          padding={4}
+          animationDuration={500}
+          iterations={8}
+        >
+          <p className="text-xl font-bold sm:text-2xl">
+            For strategically lazy people.
+          </p>
+        </Highlighter>
       </div>
 
       {/** Description */}
       <div className="flex flex-col items-center gap-10">
-        <p className="text-center text-base font-medium text-balance text-gray-600 sm:text-lg">
+        <p className="text-center text-base font-medium text-balance text-gray-600 sm:text-lg dark:text-gray-300">
           From idea to post, everything is automated,
           <br className="hidden sm:block" />
           making brand-building effortless with Luua.
         </p>
 
         {/** Login Button (reserve space and fade-in when iframe is ready) */}
-        <div className="relative flex h-[44px] w-[280px] items-center justify-center">
+        <div className="relative -mt-2 flex h-[44px] w-[280px] items-center justify-center">
           {isLoading ? (
-            <Loader className="size-6 animate-spin" color="black" />
+            <Loader className="size-6 animate-spin" />
           ) : (
             <div
               ref={buttonRef}
@@ -98,7 +111,7 @@ function LoginPanel({ isLoading, onLogin }: LoginPanelProps) {
                 onError={() => {
                   toast.error('Something went wrong, Please try again !')
                 }}
-                theme="filled_black"
+                theme="outline"
                 text="continue_with"
                 width={280}
               />
