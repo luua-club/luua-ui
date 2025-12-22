@@ -96,7 +96,7 @@ function AutoPilot() {
             <p className="text-sm font-medium">New to Autopilot?</p>
 
             <HeroVideoDialog
-              videoSrc={EXTERNAL_URLS.youtubeAutopilot}
+              videoSrc={EXTERNAL_URLS.youtube_autopilot}
               thumbnailSrc={
                 theme === 'dark' ? AutoPilotImageDark : AutoPilotImage
               }

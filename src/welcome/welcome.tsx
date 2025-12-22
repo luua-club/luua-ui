@@ -63,7 +63,7 @@ function Welcome() {
       {/** Main Content */}
       <div className="m-auto flex max-w-4xl flex-col gap-3 p-5">
         {/** Header */}
-        <div className="flex items-end justify-between">
+        <div className="my-4 flex flex-col items-center justify-between gap-4 text-center md:my-0 md:flex-row md:items-end md:gap-2 md:text-start">
           {/** Title */}
           <p className="flex items-center gap-3 text-xl font-semibold text-balance">
             <LampDesk className="hidden size-6 md:block" /> Welcome. What’s the
@@ -71,7 +71,7 @@ function Welcome() {
           </p>
 
           {/** Video */}
-          <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtubeAutopilot}>
+          <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtube_main_video}>
             <Button size="sm" className="text-xs">
               <Lightbulb className="size-3.5" /> How it works ?
             </Button>

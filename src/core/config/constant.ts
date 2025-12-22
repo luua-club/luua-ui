@@ -138,5 +138,7 @@ export const EXTERNAL_URLS = {
   instagram:
     'https://www.instagram.com/luua_club?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
   linkedIn: 'https://linkedin.com/company/luuaclub/',
-  youtubeAutopilot: 'https://www.youtube.com/embed/aruHLNNsmRc',
+  youtube_main_video: 'https://www.youtube.com/embed/aruHLNNsmRc',
+  //TODO:
+  youtube_autopilot: 'https://www.youtube.com/embed/aruHLNNsmRc',
 }
