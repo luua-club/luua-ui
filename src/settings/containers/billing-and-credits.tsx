@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { postHogCancelledPlanCapture } from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import { Button } from '@/shared/ui/button'
@@ -59,6 +60,11 @@ function BillingAndCredits() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.user],
       })
+
+      // POSTHOG
+      postHogCancelledPlanCapture()
+      // END POSTHOG
+
       toast.success('Subscription cancelled successfully')
     },
     onError: () => {

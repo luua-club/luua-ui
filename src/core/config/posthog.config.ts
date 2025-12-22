@@ -1,67 +1,45 @@
 import posthog from 'posthog-js'
 
+import { DraftItem, IDraftRequest } from '../models/draft.model'
+import { userStyleResponseType } from '../models/user.model'
+
 /**
- * It runs when user has selected either of the following:
- * 1. Role
- * 2. Industry
- * 3. Goal
- * on the onboarding page.
- *
- * @param role - The role selected by the user.
- * @param industry - The industry selected by the user.
- * @param goal - The goal selected by the user.
+ * -------------------------------
+ * Styles Analytics
+ * -------------------------------
  */
-export const postHogOnboardingCompleted = (
-  role?: string,
-  industry?: string,
-  goal?: string
+/**
+ * It runs when user updates their basic style.
+ *
+ * @param style - The style object.
+ */
+export const postHogStyleUpdateCapture = (style: userStyleResponseType) => {
+  posthog.capture('styles:updated', {
+    style,
+  })
+}
+
+/**
+ * It runs when user updates their enhanced style.
+ *
+ * @param style_text - The style text.
+ * @param gcp_storage_doc_ids - The gcp storage doc ids.
+ */
+export const postHogStyleEnhancedCapture = (
+  style_text?: string,
+  gcp_storage_doc_ids?: string[]
 ) => {
-  posthog.capture('onboarding:completed', {
-    role,
-    industry,
-    goal,
+  posthog.capture('styles:enhanced_updated', {
+    style_text,
+    gcp_storage_doc_ids,
   })
 }
 
 /**
- * It runs no of the following values are input by user:
- * 1. Role
- * 2. Industry
- * 3. Goal
+ * -------------------------------
+ * Create Post Analytics
+ * -------------------------------
  */
-export const postHogOnboardingSkipped = () => {
-  posthog.capture('onboarding:skipped')
-}
-
-/**
- * It will run when user has selected the styles.
- *
- * @param styles - user choses styles array
- */
-export const postHogOnboardingStylesCompleted = (styles: string[]) => {
-  posthog.capture('onboarding:styles_completed', {
-    styles,
-  })
-}
-
-/** It runs when user has not selected any styles. */
-export const postHogOnboardingStylesSkipped = () => {
-  posthog.capture('onboarding:styles_skipped')
-}
-
-/**
- * It runs when the intro i.e Welcome Drawer or Paid Drawer is skipped.
- *
- * @param introTitle - The title of that intro drawer.
- * @param stepNumber - That active step number where it was skipped.
- */
-export const postHogIntroCapture = (introTitle: string, stepNumber: number) => {
-  posthog.capture('intro:skipped', {
-    introTitle,
-    stepNumber,
-  })
-}
-
 /**
  * It runs when user has generated AI content.
  *
@@ -85,61 +63,26 @@ export const postHogGenerationCapture = (
 }
 
 /**
- * It runs when user save draft from create page.
- *
- * @param draft_id - The id of the draft.
- * @param posts_count - The number of posts generated.
- * @param linkedin_content - The content of the LinkedIn post.
- * @param twitter_content - The content of the Twitter post.
- * @param latest_generated_posts_linkedin - The latest generated post on LinkedIn.
- * @param latest_generated_posts_twitter - The latest generated post on Twitter.
+ * -------------------------------
+ * Final Review Analytics
+ * -------------------------------
  */
-export const postHogDraftCapture = (
-  draft_id: string,
-  posts_count: number,
-  linkedin_content?: string,
-  twitter_content?: string,
-  latest_generated_posts_linkedin?: string,
-  latest_generated_posts_twitter?: string
-) => {
-  posthog.capture('drafts:saved', {
-    draft_id,
-    posts_count,
-    linkedin_content,
-    twitter_content,
-    latest_generated_posts_linkedin,
-    latest_generated_posts_twitter,
-  })
-}
-
 /**
  * It runs when user schedule post from create page.
  *
  * @param draft_id - The id of the draft.
- * @param posts_count - The number of posts generated.
- * @param linkedin_content - The content of the LinkedIn post.
- * @param twitter_content - The content of the Twitter post.
- * @param latest_generated_posts_linkedin - The latest generated post on LinkedIn.
- * @param latest_generated_posts_twitter - The latest generated post on Twitter.
- * @param schedule_date - The date of the schedule.
+ * @param post_ids - The ids of the posts.
+ * @param draft_data - The draft data.
  */
 export const postHogScheduleCapture = (
-  draft_id: string,
-  posts_count: number,
-  linkedin_content?: string,
-  twitter_content?: string,
-  latest_generated_posts_linkedin?: string,
-  latest_generated_posts_twitter?: string,
-  schedule_date?: string
+  draftId: string,
+  postIds: string[],
+  draftData: DraftItem | IDraftRequest
 ) => {
   posthog.capture('posts:scheduled', {
-    draft_id,
-    posts_count,
-    linkedin_content,
-    twitter_content,
-    latest_generated_posts_linkedin,
-    latest_generated_posts_twitter,
-    schedule_date,
+    draft_id: draftId,
+    post_ids: postIds,
+    draft_data: draftData,
   })
 }
 
@@ -147,30 +90,26 @@ export const postHogScheduleCapture = (
  * It runs when user publish post from create page.
  *
  * @param draft_id - The id of the draft.
- * @param posts_count - The number of posts generated.
- * @param linkedin_content - The content of the LinkedIn post.
- * @param twitter_content - The content of the Twitter post.
- * @param latest_generated_posts_linkedin - The latest generated post on LinkedIn.
- * @param latest_generated_posts_twitter - The latest generated post on Twitter.
+ * @param post_ids - The ids of the posts.
+ * @param draft_data - The draft data.
  */
 export const postHogPublishCapture = (
-  draft_id: string,
-  posts_count: number,
-  linkedin_content?: string,
-  twitter_content?: string,
-  latest_generated_posts_linkedin?: string,
-  latest_generated_posts_twitter?: string
+  draftId: string,
+  postIds: string[],
+  draftData: DraftItem | IDraftRequest
 ) => {
   posthog.capture('posts:published', {
-    draft_id,
-    posts_count,
-    linkedin_content,
-    twitter_content,
-    latest_generated_posts_linkedin,
-    latest_generated_posts_twitter,
+    draft_id: draftId,
+    post_ids: postIds,
+    draft_data: draftData,
   })
 }
 
+/**
+ * -------------------------------
+ * Payments Analytics
+ * -------------------------------
+ */
 /**
  * It runs when user starts the checkout process for a subscription plan.
  *
@@ -183,6 +122,13 @@ export const postHogCheckoutCapture = (plan?: string) => {
 }
 
 /**
+ * It runs when user cancels their subscription plan.
+ */
+export const postHogCancelledPlanCapture = () => {
+  posthog.capture('payments:subscription_cancelled')
+}
+
+/**
  * It runs when user clicks on upgrade button to upgrade their subscription plan.
  *
  * @param plan - The current plan the user is on (optional).
@@ -192,26 +138,10 @@ export const postHogUpgradeCapture = (plan?: string) => {
 }
 
 /**
- * It runs when user cancels their subscription plan.
+ * -------------------------------
+ * Error Captures
+ * -------------------------------
  */
-export const postHogCancelledPlanCapture = () => {
-  posthog.capture('payments:subscription_cancelled')
-}
-
-/**
- * It runs when user clicks to connect a social media platform.
- *
- * @param platform - The social media platform being connected (e.g., 'linkedin', 'twitter').
- */
-export const postHogConnectSocialCapture = (platform: string) => {
-  posthog.capture('socials:connect_clicked', { platform })
-}
-
-/**
- * It runs when user clicks to disconnect a social media platform.
- *
- * @param platform - The social media platform being disconnected (e.g., 'linkedin', 'twitter').
- */
-export const postHogDisconnectSocialCapture = (platform: string) => {
-  posthog.capture('socials:disconnect_clicked', { platform })
+export const postHogErrorCapture = (error: Error | null) => {
+  posthog.captureException(error)
 }

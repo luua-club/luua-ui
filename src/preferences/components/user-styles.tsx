@@ -3,20 +3,21 @@ import { Loader, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { postHogStyleUpdateCapture } from '@/core/config/posthog.config'
 import SelectionChip from '@/shared/components/selection-chip'
 import { WritingStyleChip } from '@/shared/models/style-chip.model'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { cn } from '@/shared/utils'
 
-import { userApi } from '../api/user.api'
-import { QUERY_KEYS } from '../config/constant'
-import { writingStyles } from '../config/user-preferences.config'
+import { userApi } from '../../core/api/user.api'
+import { QUERY_KEYS } from '../../core/config/constant'
+import { writingStyles } from '../../core/config/user-preferences.config'
 import {
   IUserStyleRequest,
   UserStyleResponseSchema,
   userStyleResponseType,
-} from '../models/user.model'
+} from '../../core/models/user.model'
 
 interface UserStylesProps {
   data?: userStyleResponseType
@@ -44,11 +45,15 @@ function UserStyles({
   const queryClient = useQueryClient()
   const setUserStyleMutation = useMutation({
     mutationFn: (payload: IUserStyleRequest) => userApi.setUserStyle(payload),
-    onSuccess: () => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userStyle] })
       if (showSuccessToast) {
         toast.success('User style updated successfully')
       }
+
+      // POSTHOG
+      postHogStyleUpdateCapture(data.data)
+      // END POSTHOG
     },
     onError: () => {
       toast.error('Failed to update user style')
