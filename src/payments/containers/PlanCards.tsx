@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { Check, Flame, Flower, Sprout, X } from 'lucide-react'
-import posthog from 'posthog-js'
 import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
 import {
   postHogCheckoutCapture,
+  postHogErrorCapture,
   postHogUpgradeCapture,
 } from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -24,7 +24,10 @@ function PlanCards() {
       const { payment_link } = data
 
       if (payment_link) {
+        // POSTHOG
         postHogCheckoutCapture(user?.plan)
+        // END POSTHOG
+
         window.location.href = payment_link
         return
       }
@@ -32,7 +35,10 @@ function PlanCards() {
       toast.error('Unable to open checkout link. Please try again later.')
     },
     onError: () => {
-      posthog.captureException(createPaymentLinkMutation.error)
+      // POSTHOG
+      postHogErrorCapture(createPaymentLinkMutation.error)
+      // END POSTHOG
+
       toast.error('Failed to start checkout. Please try again.')
     },
   })
@@ -45,7 +51,10 @@ function PlanCards() {
    * Handle upgrade click
    */
   const handleUpgradeClick = () => {
+    // POSTHOG
     postHogUpgradeCapture(user?.plan)
+    // END POSTHOG
+
     createPaymentLinkMutation.mutate()
   }
 
@@ -80,7 +89,7 @@ function PlanCards() {
           <h2 className="text-sm font-semibold">Operational Features</h2>
           <ul className="my-2 space-y-2 text-sm">
             <li className="flex items-center gap-2">
-              <Check className="size-4" />5 Auto Gen actions per month
+              <Check className="size-4" />5 Autopilot actions per month
             </li>
             <li className="flex items-center gap-2">
               <Check className="size-4" />
@@ -154,7 +163,7 @@ function PlanCards() {
           <ul className="my-2 space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <Check className="size-4" />
-              Unlimited Auto Mode actions
+              Unlimited Autopilot actions
             </li>
             <li className="flex items-center gap-2">
               <Check className="size-4" />

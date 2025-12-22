@@ -1,8 +1,8 @@
 import { Brain } from 'lucide-react'
 
-import BrandLinkedIn from '@/assets/images/brand-linkedin.svg?react'
-import BrandX from '@/assets/images/brand-x.svg?react'
-import BrandYoutube from '@/assets/images/brand-youtube.svg?react'
+import BrandLinkedIn from '@/assets/icons/brand-linkedin.svg?react'
+import BrandX from '@/assets/icons/brand-x.svg?react'
+import BrandYoutube from '@/assets/icons/brand-youtube.svg?react'
 
 import { ExamplePrompt } from '../models/example-prompt.model'
 

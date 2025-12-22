@@ -15,6 +15,16 @@ class FilesApi extends BaseApiService {
   async uploadUrl(data: FileUploadRequest) {
     return this.post<UploadedFile>(data, '/style-gen/upload-url')
   }
+
+  /**
+   * Upload URL for posts
+   *
+   * @param data FileUploadRequest
+   * @returns UploadedFile
+   */
+  async uploadPostUrl(data: FileUploadRequest) {
+    return this.post<UploadedFile>(data, '/posts/upload-url')
+  }
 }
 
 export const filesApi = new FilesApi()

@@ -4,5 +4,5 @@ export default function getPreferencesRoute(privateRoute: AnyRoute) {
   return createRoute({
     getParentRoute: () => privateRoute,
     path: '/preferences',
-  }).lazy(() => import('./Preferences').then(d => d.Route))
+  }).lazy(() => import('./preferences').then(d => d.Route))
 }

@@ -2,7 +2,6 @@ import { X } from 'lucide-react'
 
 import { Button } from '@/shared/ui/button'
 
-//TODO: IT WILL BE A EXTERNAL LINK
 const PostImagePreview = ({
   imagePreviews,
   onRemove,
@@ -16,11 +15,14 @@ const PostImagePreview = ({
 
   if (count === 1) {
     return (
-      <div className="group relative">
+      <div className="group bg-muted relative overflow-hidden">
         <img
           src={imagePreviews[0]}
           alt="attachment-0"
-          className="aspect-video w-full object-cover"
+          className="aspect-video h-full w-full object-cover"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
         />
         <RemoveButton index={0} onRemove={onRemove} />
       </div>
@@ -31,11 +33,14 @@ const PostImagePreview = ({
     return (
       <div className="grid grid-cols-2">
         {imagePreviews.slice(0, 2).map((src, idx) => (
-          <div key={idx} className="group relative">
+          <div key={idx} className="group bg-muted relative overflow-hidden">
             <img
               src={src}
               alt={`attachment-${idx}`}
-              className="aspect-square w-full object-cover"
+              className="aspect-square h-full w-full object-cover"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
             <RemoveButton index={idx} onRemove={onRemove} />
           </div>
@@ -47,20 +52,29 @@ const PostImagePreview = ({
   if (count === 3) {
     return (
       <div className="grid grid-cols-2 grid-rows-2">
-        <div className="group relative col-span-1 row-span-2">
+        <div className="group bg-muted relative col-span-1 row-span-2 overflow-hidden">
           <img
             src={imagePreviews[0]}
             alt={`attachment-0`}
             className="h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
           />
           <RemoveButton index={0} onRemove={onRemove} />
         </div>
         {imagePreviews.slice(1, 3).map((src, idx) => (
-          <div key={idx + 1} className="group relative">
+          <div
+            key={idx + 1}
+            className="group bg-muted relative overflow-hidden"
+          >
             <img
               src={src}
               alt={`attachment-${idx + 1}`}
-              className="aspect-square w-full object-cover"
+              className="aspect-square h-full w-full object-cover"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
             <RemoveButton index={idx + 1} onRemove={onRemove} />
           </div>
@@ -75,11 +89,14 @@ const PostImagePreview = ({
         const isLast = idx === 3
         const showOverlay = isLast && imagePreviews.length > 4
         return (
-          <div key={idx} className="group relative">
+          <div key={idx} className="group bg-muted relative overflow-hidden">
             <img
               src={src}
               alt={`attachment-${idx}`}
-              className="aspect-square w-full object-cover"
+              className="aspect-square h-full w-full object-cover"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
             <RemoveButton index={idx} onRemove={onRemove} />
             {showOverlay && (
@@ -106,7 +123,6 @@ const RemoveButton = ({
   if (!onRemove) return null
   return (
     <Button
-      variant="outline"
       size="icon"
       aria-label="Remove image"
       onClick={e => {

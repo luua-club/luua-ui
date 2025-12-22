@@ -28,12 +28,14 @@ import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
 import { ThemeProvider } from './shared/provider/theme-provider'
 import { getLocalStorageItem } from './shared/utils/localstorage.util'
 
-// Initialize PostHog
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
-  api_host: import.meta.env.VITE_PUBLIC_REVERSE_PROXY_URL,
-  person_profiles: 'always',
-  capture_exceptions: true,
-})
+// Initialize PostHog only in production
+if (import.meta.env.PROD) {
+  posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
+    api_host: import.meta.env.VITE_PUBLIC_REVERSE_PROXY_URL,
+    person_profiles: 'always',
+    capture_exceptions: true,
+  })
+}
 
 export function AppContent() {
   // ---- Variables ----
@@ -68,16 +70,6 @@ export function AppContent() {
 
     if (UserSchema.safeParse(userData.data).success) {
       dispatch(setUser(userData.data))
-
-      // Add user to posthog
-      posthog.identify(`${userData.data.email}`, {
-        name: userData.data.name,
-        email: userData.data.email,
-        plan: userData.data.plan,
-        linkedin_connected: userData.data.connected_channels.linkedin.connected,
-        twitter_connected: userData.data.connected_channels.twitter.connected,
-        theme: localStorage.getItem(THEME_LOCAL_STORAGE_KEY),
-      })
     } else {
       toast.error('Something went wrong, Please try again !')
       logout()
@@ -92,7 +84,6 @@ export function AppContent() {
       const err = error as AxiosError
 
       if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
-        posthog.captureException(error)
         toast.error(
           'Some error has occurred, please try again later, if the problem persists, please contact support, loggin out..'
         )

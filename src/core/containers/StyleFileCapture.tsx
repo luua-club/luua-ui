@@ -1,6 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { ChevronRight, CloudUpload, Loader, Shredder, X } from 'lucide-react'
+import {
+  ChevronRight,
+  CloudUpload,
+  Loader,
+  WandSparkles,
+  X,
+} from 'lucide-react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -55,10 +61,10 @@ const StyleFileCapture: React.FC<StyleFileCaptureProps> = ({
   multiple = true,
   description = (
     <span className="font-base text-muted-foreground">
-      Could upload up to 5 image upto 5MB each.
+      Upload up to 5 files (5MB each).
     </span>
   ),
-  submitLabel = 'Analyze file',
+  submitLabel = 'Create style',
   onSubmit: onSubmitProp,
   hideSubmit = false,
   submitFullWidth = false,
@@ -243,7 +249,7 @@ const StyleFileCapture: React.FC<StyleFileCaptureProps> = ({
               </>
             ) : (
               <>
-                <Shredder />
+                <WandSparkles />
                 {submitLabel}
               </>
             )}

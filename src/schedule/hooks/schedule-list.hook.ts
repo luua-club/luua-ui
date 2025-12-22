@@ -9,7 +9,7 @@ import { type ApiResponse } from '@/core/models/api.model'
 import { type IScheduledPostResponse } from '@/core/models/schedule.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 import { DEFAULT_TIME_SLOT_INTERVAL } from '@/shared/config/constant'
-import { getTimeSlots } from '@/shared/utils/time'
+import { getTimeSlots } from '@/shared/utils/time.util'
 
 const useScheduleList = () => {
   const queryClient = useQueryClient()

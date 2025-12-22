@@ -56,8 +56,8 @@ export default defineConfig({
           if (id.includes('/src/auth/')) {
             return 'route-auth'
           }
-          if (id.includes('/src/dashboard/')) {
-            return 'route-dashboard'
+          if (id.includes('/src/welcome/')) {
+            return 'route-welcome'
           }
           if (id.includes('/src/settings/')) {
             return 'route-settings'
@@ -65,14 +65,20 @@ export default defineConfig({
           if (id.includes('/src/creation/')) {
             return 'route-creation'
           }
-          if (id.includes('/src/auto-gen/')) {
-            return 'route-autogen'
+          if (id.includes('/src/autopilot/')) {
+            return 'route-autopilot'
           }
           if (id.includes('/src/payments/')) {
             return 'route-payments'
           }
           if (id.includes('/src/onboarding/')) {
             return 'route-onboarding'
+          }
+          if (id.includes('/src/bookmarks/')) {
+            return 'route-bookmarks'
+          }
+          if (id.includes('/src/review/')) {
+            return 'route-review'
           }
         },
       },

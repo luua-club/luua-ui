@@ -1,11 +1,9 @@
-import { TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
@@ -13,6 +11,7 @@ import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
 import { UserSocial } from '../models/social.model'
 import { extractUserInitial } from '../utils/common.util'
+import ThumbnailImage from './ThumbnailImage'
 
 type PostProps = IPost & {
   isLoading?: boolean
@@ -23,6 +22,7 @@ type PostProps = IPost & {
 function Post({
   channel,
   content,
+  attached_media,
   isLoading = false,
   tileView = false,
   maintainFormatting = false,
@@ -97,16 +97,6 @@ function Post({
           <div className="flex min-w-0 flex-col">
             <div className="flex min-w-0 items-center gap-2 text-sm font-medium sm:text-base">
               <h6 className="truncate">{user.name}</h6>
-              {!channelUser.connected && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <TriangleAlert className="size-4 shrink-0 animate-pulse text-yellow-600" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <span>{platform?.name} account not connected</span>
-                  </TooltipContent>
-                </Tooltip>
-              )}
             </div>
             <p className="truncate text-xs font-medium text-zinc-400">
               {user.username}
@@ -123,28 +113,52 @@ function Post({
         {!tileView && <hr />}
 
         {/** CONTENT */}
-        {maintainFormatting ? (
-          <div className="p-4 pt-3 text-sm">
-            <p className="break-words whitespace-pre-wrap">{displayText}</p>
-            {isLong && (
-              <Button
-                variant="link"
-                className="!p-0 text-xs text-blue-600 dark:text-blue-300"
-                onClick={() => setExpanded(prev => !prev)}
-              >
-                {expanded ? 'See less' : 'See more'}
-              </Button>
-            )}
-          </div>
-        ) : (
-          <p
+        {(displayText.length > 0 || content.length > 0) &&
+          (maintainFormatting ? (
+            <div className="p-4 pt-3 text-sm">
+              <p className="break-words whitespace-pre-wrap">{displayText}</p>
+              {isLong && (
+                <Button
+                  variant="link"
+                  className="!p-0 text-xs text-blue-600 dark:text-blue-300"
+                  onClick={() => setExpanded(prev => !prev)}
+                >
+                  {expanded ? 'See less' : 'See more'}
+                </Button>
+              )}
+            </div>
+          ) : (
+            <p
+              className={cn(
+                'text-card-foreground my-4 px-4 text-sm',
+                tileView ? 'mt-0 line-clamp-3' : undefined
+              )}
+            >
+              {content}
+            </p>
+          ))}
+
+        {attached_media && attached_media.length > 0 && (
+          <div
             className={cn(
-              'text-card-foreground my-4 px-4 text-sm',
-              tileView ? 'mt-0 line-clamp-3' : undefined
+              'flex flex-col gap-2 p-4',
+              content.length > 0 && 'pt-0'
             )}
           >
-            {content}
-          </p>
+            <p className="text-xs font-bold">
+              Attachments ({attached_media.length})
+            </p>
+            <div className="flex gap-2 overflow-x-auto">
+              {attached_media.map((image, index) => (
+                <ThumbnailImage
+                  key={index}
+                  src={image.thumbnail || image.url}
+                  alt={`attachment-${index}`}
+                  className="h-12 w-12 flex-shrink-0"
+                />
+              ))}
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

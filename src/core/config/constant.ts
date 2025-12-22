@@ -1,5 +1,5 @@
-import BrandLinkedIn from '@/assets/images/brand-linkedin.svg?react'
-import BrandX from '@/assets/images/brand-x.svg?react'
+import BrandLinkedIn from '@/assets/icons/brand-linkedin.svg?react'
+import BrandX from '@/assets/icons/brand-x.svg?react'
 
 import { channelType, ISocialChannel } from '../models/social.model'
 
@@ -10,6 +10,20 @@ import { channelType, ISocialChannel } from '../models/social.model'
  */
 export const LUUA_USER_KEY: string =
   import.meta.env.VITE_LUUA_LS_USER || 'luua-user'
+
+/**
+ * The key to store the extension id in session storage
+ *
+ * @default 'extensionId'
+ */
+export const LUUA_EXTENSION_ID_KEY: string = 'extensionId'
+
+/**
+ * The key to store the extension login flag in session storage
+ *
+ * @default 'isExtensionLogin'
+ */
+export const LUUA_EXTENSION_LOGIN_KEY: string = 'isExtensionLogin'
 
 /**
  * Base URL for the API
@@ -24,7 +38,7 @@ export const SUGGESTED_PROMPT_TEXT = [
   'Got an idea? Turn it into a post',
   'Type a thought — Luua makes it a post',
   'Drop an idea or paste a link',
-  'Found something cool? Drop it here'
+  'Found something cool? Drop it here',
 ]
 
 export const EDIT_PROMPT_TEXT = [
@@ -32,7 +46,7 @@ export const EDIT_PROMPT_TEXT = [
   'Add a hook at the start',
   'Make it sound more professional',
   'Add a call to action at the end',
-  'Add another example from this → [link]'
+  'Add another example from this → [link]',
 ]
 
 /**
@@ -40,14 +54,14 @@ export const EDIT_PROMPT_TEXT = [
  */
 export const SOCIAL_PLATFORM: ISocialChannel[] = [
   {
-    name: 'Twitter',
-    logo: BrandX,
-    tooltip: 'Twitter / X.com',
-  },
-  {
     name: 'LinkedIn',
     logo: BrandLinkedIn,
     tooltip: 'Linkedin',
+  },
+  {
+    name: 'Twitter',
+    logo: BrandX,
+    tooltip: 'Twitter / X.com',
   },
 ]
 
@@ -119,4 +133,12 @@ export const EXTERNAL_URLS = {
   contactUs: 'https://luua.club/contact',
   chromeExt:
     'https://chromewebstore.google.com/detail/luua-inspiration-extensio/aolfcbppcakoomagjeiphibfokcjiogj?authuser=0&hl=en',
+  discord: 'https://discord.gg/Q9DDvAsVmb',
+  x: 'https://x.com/luuaclub',
+  instagram:
+    'https://www.instagram.com/luua_club?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
+  linkedIn: 'https://linkedin.com/company/luuaclub/',
+  youtube_main_video: 'https://www.youtube.com/embed/aruHLNNsmRc',
+  //TODO:
+  youtube_autopilot: 'https://www.youtube.com/embed/aruHLNNsmRc',
 }
