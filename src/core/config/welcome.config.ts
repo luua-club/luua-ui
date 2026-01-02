@@ -32,6 +32,8 @@ export type BentoItemConfig = {
   route?: string
   imageData?: BentoImageData
   externalUrl?: string
+  sortOrderDesktop?: number
+  sortOrderMobile?: number
 }
 
 export const BENTO_ITEMS: BentoItemConfig[] = [
@@ -48,6 +50,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       objectFit: 'object-top',
     },
     externalUrl: EXTERNAL_URLS.chromeExt,
+    sortOrderDesktop: 1,
+    sortOrderMobile: 4,
   },
   {
     title: 'Autopilot content creation',
@@ -61,6 +65,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       objectFit: 'object-top-left',
     },
     route: '/autopilot',
+    sortOrderDesktop: 2,
+    sortOrderMobile: 3,
   },
   {
     title: 'Set up styles for AI',
@@ -75,6 +81,8 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       objectFit: 'object-top-left',
     },
     route: '/preferences',
+    sortOrderDesktop: 3,
+    sortOrderMobile: 2,
   },
   {
     title: 'Create and schedule',
@@ -89,5 +97,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       ratio: 'aspect-[3/2]',
       objectFit: 'object-top-left',
     },
+    sortOrderDesktop: 4,
+    sortOrderMobile: 1,
   },
 ]
