@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useMemo } from 'react'
 
 import {
   BENTO_ITEMS,
@@ -8,10 +9,12 @@ import {
   BentoItemConfig,
 } from '@/core/config/welcome.config'
 import { BentoGrid, BentoGridItem } from '@/shared/components/bento-grid'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 
 function FeaturesGrid() {
   // --- Hooks ---
   const router = useRouter()
+  const isMobile = useIsMobile()
 
   // --- Functions ---
   /**
@@ -27,9 +30,25 @@ function FeaturesGrid() {
   }
 
   /**
+   * Sorts bento items based on screen size (mobile vs desktop)
+   * Memoized to avoid unnecessary re-sorting on every render
+   */
+  const sortedBentoItems = useMemo(() => {
+    return [...BENTO_ITEMS].sort((a, b) => {
+      const orderA = isMobile
+        ? (a.sortOrderMobile ?? a.sortOrderDesktop ?? 0)
+        : (a.sortOrderDesktop ?? a.sortOrderMobile ?? 0)
+      const orderB = isMobile
+        ? (b.sortOrderMobile ?? b.sortOrderDesktop ?? 0)
+        : (b.sortOrderDesktop ?? b.sortOrderMobile ?? 0)
+      return orderA - orderB
+    })
+  }, [isMobile])
+
+  /**
    * Transforms BENTO_ITEMS config into BentoGridItem-compatible format
    */
-  const items = BENTO_ITEMS.map(item => {
+  const items = sortedBentoItems.map(item => {
     const Icon = item.icon
     return {
       title: <BentoTitle>{item.title}</BentoTitle>,
