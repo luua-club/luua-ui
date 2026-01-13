@@ -152,7 +152,7 @@ function PostCardActions({
                 setFiles(newFiles)
                 setUploadError('') // Clear error when files change
               }}
-              accept="image/*,application/pdf"
+              accept="image/*"
               maxFiles={uploadConfig.maxFiles}
               maxSize={uploadConfig.maxSizePerFile}
               onFileReject={(_, message) => {

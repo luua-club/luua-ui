@@ -72,7 +72,7 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
                 maxSize={10 * 1024 * 1024}
                 description={
                   <span className="font-base text-muted-foreground">
-                    Upload up to 5 files (10MB each).
+                    Can Upload up to 5 files (10MB each).
                   </span>
                 }
                 accept="application/pdf,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
