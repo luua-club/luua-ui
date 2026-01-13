@@ -9,7 +9,11 @@ import { draftsApi } from '@/core/api/drafts.api'
 import PopoverPrompt from '@/core/components/popover-prompt'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
-import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import {
+  POST_WORD_COUNT,
+  QUERY_KEYS,
+  SOCIAL_PLATFORM,
+} from '@/core/config/constant'
 import {
   linkedinPrompts,
   standardPrompts,
@@ -292,6 +296,26 @@ function Create() {
     setGenerationUserChannel(activeTab)
   }
 
+  const isCharacterLimitExceeded = () => {
+    const linkedinContent = postDrafts.LinkedIn?.content || ''
+    const twitterContent = postDrafts.Twitter?.content || ''
+
+    const linkedinExceeded = linkedinContent.length > POST_WORD_COUNT.LinkedIn
+    const twitterExceeded = twitterContent.length > POST_WORD_COUNT.Twitter
+
+    // If we have content for either platform, check if it exceeds the limit
+    const hasLinkedInContent =
+      linkedinContent || (postDrafts.LinkedIn?.attached_media?.length ?? 0) > 0
+    const hasTwitterContent =
+      twitterContent || (postDrafts.Twitter?.attached_media?.length ?? 0) > 0
+
+    if (hasLinkedInContent && linkedinExceeded) return true
+    if (hasTwitterContent && twitterExceeded && user?.plan !== 'Free')
+      return true
+
+    return false
+  }
+
   const isSuggestionsVisible = () => {
     if (
       (draftEnabled && draftQuery.isPending) ||
@@ -446,7 +470,7 @@ function Create() {
       <DraftFooterActions
         loading={isGenerationDataFetching || !getCurrentState()}
         onSaveDraft={handleSaveDraft}
-        disabled={saveDraftMutation.isPending}
+        disabled={saveDraftMutation.isPending || isCharacterLimitExceeded()}
         onReviewAndShare={handleReviewAndShare}
         onScheduleClick={handleScheduleClick}
       />

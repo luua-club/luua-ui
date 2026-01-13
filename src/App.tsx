@@ -70,6 +70,15 @@ export function AppContent() {
 
     if (UserSchema.safeParse(userData.data).success) {
       dispatch(setUser(userData.data))
+
+      // Identify user in PostHog
+      if (import.meta.env.PROD) {
+        posthog.identify(userData.data.email, {
+          email: userData.data.email,
+          name: userData.data.name,
+          plan: userData.data.plan,
+        })
+      }
     } else {
       toast.error('Something went wrong, Please try again !')
       logout()
