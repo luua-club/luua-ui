@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
+import { CredentialResponse } from '@react-oauth/google'
 import {
   useIsFetching,
   useMutation,
@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { Loader, Mail } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -46,17 +46,14 @@ import {
   setSessionStorageItem,
 } from '@/shared/utils/sessionstorage.util'
 
+import { GoogleLoginButton } from './components/google-login-button'
 import IconLogo from './components/logo-header'
-import { OTPVerification } from './components/otp-verification'
 import RightPanel from './components/right-panel'
+import { OTPVerification } from './containers/otp-verification'
 
 function Login() {
   // ---- States ----
-  const [buttonReady, setButtonReady] = useState(false)
   const [showOtpInput, setShowOtpInput] = useState(false)
-
-  // --- Refs ---
-  const buttonRef = useRef<HTMLDivElement | null>(null)
 
   // --- Forms ---
   const {
@@ -100,7 +97,9 @@ function Login() {
       toast.success('OTP sent to your email')
     },
     onError: () => {
-      toast.error('Failed to send OTP. Please try again.')
+      toast.error(
+        `Kindly wait a few moments to receive the OTP for email - ${email}`
+      )
     },
   })
   const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
@@ -154,51 +153,6 @@ function Login() {
     dispatch(clearUser())
     removeLocalStorageItem(key)
   }, [dispatch, key, isExtensionLogin])
-
-  /**
-   * Show the Google button only after its iframe is present to avoid snap
-   */
-  useEffect(() => {
-    if (isLoading || showOtpInput) return
-
-    const el = buttonRef.current
-    if (!el) return
-
-    // Already mounted?
-    if (el.querySelector('iframe')) {
-      // Next frame to allow paint before transition, then small delay for smoother entrance
-      const rafId = requestAnimationFrame(() => {
-        const tId = window.setTimeout(() => setButtonReady(true), 250)
-        // cleanup mirrors below return
-        ;(cleanupFns => cleanupFns.push(() => window.clearTimeout(tId)))(
-          cleanup
-        )
-      })
-      const cleanup: Array<() => void> = [() => cancelAnimationFrame(rafId)]
-      return () => cleanup.forEach(fn => fn())
-    }
-
-    const observer = new MutationObserver(() => {
-      if (el.querySelector('iframe')) {
-        // slight delay so the iframe has painted before we reveal
-        window.setTimeout(() => setButtonReady(true), 250)
-        observer.disconnect()
-      }
-    })
-    observer.observe(el, { childList: true, subtree: true })
-
-    // Fallback in case iframe takes too long
-    const timeout = window.setTimeout(() => {
-      // even on fallback, keep a tiny delay to maintain consistency
-      window.setTimeout(() => setButtonReady(true), 150)
-      observer.disconnect()
-    }, 1500)
-
-    return () => {
-      observer.disconnect()
-      window.clearTimeout(timeout)
-    }
-  }, [isLoading, showOtpInput])
 
   // ---- Handlers ----
   /**
@@ -283,7 +237,7 @@ function Login() {
       <Spotlight />
 
       {/* Left Section */}
-      <div className="relative z-10 flex w-full flex-col p-8 lg:w-1/2 lg:p-8">
+      <div className="relative z-10 flex w-full flex-col p-4 lg:w-1/2 lg:p-8">
         <div className="relative flex flex-1 flex-col items-center justify-center">
           {/* Conditional Content: OTP View or Default Login View */}
           {showOtpInput ? (
@@ -308,39 +262,16 @@ function Login() {
 
               {/* Auth Options */}
               <div className="w-full max-w-sm space-y-4">
-                {/* Google Sign In (reserve space and fade-in when iframe is ready) */}
-                <div className="relative flex h-[44px] w-full items-center justify-center">
-                  {isLoading ? (
-                    <Loader className="text-foreground size-6 animate-spin" />
-                  ) : (
-                    <div
-                      ref={buttonRef}
-                      className={`w-full transform-gpu transition-opacity duration-900 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[opacity] ${
-                        buttonReady ? 'opacity-100' : 'opacity-0'
-                      } ${magicLinkMutation.isPending ? 'pointer-events-none' : ''}`}
-                      style={
-                        magicLinkMutation.isPending
-                          ? { opacity: 0.5 }
-                          : undefined
-                      }
-                    >
-                      <GoogleLogin
-                        onSuccess={onLogin}
-                        onError={() => {
-                          toast.error(
-                            'Something went wrong, Please try again !'
-                          )
-                        }}
-                        theme={theme === 'dark' ? 'filled_black' : 'outline'}
-                        text="continue_with"
-                        width={'100%'}
-                        shape="circle"
-                        useOneTap={!magicLinkMutation.isPending}
-                        cancel_on_tap_outside
-                      />
-                    </div>
-                  )}
-                </div>
+                {/* Google Sign In */}
+                <GoogleLoginButton
+                  onSuccess={onLogin}
+                  onError={() => {
+                    toast.error('Something went wrong, Please try again !')
+                  }}
+                  disabled={magicLinkMutation.isPending}
+                  isLoading={isLoading}
+                  enableOneTap={!magicLinkMutation.isPending}
+                />
 
                 {/* Divider */}
                 <div className="flex items-center gap-4">
@@ -377,7 +308,8 @@ function Login() {
                       disabled={
                         isLoading ||
                         magicLinkMutation.isPending ||
-                        !email?.trim()
+                        !email?.trim() ||
+                        !!errors.email
                       }
                     >
                       {magicLinkMutation.isPending ? (

@@ -8,7 +8,7 @@ import { LoginResponse } from '@/core/models/auth.model'
 import { Button } from '@/shared/ui/button'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/shared/ui/input-otp'
 
-import IconLogo from './logo-header'
+import IconLogo from '../components/logo-header'
 
 const RESEND_COOLDOWN_SECONDS = 60 // 1 minutes
 
