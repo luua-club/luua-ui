@@ -233,7 +233,7 @@ function Login() {
   }
 
   return (
-    <div className="bg-background relative flex min-h-screen w-full overflow-hidden">
+    <div className="bg-background relative flex h-dvh w-full overflow-hidden">
       <Spotlight />
 
       {/* Left Section */}
