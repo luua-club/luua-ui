@@ -141,4 +141,6 @@ export const EXTERNAL_URLS = {
   youtube_main_video: 'https://www.youtube.com/embed/aruHLNNsmRc',
   //TODO:
   youtube_autopilot: 'https://www.youtube.com/embed/aruHLNNsmRc',
+  tos: 'https://luua.club/legal/terms-of-service',
+  privacy: 'https://luua.club/legal/privacy-policy',
 }

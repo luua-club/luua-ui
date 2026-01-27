@@ -99,9 +99,6 @@ pnpm preview
 
 # Run linter
 pnpm lint
-
-# Run tests
-pnpm test
 ```
 
 ## 📦 Tech Stack
