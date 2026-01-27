@@ -1,9 +1,7 @@
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google'
 import { Loader } from 'lucide-react'
-import { useRef } from 'react'
 
 import { useTheme } from '@/shared/provider/theme-provider'
-import { Button } from '@/shared/ui/button'
 
 interface GoogleLoginButtonProps {
   onSuccess: (credentialResponse: CredentialResponse) => void
@@ -20,55 +18,16 @@ export function GoogleLoginButton({
   isLoading = false,
   enableOneTap = true,
 }: GoogleLoginButtonProps) {
-  const buttonRef = useRef<HTMLDivElement | null>(null)
   const { theme } = useTheme()
-
-  const handleClick = () => {
-    // Trigger the hidden Google button
-    const iframe = buttonRef.current?.querySelector('iframe')
-    if (iframe) {
-      iframe.contentWindow?.postMessage({ type: 'click' }, '*')
-    }
-    // Fallback: click the div which should trigger Google's click handler
-    const googleBtn =
-      buttonRef.current?.querySelector('[role="button"]') ||
-      buttonRef.current?.querySelector('div[style]')
-    if (googleBtn instanceof HTMLElement) {
-      googleBtn.click()
-    }
-  }
 
   return (
     <div className="relative h-10 w-full">
-      {/* Hidden Google Login - positioned behind custom button */}
-      <div
-        ref={buttonRef}
-        className="absolute inset-0 overflow-hidden opacity-0"
-        style={{ pointerEvents: 'none' }}
-      >
-        <GoogleLogin
-          onSuccess={onSuccess}
-          onError={onError}
-          theme={theme === 'dark' ? 'filled_black' : 'outline'}
-          text="continue_with"
-          shape="rectangular"
-          width={400}
-          useOneTap={enableOneTap}
-        />
-      </div>
-
-      {/* Custom Google Button */}
-      <Button
-        type="button"
-        variant="outline"
-        className="h-10 w-full rounded-full"
-        disabled={disabled || isLoading}
-        onClick={handleClick}
-      >
+      {/* Custom styled background button (visual only) */}
+      <div className="border-input bg-background pointer-events-none absolute inset-0 flex h-10 w-full items-center justify-center rounded-full border">
         {isLoading ? (
           <Loader className="size-5 animate-spin" />
         ) : (
-          <>
+          <span className="flex items-center text-sm font-medium">
             <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
@@ -88,9 +47,28 @@ export function GoogleLoginButton({
               />
             </svg>
             Continue with Google
-          </>
+          </span>
         )}
-      </Button>
+      </div>
+
+      {/* Real Google Login button - transparent overlay so user clicks it directly */}
+      <div
+        className="absolute inset-0 flex items-center justify-center overflow-hidden [&_iframe]:!h-10 [&_iframe]:!w-full"
+        style={{
+          opacity: disabled || isLoading ? 0 : 0.01,
+          pointerEvents: disabled || isLoading ? 'none' : 'auto',
+        }}
+      >
+        <GoogleLogin
+          onSuccess={onSuccess}
+          onError={onError}
+          theme={theme === 'dark' ? 'filled_black' : 'outline'}
+          text="continue_with"
+          shape="rectangular"
+          width={400}
+          useOneTap={enableOneTap}
+        />
+      </div>
     </div>
   )
 }
