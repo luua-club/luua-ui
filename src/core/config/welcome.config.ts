@@ -50,7 +50,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       objectFit: 'object-top',
     },
     externalUrl: EXTERNAL_URLS.chromeExt,
-    sortOrderDesktop: 1,
+    sortOrderDesktop: 4,
     sortOrderMobile: 4,
   },
   {
@@ -65,7 +65,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       objectFit: 'object-top-left',
     },
     route: '/autopilot',
-    sortOrderDesktop: 2,
+    sortOrderDesktop: 3,
     sortOrderMobile: 3,
   },
   {
@@ -81,7 +81,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       objectFit: 'object-top-left',
     },
     route: '/preferences',
-    sortOrderDesktop: 3,
+    sortOrderDesktop: 2,
     sortOrderMobile: 2,
   },
   {
@@ -97,7 +97,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
       ratio: 'aspect-[3/2]',
       objectFit: 'object-top-left',
     },
-    sortOrderDesktop: 4,
+    sortOrderDesktop: 1,
     sortOrderMobile: 1,
   },
 ]
