@@ -144,6 +144,7 @@ function Bookmarks() {
             description={insp.additional_context ?? undefined}
             createdAt={insp.created_at}
             utilized={insp.utilized}
+            inspirationId={insp.id}
             isProcessing={deletingIds.has(insp.id)}
             onCreate={() => {
               // Navigate to create page with inspiration link and context to trigger AI generation

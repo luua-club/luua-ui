@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { Edit2, PencilRuler, Trash2 } from 'lucide-react'
 
@@ -21,6 +22,7 @@ interface LinkContentCardProps {
   onEdit?: () => void
   onCreate?: () => void
   utilized?: boolean
+  inspirationId?: string
 }
 
 function LinkContentCard({
@@ -32,6 +34,7 @@ function LinkContentCard({
   onDelete,
   onCreate,
   isProcessing = false,
+  inspirationId,
 }: LinkContentCardProps) {
   return (
     <Card
@@ -67,15 +70,30 @@ function LinkContentCard({
             {format(new Date(createdAt), 'PP')}
           </p>
 
-          <Badge
-            variant="default"
-            className={cn(
-              'rounded-sm border-slate-600 bg-slate-100 text-xs font-semibold text-slate-600 opacity-0 dark:border-slate-400 dark:bg-slate-800 dark:text-slate-400',
-              utilized && 'opacity-100'
-            )}
-          >
-            Drafted by Autopilot
-          </Badge>
+          {utilized && inspirationId ? (
+            <Link
+              to="/creation/drafts"
+              search={{ inspiration_id: inspirationId }}
+              className="inline-block"
+            >
+              <Badge
+                variant="default"
+                className="cursor-pointer rounded-sm border-slate-600 bg-slate-100 text-xs font-semibold text-slate-600 transition-opacity hover:opacity-80 dark:border-slate-400 dark:bg-slate-800 dark:text-slate-400"
+              >
+                Drafted by Autopilot
+              </Badge>
+            </Link>
+          ) : (
+            <Badge
+              variant="default"
+              className={cn(
+                'rounded-sm border-slate-600 bg-slate-100 text-xs font-semibold text-slate-600 opacity-0 dark:border-slate-400 dark:bg-slate-800 dark:text-slate-400',
+                utilized && 'opacity-100'
+              )}
+            >
+              Drafted by Autopilot
+            </Badge>
+          )}
         </div>
 
         {/** Actions */}
