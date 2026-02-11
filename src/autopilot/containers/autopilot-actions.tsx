@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { Box, CircleAlert, Loader, Settings2 } from 'lucide-react'
+import { Box, CircleAlert, Loader, Play, Settings2 } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { autopilotApi } from '@/core/api/autopilot.api'
@@ -11,6 +12,8 @@ import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { Switch } from '@/shared/ui/switch'
 import { cn } from '@/shared/utils'
+
+import TriggerAutopilotModal from './trigger-autopilot-modal'
 
 interface AutopilotActions {
   checked: boolean
@@ -31,6 +34,7 @@ function AutopilotActions({
   const queryClient = useQueryClient()
   const user = useUserState()
   const router = useRouter()
+  const [isTriggerModalOpen, setIsTriggerModalOpen] = useState(false)
 
   /**
    * Enable/Disable auto-gen
@@ -86,49 +90,76 @@ function AutopilotActions({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      {/* Edit button */}
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => setIsSettingsOpen(true)}
-        className="!text-sm"
-        disabled={!checked || isLoading || updateSettingsMutation.isPending}
-      >
-        <Settings2 className="size-3.5" />
-        Edit
-      </Button>
-
-      {/* Separator */}
-      <Separator orientation="vertical" className="!h-6" />
-
-      {/* Toggle */}
-      <div className="text-muted-foreground flex items-center gap-2">
-        <span className={cn('text-sm font-medium', checked && 'text-primary')}>
-          {checked ? 'Enabled' : 'Disabled'}
-        </span>
-
-        {isLoading || updateSettingsMutation.isPending ? (
-          <Loader className="size-4 animate-spin" />
-        ) : (
-          <Switch
-            className="cursor-pointer"
-            checked={checked}
-            onCheckedChange={next => {
-              // Optimistic update
-              setChecked(next)
-              updateSettingsMutation.mutate(getPayload(next), {
-                onError: () => {
-                  // Rollback UI on error
-                  setChecked(!next)
-                },
-              })
-            }}
-          />
+    <>
+      <div className="flex items-center gap-3">
+        {/* Trigger Now button - only visible when enabled and limit not reached */}
+        {checked && !limitReached && (
+          <>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => setIsTriggerModalOpen(true)}
+              className="!text-sm"
+              disabled={isLoading || updateSettingsMutation.isPending}
+            >
+              <Play className="size-3.5" />
+              Trigger Now
+            </Button>
+            <Separator orientation="vertical" className="!h-6" />
+          </>
         )}
+
+        {/* Edit button */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setIsSettingsOpen(true)}
+          className="!text-sm"
+          disabled={!checked || isLoading || updateSettingsMutation.isPending}
+        >
+          <Settings2 className="size-3.5" />
+          Edit
+        </Button>
+
+        {/* Separator */}
+        <Separator orientation="vertical" className="!h-6" />
+
+        {/* Toggle */}
+        <div className="text-muted-foreground flex items-center gap-2">
+          <span
+            className={cn('text-sm font-medium', checked && 'text-primary')}
+          >
+            {checked ? 'Enabled' : 'Disabled'}
+          </span>
+
+          {isLoading || updateSettingsMutation.isPending ? (
+            <Loader className="size-4 animate-spin" />
+          ) : (
+            <Switch
+              className="cursor-pointer"
+              checked={checked}
+              onCheckedChange={next => {
+                // Optimistic update
+                setChecked(next)
+                updateSettingsMutation.mutate(getPayload(next), {
+                  onError: () => {
+                    // Rollback UI on error
+                    setChecked(!next)
+                  },
+                })
+              }}
+            />
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Trigger Autopilot Modal */}
+      <TriggerAutopilotModal
+        open={isTriggerModalOpen}
+        onOpenChange={setIsTriggerModalOpen}
+      />
+    </>
   )
 }
 

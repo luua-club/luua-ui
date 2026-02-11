@@ -13,6 +13,10 @@ class AutopilotApi extends BaseApiService {
   async updateAutoPilotSettings(settings: Partial<AutopilotSettings>) {
     return this.post<AutopilotSettings>(settings)
   }
+
+  async triggerAutopilot(payload: { inspiration_id: string }) {
+    return this.post(payload, '/trigger')
+  }
 }
 
 export const autopilotApi = new AutopilotApi()
