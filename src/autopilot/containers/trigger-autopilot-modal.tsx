@@ -37,7 +37,7 @@ function TriggerAutopilotModal({
     queryKey: [QUERY_KEYS.inspirations, 'unutilized'],
     queryFn: async () => {
       const response = await inspirationApi.getInspirations({
-        limit: 100,
+        limit: 25,
         offset: 0,
       })
       return response.data.inspirations.filter(
