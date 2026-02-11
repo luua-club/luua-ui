@@ -123,7 +123,7 @@ function TriggerAutopilotModal({
                       />
                       <label
                         htmlFor={inspiration.id}
-                        className="flex-1 cursor-pointer"
+                        className="text-card-foreground flex-1 cursor-pointer"
                       >
                         <div className="font-medium">{inspiration.link}</div>
                         {inspiration.additional_context && (
