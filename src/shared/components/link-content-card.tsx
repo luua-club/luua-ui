@@ -15,9 +15,11 @@ import { cn } from '../utils'
 
 interface LinkContentCardProps {
   createdAt: string
+  title?: string
   description?: string
   isProcessing?: boolean
   link: string
+  additional_context?: string
   onDelete?: () => void
   onEdit?: () => void
   onCreate?: () => void
@@ -27,6 +29,7 @@ interface LinkContentCardProps {
 
 function LinkContentCard({
   link,
+  title,
   description,
   createdAt,
   utilized = false,
@@ -50,7 +53,7 @@ function LinkContentCard({
             rel="noopener noreferrer"
             className="text-primary line-clamp-2 max-w-full overflow-hidden text-sm break-words whitespace-normal underline-offset-4 hover:underline"
           >
-            {link}
+            {title || link}
           </a>
         </CardTitle>
       </CardHeader>

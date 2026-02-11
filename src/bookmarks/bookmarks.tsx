@@ -141,7 +141,8 @@ function Bookmarks() {
           <LinkContentCard
             key={insp.id}
             link={insp.link}
-            description={insp.additional_context ?? undefined}
+            title={insp.title ?? undefined}
+            description={insp.description ?? undefined}
             createdAt={insp.created_at}
             utilized={insp.utilized}
             inspirationId={insp.id}
