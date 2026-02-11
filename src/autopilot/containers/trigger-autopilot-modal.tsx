@@ -125,10 +125,14 @@ function TriggerAutopilotModal({
                         htmlFor={inspiration.id}
                         className="text-card-foreground flex-1 cursor-pointer"
                       >
-                        <div className="font-medium">{inspiration.link}</div>
-                        {inspiration.additional_context && (
+                        <div className="font-medium">
+                          {inspiration.title || inspiration.link}
+                        </div>
+                        {inspiration.description && (
                           <div className="text-muted-foreground mt-1 text-sm">
-                            {inspiration.additional_context}
+                            {inspiration.description.length > 150
+                              ? `${inspiration.description.slice(0, 150)}...`
+                              : inspiration.description}
                           </div>
                         )}
                         <div className="text-muted-foreground mt-2 text-xs">
