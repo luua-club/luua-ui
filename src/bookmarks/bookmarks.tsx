@@ -141,9 +141,13 @@ function Bookmarks() {
           <LinkContentCard
             key={insp.id}
             link={insp.link}
-            description={insp.additional_context ?? undefined}
+            title={insp.title ?? undefined}
+            description={insp.description ?? undefined}
+            additionalContext={insp.additional_context ?? undefined}
+            icon={insp.icon ?? undefined}
             createdAt={insp.created_at}
             utilized={insp.utilized}
+            inspirationId={insp.id}
             isProcessing={deletingIds.has(insp.id)}
             onCreate={() => {
               // Navigate to create page with inspiration link and context to trigger AI generation

@@ -5,6 +5,9 @@ interface Inspiration {
   link: string
   additional_context: string | null
   utilized: boolean
+  title: string | null
+  description: string | null
+  icon: string | null
   created_at: string
   updated_at: string
 }
