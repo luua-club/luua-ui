@@ -143,6 +143,8 @@ function Bookmarks() {
             link={insp.link}
             title={insp.title ?? undefined}
             description={insp.description ?? undefined}
+            additionalContext={insp.additional_context ?? undefined}
+            icon={insp.icon ?? undefined}
             createdAt={insp.created_at}
             utilized={insp.utilized}
             inspirationId={insp.id}

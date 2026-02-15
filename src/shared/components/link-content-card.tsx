@@ -1,25 +1,25 @@
 import { Link } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { Edit2, PencilRuler, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+
+import luuaIconLogo from '@/assets/logos/luua-icon-logo.svg'
 
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '../ui/card'
+import { Card, CardContent, CardFooter, CardHeader } from '../ui/card'
+import { Skeleton } from '../ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { cn } from '../utils'
 
 interface LinkContentCardProps {
   createdAt: string
   title?: string
   description?: string
+  additionalContext?: string
+  icon?: string
   isProcessing?: boolean
   link: string
-  additional_context?: string
   onDelete?: () => void
   onEdit?: () => void
   onCreate?: () => void
@@ -27,10 +27,68 @@ interface LinkContentCardProps {
   inspirationId?: string
 }
 
+function SourceProfile({
+  icon,
+  title,
+  description,
+  link,
+}: {
+  icon?: string
+  title?: string
+  description?: string
+  link: string
+}) {
+  const [imgLoaded, setImgLoaded] = useState(false)
+
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex min-w-0 items-start gap-3 rounded-md border border-dashed p-3"
+    >
+      <div className="size-6 shrink-0 overflow-hidden rounded-sm">
+        {!imgLoaded && <Skeleton className="size-full rounded-sm" />}
+        <img
+          src={icon || luuaIconLogo}
+          alt={title || 'icon'}
+          className={cn(
+            'size-full object-cover object-center',
+            !imgLoaded && 'hidden'
+          )}
+          onLoad={() => setImgLoaded(true)}
+          onError={e => {
+            e.currentTarget.src = luuaIconLogo
+          }}
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-primary -mt-1 line-clamp-2 text-sm font-semibold break-words underline-offset-4 hover:underline">
+          {title || link}
+        </p>
+        {description && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-muted-foreground mt-0.5 line-clamp-1 cursor-default text-xs break-words">
+                {description}
+              </p>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-72 text-wrap">
+              {description}
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    </a>
+  )
+}
+
 function LinkContentCard({
   link,
   title,
   description,
+  additionalContext,
+  icon,
   createdAt,
   utilized = false,
   onEdit,
@@ -43,26 +101,25 @@ function LinkContentCard({
     <Card
       className={`flex flex-col gap-2 rounded-sm p-0 shadow-none ${isProcessing ? 'opacity-50' : ''} relative`}
     >
-      {/* Header */}
-      <CardHeader className="flex items-start justify-between gap-2 px-4 pt-4">
-        {/* Title */}
-        <CardTitle className="min-w-0 flex-1">
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary line-clamp-2 max-w-full overflow-hidden text-sm break-words whitespace-normal underline-offset-4 hover:underline"
-          >
-            {title || link}
-          </a>
-        </CardTitle>
+      {/* Header: Source profile */}
+      <CardHeader className="px-4 pt-4">
+        <SourceProfile
+          icon={icon}
+          title={title}
+          description={description}
+          link={link}
+        />
       </CardHeader>
 
-      {/* Content */}
+      {/* Content: Additional Context */}
       <CardContent className="line-clamp-3 flex-1 px-4">
-        {/* Additional Context */}
-        <p className="text-muted-foreground text-sm break-words">
-          {description}
+        <p
+          className={cn(
+            'text-muted-foreground text-sm break-words',
+            !additionalContext && 'italic'
+          )}
+        >
+          {additionalContext || 'No additional context'}
         </p>
       </CardContent>
 
