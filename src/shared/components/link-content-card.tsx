@@ -4,6 +4,7 @@ import { Edit2, PencilRuler, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import luuaIconLogo from '@/assets/logos/luua-icon-logo.svg'
+import luuaWhiteIconLogo from '@/assets/logos/luua-white-icon-logo.svg'
 
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -39,6 +40,9 @@ function SourceProfile({
   link: string
 }) {
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [imgError, setImgError] = useState(false)
+
+  const showFallback = !icon || imgError
 
   return (
     <a
@@ -48,19 +52,34 @@ function SourceProfile({
       className="flex min-w-0 items-start gap-3 rounded-md border border-dashed p-3"
     >
       <div className="size-6 shrink-0 overflow-hidden rounded-sm">
-        {!imgLoaded && <Skeleton className="size-full rounded-sm" />}
-        <img
-          src={icon || luuaIconLogo}
-          alt={title || 'icon'}
-          className={cn(
-            'size-full object-cover object-center',
-            !imgLoaded && 'hidden'
-          )}
-          onLoad={() => setImgLoaded(true)}
-          onError={e => {
-            e.currentTarget.src = luuaIconLogo
-          }}
-        />
+        {showFallback ? (
+          <>
+            <img
+              src={luuaIconLogo}
+              alt="Luua"
+              className="size-full object-cover object-center dark:hidden"
+            />
+            <img
+              src={luuaWhiteIconLogo}
+              alt="Luua"
+              className="hidden size-full object-cover object-center dark:block"
+            />
+          </>
+        ) : (
+          <>
+            {!imgLoaded && <Skeleton className="size-full rounded-sm" />}
+            <img
+              src={icon}
+              alt={title || 'icon'}
+              className={cn(
+                'size-full object-cover object-center',
+                !imgLoaded && 'hidden'
+              )}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+            />
+          </>
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-primary -mt-1 line-clamp-2 text-sm font-semibold break-words underline-offset-4 hover:underline">
