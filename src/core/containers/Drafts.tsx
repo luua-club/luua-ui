@@ -37,9 +37,10 @@ import { useDraftList } from '../hooks/draft-list.hook'
 
 interface DraftsProps {
   showOnlyAutoPilot?: boolean
+  inspirationId?: string
 }
 
-const Drafts = ({ showOnlyAutoPilot = false }: DraftsProps) => {
+const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
   // --- Hooks ---
   const {
     dateRange,
@@ -62,7 +63,7 @@ const Drafts = ({ showOnlyAutoPilot = false }: DraftsProps) => {
     pendingDeletePost,
     deletingIds,
     isDeleting,
-  } = useDraftList(showOnlyAutoPilot)
+  } = useDraftList(showOnlyAutoPilot, inspirationId)
   const navigate = useNavigate()
 
   // --- Handlers ---

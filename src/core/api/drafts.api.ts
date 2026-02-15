@@ -25,6 +25,7 @@ class DraftsApi extends BaseApiService {
       limit: number
       offset: number
       autopilot?: boolean
+      inspiration_id?: string
     } = {
       from,
       to,
@@ -35,6 +36,11 @@ class DraftsApi extends BaseApiService {
 
     if (autopilot) {
       payload['autopilot'] = true
+    }
+
+    // Add inspiration_id if provided in request
+    if ('inspiration_id' in request && request.inspiration_id) {
+      payload['inspiration_id'] = request.inspiration_id
     }
 
     return this.get<IDraftListResponse>(undefined, {

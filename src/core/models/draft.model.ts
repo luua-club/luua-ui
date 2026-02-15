@@ -28,6 +28,7 @@ export interface IDraftListRequest extends Omit<IPagination, 'total'> {
   sort: 'asc' | 'desc'
   from?: string
   to?: string
+  inspiration_id?: string
 }
 
 export interface IDraftListResponse extends IPagination {

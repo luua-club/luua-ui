@@ -8,7 +8,10 @@ import { type ApiResponse } from '@/core/models/api.model'
 import { type IDraftListResponse } from '@/core/models/draft.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 
-export function useDraftList(showOnlyAutoGen: boolean = false) {
+export function useDraftList(
+  showOnlyAutoGen: boolean = false,
+  inspirationId?: string
+) {
   // --- Hooks ---
   const queryClient = useQueryClient()
 
@@ -53,6 +56,7 @@ export function useDraftList(showOnlyAutoGen: boolean = false) {
       offset,
       sortDir,
       showOnlyAutoGen,
+      inspirationId,
     ],
     queryFn: () =>
       draftsApi.getDrafts(
@@ -62,6 +66,7 @@ export function useDraftList(showOnlyAutoGen: boolean = false) {
           sort: sortDir,
           from: from,
           to: to,
+          inspiration_id: inspirationId,
         },
         showOnlyAutoGen
       ),
