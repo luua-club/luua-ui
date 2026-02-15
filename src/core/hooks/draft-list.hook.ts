@@ -69,6 +69,7 @@ export function useDraftList(
           sort: sortDir,
           from: from,
           to: to,
+          inspiration_id: inspirationId,
         },
         showOnlyAutoGen
       ),
