@@ -1,4 +1,4 @@
-import { InspirationResponse } from '../models/inspiration.model'
+import { Inspiration, InspirationResponse } from '../models/inspiration.model'
 import { BaseApiService } from './base.api'
 
 class InspirationApi extends BaseApiService {
@@ -49,6 +49,16 @@ class InspirationApi extends BaseApiService {
     req: { link: string; additional_context: string | null }
   ) {
     return this.patch(req, `/${id}`)
+  }
+
+  /**
+   * Get a single inspiration by ID
+   *
+   * @param id - Inspiration ID
+   * @returns Promise<Inspiration>
+   */
+  async getInspiration(id: string, signal?: AbortSignal) {
+    return this.get<Inspiration>(`/${id}`, { signal })
   }
 
   /**

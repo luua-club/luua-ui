@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
+  Bookmark,
   Bot,
   Calendar,
   CircleSlash,
@@ -13,7 +14,9 @@ import {
   Trash,
   Trash2,
 } from 'lucide-react'
+import { useState } from 'react'
 
+import BookmarkPreviewModal from '@/core/components/bookmark-preview-modal'
 import Post from '@/core/components/Post'
 import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
@@ -41,6 +44,12 @@ interface DraftsProps {
 }
 
 const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
+  // --- Bookmark preview modal state ---
+  const [bookmarkModalOpen, setBookmarkModalOpen] = useState(false)
+  const [bookmarkInspirationId, setBookmarkInspirationId] = useState<
+    string | null
+  >(null)
+
   // --- Hooks ---
   const {
     dateRange,
@@ -76,7 +85,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
   return (
     <div
       className={cn(
-        'm-auto flex max-w-4xl flex-col p-5',
+        'm-auto flex max-w-4xl flex-col p-3 sm:p-5',
         showOnlyAutoPilot && 'p-0'
       )}
     >
@@ -123,11 +132,11 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                   key={draft.id}
                 >
                   {/* --- Draft Header --- */}
-                  <div className="mb-2 flex items-center justify-between">
+                  <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     {/* --- Draft Date --- */}
-                    <p
+                    <div
                       title={new Date(draft.updated_at).toString()}
-                      className="flex items-center gap-2 text-xs font-semibold sm:text-base"
+                      className="flex flex-wrap items-center gap-2 text-xs font-semibold sm:text-sm"
                     >
                       {format(
                         new Date(draft.updated_at),
@@ -152,7 +161,30 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                           </TooltipContent>
                         </Tooltip>
                       )}
-                    </p>
+                      {draft.inspiration_ids &&
+                        draft.inspiration_ids.length > 0 && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant="outline"
+                                className="cursor-pointer rounded-xs border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                                onClick={() => {
+                                  setBookmarkInspirationId(
+                                    draft.inspiration_ids![0]
+                                  )
+                                  setBookmarkModalOpen(true)
+                                }}
+                              >
+                                <Bookmark className="!size-3.5" />
+                                View Bookmark
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <span>View source bookmark</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                    </div>
 
                     {/* --- Draft Actions --- */}
                     <div className="flex items-center gap-2">
@@ -169,7 +201,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                         }
                       >
                         <PencilRuler className="size-4" />
-                        Edit
+                        <span className="hidden sm:inline">Edit</span>
                       </Button>
 
                       <DropdownMenu>
@@ -223,7 +255,10 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
 
                   {/* --- Draft Posts --- */}
                   <div
-                    className={`mt-4 grid grid-cols-1 gap-4 lg:grid-cols-${draft.posts.length > 1 ? '2' : '1'}`}
+                    className={cn(
+                      'mt-4 grid grid-cols-1 gap-4',
+                      draft.posts.length > 1 && 'md:grid-cols-2'
+                    )}
                   >
                     {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft, postId =>
                       openDeletePost(draft.id, postId)
@@ -275,6 +310,13 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
           }
           closeDelete()
         }}
+      />
+
+      {/* --- Bookmark Preview Modal --- */}
+      <BookmarkPreviewModal
+        open={bookmarkModalOpen}
+        onOpenChange={setBookmarkModalOpen}
+        inspirationId={bookmarkInspirationId ?? ''}
       />
     </div>
   )

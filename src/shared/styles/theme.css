@@ -97,6 +97,17 @@
     }
   }
 
+  --animate-shimmer: shimmer 1.5s infinite linear;
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
   --spacing-nav-height: 3.5rem;
 }
 
