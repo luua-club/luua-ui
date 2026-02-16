@@ -1,6 +1,6 @@
 import { IPagination } from './pagination.model'
 
-interface Inspiration {
+export interface Inspiration {
   id: string
   link: string
   additional_context: string | null

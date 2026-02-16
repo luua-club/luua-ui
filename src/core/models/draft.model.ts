@@ -11,6 +11,7 @@ export type DraftItem = {
   id: string
   posts: PostItem[]
   autopilot?: boolean
+  inspiration_ids?: string[]
   created_at: string
   updated_at: string
 }
