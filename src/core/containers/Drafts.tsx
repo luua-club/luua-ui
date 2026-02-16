@@ -50,6 +50,12 @@ interface DraftsProps {
 }
 
 const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
+  // --- Bookmark preview modal state ---
+  const [bookmarkModalOpen, setBookmarkModalOpen] = useState(false)
+  const [bookmarkInspirationId, setBookmarkInspirationId] = useState<
+    string | null
+  >(null)
+
   // --- Hooks ---
   const {
     dateRange,
