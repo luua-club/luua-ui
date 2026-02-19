@@ -1,6 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { Plus, X } from 'lucide-react'
 
+import { useAppDispatch } from '@/core/hooks/global-state.hook'
+import { clearStatusFilter } from '@/core/store/posts-view-slice'
 import { useCalendar } from '@/posts-view/contexts/calendar-context'
 import { IEvent } from '@/posts-view/models/interfaces'
 import { Button } from '@/shared/ui/button'
@@ -11,6 +13,7 @@ import { StatusFilter } from './status-filter'
 import { TodayButton } from './today-button'
 
 function ClearFiltersButton() {
+  const dispatch = useAppDispatch()
   const {
     selectedStatus,
     selectedChannel,
@@ -29,6 +32,7 @@ function ClearFiltersButton() {
       onClick={() => {
         setSelectedStatus('all')
         setSelectedChannel('all')
+        dispatch(clearStatusFilter())
       }}
     >
       <X className="size-2.5" />

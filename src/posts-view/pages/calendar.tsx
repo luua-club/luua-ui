@@ -2,12 +2,17 @@ import { createLazyRoute } from '@tanstack/react-router'
 import { Loader } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
+import { useAppSelector } from '@/core/hooks/global-state.hook'
+
 import { ClientContainer } from '../components/client-container'
 import { CalendarProvider, useCalendar } from '../contexts/calendar-context'
 import useCalendarData from '../hooks/use-calendar-data.hook'
 
 function CalendarContent() {
-  const { selectedDate, setLocalEvents } = useCalendar()
+  const { selectedDate, setLocalEvents, setSelectedStatus } = useCalendar()
+  const statusFilter = useAppSelector(
+    state => state.postsViewState.statusFilter
+  )
 
   const { events, isLoading } = useCalendarData({
     currentDate: selectedDate,
@@ -22,6 +27,10 @@ function CalendarContent() {
       setLocalEvents(events)
     }
   }, [events, setLocalEvents])
+
+  useEffect(() => {
+    setSelectedStatus(statusFilter)
+  }, [statusFilter, setSelectedStatus])
 
   if (isLoading && events.length === 0) {
     return (
@@ -43,7 +52,7 @@ function Calendar() {
 }
 
 //--- Lazy Route ---
-export const Route = createLazyRoute('/posts-view')({
+export const Route = createLazyRoute('/posts-view/calendar')({
   component: Calendar,
 })
 

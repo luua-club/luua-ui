@@ -13,7 +13,7 @@ interface IAppSidebarUngroupedProps {
 
 function AppSidebarUngrouped({ ungroupedItems }: IAppSidebarUngroupedProps) {
   return (
-    <SidebarGroup>
+    <SidebarGroup className="py-0">
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           {ungroupedItems.map(item => (
