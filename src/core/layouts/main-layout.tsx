@@ -3,9 +3,7 @@ import { useRef } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar/sidebar'
 import GlobalLoader from '@/shared/components/global-loader'
-import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
-
-import Nav from '../components/navbar'
+import { SidebarProvider } from '@/shared/ui/sidebar'
 
 function MainLayout() {
   return (
@@ -18,7 +16,6 @@ function MainLayout() {
 // This component is now inside SidebarProvider, so it can use useSidebar
 const SidebarContent = () => {
   // --- Hooks ---
-  const { toggleSidebar } = useSidebar()
   const routerState = useRouterState()
 
   // --- Refs ---
