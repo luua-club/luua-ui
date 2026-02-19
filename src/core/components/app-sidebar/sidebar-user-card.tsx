@@ -63,7 +63,10 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               {/* Avatar */}
               <Avatar className="h-8 w-8 rounded-full">
-                <AvatarImage src={user.profile_image} alt={user.name} />
+                <AvatarImage
+                  src={user.profile_image ?? undefined}
+                  alt={user.name}
+                />
                 <AvatarFallback className="rounded-lg bg-amber-400 font-medium text-black">
                   {extractUserInitial(user.name)}
                 </AvatarFallback>
@@ -191,7 +194,7 @@ const UserCardDropdownTrigger = ({ user }: UserCardDropdownProps) => {
       >
         {/** Avatar */}
         <Avatar className="h-8 w-8 rounded-full">
-          <AvatarImage src={user.profile_image} alt={user.name} />
+          <AvatarImage src={user.profile_image ?? undefined} alt={user.name} />
           <AvatarFallback className="rounded-lg bg-amber-400 font-medium text-black">
             {extractUserInitial(user.name)}
           </AvatarFallback>

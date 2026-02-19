@@ -1,0 +1,7 @@
+@utility bg-calendar-disabled-hour {
+  background-image: repeating-linear-gradient(
+    -60deg,
+    var(--color-border) 0 0.5px,
+    transparent 0.5px 8px
+  );
+}

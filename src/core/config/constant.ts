@@ -80,6 +80,7 @@ export const QUERY_KEYS = {
   inspirations: 'inspirations',
   subscriptionDetails: 'subscription-details',
   usageSummary: 'usage-summary',
+  calendarEvents: 'calendar-events',
 }
 
 /**
