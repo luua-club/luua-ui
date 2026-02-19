@@ -1,7 +1,7 @@
 import { createLazyRoute } from '@tanstack/react-router'
 
 function PostListView() {
-  return <h1>Post List View</h1>
+  return <h1>WIP</h1>
 }
 
 export const Route = createLazyRoute('/posts-view/list')({

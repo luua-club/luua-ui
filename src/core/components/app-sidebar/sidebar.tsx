@@ -37,9 +37,6 @@ function AppSidebar() {
 
         {/* 5. Automation */}
         <AppSidebarAutomation />
-
-        {/* 4. Styles */}
-        <AppSidebarUngrouped ungroupedItems={[stylesItem]} />
       </SidebarContent>
 
       {/* Footer */}
