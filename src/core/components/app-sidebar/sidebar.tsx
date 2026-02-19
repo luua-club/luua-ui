@@ -14,7 +14,6 @@ import AppSidebarHeader from './sidebar-header'
 import AppSidebarUngrouped from './sidebar-ungrouped'
 
 const welcomeItem = ungroupedItems.find(item => item.url === '/welcome')!
-const stylesItem = ungroupedItems.find(item => item.url === '/preferences')!
 
 function AppSidebar() {
   return (
