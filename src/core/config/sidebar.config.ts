@@ -4,6 +4,7 @@ import {
   Gauge,
   House,
   LucideCalendar,
+  LucideLayoutDashboard,
   Network,
   Paintbrush,
 } from 'lucide-react'
@@ -32,7 +33,12 @@ export const ungroupedItems: ISidebarItem[] = [
     icon: Network,
   },
   {
-    title: 'Styles',
+    title: 'All Posts',
+    url: '/posts-view',
+    icon: LucideLayoutDashboard,
+  },
+  {
+    title: 'Your Styles',
     url: '/preferences',
     icon: Paintbrush,
   },
