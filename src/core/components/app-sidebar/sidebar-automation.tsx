@@ -37,7 +37,7 @@ function AppSidebarAutomation() {
   }
 
   return (
-    <SidebarGroup className="py-0">
+    <SidebarGroup className="py-0 pt-2">
       <SidebarGroupContent>
         <SidebarMenu>
           <Collapsible

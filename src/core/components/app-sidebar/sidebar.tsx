@@ -13,7 +13,6 @@ import AppSidebarFooter from './sidebar-footer'
 import AppSidebarHeader from './sidebar-header'
 import AppSidebarUngrouped from './sidebar-ungrouped'
 
-const welcomeItem = ungroupedItems.find(item => item.url === '/welcome')!
 const dashboardItem = ungroupedItems.find(item => item.url === '/creation')!
 
 function AppSidebar() {
@@ -26,11 +25,11 @@ function AppSidebar() {
 
       {/* Content */}
       <SidebarContent>
-        {/* 1. Welcome */}
-        <AppSidebarUngrouped ungroupedItems={[welcomeItem, dashboardItem]} />
-
         {/* 2. Create Box */}
         <AppSidebarCreateBox />
+
+        {/* 1. Welcome */}
+        <AppSidebarUngrouped ungroupedItems={[dashboardItem]} />
 
         {/* 3. All Posts */}
         <AppSidebarAllPosts />

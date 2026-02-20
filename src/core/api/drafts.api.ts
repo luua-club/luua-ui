@@ -18,7 +18,10 @@ class DraftsApi extends BaseApiService {
   }
 
   async renameDraft(data: IDraftRenameRequest) {
-    return this.post<IDraftResponse>(data)
+    return this.patch<IDraftResponse, Pick<IDraftRenameRequest, 'name'>>(
+      { name: data.name },
+      `${data.id}/metadata`
+    )
   }
 
   async getDrafts(request: IDraftListRequest, autopilot = false) {

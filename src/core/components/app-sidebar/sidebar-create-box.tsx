@@ -1,9 +1,7 @@
-import { Link } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { FolderClosed, Plus } from 'lucide-react'
 
-import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { ISidebarItem } from '@/core/models/sidebar.model'
-import { creationTabsActions } from '@/core/store/creation-tabs-slice'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -24,32 +22,32 @@ const savedWorkItem: ISidebarItem = {
 
 function AppSidebarCreateBox() {
   const { isMobile, setOpenMobile } = useSidebar()
-  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const handleMobileClose = () => {
     if (isMobile) setOpenMobile(false)
   }
 
   const handleCreateClick = () => {
-    dispatch(creationTabsActions.openUntitled())
+    navigate({ to: '/creation/create' })
     handleMobileClose()
   }
 
   return (
-    <SidebarGroup className="mt-2 mb-4 border-t-2 border-b-2 border-dotted pt-2">
+    <SidebarGroup className="border-b-1 pt-2">
       <SidebarGroupLabel className="sr-only">Create</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-1">
         <SidebarMenu className="gap-2">
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Create Post"
-              asChild
-              className="bg-accent-foreground/5 text-primary font-medium"
+              className="cursor-pointer rounded-sm bg-blue-700/85 py-2 font-medium text-white shadow-xs backdrop-blur-sm hover:bg-blue-700/95 hover:text-white active:bg-blue-800 active:text-white"
+              onClick={handleCreateClick}
             >
-              <Link to={'/creation/create'} onClick={handleCreateClick}>
-                <Plus />
-                <span className="transition-opacity duration-200">Create</span>
-              </Link>
+              <Plus />
+              <span className="transition-opacity duration-200">
+                Create Post
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <AppSideBarItem item={savedWorkItem} />

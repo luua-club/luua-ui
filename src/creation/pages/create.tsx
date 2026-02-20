@@ -26,13 +26,11 @@ import {
   youtubePrompts,
 } from '@/core/config/example-prompts.config'
 import { queryClient } from '@/core/config/global.config'
-import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { WithOptional } from '@/core/models/common.model'
 import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
 import { MediaObject } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
-import { creationTabsActions } from '@/core/store/creation-tabs-slice'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import PromptChip from '@/shared/components/prompt-chip'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
@@ -48,7 +46,6 @@ const SOCIAL_TABS: channelType[] = [...SOCIAL_PLATFORM.map(s => s.name)]
 
 function Create() {
   const user = useUserState()
-  const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<channelType>(SOCIAL_TABS[0])
   const [postDrafts, setPostDrafts] = useState<postDraftsType>(
@@ -72,7 +69,7 @@ function Create() {
     return hasLinkedInContent || hasTwitterContent
   }, [postDrafts])
 
-  const isUntitledDirty = !draftId && hasAnyContent
+  const isUnsavedDraftDirty = !draftId && hasAnyContent
 
   const withBypassedGuard = (fn: () => void) => {
     bypassGuardRef.current = true
@@ -84,19 +81,23 @@ function Create() {
 
   const blocker = useBlocker({
     withResolver: true,
-    enableBeforeUnload: () => isUntitledDirty,
+    enableBeforeUnload: () => isUnsavedDraftDirty,
     shouldBlockFn: ({ current, next }) => {
-      if (bypassGuardRef.current || !isUntitledDirty) return false
+      if (bypassGuardRef.current || !isUnsavedDraftDirty) return false
 
       const currentSearch = current.search as { draftId?: string }
       const nextSearch = next.search as { draftId?: string }
-
-      const isCurrentUntitledCreate =
+      const isCurrentUnsavedRoute =
         current.pathname === '/creation/create' && !currentSearch.draftId
-      const isNextUntitledCreate =
+
+      if (!isCurrentUnsavedRoute) {
+        return false
+      }
+
+      const isSameUnsavedRoute =
         next.pathname === '/creation/create' && !nextSearch.draftId
 
-      return isCurrentUntitledCreate && !isNextUntitledCreate
+      return !isSameUnsavedRoute
     },
   })
 
@@ -150,16 +151,6 @@ function Create() {
       )
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
-      dispatch(
-        creationTabsActions.openSavedDraft({
-          id: newDraftId,
-          name: response.data.draft.name,
-        })
-      )
-      if (!draftId) {
-        dispatch(creationTabsActions.closeTab('untitled'))
-      }
-
       if (variables?.callback && typeof variables.callback === 'function') {
         withBypassedGuard(() => variables.callback?.(newDraftId))
       } else {
@@ -179,17 +170,9 @@ function Create() {
   })
 
   useEffect(() => {
-    if (!draftId) {
-      setPostDrafts({} as postDraftsType)
-      return
-    }
-
-    dispatch(
-      creationTabsActions.openSavedDraft({
-        id: draftId,
-      })
-    )
-  }, [draftId, dispatch])
+    if (draftId) return
+    setPostDrafts({} as postDraftsType)
+  }, [draftId])
 
   useEffect(() => {
     if (!draftQuery.data) {
@@ -201,17 +184,8 @@ function Create() {
       nextDrafts[p.channel] = p
     })
 
-    if (draftId) {
-      dispatch(
-        creationTabsActions.openSavedDraft({
-          id: draftId,
-          name: draftQuery.data.name,
-        })
-      )
-    }
-
     setPostDrafts(nextDrafts)
-  }, [draftQuery.data, draftId, dispatch])
+  }, [draftQuery.data, draftId])
 
   useEffect(() => {
     if (!draftQuery.isError) return
@@ -221,29 +195,38 @@ function Create() {
       toast.error('Something went wrong')
     }
 
-    dispatch(creationTabsActions.openUntitled())
-    navigate({ to: '/creation/create', replace: true })
-  }, [draftQuery.isError, draftQuery.error, dispatch, navigate])
+    setPostDrafts({} as postDraftsType)
+    withBypassedGuard(() => {
+      navigate({
+        to: '/creation/create',
+        replace: true,
+      })
+    })
+  }, [draftQuery.isError, draftQuery.error, navigate])
 
   const handleContentChange = useCallback((val: string, name: channelType) => {
-    setPostDrafts(prev => ({
-      ...prev,
-      [name]: {
-        ...(prev[name] ?? { channel: name }),
-        content: val,
-      },
-    }))
+    setPostDrafts(prev => {
+      return {
+        ...prev,
+        [name]: {
+          ...(prev[name] ?? { channel: name }),
+          content: val,
+        },
+      }
+    })
   }, [])
 
   const handleImagesChange = useCallback(
     (images: MediaObject[], name: channelType) => {
-      setPostDrafts(prev => ({
-        ...prev,
-        [name]: {
-          ...(prev[name] ?? { channel: name }),
-          attached_media: images,
-        },
-      }))
+      setPostDrafts(prev => {
+        return {
+          ...prev,
+          [name]: {
+            ...(prev[name] ?? { channel: name }),
+            attached_media: images,
+          },
+        }
+      })
     },
     []
   )

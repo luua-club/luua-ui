@@ -7,10 +7,8 @@ import { toast } from 'sonner'
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
-import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { type DraftItem } from '@/core/models/draft.model'
 import { type channelType } from '@/core/models/social.model'
-import { creationTabsActions } from '@/core/store/creation-tabs-slice'
 import RenameDraftPopover from '@/creation/components/rename-draft-popover'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardFooter } from '@/shared/ui/card'
@@ -171,7 +169,6 @@ function DraftCardSkeleton() {
 // ---------------------------------------------------------------------------
 function CreationLanding() {
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
 
   const { data, isPending } = useQuery({
     queryKey: [QUERY_KEYS.drafts, 'landing', 4],
@@ -188,12 +185,6 @@ function CreationLanding() {
         name: payload.name,
       }),
     onSuccess: (_response, variables) => {
-      dispatch(
-        creationTabsActions.renameSavedDraft({
-          id: variables.id,
-          name: variables.name,
-        })
-      )
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.draft, variables.id],
@@ -206,18 +197,10 @@ function CreationLanding() {
   })
 
   const handleDraftClick = (draftId: string) => {
-    const selected = drafts.find(d => d.id === draftId)
-    dispatch(
-      creationTabsActions.openSavedDraft({
-        id: draftId,
-        name: selected?.name,
-      })
-    )
     navigate({ to: '/creation/create', search: { draftId } })
   }
 
   const handleNewPost = () => {
-    dispatch(creationTabsActions.openUntitled())
     navigate({ to: '/creation/create' })
   }
 
