@@ -65,6 +65,9 @@ export default defineConfig({
           if (id.includes('/src/creation/')) {
             return 'route-creation'
           }
+          if (id.includes('/src/drafts/')) {
+            return 'route-drafts'
+          }
           if (id.includes('/src/autopilot/')) {
             return 'route-autopilot'
           }

@@ -1,6 +1,6 @@
 import { createLazyRoute, useSearch } from '@tanstack/react-router'
 
-import DraftsContainer from '../../core/containers/Drafts'
+import DraftsContainer from '@/core/containers/Drafts'
 
 const Drafts = () => {
   const search = useSearch({ from: '/creation/drafts' })
@@ -9,7 +9,7 @@ const Drafts = () => {
   return <DraftsContainer inspirationId={inspirationId} />
 }
 
-export const Route = createLazyRoute('/creation/drafts')({
+export const Route = createLazyRoute('/drafts')({
   component: Drafts,
 })
 

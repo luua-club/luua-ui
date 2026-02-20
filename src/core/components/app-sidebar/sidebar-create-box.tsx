@@ -1,7 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { FolderClosed, Plus } from 'lucide-react'
 
+import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { ISidebarItem } from '@/core/models/sidebar.model'
+import { creationTabsActions } from '@/core/store/creation-tabs-slice'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -16,15 +18,21 @@ import AppSideBarItem from './sidebar-item'
 
 const savedWorkItem: ISidebarItem = {
   title: 'Saved Work',
-  url: '/creation/drafts',
+  url: '/drafts',
   icon: FolderClosed,
 }
 
 function AppSidebarCreateBox() {
   const { isMobile, setOpenMobile } = useSidebar()
+  const dispatch = useAppDispatch()
 
   const handleMobileClose = () => {
     if (isMobile) setOpenMobile(false)
+  }
+
+  const handleCreateClick = () => {
+    dispatch(creationTabsActions.openUntitled())
+    handleMobileClose()
   }
 
   return (
@@ -38,11 +46,9 @@ function AppSidebarCreateBox() {
               asChild
               className="bg-accent-foreground/5 text-primary font-medium"
             >
-              <Link to={'/creation/create'} onClick={handleMobileClose}>
+              <Link to={'/creation/create'} onClick={handleCreateClick}>
                 <Plus />
-                <span className="transition-opacity duration-200">
-                  Create Post
-                </span>
+                <span className="transition-opacity duration-200">Create</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

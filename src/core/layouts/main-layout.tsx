@@ -38,10 +38,11 @@ const SidebarContent = () => {
   return (
     <>
       <AppSidebar />
-      <div className="w-full">
+      <div className="min-w-0 flex-1 overflow-x-hidden">
         {/* <Nav handleSidebar={toggleSidebar} /> */}
-        <div className="h-4"></div>
-        <main>{shouldShowLoader ? <GlobalLoader /> : <Outlet />}</main>
+        <main className="min-h-screen">
+          {shouldShowLoader ? <GlobalLoader /> : <Outlet />}
+        </main>
       </div>
     </>
   )
