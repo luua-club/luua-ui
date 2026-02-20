@@ -85,7 +85,7 @@ function DraftCard({
       <Separator />
       <CardFooter className="bg-card gap-2 px-3 py-2">
         <StackedPlatformIcons channels={channels} />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-center justify-between">
             <p className="text-foreground truncate text-xs leading-tight font-medium">
               {draft.name || 'Untitled'}
@@ -207,7 +207,7 @@ function CreationLanding() {
   return (
     <div className="bg-accent/60 min-h-screen pt-8">
       <div className="mx-auto max-w-5xl px-6">
-        <h1 className="mb-4 flex gap-2 text-sm font-medium">
+        <h1 className="mb-4 flex gap-2 text-sm font-semibold">
           <FolderEdit className="size-5" /> Pick Up Where You Left Off
         </h1>
 
@@ -239,11 +239,13 @@ function CreationLanding() {
           </p>
         )}
 
-        <div className="flex justify-end">
-          <Button variant={'link'} className="text-xs" asChild>
-            <Link to="/drafts">View all</Link>
-          </Button>
-        </div>
+        {drafts.length >= 4 && (
+          <div className="flex justify-end">
+            <Button variant={'link'} className="text-xs" asChild>
+              <Link to="/drafts">View all</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

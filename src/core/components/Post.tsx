@@ -17,6 +17,7 @@ type PostProps = IPost & {
   isLoading?: boolean
   tileView?: boolean
   maintainFormatting?: boolean
+  noBorder?: boolean
 }
 
 function Post({
@@ -26,6 +27,7 @@ function Post({
   isLoading = false,
   tileView = false,
   maintainFormatting = false,
+  noBorder = false,
 }: PostProps) {
   // Read-more toggle for not-editable view
   const [expanded, setExpanded] = useState(false)
@@ -76,7 +78,8 @@ function Post({
     <Card
       className={cn(
         'bg-card relative flex flex-col rounded-md p-0 shadow-none',
-        tileView ? 'min-h-auto' : 'h-fit'
+        tileView ? 'min-h-auto' : 'h-fit',
+        noBorder && 'border-none'
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">

@@ -394,7 +394,7 @@ function Create() {
 
   return (
     <>
-      <div className="mx-auto mt-4 max-w-2xl px-4 pb-20">
+      <div className="mx-auto mt-8 max-w-2xl px-4 pb-20">
         <Tabs
           className="relative"
           value={activeTab}

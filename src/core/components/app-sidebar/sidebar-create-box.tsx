@@ -41,7 +41,7 @@ function AppSidebarCreateBox() {
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Create Post"
-              className="cursor-pointer rounded-sm bg-blue-700/85 py-2 font-medium text-white shadow-xs backdrop-blur-sm hover:bg-blue-700/95 hover:text-white active:bg-blue-800 active:text-white"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/80 active:text-primary-foreground cursor-pointer rounded-sm py-2 font-medium shadow-xs"
               onClick={handleCreateClick}
             >
               <Plus />

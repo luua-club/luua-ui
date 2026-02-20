@@ -5,7 +5,10 @@ import { type DateRange } from 'react-day-picker'
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { type ApiResponse } from '@/core/models/api.model'
-import { type IDraftListResponse } from '@/core/models/draft.model'
+import {
+  type IDraftListResponse,
+  type IDraftRenameRequest,
+} from '@/core/models/draft.model'
 import { toStartOfDayIso } from '@/core/utils/common.util'
 
 export function useDraftList(
@@ -59,17 +62,21 @@ export function useDraftList(
       inspirationId,
     ],
     queryFn: () =>
-      draftsApi.getDrafts(
-        {
-          limit,
-          offset,
-          sort: sortDir,
-          from: from,
-          to: to,
-          inspiration_id: inspirationId,
-        },
-        showOnlyAutoGen
-      ),
+      draftsApi
+        .getDrafts(
+          {
+            limit,
+            offset,
+            sort: sortDir,
+            from: from,
+            to: to,
+          },
+          showOnlyAutoGen
+        )
+        .then(x => {
+          x.data.posts[0].autopilot = true
+          return x
+        }),
     placeholderData: prev => prev,
     refetchOnMount: 'always',
   })
@@ -102,6 +109,14 @@ export function useDraftList(
   // ----- Mutation: delete a draft -----
   const deleteMutation = useMutation({
     mutationFn: (draftId: string) => draftsApi.deleteDraft(draftId),
+  })
+
+  // ----- Mutation: rename a draft -----
+  const renameMutation = useMutation({
+    mutationFn: (data: IDraftRenameRequest) => draftsApi.renameDraft(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+    },
   })
 
   // ----- Mutation: delete a post within a draft -----
@@ -205,5 +220,9 @@ export function useDraftList(
     deletingIds,
     // Aggregate deletion pending flag
     isDeleting: deleteMutation.isPending || deletePostMutation.isPending,
+    // Rename
+    renameDraft: (id: string, name: string) =>
+      renameMutation.mutate({ id, name }),
+    isRenaming: renameMutation.isPending,
   }
 }

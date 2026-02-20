@@ -4,11 +4,13 @@ import {
   Bookmark,
   Bot,
   Calendar,
-  CircleSlash,
+  ChevronDown,
+  ExternalLink,
+  FileText,
   FolderClosed,
   FolderHeart,
-  Loader,
   MoreHorizontal,
+  Pencil,
   PencilRuler,
   Send,
   Trash,
@@ -22,15 +24,21 @@ import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import ErrorBanner from '@/shared/components/error-banner'
-import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/shared/ui/collapsible'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import { Input } from '@/shared/ui/input'
+import { Separator } from '@/shared/ui/separator'
+import { Skeleton } from '@/shared/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
@@ -75,22 +83,56 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
   } = useDraftList(showOnlyAutoPilot, inspirationId)
   const navigate = useNavigate()
 
-  // --- Handlers ---
-  const handleDeleteDraft = (draftId: string) => openDelete(draftId)
+  // Track which rows are CLOSED (default = open)
+  const [closedIds, setClosedIds] = useState<Set<string>>(new Set())
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState<string>('')
 
-  if (isError) {
-    return <ErrorBanner />
+  const allExpanded = closedIds.size === 0
+
+  const toggleExpandAll = () => {
+    if (allExpanded) {
+      setClosedIds(new Set(drafts.map(d => d.id)))
+    } else {
+      setClosedIds(new Set())
+    }
   }
 
+  const toggleOpen = (id: string) => {
+    setClosedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const startRename = (draft: DraftItem) => {
+    setRenamingId(draft.id)
+    setRenameValue(draft.name)
+  }
+
+  const commitRename = () => {
+    if (!renamingId) return
+    const trimmed = renameValue.trim()
+    if (trimmed) renameDraft(renamingId, trimmed)
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  const cancelRename = () => {
+    setRenamingId(null)
+    setRenameValue('')
+  }
+
+  if (isError) return <ErrorBanner />
+
   return (
-    <div
-      className={cn(
-        'm-auto flex max-w-4xl flex-col p-3 sm:p-5',
-        showOnlyAutoPilot && 'p-0'
-      )}
-    >
-      {/* --- Header --- */}
-      <h1 className="text-lg font-bold">
+    <>
+      <h1 className="mx-auto max-w-5xl py-4 text-lg font-semibold">
         {showOnlyAutoPilot ? (
           <span className="flex items-center gap-2">
             <FolderHeart className="size-5" /> Generated Autopilot Drafts
@@ -102,111 +144,213 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
         )}
       </h1>
 
-      {/* --- Filters & Sorting --- */}
-      <div className="mt-8">
-        <ListControls
-          dateRange={dateRange}
-          onDateRangeChange={setDateRange}
-          sort={sort}
-          onSortChange={setSort}
-          allDateSelectable
-        />
+      <div
+        className={cn(
+          'bg-muted/40 border-t border-b p-3',
+          showOnlyAutoPilot && 'rounded-md border'
+        )}
+      >
+        <div className="mx-auto max-w-5xl">
+          <ListControls
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            sort={sort}
+            onSortChange={setSort}
+            allDateSelectable
+            allExpanded={allExpanded}
+            onToggleExpandAll={toggleExpandAll}
+          />
+        </div>
       </div>
 
-      {/* --- Drafts List --- */}
-      <div className="mt-4 flex flex-col gap-4">
-        {isLoading && <Loader className="mx-auto mt-8 size-5 animate-spin" />}
+      <div
+        className={cn(
+          'mx-auto mt-4 flex max-w-5xl flex-col',
+          showOnlyAutoPilot && 'p-0'
+        )}
+      >
+        <div className="mt-4 flex flex-col gap-4">
+          {/* Skeleton */}
+          {isLoading &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-lg border">
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <Skeleton className="size-4 rounded" />
+                  <Skeleton className="h-4 w-44 rounded" />
+                  <Skeleton className="ml-2 h-4 w-24 rounded" />
+                  <div className="ml-auto flex gap-1.5">
+                    <Skeleton className="h-8 w-14 rounded-md" />
+                    <Skeleton className="size-8 rounded-md" />
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4 p-4">
+                  <Skeleton className="h-40 rounded-lg" />
+                  <Skeleton className="h-40 rounded-lg" />
+                </div>
+              </div>
+            ))}
 
-        {!isLoading && (
-          <>
-            {drafts.length === 0 && (
-              <p className="mx-auto mt-8 flex items-center gap-2 text-sm font-semibold">
-                <CircleSlash className="size-4" /> No drafts found
+          {/* Empty state */}
+          {!isLoading && drafts.length === 0 && (
+            <div className="flex flex-col items-center gap-3 text-center">
+              <div className="bg-muted rounded-xl p-4">
+                <FileText className="text-muted-foreground size-6" />
+              </div>
+              <p className="text-sm font-medium">
+                {showOnlyAutoPilot
+                  ? 'No generated drafts yet'
+                  : 'No drafts yet'}
               </p>
-            )}
+              <p className="text-muted-foreground text-xs">
+                {showOnlyAutoPilot
+                  ? 'Your Autopilot generated drafts will appear here'
+                  : 'Your saved drafts will appear here.'}
+              </p>
+            </div>
+          )}
 
-            {drafts.map((draft: DraftItem, idx: number) => {
+          {/* Draft rows */}
+          {!isLoading &&
+            drafts.map((draft: DraftItem, idx: number) => {
+              const isOpen = !closedIds.has(draft.id)
+              const isRenaming = renamingId === draft.id
+              const hasLinkedIn = draft.posts.some(
+                p => p.channel === 'LinkedIn'
+              )
+              const hasTwitter = draft.posts.some(p => p.channel === 'Twitter')
+              const postCount = draft.posts.length
+
+              const platformLabel = [
+                hasLinkedIn && 'LinkedIn',
+                hasTwitter && 'X / Twitter',
+              ]
+                .filter(Boolean)
+                .join(' · ')
+
               return (
-                <div
-                  className={`dark:bg-sidebar/40 rounded-lg border-2 border-dotted p-4 pt-2 ${deletingIds.has(draft.id) ? 'pointer-events-none opacity-50' : ''}`}
+                <Collapsible
                   key={draft.id}
+                  open={isOpen}
+                  onOpenChange={() => toggleOpen(draft.id)}
+                  className={cn(
+                    'bg-card rounded-lg border',
+                    deletingIds.has(draft.id) &&
+                      'pointer-events-none opacity-40'
+                  )}
                 >
-                  {/* --- Draft Header --- */}
-                  <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    {/* --- Draft Date --- */}
-                    <div
-                      title={new Date(draft.updated_at).toString()}
-                      className="flex flex-wrap items-center gap-2 text-xs font-semibold sm:text-sm"
+                  {/* Autopilot banner */}
+                  {draft.autopilot && (
+                    <button
+                      onClick={() => navigate({ to: '/bookmarks' })}
+                      className="flex w-full items-center gap-1.5 rounded-t-lg border-b bg-violet-50 px-4 py-1.5 text-left text-xs font-medium text-violet-700 hover:bg-violet-100 dark:bg-violet-950/30 dark:text-violet-300 dark:hover:bg-violet-950/50"
                     >
-                      {format(
-                        new Date(draft.updated_at),
-                        'MMM do, EEEE, hh:mm a'
-                      )}
-                      {draft.autopilot && (
+                      <Bot className="size-3" />
+                      <span>By Autopilot</span>
+                      <span className="text-violet-400 dark:text-violet-500">
+                        ·
+                      </span>
+                      <span className="text-violet-500 underline-offset-2 hover:underline dark:text-violet-400">
+                        View bookmarks
+                      </span>
+                      <ExternalLink className="ml-auto size-3 text-violet-400" />
+                    </button>
+                  )}
+
+                  {/* Header */}
+                  <div className="flex items-center gap-2 px-4 py-2.5">
+                    {/* Left: expand trigger + pencil rename */}
+                    {isRenaming ? (
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <ChevronDown
+                          className={cn(
+                            'text-muted-foreground size-4 shrink-0 transition-transform duration-200',
+                            !isOpen && '-rotate-90'
+                          )}
+                        />
+                        <Input
+                          autoFocus
+                          value={renameValue}
+                          className="h-7 max-w-64 text-sm"
+                          onChange={e => setRenameValue(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') commitRename()
+                            if (e.key === 'Escape') cancelRename()
+                          }}
+                          onBlur={commitRename}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex min-w-0 flex-1 items-center gap-1">
+                        <CollapsibleTrigger asChild>
+                          <button className="hover:bg-muted/60 -mx-1 flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-md px-1 py-1 text-left transition-colors">
+                            <ChevronDown
+                              className={cn(
+                                'text-muted-foreground size-4 shrink-0 transition-transform duration-200',
+                                !isOpen && '-rotate-90'
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                'truncate text-sm font-medium',
+                                !draft.name?.trim() &&
+                                  'text-muted-foreground italic'
+                              )}
+                            >
+                              {draft.name?.trim() || 'Untitled'}
+                            </span>
+                            {platformLabel && (
+                              <span className="text-muted-foreground ml-1 shrink-0 text-xs">
+                                {platformLabel}
+                              </span>
+                            )}
+                          </button>
+                        </CollapsibleTrigger>
+
+                        {/* Pencil rename — outside trigger so it doesn't toggle expand */}
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Badge
-                              variant="outline"
-                              className="rounded-xs border-orange-600 font-semibold text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7 shrink-0"
+                              onClick={() => startRename(draft)}
                             >
-                              <Bot className="!size-3.5" />
-                              Autopilot
-                            </Badge>
+                              <Pencil className="size-3.5" />
+                            </Button>
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <span>
-                              This draft was generated automatically <br /> by
-                              Luua through Autopilot Feature
-                            </span>
-                          </TooltipContent>
+                          <TooltipContent>Rename</TooltipContent>
                         </Tooltip>
-                      )}
-                      {draft.inspiration_ids &&
-                        draft.inspiration_ids.length > 0 && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge
-                                variant="outline"
-                                className="cursor-pointer rounded-xs border-blue-600 font-semibold text-blue-600 dark:border-blue-400 dark:text-blue-400"
-                                onClick={() => {
-                                  setBookmarkInspirationId(
-                                    draft.inspiration_ids![0]
-                                  )
-                                  setBookmarkModalOpen(true)
-                                }}
-                              >
-                                <Bookmark className="!size-3.5" />
-                                View Bookmark
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <span>View source bookmark</span>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                    </div>
+                      </div>
+                    )}
 
-                    {/* --- Draft Actions --- */}
-                    <div className="flex items-center gap-2">
+                    {/* Divider */}
+                    <div className="bg-border mx-1 h-4 w-px shrink-0" />
+
+                    {/* Actions */}
+                    <div className="flex shrink-0 items-center gap-1">
                       <Button
-                        variant="outline"
-                        className="!px-2"
+                        variant="secondary"
+                        size="sm"
+                        className="h-8 gap-1.5 px-3 text-xs"
                         onClick={() =>
                           navigate({
                             to: `/creation/create`,
-                            search: {
-                              draftId: draft.id,
-                            },
+                            search: { draftId: draft.id },
                           })
                         }
                       >
-                        <PencilRuler className="size-4" />
-                        <span className="hidden sm:inline">Edit</span>
+                        <PencilRuler className="size-3.5" />
+                        Edit
                       </Button>
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="!px-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-foreground size-8"
+                          >
                             <MoreHorizontal className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -215,9 +359,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                             onClick={() =>
                               navigate({
                                 to: '/review/$draftId',
-                                params: {
-                                  draftId: draft.id,
-                                },
+                                params: { draftId: draft.id },
                               })
                             }
                           >
@@ -228,97 +370,105 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                             onClick={() =>
                               navigate({
                                 to: '/review/$draftId',
-                                params: {
-                                  draftId: draft.id,
-                                },
-                                search: {
-                                  schedule: 'true',
-                                },
+                                params: { draftId: draft.id },
+                                search: { schedule: 'true' },
                               })
                             }
                           >
                             <Calendar className="size-4" />
                             Schedule
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onSelect={() => handleDeleteDraft(draft.id)}
-                          >
-                            <Trash className="size-4" />
-                            Delete
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </div>
 
-                  {/* --- Draft Posts --- */}
-                  <div
-                    className={cn(
-                      'mt-4 grid grid-cols-1 gap-4',
-                      draft.posts.length > 1 && 'md:grid-cols-2'
-                    )}
-                  >
-                    {getPost(`${draft.id}-${idx}`, 'LinkedIn', draft, postId =>
-                      openDeletePost(draft.id, postId)
-                    )}
+                  {/* Expanded content */}
+                  <CollapsibleContent className="bg-muted/40">
+                    <Separator />
+                    <div
+                      className={cn(
+                        'grid grid-cols-1 gap-4 p-4',
+                        draft.posts.length > 1 && 'lg:grid-cols-2'
+                      )}
+                    >
+                      {getPost(
+                        `${draft.id}-${idx}`,
+                        'LinkedIn',
+                        draft,
+                        postId => openDeletePost(draft.id, postId)
+                      )}
+                      {getPost(
+                        `${draft.id}-${idx + 1}`,
+                        'Twitter',
+                        draft,
+                        postId => openDeletePost(draft.id, postId)
+                      )}
+                    </div>
 
-                    {getPost(
-                      `${draft.id}-${idx + 1}`,
-                      'Twitter',
-                      draft,
-                      postId => openDeletePost(draft.id, postId)
-                    )}
-                  </div>
-                </div>
+                    {/* Footer */}
+                    <Separator />
+                    <div className="bg-card flex items-center justify-between rounded-xl px-4 py-2">
+                      <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                        <span title={new Date(draft.updated_at).toString()}>
+                          {format(new Date(draft.updated_at), 'MMM d, h:mm a')}
+                        </span>
+                        <span className="text-muted-foreground/40">·</span>
+                        <span>
+                          {postCount} {postCount === 1 ? 'post' : 'posts'}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive bg-destructive/10 hover:bg-destructive/15 h-7 gap-1.5 px-2 text-xs"
+                        onClick={() => openDelete(draft.id)}
+                      >
+                        <Trash className="size-3.5" />
+                        Delete
+                      </Button>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
               )
             })}
-          </>
-        )}
-      </div>
-
-      {/* --- Pagination --- */}
-      {!isLoading && drafts.length > 0 && total > limit && (
-        <div className="mt-8 mb-8">
-          <PaginationList
-            limit={limit}
-            offset={offset}
-            total={total}
-            onOffsetChange={setOffset}
-          />
         </div>
-      )}
 
-      {/* --- Confirm Dialog --- */}
-      <ConfirmDialog
-        open={confirmOpen}
-        onOpenChange={open => (open ? undefined : closeDelete())}
-        title={pendingDeletePost ? 'Delete post ?' : 'Delete draft ?'}
-        description={
-          pendingDeletePost
-            ? 'This action cannot be undone. This will permanently delete the selected post from the draft.'
-            : 'This action cannot be undone. This will permanently delete the selected draft.'
-        }
-        confirmLabel="Delete"
-        confirmDisabled={isDeleting}
-        onConfirm={() => {
-          if (pendingDeletePost) {
-            confirmDeletePost()
-          } else {
-            confirmDelete()
+        {/* Pagination */}
+        {!isLoading && drafts.length > 0 && total > limit && (
+          <div className="mt-8 mb-8">
+            <PaginationList
+              limit={limit}
+              offset={offset}
+              total={total}
+              onOffsetChange={setOffset}
+            />
+          </div>
+        )}
+
+        {/* Confirm dialog */}
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={open => (open ? undefined : closeDelete())}
+          title={pendingDeletePost ? 'Delete post?' : 'Delete draft?'}
+          description={
+            pendingDeletePost
+              ? 'This action cannot be undone. This will permanently delete the selected post from the draft.'
+              : 'This action cannot be undone. This will permanently delete the selected draft.'
           }
-          closeDelete()
-        }}
-      />
-
-      {/* --- Bookmark Preview Modal --- */}
-      <BookmarkPreviewModal
-        open={bookmarkModalOpen}
-        onOpenChange={setBookmarkModalOpen}
-        inspirationId={bookmarkInspirationId ?? ''}
-      />
-    </div>
+          confirmLabel="Delete"
+          confirmDisabled={isDeleting}
+          onConfirm={() => {
+            if (pendingDeletePost) {
+              confirmDeletePost()
+            } else {
+              confirmDelete()
+            }
+            closeDelete()
+          }}
+        />
+      </div>
+    </>
   )
 }
 
@@ -329,33 +479,28 @@ const getPost = (
   onDelete: (postId: string) => void
 ) => {
   const item = draftItem.posts.find(post => post.channel === channel)
-
-  if (!item) {
-    return
-  }
+  if (!item) return
 
   return (
-    <>
-      <div className="relative">
-        {draftItem.posts.length > 1 && (
-          <Button
-            className="text-destructive !bg-card hover:text-destructive/80 absolute -top-2 -right-2 z-10 size-6 rounded-full !p-0"
-            variant="outline"
-            size="icon"
-            onClick={() => onDelete(item.id)}
-          >
-            <Trash2 className="size-3" />
-          </Button>
-        )}
-        <Post
-          id={`${id}`}
-          channel={item.channel}
-          content={item.content}
-          attached_media={item.attached_media}
-          maintainFormatting
-        />
-      </div>
-    </>
+    <div className="relative" key={item.id}>
+      {draftItem.posts.length > 1 && (
+        <Button
+          className="text-destructive !bg-card hover:text-destructive/80 absolute -top-2 -right-2 z-10 size-6 rounded-full !p-0"
+          variant="outline"
+          size="icon"
+          onClick={() => onDelete(item.id)}
+        >
+          <Trash2 className="size-3" />
+        </Button>
+      )}
+      <Post
+        id={id}
+        channel={item.channel}
+        content={item.content}
+        attached_media={item.attached_media}
+        maintainFormatting
+      />
+    </div>
   )
 }
 
