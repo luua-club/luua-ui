@@ -20,6 +20,7 @@ import getWelcomeRoute from '@/welcome/router'
 import getAutoPilotRoute from './autopilot/router'
 import getBookmarksRoute from './bookmarks/router'
 import { AuthGuard } from './guards'
+import getPostsViewRoute from './posts-view/router'
 
 export const rootRoute = createRootRoute({
   component: AppContent,
@@ -43,6 +44,7 @@ const welcomeRoute = getWelcomeRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
+const postsViewhubRoute = getPostsViewRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -57,6 +59,7 @@ const routeTree = rootRoute.addChildren([
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,
+    postsViewhubRoute,
   ]),
 ])
 

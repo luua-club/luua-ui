@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './shared/styles/colors.css';
 @import './shared/styles/theme.css';
+@import './shared/styles/utility.css';
 
 @custom-variant dark (&:is(.dark *));
 

@@ -4,6 +4,7 @@ import {
   FolderClosed,
   House,
   LucideCalendar,
+  LucideLayoutDashboard,
   Network,
   Paintbrush,
   PencilRuler,
@@ -26,6 +27,11 @@ export const ungroupedItems: ISidebarItem[] = [
     title: 'Autopilot',
     url: '/autopilot',
     icon: Network,
+  },
+  {
+    title: 'All Posts',
+    url: '/posts-view',
+    icon: LucideLayoutDashboard,
   },
   {
     title: 'Your Styles',
