@@ -80,7 +80,7 @@ function Review() {
   useEffect(() => {
     if (isError) {
       toast.error('Failed to load draft')
-      navigate({ to: '/creation/drafts' })
+      navigate({ to: '/drafts' })
     }
   }, [isError, navigate])
 

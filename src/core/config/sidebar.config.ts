@@ -1,6 +1,7 @@
 import {
   Bookmark,
   FileCheck,
+  Gauge,
   House,
   LucideCalendar,
   Network,
@@ -14,6 +15,11 @@ export const ungroupedItems: ISidebarItem[] = [
     title: 'Welcome',
     url: '/welcome',
     icon: House,
+  },
+  {
+    title: 'Dashboard',
+    url: '/creation',
+    icon: Gauge,
   },
   {
     title: 'Bookmarks',

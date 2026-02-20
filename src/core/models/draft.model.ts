@@ -9,6 +9,7 @@ export type PostItem = Pick<
 
 export type DraftItem = {
   id: string
+  name: string
   posts: PostItem[]
   autopilot?: boolean
   created_at: string
@@ -17,7 +18,13 @@ export type DraftItem = {
 
 export interface IDraftRequest {
   id?: string
+  name?: string
   posts: WithOptional<PostItem, 'id'>[]
+}
+
+export interface IDraftRenameRequest {
+  id: string
+  name: string
 }
 
 export interface IDraftResponse {
