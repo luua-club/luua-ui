@@ -48,3 +48,22 @@ export interface IAnalyticsResponse {
   period_end: string
   total_posts: number
 }
+
+export interface IDailyDataPoint {
+  date: string
+  value: number
+}
+
+export interface IAnalyticsMetric {
+  label: string
+  value: number
+  change_percent: number | null
+  daily_data: IDailyDataPoint[]
+}
+
+export interface IAnalyticsResponse {
+  metrics: IAnalyticsMetric[]
+  period_start: string
+  period_end: string
+  total_posts: number
+}
