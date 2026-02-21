@@ -4,6 +4,7 @@ import {
 } from '@/posts-view/models/calendar.model'
 
 import { IPublishDraftRequest } from '../models/draft.model'
+import { IAnalyticsResponse } from '../models/post.model'
 import {
   IPublishedPostListRequest,
   IPublishedPostListResponse,
@@ -56,6 +57,10 @@ class PostsApi extends BaseApiService {
     return this.get<ICalendarEventsResponse>('/calendar', {
       params: req,
     })
+  }
+
+  async getAnalytics() {
+    return this.get<IAnalyticsResponse>('/analytics')
   }
 }
 
