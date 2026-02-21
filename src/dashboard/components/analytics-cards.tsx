@@ -6,7 +6,7 @@ import { QUERY_KEYS } from '@/core/config/constant'
 import { type IAnalyticsMetric } from '@/core/models/post.model'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
-import { Skeleton } from '@/shared/ui/skeleton'
+//import { Skeleton } from '@/shared/ui/skeleton'
 import {
   Tooltip,
   TooltipContent,
