@@ -33,40 +33,62 @@ function SocialCard({
   onDisconnect,
 }: SocialCardProps) {
   const router = useRouter()
+  const isLinkedInPending =
+    platform.name === 'LinkedIn' &&
+    userChannel.connected &&
+    !userChannel.meta?.account_type
+  const isConnected = userChannel.connected && !isLinkedInPending
+  const isPageAccount =
+    platform.name === 'LinkedIn' && userChannel.meta?.account_type === 'page'
+  const selectedLinkedInPage = userChannel.meta?.pages?.find(
+    page => page.id === userChannel.meta?.organization_id
+  )
+  const accountName = isPageAccount
+    ? userChannel.meta?.organization_name ||
+      userChannel.meta?.organizaion_name ||
+      selectedLinkedInPage?.name ||
+      userChannel.user_name
+    : userChannel.user_name
+  const accountImage = isPageAccount
+    ? userChannel.meta?.organization_profile_image ||
+      selectedLinkedInPage?.profile_image ||
+      userChannel.user_profile_picture
+    : userChannel.user_profile_picture
+
   return (
     <div
       className={cn(
         'w-full rounded-2xl border-1 p-2 pt-0 pb-2',
-        userChannel.connected &&
+        isConnected &&
           'border-brand-border-success bg-brand-background-success dark:bg-card dark:border-card',
-        !userChannel.connected &&
+        !isConnected &&
           'border-brand-border-warning bg-brand-background-warning dark:bg-card dark:border-card'
       )}
     >
       <div
         className={cn(
           'flex items-center justify-center gap-2 py-3 text-sm font-semibold',
-          userChannel.connected &&
-            'text-brand-text-success dark:text-green-500',
-          !userChannel.connected &&
-            'text-brand-text-warning dark:text-orange-400'
+          isConnected && 'text-brand-text-success dark:text-green-500',
+          !isConnected && 'text-brand-text-warning dark:text-orange-400'
         )}
       >
         {platform?.logo && <platform.logo className="size-5" />}
         <span>
-          {userChannel.connected
+          {isConnected
             ? `${platform.name} connected`
-            : `${platform.name} not connected`}
+            : isLinkedInPending
+              ? `${platform.name} pending setup`
+              : `${platform.name} not connected`}
         </span>
       </div>
 
       <div
         className={cn(
           'bg-card dark:bg-background flex flex-col items-center justify-center space-y-4 rounded-xl p-2 text-center shadow-md',
-          !userChannel.connected && 'p-6'
+          !isConnected && 'p-6'
         )}
       >
-        {userChannel.connected ? (
+        {isConnected ? (
           <PulseCheck />
         ) : (
           <div className="dark:border-card-foreground/30 flex items-center justify-center rounded-full border-2 border-dashed p-2">
@@ -76,34 +98,36 @@ function SocialCard({
 
         <div className="space-y-2 px-2">
           <h3 className="text-lg leading-tight font-semibold">
-            {userChannel.connected
+            {isConnected
               ? `Your ${platform.name} is connected`
-              : `Connect your ${platform.name} account`}
+              : isLinkedInPending
+                ? `Finish your ${platform.name} setup`
+                : `Connect your ${platform.name} account`}
           </h3>
           <p className="text-muted-foreground text-sm leading-relaxed text-balance">
-            {userChannel.connected
+            {isConnected
               ? `You can safely post content to this platform. Every post goes live only after you approve it.`
-              : 'We use official integrations and never access your personal data'}
+              : isLinkedInPending
+                ? 'Choose whether to post as your profile or as a page to complete setup.'
+                : 'We use official integrations and never access your personal data'}
           </p>
         </div>
 
-        {userChannel.connected ? (
+        {isConnected ? (
           <div className="dark:bg-card dark:border-card flex w-full items-center justify-between rounded-xl border border-gray-100 p-3 pr-3 pl-3 text-left">
             <div className="flex items-center gap-3">
               <Avatar className="dark:border-card h-10 w-10 border border-gray-100">
-                <AvatarImage
-                  src={userChannel.user_profile_picture ?? undefined}
-                />
+                <AvatarImage src={accountImage ?? undefined} />
                 <AvatarFallback className="dark:bg-card-foreground dark:text-card bg-gray-100 text-gray-600">
-                  {extractUserInitial(userChannel.user_name)}
+                  {extractUserInitial(accountName)}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className="dark:text-card-foreground/70 text-xs text-gray-500">
-                  Account Info
+                  {isPageAccount ? 'Page Account' : 'Personal Account'}
                 </p>
                 <p className="dark:text-card-foreground text-sm font-semibold text-gray-900">
-                  {userChannel.user_name}
+                  {accountName}
                 </p>
               </div>
             </div>
@@ -146,7 +170,7 @@ function SocialCard({
             onClick={onConnect}
           >
             {isLoading && <Loader className="size-4 animate-spin" />}
-            Connect
+            {isLinkedInPending ? 'Complete setup' : 'Connect'}
           </Button>
         )}
       </div>

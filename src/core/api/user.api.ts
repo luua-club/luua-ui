@@ -1,4 +1,4 @@
-import { channelType } from '../models/social.model'
+import { channelType, LinkedInAccountType } from '../models/social.model'
 import {
   IUserStyleRequest,
   User,
@@ -48,6 +48,19 @@ class UserApi extends BaseApiService {
    */
   async disconnectSocial(platform: channelType) {
     return this.patch({ channel: platform }, '/disconnect-social')
+  }
+
+  /**
+   * Set the LinkedIn posting target (person/page)
+   *
+   * @param data - LinkedIn target payload
+   * @returns Promise<ApiResponse<void>> The response from the server
+   */
+  async setLinkedInTarget(data: {
+    account_type: LinkedInAccountType
+    organization_id: string | null
+  }) {
+    return this.patch<void, typeof data>(data, '/linkedin-target')
   }
 
   /**
