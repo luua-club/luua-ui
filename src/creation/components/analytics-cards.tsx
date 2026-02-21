@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 
-import { postsApi } from '@/core/api/posts.api'
+import { analyticsApi } from '@/core/api/analytics.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { type IAnalyticsMetric } from '@/core/models/post.model'
 import { Button } from '@/shared/ui/button'
@@ -155,7 +155,7 @@ function AnalyticsCardSkeleton() {
 export default function AnalyticsCards() {
   const { data, isPending, isError } = useQuery({
     queryKey: [QUERY_KEYS.analytics],
-    queryFn: () => postsApi.getAnalytics(),
+    queryFn: () => analyticsApi.getDashboard(),
     staleTime: 5 * 60_000, // 5 minutes
   })
 
