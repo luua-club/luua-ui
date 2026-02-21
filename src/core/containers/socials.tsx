@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
+import LinkedInTargetSelectorDialog from '@/core/components/linkedin-target-selector-dialog'
 import SocialCard from '@/core/components/social-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
-import { channelType } from '@/core/models/social.model'
+import { channelType, LinkedInAccountType } from '@/core/models/social.model'
 import { UserState } from '@/core/models/user.model'
 
 const Socials = ({
@@ -26,6 +27,11 @@ const Socials = ({
 
   const twitter = SOCIAL_PLATFORM.find(s => s.name === 'Twitter')!
   const linkedin = SOCIAL_PLATFORM.find(s => s.name === 'LinkedIn')!
+  const linkedInChannel = user.connected_channels.linkedin
+  const isLinkedInSetupPending = Boolean(
+    linkedInChannel?.connected && !linkedInChannel?.meta?.account_type
+  )
+  const [isLinkedInSelectorOpen, setIsLinkedInSelectorOpen] = useState(false)
 
   const handleConnect = async (platform: channelType) => {
     try {
@@ -70,33 +76,74 @@ const Socials = ({
     },
   })
 
+  const linkedInTargetMutation = useMutation({
+    mutationFn: (payload: {
+      account_type: LinkedInAccountType
+      organization_id: string | null
+    }) => userApi.setLinkedInTarget(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
+      toast.success('LinkedIn account setup completed')
+      setIsLinkedInSelectorOpen(false)
+    },
+    onError: () => {
+      toast.error('Failed to save LinkedIn account selection')
+    },
+  })
+
+  useEffect(() => {
+    if (isLinkedInSetupPending) {
+      setIsLinkedInSelectorOpen(true)
+      return
+    }
+    setIsLinkedInSelectorOpen(false)
+  }, [isLinkedInSetupPending])
+
   const setSocialLoading = (payload: channelType, isLoading: boolean) => {
     setLoadingStates(prev => ({ ...prev, [payload]: isLoading }))
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {(!channels || channels.includes('LinkedIn')) && (
-        <SocialCard
-          platform={linkedin}
-          userChannel={user?.connected_channels?.linkedin}
-          isLoading={loadingStates.LinkedIn}
-          onConnect={() => handleConnect('LinkedIn')}
-          onDisconnect={() => handleDisconnectMutation.mutate('LinkedIn')}
-        />
-      )}
+    <>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {(!channels || channels.includes('LinkedIn')) && (
+          <SocialCard
+            platform={linkedin}
+            userChannel={linkedInChannel}
+            isLoading={
+              loadingStates.LinkedIn || linkedInTargetMutation.isPending
+            }
+            onConnect={() =>
+              isLinkedInSetupPending
+                ? setIsLinkedInSelectorOpen(true)
+                : handleConnect('LinkedIn')
+            }
+            onDisconnect={() => handleDisconnectMutation.mutate('LinkedIn')}
+          />
+        )}
 
-      {(!channels || channels.includes('Twitter')) && (
-        <SocialCard
-          platform={twitter}
-          userChannel={user?.connected_channels?.twitter}
-          isLoading={loadingStates.Twitter}
-          onConnect={() => handleConnect('Twitter')}
-          onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
-          showUpgradePlan={user?.plan === 'Free'}
+        {(!channels || channels.includes('Twitter')) && (
+          <SocialCard
+            platform={twitter}
+            userChannel={user.connected_channels.twitter}
+            isLoading={loadingStates.Twitter}
+            onConnect={() => handleConnect('Twitter')}
+            onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
+            showUpgradePlan={user?.plan === 'Free'}
+          />
+        )}
+      </div>
+
+      {(!channels || channels.includes('LinkedIn')) && (
+        <LinkedInTargetSelectorDialog
+          open={isLinkedInSelectorOpen}
+          onOpenChange={setIsLinkedInSelectorOpen}
+          linkedInChannel={linkedInChannel}
+          isSubmitting={linkedInTargetMutation.isPending}
+          onSubmit={linkedInTargetMutation.mutate}
         />
       )}
-    </div>
+    </>
   )
 }
 

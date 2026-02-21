@@ -9,7 +9,12 @@ import { UserState } from '@/core/models/user.model'
  * @returns True if the platform is connected, false otherwise
  */
 const isSocialConnected = (name: string, user: UserState) => {
-  if (name === 'LinkedIn') return user?.connected_channels?.linkedin?.connected
+  if (name === 'LinkedIn') {
+    return Boolean(
+      user?.connected_channels?.linkedin?.connected &&
+        user?.connected_channels?.linkedin?.meta?.account_type
+    )
+  }
   if (name === 'Twitter') return user?.connected_channels?.twitter?.connected
   return false
 }
