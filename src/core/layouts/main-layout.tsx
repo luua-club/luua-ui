@@ -3,7 +3,7 @@ import { useRef } from 'react'
 
 import AppSidebar from '@/core/components/app-sidebar/sidebar'
 import GlobalLoader from '@/shared/components/global-loader'
-import { SidebarProvider, useSidebar } from '@/shared/ui/sidebar'
+import { SidebarProvider } from '@/shared/ui/sidebar'
 
 function MainLayout() {
   return (
