@@ -1,16 +1,15 @@
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { SidebarMenu } from '@/shared/ui/sidebar'
 
-import AppSidebarPaymentCTA from './sidebar-payment-cta'
+import AppSidebarTabCTA from './sidebar-tab-cta'
 import { UserSidebarCard } from './sidebar-user-card'
 
 function AppSidebarFooter() {
   const user = useUserState()
-  const isFreePlan = user?.plan === 'Free'
 
   return (
     <div className="flex flex-col gap-3">
-      {isFreePlan && <AppSidebarPaymentCTA />}
+      <AppSidebarTabCTA />
       <SidebarMenu>
         <UserSidebarCard user={user} />
       </SidebarMenu>

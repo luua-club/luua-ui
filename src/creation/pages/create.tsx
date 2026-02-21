@@ -6,6 +6,7 @@ import {
   useSearch,
 } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
+import { ArrowLeft } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -33,6 +34,7 @@ import { MediaObject } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import PromptChip from '@/shared/components/prompt-chip'
+import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { WordRotate } from '@/shared/ui/word-rotate'
 import { cn } from '@/shared/utils'
@@ -397,6 +399,17 @@ function Create() {
 
   return (
     <>
+      <div className="mb-4 hidden justify-start p-4 md:flex">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          onClick={() => navigate({ to: '/creation' })}
+        >
+          <ArrowLeft />
+          Back to Dashboard
+        </Button>
+      </div>
       <div className="mx-auto mt-8 max-w-2xl px-4 pb-20">
         <Tabs
           className="relative"

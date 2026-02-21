@@ -239,7 +239,7 @@ function CreationLanding() {
           </p>
         )}
 
-        {drafts.length >= 4 && (
+        {drafts.length >= 1 && (
           <div className="flex justify-end">
             <Button variant={'link'} className="text-xs" asChild>
               <Link to="/drafts">View all</Link>
