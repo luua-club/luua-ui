@@ -208,7 +208,6 @@ function CreationLanding() {
   return (
     <div className="bg-accent/60 min-h-screen pt-8">
       <AnalyticsCards />
-      <div className="mt-6" />
       <div className="mx-auto max-w-5xl px-6">
         <h1 className="mb-4 flex gap-2 text-sm font-semibold">
           <FolderEdit className="size-5" /> Pick Up Where You Left Off
