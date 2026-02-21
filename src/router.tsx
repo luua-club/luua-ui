@@ -19,6 +19,7 @@ import getWelcomeRoute from '@/welcome/router'
 
 import getAutoPilotRoute from './autopilot/router'
 import getBookmarksRoute from './bookmarks/router'
+import getDraftsRoute from './drafts/router'
 import { AuthGuard } from './guards'
 
 export const rootRoute = createRootRoute({
@@ -43,6 +44,7 @@ const welcomeRoute = getWelcomeRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
+const draftsRoute = getDraftsRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -57,6 +59,7 @@ const routeTree = rootRoute.addChildren([
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,
+    draftsRoute,
   ]),
 ])
 

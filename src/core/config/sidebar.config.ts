@@ -42,7 +42,7 @@ export const creationItems: ISidebarItem[] = [
   },
   {
     title: 'Saved Drafts',
-    url: '/creation/drafts',
+    url: '/drafts',
     icon: FolderClosed,
   },
 ]

@@ -19,14 +19,5 @@ export default function getCreationRouteTree(privateRoute: AnyRoute) {
     path: 'create',
   }).lazy(() => import('./pages/create').then(d => d.Route))
 
-  const draftsPageRoute = createRoute({
-    getParentRoute: () => creationRoute,
-    path: 'drafts',
-  }).lazy(() => import('./pages/drafts').then(d => d.Route))
-
-  return creationRoute.addChildren([
-    creationIndexRoute,
-    createPageRoute,
-    draftsPageRoute,
-  ])
+  return creationRoute.addChildren([creationIndexRoute, createPageRoute])
 }

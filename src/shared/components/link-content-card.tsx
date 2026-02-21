@@ -151,7 +151,7 @@ function LinkContentCard({
 
           {utilized && inspirationId ? (
             <Link
-              to="/creation/drafts"
+              to="/drafts"
               search={{ inspiration_id: inspirationId }}
               className="inline-block"
             >
