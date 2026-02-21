@@ -1,47 +1,38 @@
-import { Link } from '@tanstack/react-router'
+import { PanelLeft } from 'lucide-react'
 
-import { useUserState } from '@/core/hooks/user-state.hook'
-import ChipBadge from '@/shared/components/chip-badge'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/shared/ui/sidebar'
 
 import { AppIconLogo, AppTextLogo } from '../app-logo'
 
 function AppSidebarHeader() {
   // --- Hooks ---
-  const user = useUserState()
-
-  // --- Computed Variables ---
-  const isProPlan = user?.plan === 'Pro'
+  const { toggleSidebar } = useSidebar()
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton
-          asChild
           className="data-[slot=sidebar-menu-button]:!p-1.5"
+          onClick={toggleSidebar}
         >
-          <Link to="/welcome">
-            {/* Logo Icon */}
-            <AppIconLogo />
+          {/* Icon slot: logo fades out on sidebar hover when collapsed, expand icon fades in */}
+          <span className="relative inline-flex size-5 shrink-0 items-center justify-center">
+            <span className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 group-data-[collapsible=icon]:group-hover:opacity-0">
+              <AppIconLogo />
+            </span>
+            <PanelLeft className="absolute !size-4 opacity-0 transition-opacity duration-150 group-data-[collapsible=icon]:group-hover:opacity-100" />
+          </span>
 
-            <div className="flex w-full items-center justify-between">
-              {/* Logo Text */}
-              <div className="flex items-center gap-1">
-                <AppTextLogo />
-              </div>
+          {/* Text: visible only in expanded state */}
+          <AppTextLogo className="group-data-[collapsible=icon]:hidden" />
 
-              {/* Free or Pro */}
-              {isProPlan ? (
-                <ChipBadge variant="hot">Pro</ChipBadge>
-              ) : (
-                <ChipBadge variant="cold">Free</ChipBadge>
-              )}
-            </div>
-          </Link>
+          {/* Collapse button: right side, expanded state only */}
+          <PanelLeft className="ml-auto !size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

@@ -34,7 +34,7 @@ function Preferences() {
   }
 
   return (
-    <div className="m-auto flex max-w-4xl flex-col p-5">
+    <div className="m-auto mt-4 flex max-w-4xl flex-col p-5 md:mt-0">
       {/* --- Summary --- */}
       <Summary
         data={data?.data}

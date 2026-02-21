@@ -1,4 +1,4 @@
-import { WithOptional } from '../models/common.model'
+import { WithOptional } from './common.model'
 import { IPagination } from './pagination.model'
 import { IPost } from './post.model'
 
@@ -9,6 +9,7 @@ export type PostItem = Pick<
 
 export type DraftItem = {
   id: string
+  name: string
   posts: PostItem[]
   autopilot?: boolean
   inspiration_ids?: string[]
@@ -18,7 +19,13 @@ export type DraftItem = {
 
 export interface IDraftRequest {
   id?: string
+  name?: string
   posts: WithOptional<PostItem, 'id'>[]
+}
+
+export interface IDraftRenameRequest {
+  id: string
+  name: string
 }
 
 export interface IDraftResponse {

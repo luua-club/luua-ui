@@ -49,7 +49,7 @@ function Post({
   } = {
     name: userState.name,
     username: userState.email,
-    image: userState.profile_image,
+    image: userState.profile_image ?? '',
   }
 
   if (channelUser) {
@@ -60,7 +60,7 @@ function Post({
           ? `@${channelUser.user_id}`
           : channelUser.user_email
         : userState.email,
-      image: channelUser.user_profile_picture || userState.profile_image,
+      image: channelUser.user_profile_picture ?? userState.profile_image ?? '',
     }
   }
 

@@ -1,5 +1,5 @@
-import { createLazyRoute, useLocation } from '@tanstack/react-router'
-import { LampDesk, Lightbulb } from 'lucide-react'
+import { createLazyRoute, Link, useLocation } from '@tanstack/react-router'
+import { Gauge, LampDesk, Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { EXTERNAL_URLS } from '@/core/config/constant'
@@ -61,7 +61,7 @@ function Welcome() {
   return (
     <>
       {/** Main Content */}
-      <div className="m-auto flex max-w-4xl flex-col gap-3 p-5">
+      <div className="m-auto mt-6 flex max-w-4xl flex-col gap-3 p-5">
         {/** Header */}
         <div className="my-4 flex flex-col items-center justify-between gap-4 text-center md:my-0 md:flex-row md:items-end md:gap-2 md:text-start">
           {/** Title */}
@@ -70,12 +70,20 @@ function Welcome() {
             focus today?
           </p>
 
-          {/** Video */}
-          <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtube_main_video}>
-            <Button size="sm" className="text-xs">
-              <Lightbulb className="size-3.5" /> How it works ?
-            </Button>
-          </HeroVideoDialog>
+          <div className="mb-2 flex items-center gap-4">
+            <Link to="/dashboard">
+              <Button size="sm" className="text-xs" variant={'outline'}>
+                <Gauge className="size-3.5" /> My Dashboard
+              </Button>
+            </Link>
+
+            {/** Video */}
+            <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtube_main_video}>
+              <Button size="sm" className="text-xs">
+                <Lightbulb className="size-3.5" /> How it works ?
+              </Button>
+            </HeroVideoDialog>
+          </div>
         </div>
 
         {/** Bento Grid */}

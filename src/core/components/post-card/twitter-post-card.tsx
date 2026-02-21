@@ -130,7 +130,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
         {/* Avatar */}
         <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
           <AvatarImage
-            src={user_social.user_profile_picture}
+            src={user_social.user_profile_picture ?? undefined}
             alt={user_social.user_name}
           />
           <AvatarFallback>

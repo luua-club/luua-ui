@@ -1,10 +1,16 @@
 import { ParsedLocation, redirect } from '@tanstack/react-router'
 
 import { LUUA_USER_KEY } from '@/core/config/constant'
+import { LoginResponse } from '@/core/models/auth.model'
+import { User } from '@/core/models/user.model'
+import { getPostLoginRoute } from '@/core/utils/post-login-route.util'
 import { getLocalStorageItem } from '@/shared/utils/localstorage.util'
 
 export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
-  const isLoggedIn = getLocalStorageItem(LUUA_USER_KEY) !== null
+  const authData = getLocalStorageItem<
+    LoginResponse & { user?: User & Record<string, unknown> }
+  >(LUUA_USER_KEY)
+  const isLoggedIn = !!authData?.access_token
 
   const path = location.pathname
 
@@ -22,16 +28,26 @@ export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
     throw redirect({ to: '/login', search: redirectSearch })
   }
 
-  // If user is logged in and the current path is login, redirect to welcome
+  // If user is logged in and the current path is login, redirect based on onboarding state
   // UNLESS it's an extension login request (allow extension login flow)
   if (isLoggedIn && path === '/login' && !isExtensionLogin) {
-    throw redirect({ to: '/welcome' })
+    throw redirect({
+      to: getPostLoginRoute({
+        loginResponse: authData,
+        user: authData?.user ?? null,
+      }),
+    })
   }
 
-  // If user is logged in and the current path is root, redirect to welcome
+  // If user is logged in and the current path is root, redirect based on onboarding state
   // Arises when user is logged in and enter our normal url
   if (isLoggedIn && path === '/') {
-    throw redirect({ to: '/welcome' })
+    throw redirect({
+      to: getPostLoginRoute({
+        loginResponse: authData,
+        user: authData?.user ?? null,
+      }),
+    })
   }
 
   return {}

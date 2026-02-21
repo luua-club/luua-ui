@@ -62,6 +62,9 @@ export default defineConfig({
           if (id.includes('/src/settings/')) {
             return 'route-settings'
           }
+          if (id.includes('/src/dashboard/')) {
+            return 'route-dashboard'
+          }
           if (id.includes('/src/creation/')) {
             return 'route-creation'
           }
@@ -79,6 +82,9 @@ export default defineConfig({
           }
           if (id.includes('/src/review/')) {
             return 'route-review'
+          }
+          if (id.includes('/src/drafts/')) {
+            return 'route-drafts'
           }
         },
       },

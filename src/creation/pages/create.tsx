@@ -1,8 +1,14 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import {
+  createLazyRoute,
+  useBlocker,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
+import { ArrowLeft } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
@@ -26,7 +32,9 @@ import { WithOptional } from '@/core/models/common.model'
 import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
 import { MediaObject } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
+import ConfirmDialog from '@/shared/components/confirm-dialog'
 import PromptChip from '@/shared/components/prompt-chip'
+import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import { WordRotate } from '@/shared/ui/word-rotate'
 import { cn } from '@/shared/utils'
@@ -40,10 +48,60 @@ const SOCIAL_TABS: channelType[] = [...SOCIAL_PLATFORM.map(s => s.name)]
 
 function Create() {
   const user = useUserState()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<channelType>(SOCIAL_TABS[0])
   const [postDrafts, setPostDrafts] = useState<postDraftsType>(
     {} as postDraftsType
   )
+  const bypassGuardRef = useRef(false)
+
+  const search = useSearch({ from: '/creation/create' })
+  const draftId = search.draftId
+  const draftEnabled = Boolean(draftId)
+
+  const hasAnyContent = useMemo(() => {
+    const hasLinkedInContent =
+      !!postDrafts.LinkedIn?.content?.trim() ||
+      (postDrafts.LinkedIn?.attached_media?.length ?? 0) > 0
+
+    const hasTwitterContent =
+      !!postDrafts.Twitter?.content?.trim() ||
+      (postDrafts.Twitter?.attached_media?.length ?? 0) > 0
+
+    return hasLinkedInContent || hasTwitterContent
+  }, [postDrafts])
+
+  const isUnsavedDraftDirty = !draftId && hasAnyContent
+
+  const withBypassedGuard = (fn: () => void) => {
+    bypassGuardRef.current = true
+    fn()
+    setTimeout(() => {
+      bypassGuardRef.current = false
+    }, 0)
+  }
+
+  const blocker = useBlocker({
+    withResolver: true,
+    enableBeforeUnload: () => isUnsavedDraftDirty,
+    shouldBlockFn: ({ current, next }) => {
+      if (bypassGuardRef.current || !isUnsavedDraftDirty) return false
+
+      const currentSearch = current.search as { draftId?: string }
+      const nextSearch = next.search as { draftId?: string }
+      const isCurrentUnsavedRoute =
+        current.pathname === '/creation/create' && !currentSearch.draftId
+
+      if (!isCurrentUnsavedRoute) {
+        return false
+      }
+
+      const isSameUnsavedRoute =
+        next.pathname === '/creation/create' && !nextSearch.draftId
+
+      return !isSameUnsavedRoute
+    },
+  })
 
   const getCurrentState = () => {
     const hasLinkedInContent =
@@ -63,38 +121,6 @@ function Create() {
     }
   }
 
-  const handleContentChange = useCallback(
-    (val: string, name: channelType) => {
-      setPostDrafts(prev => ({
-        ...prev,
-        [name]: {
-          ...(prev[name] ?? { channel: name }),
-          content: val,
-        },
-      }))
-    },
-    [setPostDrafts]
-  )
-
-  const handleImagesChange = useCallback(
-    (images: MediaObject[], name: channelType) => {
-      setPostDrafts(prev => ({
-        ...prev,
-        [name]: {
-          ...(prev[name] ?? { channel: name }),
-          attached_media: images,
-        },
-      }))
-    },
-    [setPostDrafts]
-  )
-
-  const navigate = useNavigate()
-  const search: { draftId?: string; source?: string } = useSearch({
-    from: '/creation/create',
-  })
-  const draftId = search.draftId
-  const draftEnabled = Boolean(draftId)
   const draftQuery = useQuery<DraftItem>({
     queryKey: [QUERY_KEYS.draft, draftId],
     queryFn: async () => {
@@ -113,33 +139,30 @@ function Create() {
       callback?: (id: string) => void
     }) => draftsApi.postDraft(payload.request),
     onSuccess: (response, variables) => {
-      // Rehydrate local state with response data
+      const newDraftId = response.data.draft.id
+
       const postDraft = {} as postDraftsType
       response.data.draft.posts.forEach((p: PostItem) => {
         postDraft[p.channel] = p
       })
       setPostDrafts(postDraft)
 
-      // Update query cache with the new draft data
       queryClient.setQueryData(
-        [QUERY_KEYS.draft, response.data.draft.id],
+        [QUERY_KEYS.draft, newDraftId],
         response.data.draft
       )
-
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
       if (variables?.callback && typeof variables.callback === 'function') {
-        try {
-          variables.callback(response.data.draft.id)
-        } catch (error) {
-          console.error('Callback error:', error)
-          toast.error('Navigation failed')
-        }
+        withBypassedGuard(() => variables.callback?.(newDraftId))
       } else {
         toast.success('Draft saved successfully')
-        navigate({
-          to: '/creation/create',
-          search: { draftId: response.data.draft.id },
+        withBypassedGuard(() => {
+          navigate({
+            to: '/creation/create',
+            search: { draftId: newDraftId },
+            replace: true,
+          })
         })
       }
     },
@@ -148,11 +171,9 @@ function Create() {
     },
   })
 
-  // Reset state when navigating to /create without a draftId
   useEffect(() => {
-    if (!draftId) {
-      setPostDrafts({} as postDraftsType)
-    }
+    if (draftId) return
+    setPostDrafts({} as postDraftsType)
   }, [draftId])
 
   useEffect(() => {
@@ -160,35 +181,61 @@ function Create() {
       return
     }
 
-    const postDraft = {} as postDraftsType
-
+    const nextDrafts = {} as postDraftsType
     draftQuery.data.posts.forEach((p: PostItem) => {
-      postDraft[p.channel] = p
+      nextDrafts[p.channel] = p
     })
 
-    setPostDrafts(postDraft)
-  }, [draftQuery.data])
+    setPostDrafts(nextDrafts)
+  }, [draftQuery.data, draftId])
 
   useEffect(() => {
-    if (draftQuery.isError) {
-      const err = draftQuery.error
+    if (!draftQuery.isError) return
 
-      if (isAxiosError(err) && err.response?.status !== 404) {
-        toast.error('Something went wrong')
-      }
-
-      navigate({ to: '/creation/create' })
+    const err = draftQuery.error
+    if (isAxiosError(err) && err.response?.status !== 404) {
+      toast.error('Something went wrong')
     }
+
+    setPostDrafts({} as postDraftsType)
+    withBypassedGuard(() => {
+      navigate({
+        to: '/creation/create',
+        replace: true,
+      })
+    })
   }, [draftQuery.isError, draftQuery.error, navigate])
 
+  const handleContentChange = useCallback((val: string, name: channelType) => {
+    setPostDrafts(prev => {
+      return {
+        ...prev,
+        [name]: {
+          ...(prev[name] ?? { channel: name }),
+          content: val,
+        },
+      }
+    })
+  }, [])
+
+  const handleImagesChange = useCallback(
+    (images: MediaObject[], name: channelType) => {
+      setPostDrafts(prev => {
+        return {
+          ...prev,
+          [name]: {
+            ...(prev[name] ?? { channel: name }),
+            attached_media: images,
+          },
+        }
+      })
+    },
+    []
+  )
+
   const {
-    // State
     posts: generatedPostContent,
-
-    // Loading
     isGenerationDataFetching,
-
-    // Setters
     setUserPrompt: setGenerationUserPrompt,
     setUserSearch: setGenerationUserSearch,
     setUserChannel: setGenerationUserChannel,
@@ -211,10 +258,13 @@ function Create() {
 
     if (draftId) {
       draftPayload.id = draftId
+      if (draftQuery.data?.name) {
+        draftPayload.name = draftQuery.data.name
+      }
     }
 
-    const linkedinObj = postDrafts['LinkedIn']
-    const twitterObj = postDrafts['Twitter']
+    const linkedinObj = postDrafts.LinkedIn
+    const twitterObj = postDrafts.Twitter
 
     const hasLinkedInContent =
       linkedinObj?.content || (linkedinObj?.attached_media?.length ?? 0) > 0
@@ -242,9 +292,6 @@ function Create() {
     return draftPayload
   }
 
-  /**
-   * Handle `source` query param to trigger generation and then remove it
-   */
   useEffect(() => {
     const source = search.source
     if (!source) return
@@ -252,15 +299,16 @@ function Create() {
     setGenerationUserPrompt(source)
     setGenerationUserSearch(false)
 
-    // Remove source param after using it
-    navigate({
-      to: '/creation/create',
-      search: { draftId: search.draftId },
-      replace: true,
+    withBypassedGuard(() => {
+      navigate({
+        to: '/creation/create',
+        search: draftId ? { draftId } : {},
+        replace: true,
+      })
     })
   }, [
     search.source,
-    search.draftId,
+    draftId,
     setGenerationUserPrompt,
     setGenerationUserSearch,
     navigate,
@@ -270,7 +318,6 @@ function Create() {
     const postPayload = getDraftRequestPayload()
     if (postPayload.posts.length === 0) return
 
-    // Call api
     saveDraftMutation.mutate({ request: postPayload, callback })
   }
 
@@ -303,7 +350,6 @@ function Create() {
     const linkedinExceeded = linkedinContent.length > POST_WORD_COUNT.LinkedIn
     const twitterExceeded = twitterContent.length > POST_WORD_COUNT.Twitter
 
-    // If we have content for either platform, check if it exceeds the limit
     const hasLinkedInContent =
       linkedinContent || (postDrafts.LinkedIn?.attached_media?.length ?? 0) > 0
     const hasTwitterContent =
@@ -343,9 +389,28 @@ function Create() {
     return false
   }
 
+  const handleBlockedSave = () => {
+    if (blocker.status !== 'blocked') return
+
+    handleSaveDraft(() => {
+      withBypassedGuard(() => blocker.proceed?.())
+    })
+  }
+
   return (
     <>
-      <div className="mx-auto mt-4 max-w-2xl px-4 pb-20">
+      <div className="mb-4 hidden justify-start p-4 md:flex">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          onClick={() => navigate({ to: '/dashboard' })}
+        >
+          <ArrowLeft />
+          Back to Dashboard
+        </Button>
+      </div>
+      <div className="mx-auto mt-8 max-w-2xl px-4 pb-20">
         <Tabs
           className="relative"
           value={activeTab}
@@ -400,7 +465,7 @@ function Create() {
             className="data-[state=inactive]:hidden"
           >
             <LinkedInPostCard
-              key={`linkedin-${draftId || 'new'}`}
+              key={`linkedin-${draftId || 'untitled'}`}
               loading={
                 (draftEnabled && draftQuery.isPending) ||
                 isGenerationDataFetching
@@ -418,7 +483,7 @@ function Create() {
             className="data-[state=inactive]:hidden"
           >
             <TwitterPostCard
-              key={`twitter-${draftId || 'new'}`}
+              key={`twitter-${draftId || 'untitled'}`}
               loading={
                 (draftEnabled && draftQuery.isPending) ||
                 isGenerationDataFetching
@@ -467,12 +532,28 @@ function Create() {
           )}
         </AnimatePresence>
       </div>
+
       <DraftFooterActions
         loading={isGenerationDataFetching || !getCurrentState()}
-        onSaveDraft={handleSaveDraft}
+        onSaveDraft={() => handleSaveDraft()}
         disabled={saveDraftMutation.isPending || isCharacterLimitExceeded()}
         onReviewAndShare={handleReviewAndShare}
         onScheduleClick={handleScheduleClick}
+      />
+
+      <ConfirmDialog
+        open={blocker.status === 'blocked'}
+        onOpenChange={open => {
+          if (!open && blocker.status === 'blocked') {
+            blocker.reset?.()
+          }
+        }}
+        title="Save draft before leaving"
+        description="You have unsaved content. Save this draft to continue."
+        confirmLabel="Save Draft"
+        cancelLabel="Stay"
+        confirmDisabled={saveDraftMutation.isPending}
+        onConfirm={handleBlockedSave}
       />
     </>
   )

@@ -19,7 +19,10 @@ import getWelcomeRoute from '@/welcome/router'
 
 import getAutoPilotRoute from './autopilot/router'
 import getBookmarksRoute from './bookmarks/router'
+import getDashboardRoute from './dashboard/router'
+import getDraftsRoute from './drafts/router'
 import { AuthGuard } from './guards'
+import getPostsViewRoute from './posts-view/router'
 
 export const rootRoute = createRootRoute({
   component: AppContent,
@@ -36,6 +39,8 @@ const authRoute = getAuthRoute(rootRoute)
 const scheduleRoute = getScheduleRoute(privateRoute)
 const settingsRouteTree = getSettingsRouteTree(privateRoute)
 const creationRouteTree = getCreationRouteTree(privateRoute)
+const dashboardRoute = getDashboardRoute(privateRoute)
+const draftsRoute = getDraftsRoute(privateRoute)
 const publishedRoute = getPublishedRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
 const paymentsRoute = getPaymentsRoute(privateRoute)
@@ -43,6 +48,7 @@ const welcomeRoute = getWelcomeRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
+const postsViewhubRoute = getPostsViewRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -50,13 +56,16 @@ const routeTree = rootRoute.addChildren([
     scheduleRoute,
     settingsRouteTree,
     creationRouteTree,
+    dashboardRoute, //
+    draftsRoute,
     publishedRoute,
     preferencesRoute,
     paymentsRoute,
-    welcomeRoute,
+    welcomeRoute, //
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,
+    postsViewhubRoute,
   ]),
 ])
 
