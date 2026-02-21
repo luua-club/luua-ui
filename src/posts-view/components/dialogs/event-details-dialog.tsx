@@ -7,7 +7,6 @@ import {
   ExternalLink,
   Loader,
   RefreshCw,
-  Text,
   Trash2,
   XCircle,
 } from 'lucide-react'
