@@ -34,7 +34,7 @@ function AppSidebarCreateBox() {
   }
 
   return (
-    <SidebarGroup className="border-b-1 pt-2">
+    <SidebarGroup className="bg-muted border-y-1 pt-4">
       <SidebarGroupLabel className="sr-only">Create</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-1">
         <SidebarMenu className="gap-2">

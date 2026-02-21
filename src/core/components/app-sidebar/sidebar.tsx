@@ -18,6 +18,7 @@ import AppSidebarHeader from './sidebar-header'
 import AppSidebarUngrouped from './sidebar-ungrouped'
 
 const dashboardItem = ungroupedItems.find(item => item.url === '/creation')!
+const welcomeItem = ungroupedItems.find(item => item.url === '/welcome')!
 
 function AppSidebar() {
   const { isMobile, toggleSidebar } = useSidebar()
@@ -45,6 +46,8 @@ function AppSidebar() {
 
         {/* Content */}
         <SidebarContent>
+          <AppSidebarUngrouped ungroupedItems={[welcomeItem]} />
+
           {/* 2. Create Box */}
           <AppSidebarCreateBox />
 
