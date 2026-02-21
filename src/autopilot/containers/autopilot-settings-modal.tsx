@@ -33,6 +33,7 @@ import {
   FormMessage,
 } from '@/shared/ui/form'
 import { Input } from '@/shared/ui/input'
+import { Switch } from '@/shared/ui/switch'
 import { Textarea } from '@/shared/ui/textarea'
 
 import {
@@ -46,6 +47,7 @@ type AutopilotSettingsModalProps = {
   defaultBasePrompt?: string
   defaultFrequencyDays?: number
   defaultChannels?: channelType[]
+  defaultAutoPublish?: boolean
 }
 
 function AutopilotSettingsModal({
@@ -54,6 +56,7 @@ function AutopilotSettingsModal({
   defaultBasePrompt,
   defaultFrequencyDays,
   defaultChannels,
+  defaultAutoPublish,
 }: AutopilotSettingsModalProps) {
   const user = useUserState()
   const baseChannels = useMemo<channelType[]>(
@@ -72,6 +75,7 @@ function AutopilotSettingsModal({
       base_prompt: defaultBasePrompt ?? '',
       frequency_days: defaultFrequencyDays ?? 5,
       channels: defaultChannels ?? baseChannels,
+      auto_publish: defaultAutoPublish ?? false,
     },
   })
 
@@ -102,12 +106,14 @@ function AutopilotSettingsModal({
       base_prompt: defaultBasePrompt ?? '',
       frequency_days: defaultFrequencyDays ?? 5,
       channels: (defaultChannels ?? baseChannels) as channelType[],
+      auto_publish: defaultAutoPublish ?? false,
     })
   }, [
     open,
     defaultBasePrompt,
     defaultFrequencyDays,
     defaultChannels,
+    defaultAutoPublish,
     form,
     baseChannels,
   ])
@@ -122,6 +128,7 @@ function AutopilotSettingsModal({
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     const payload: AutopilotSettings = {
       enabled: true,
+      auto_publish: _values.auto_publish ?? false,
       base_prompt: _values.base_prompt ?? '',
       frequency_days: _values.frequency_days,
       channels: _values.channels as channelType[],
@@ -160,6 +167,9 @@ function AutopilotSettingsModal({
                 baseChannels={baseChannels}
               />
             </div>
+
+            {/* Auto Publish */}
+            <AutoPublishField formControl={form.control} />
 
             {/* Actions */}
             <div className="flex items-center justify-end gap-2">
@@ -241,6 +251,32 @@ const FrequencyField = ({ formControl }: FormFieldProps) => {
             <Input type="number" min={1} max={30} {...field} />
           </FormControl>
           <FormMessage className="text-xs" />
+        </FormItem>
+      )}
+    />
+  )
+}
+
+const AutoPublishField = ({ formControl }: FormFieldProps) => {
+  return (
+    <FormField
+      control={formControl}
+      name="auto_publish"
+      render={({ field }) => (
+        <FormItem className="text-card-foreground flex items-center justify-between gap-4 rounded-lg border p-4">
+          <div className="space-y-0.5">
+            <FormLabel>Auto Publish</FormLabel>
+            <FormDescription className="text-balance">
+              Automatically publish generated posts without manual review
+            </FormDescription>
+          </div>
+          <FormControl>
+            <Switch
+              className="cursor-pointer"
+              checked={field.value ?? false}
+              onCheckedChange={field.onChange}
+            />
+          </FormControl>
         </FormItem>
       )}
     />

@@ -123,6 +123,7 @@ function AutoPilot() {
         defaultBasePrompt={data?.base_prompt}
         defaultFrequencyDays={data?.frequency_days}
         defaultChannels={data?.channels}
+        defaultAutoPublish={data?.auto_publish}
       />
     </div>
   )
