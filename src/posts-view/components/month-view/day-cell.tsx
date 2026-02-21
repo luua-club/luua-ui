@@ -54,7 +54,7 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
 
       <div
         className={cn(
-          'flex h-6 gap-1 px-2 lg:h-[94px] lg:flex-col lg:gap-0 lg:px-0',
+          'flex h-6 items-center gap-1 overflow-hidden px-2 lg:h-[94px] lg:flex-col lg:items-stretch lg:gap-0 lg:overflow-visible lg:px-0',
           !currentMonth && 'opacity-50'
         )}
       >
@@ -65,7 +65,7 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
             : `empty-${position}`
 
           return (
-            <div key={eventKey} className="lg:flex-1">
+            <div key={eventKey} className="lg:w-full lg:flex-1">
               {event && (
                 <>
                   <EventBullet className="lg:hidden" color={event.color} />

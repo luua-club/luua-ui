@@ -11,6 +11,7 @@ import { useMemo } from 'react'
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import type { ApiResponse } from '@/core/models/api.model'
+import { toEndOfDayIso, toStartOfDayIso } from '@/core/utils/common.util'
 
 import { ICalendarEventsResponse } from '../models/calendar.model'
 import { IEvent, IUser } from '../models/interfaces'
@@ -34,8 +35,8 @@ const useCalendarData = ({ currentDate }: UseCalendarDataOptions) => {
     const localEnd = endOfWeek(endOfMonth(currentDate))
 
     return {
-      startUtc: localStart.toISOString(),
-      endUtc: localEnd.toISOString(),
+      startUtc: toStartOfDayIso(localStart) ?? localStart.toISOString(),
+      endUtc: toEndOfDayIso(localEnd) ?? localEnd.toISOString(),
     }
   }, [currentDate])
 

@@ -1,4 +1,4 @@
-import { createLazyRoute, useLocation } from '@tanstack/react-router'
+import { createLazyRoute, Link, useLocation } from '@tanstack/react-router'
 import { Gauge, LampDesk, Lightbulb } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -71,9 +71,11 @@ function Welcome() {
           </p>
 
           <div className="mb-2 flex items-center gap-4">
-            <Button size="sm" className="text-xs" variant={'outline'}>
-              <Gauge className="size-3.5" /> Dashboard
-            </Button>
+            <Link to="/dashboard">
+              <Button size="sm" className="text-xs" variant={'outline'}>
+                <Gauge className="size-3.5" /> My Dashboard
+              </Button>
+            </Link>
 
             {/** Video */}
             <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtube_main_video}>

@@ -206,7 +206,7 @@ function DashboardPage() {
   }
 
   return (
-    <div className="bg-accent/60 dark:bg-background min-h-screen pt-8">
+    <div className="bg-accent/60 dark:bg-background min-h-screen pt-12">
       <AnalyticsCards />
 
       <div className="mx-auto max-w-5xl px-4 md:px-6">

@@ -145,10 +145,10 @@ export function MonthEventBadge({
 
           {/* Row 2 — status (left) + time (right) */}
           {showContent && status && (
-            <div className="flex w-full items-center justify-between pl-5">
+            <div className="flex w-full items-center justify-between pl-3">
               <span
                 className={cn(
-                  'inline-flex items-center gap-0.5 rounded-sm border px-1 py-[1px]',
+                  'inline-flex shrink-0 items-center gap-0.5 rounded-sm border px-1 py-[1px]',
                   status.chipClass,
                   status.textClass
                 )}
@@ -166,7 +166,7 @@ export function MonthEventBadge({
                   {status.label}
                 </span>
               </span>
-              <span className="text-foreground/85 dark:text-foreground/90 bg-muted/60 dark:bg-muted/45 rounded-sm px-1 py-[1px] text-[9px] font-semibold tabular-nums">
+              <span className="text-foreground/85 dark:text-foreground/90 bg-muted/60 dark:bg-muted/45 hidden rounded-sm px-1 py-[1px] text-[9px] font-semibold tabular-nums xl:inline">
                 {format(new Date(event.startDate), 'h:mm a')}
               </span>
             </div>

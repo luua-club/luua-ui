@@ -57,7 +57,7 @@ function AutoPilot() {
   }
 
   return (
-    <div className="m-auto max-w-4xl p-4">
+    <div className="m-auto mt-10 max-w-5xl p-4 md:mt-4">
       {/* ================= Card ================= */}
       <div className="bg-background rounded-md border">
         {/* Header */}
@@ -112,7 +112,7 @@ function AutoPilot() {
       </div>
 
       {/* ================= Drafts ================= */}
-      <div className="mt-12 px-2">
+      <div className="mt-4">
         <Drafts showOnlyAutoPilot />
       </div>
 

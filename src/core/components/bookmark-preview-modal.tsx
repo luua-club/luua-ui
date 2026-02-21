@@ -65,7 +65,7 @@ function BookmarkPreviewModal({
                   <p className="text-muted-foreground text-xs font-semibold uppercase">
                     Additional Context
                   </p>
-                  <p className="mt-1 text-sm break-words">
+                  <p className="text-primary mt-1 text-sm break-words">
                     {inspiration.additional_context}
                   </p>
                 </div>

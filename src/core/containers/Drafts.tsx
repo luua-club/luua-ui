@@ -205,11 +205,18 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
       {!isInspirationView && (
         <div
           className={cn(
-            'bg-muted/40 border-t border-b py-3',
-            showOnlyAutoPilot && 'rounded-md border'
+            !showOnlyAutoPilot && 'bg-muted/40 border-t border-b py-3',
+            showOnlyAutoPilot && 'mx-auto w-full max-w-5xl px-3 sm:px-4 md:px-6'
           )}
         >
-          <div className="mx-auto w-full max-w-5xl px-3 sm:px-4 md:px-6">
+          <div
+            className={cn(
+              !showOnlyAutoPilot &&
+                'mx-auto w-full max-w-5xl px-3 sm:px-4 md:px-6',
+              showOnlyAutoPilot &&
+                'bg-muted/40 rounded-md border px-3 py-3 sm:px-4 md:px-6'
+            )}
+          >
             <ListControls
               dateRange={dateRange}
               onDateRangeChange={setDateRange}

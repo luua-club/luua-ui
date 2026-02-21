@@ -181,7 +181,7 @@ function Bookmarks() {
   }
 
   return (
-    <div className="m-auto flex max-w-4xl flex-col gap-4 p-5">
+    <div className="m-auto mt-8 flex max-w-5xl flex-col gap-4 p-5 md:mt-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 text-center">
         <span className="flex items-center gap-2 text-lg font-bold">

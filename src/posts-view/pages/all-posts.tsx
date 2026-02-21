@@ -10,7 +10,7 @@ const tabClass = cn(
 function AllPosts() {
   return (
     <div className="flex flex-col">
-      <div className="mb-3 flex border-b pt-2">
+      <div className="mt-14 mb-4 flex items-end border-b md:mt-4">
         <Link to="/posts-view/calendar" className={tabClass}>
           Calendar View
         </Link>

@@ -85,7 +85,7 @@ function SourceProfile({
         <p className="text-primary -mt-1 line-clamp-2 text-sm font-semibold break-words underline-offset-4 hover:underline">
           {title || link}
         </p>
-        {description && (
+        {!!description && (
           <Tooltip>
             <TooltipTrigger asChild>
               <p className="text-muted-foreground mt-0.5 line-clamp-1 cursor-default text-xs break-words">
