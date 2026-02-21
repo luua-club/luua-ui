@@ -46,7 +46,6 @@ class PostsApi extends BaseApiService {
   async retryPost(id: string) {
     return this.post({ post_id: id }, `/retry`)
   }
-
 }
 
 export const postsApi = new PostsApi()
