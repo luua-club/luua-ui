@@ -256,6 +256,9 @@ function Create() {
 
     if (draftId) {
       draftPayload.id = draftId
+      if (draftQuery.data?.name) {
+        draftPayload.name = draftQuery.data.name
+      }
     }
 
     const linkedinObj = postDrafts.LinkedIn

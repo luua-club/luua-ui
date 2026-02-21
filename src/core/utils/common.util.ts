@@ -33,6 +33,24 @@ const toStartOfDayIso = (d?: Date): string | undefined => {
 }
 
 /**
+ * Normalize a calendar day to 23:59:59.999Z (UTC) and return ISO string
+ *
+ * @example
+ * toEndOfDayIso(new Date('2025-08-21T12:34:56.789Z')) // '2025-08-21T23:59:59.999Z'
+ * @param d The date to normalize
+ * @returns The normalized date in ISO string format
+ */
+const toEndOfDayIso = (d?: Date): string | undefined => {
+  if (!d) return undefined
+  const year = d.getFullYear()
+  const month = d.getMonth()
+  const date = d.getDate()
+  // Construct a Date at UTC day-end for the same calendar day
+  const utcEndOfDay = new Date(Date.UTC(year, month, date, 23, 59, 59, 999))
+  return utcEndOfDay.toISOString()
+}
+
+/**
  * Extracts the initial of a user's name
  *
  * @example
@@ -82,5 +100,6 @@ export {
   getRandomInt,
   logout,
   removeQueryParams,
+  toEndOfDayIso,
   toStartOfDayIso,
 }
