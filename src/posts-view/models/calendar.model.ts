@@ -7,6 +7,7 @@ export interface ICalendarEvent {
   status: postStatusType
   scheduled_at: string | null
   published_at: string | null
+  updated_at: string | null
   content: string
   external_id: string | null
   day_total: number

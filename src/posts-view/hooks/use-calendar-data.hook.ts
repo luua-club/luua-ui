@@ -8,7 +8,7 @@ import {
 } from 'date-fns'
 import { useMemo } from 'react'
 
-import { calendarApi } from '@/core/api/calendar.api'
+import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import type { ApiResponse } from '@/core/models/api.model'
 
@@ -41,14 +41,14 @@ const useCalendarData = ({ currentDate }: UseCalendarDataOptions) => {
 
   const query = useQuery<ApiResponse<ICalendarEventsResponse>>({
     queryKey: [QUERY_KEYS.calendarEvents, startUtc, endUtc],
-    queryFn: () => calendarApi.getEvents({ start: startUtc, end: endUtc }),
+    queryFn: () => postsApi.getCalendarEvents({ start: startUtc, end: endUtc }),
     refetchOnMount: 'always',
   })
 
   const events: IEvent[] = useMemo(() => {
     const raw = query.data?.data?.events ?? []
     return raw.flatMap(e => {
-      const displayTime = e.published_at ?? e.scheduled_at
+      const displayTime = e.published_at ?? e.scheduled_at ?? e.updated_at
       if (!displayTime) return []
       const displayDate = new Date(displayTime)
       return [
