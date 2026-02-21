@@ -1,4 +1,5 @@
 import { IPublishDraftRequest } from '../models/draft.model'
+import { IAnalyticsResponse } from '../models/post.model'
 import {
   IPublishedPostListRequest,
   IPublishedPostListResponse,
@@ -45,6 +46,10 @@ class PostsApi extends BaseApiService {
 
   async retryPost(id: string) {
     return this.post({ post_id: id }, `/retry`)
+  }
+
+  async getAnalytics() {
+    return this.get<IAnalyticsResponse>('/analytics')
   }
 }
 
