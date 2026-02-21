@@ -30,6 +30,7 @@ import {
 } from '@/core/models/auth.model'
 import { User } from '@/core/models/user.model'
 import { clearUser, setUser } from '@/core/store/auth-slice'
+import { getPostLoginRoute } from '@/core/utils/post-login-route.util'
 import { useTheme } from '@/shared/provider/theme-provider'
 import { Button } from '@/shared/ui/button'
 import { Highlighter } from '@/shared/ui/highlighter'
@@ -225,7 +226,10 @@ function Login() {
       }
 
       // Normal web app redirect (clear query params)
-      router.navigate({ to: '/welcome', search: {} })
+      router.navigate({
+        to: getPostLoginRoute({ loginResponse: res, user: response.data }),
+        search: {},
+      })
     } catch {
       removeLocalStorageItem(key)
       toast.error('Something went wrong, Please try again !')

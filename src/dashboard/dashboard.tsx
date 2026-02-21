@@ -9,8 +9,8 @@ import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
 import { type DraftItem } from '@/core/models/draft.model'
 import { type channelType } from '@/core/models/social.model'
-import AnalyticsCards from '@/creation/components/analytics-cards'
-import RenameDraftPopover from '@/creation/components/rename-draft-popover'
+import AnalyticsCards from '@/dashboard/components/analytics-cards'
+import RenameDraftPopover from '@/dashboard/components/rename-draft-popover'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardFooter } from '@/shared/ui/card'
 import { Separator } from '@/shared/ui/separator'
@@ -166,13 +166,13 @@ function DraftCardSkeleton() {
 }
 
 // ---------------------------------------------------------------------------
-// CreationLanding
+// DashboardPage
 // ---------------------------------------------------------------------------
-function CreationLanding() {
+function DashboardPage() {
   const navigate = useNavigate()
 
   const { data, isPending } = useQuery({
-    queryKey: [QUERY_KEYS.drafts, 'landing', 7],
+    queryKey: [QUERY_KEYS.drafts, 'dashboard', 7],
     queryFn: () => draftsApi.getDrafts({ limit: 7, offset: 0, sort: 'desc' }),
     staleTime: 30_000,
   })
@@ -251,8 +251,8 @@ function CreationLanding() {
   )
 }
 
-export const Route = createLazyRoute('/creation/')({
-  component: CreationLanding,
+export const Route = createLazyRoute('/dashboard')({
+  component: DashboardPage,
 })
 
-export default CreationLanding
+export default DashboardPage

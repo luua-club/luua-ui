@@ -19,7 +19,7 @@ export const ungroupedItems: ISidebarItem[] = [
   },
   {
     title: 'Dashboard',
-    url: '/creation',
+    url: '/dashboard',
     icon: Gauge,
   },
   {

@@ -404,7 +404,7 @@ function Create() {
           variant="outline"
           size="sm"
           className="text-xs"
-          onClick={() => navigate({ to: '/creation' })}
+          onClick={() => navigate({ to: '/dashboard' })}
         >
           <ArrowLeft />
           Back to Dashboard

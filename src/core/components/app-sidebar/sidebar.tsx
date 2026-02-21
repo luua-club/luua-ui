@@ -17,7 +17,7 @@ import AppSidebarFooter from './sidebar-footer'
 import AppSidebarHeader from './sidebar-header'
 import AppSidebarUngrouped from './sidebar-ungrouped'
 
-const dashboardItem = ungroupedItems.find(item => item.url === '/creation')!
+const dashboardItem = ungroupedItems.find(item => item.url === '/dashboard')!
 const welcomeItem = ungroupedItems.find(item => item.url === '/welcome')!
 
 function AppSidebar() {
