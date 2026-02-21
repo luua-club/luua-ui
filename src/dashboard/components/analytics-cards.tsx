@@ -137,19 +137,19 @@ function AnalyticsCard({ metric }: { metric: IAnalyticsMetric }) {
 // ---------------------------------------------------------------------------
 // Skeleton
 // ---------------------------------------------------------------------------
-function AnalyticsCardSkeleton() {
-  return (
-    <Card className="flex h-full min-w-0 flex-col gap-2 rounded-lg border p-4 shadow-none">
-      <Skeleton className="h-4 w-20" />
-      <Skeleton className="h-3 w-14" />
-      <Skeleton className="h-10 w-full" />
-      <div className="flex items-end justify-between">
-        <Skeleton className="h-7 w-12" />
-        <Skeleton className="h-4 w-10" />
-      </div>
-    </Card>
-  )
-}
+// function AnalyticsCardSkeleton() {
+//   return (
+//     <Card className="flex h-full min-w-0 flex-col gap-2 rounded-lg border p-4 shadow-none">
+//       <Skeleton className="h-4 w-20" />
+//       <Skeleton className="h-3 w-14" />
+//       <Skeleton className="h-10 w-full" />
+//       <div className="flex items-end justify-between">
+//         <Skeleton className="h-7 w-12" />
+//         <Skeleton className="h-4 w-10" />
+//       </div>
+//     </Card>
+//   )
+// }
 
 // ---------------------------------------------------------------------------
 // AnalyticsCards (exported)
@@ -170,13 +170,9 @@ export default function AnalyticsCards() {
   return (
     <div className="mx-auto mb-6 max-w-5xl px-4 md:px-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {isPending
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <AnalyticsCardSkeleton key={i} />
-            ))
-          : metrics.map(metric => (
-              <AnalyticsCard key={metric.label} metric={metric} />
-            ))}
+        {metrics.map(metric => (
+          <AnalyticsCard key={metric.label} metric={metric} />
+        ))}
       </div>
 
       {!isPending && totalPosts !== 0 && !isError && (
