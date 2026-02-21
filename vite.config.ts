@@ -80,6 +80,9 @@ export default defineConfig({
           if (id.includes('/src/review/')) {
             return 'route-review'
           }
+          if (id.includes('/src/drafts/')) {
+            return 'route-drafts'
+          }
         },
       },
     },

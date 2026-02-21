@@ -70,7 +70,10 @@ function Account({ user }: { user: UserState }) {
       <div className="py-8">
         <div className="flex items-center gap-4">
           <Avatar className="size-12">
-            <AvatarImage src={user.profile_image} alt={user.name} />
+            <AvatarImage
+              src={user.profile_image ?? undefined}
+              alt={user.name}
+            />
             <AvatarFallback className="bg-muted text-base font-medium">
               {extractUserInitial(user.name)}
             </AvatarFallback>

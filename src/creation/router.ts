@@ -1,4 +1,6 @@
-import { type AnyRoute, createRoute, redirect } from '@tanstack/react-router'
+import { type AnyRoute, createRoute } from '@tanstack/react-router'
+
+import { createSearchSchema } from './models/create-search.model'
 
 export default function getCreationRouteTree(privateRoute: AnyRoute) {
   const creationRoute = createRoute({
@@ -9,14 +11,12 @@ export default function getCreationRouteTree(privateRoute: AnyRoute) {
   const creationIndexRoute = createRoute({
     getParentRoute: () => creationRoute,
     path: '/',
-    loader: () => {
-      throw redirect({ to: '/creation/create' })
-    },
-  })
+  }).lazy(() => import('./pages/landing').then(d => d.Route))
 
   const createPageRoute = createRoute({
     getParentRoute: () => creationRoute,
     path: 'create',
+    validateSearch: search => createSearchSchema.parse(search),
   }).lazy(() => import('./pages/create').then(d => d.Route))
 
   return creationRoute.addChildren([creationIndexRoute, createPageRoute])

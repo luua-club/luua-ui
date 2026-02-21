@@ -41,9 +41,11 @@ const SidebarContent = () => {
   return (
     <>
       <AppSidebar />
-      <div className="w-full">
+      <div className="w-full min-w-0">
         <Nav handleSidebar={toggleSidebar} />
-        <main>{shouldShowLoader ? <GlobalLoader /> : <Outlet />}</main>
+        <main className="min-w-0">
+          {shouldShowLoader ? <GlobalLoader /> : <Outlet />}
+        </main>
       </div>
     </>
   )

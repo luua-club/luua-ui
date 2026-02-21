@@ -2,6 +2,7 @@ import {
   DraftItem,
   IDraftListRequest,
   IDraftListResponse,
+  IDraftRenameRequest,
   IDraftRequest,
   IDraftResponse,
 } from '../models/draft.model'
@@ -14,6 +15,13 @@ class DraftsApi extends BaseApiService {
 
   async postDraft(data: IDraftRequest) {
     return this.post<IDraftResponse>(data)
+  }
+
+  async renameDraft(data: IDraftRenameRequest) {
+    return this.patch<IDraftResponse, Pick<IDraftRenameRequest, 'name'>>(
+      { name: data.name },
+      `${data.id}/metadata`
+    )
   }
 
   async getDrafts(request: IDraftListRequest, autopilot = false) {
