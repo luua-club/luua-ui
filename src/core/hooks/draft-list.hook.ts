@@ -62,21 +62,16 @@ export function useDraftList(
       inspirationId,
     ],
     queryFn: () =>
-      draftsApi
-        .getDrafts(
-          {
-            limit,
-            offset,
-            sort: sortDir,
-            from: from,
-            to: to,
-          },
-          showOnlyAutoGen
-        )
-        .then(x => {
-          x.data.posts[0].autopilot = true
-          return x
-        }),
+      draftsApi.getDrafts(
+        {
+          limit,
+          offset,
+          sort: sortDir,
+          from: from,
+          to: to,
+        },
+        showOnlyAutoGen
+      ),
     placeholderData: prev => prev,
     refetchOnMount: 'always',
   })
