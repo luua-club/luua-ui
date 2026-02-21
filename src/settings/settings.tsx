@@ -66,7 +66,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="m-auto flex max-w-4xl flex-col p-5">
+    <div className="m-auto mt-8 flex max-w-4xl flex-col p-5">
       {/* Tab navigation with URL sync */}
       <Tabs
         className="w-full"

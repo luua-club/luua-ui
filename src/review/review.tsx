@@ -107,11 +107,11 @@ function Review() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-10">
+    <>
       <Button
         size="sm"
         variant={'outline'}
-        className="h-6 !px-1 text-xs"
+        className="mt-14 ml-4 text-xs md:m-4"
         onClick={() =>
           navigate({ to: '/creation/create', search: { draftId } })
         }
@@ -119,74 +119,77 @@ function Review() {
         <ChevronLeft className="size-3.5" />
         Back to editing
       </Button>
-      <Stepper
-        value={currentStep}
-        onValueChange={setCurrentStep}
-        indicators={{
-          completed: <Check className="size-4" />,
-          loading: <LoaderCircleIcon className="size-4 animate-spin" />,
-        }}
-        className="mt-4 space-y-8"
-      >
-        {/* Stepper Header */}
-        <ReviewStepperNav
-          steps={postViewSteps}
-          loadingStep={
-            isLoading
-              ? 'review'
-              : publishDraft.isPending || scheduleDraft.isPending
-                ? 'publish'
-                : undefined
-          }
-        />
 
-        {/* Stepper Content */}
-        <StepperPanel className="text-sm">
-          {postViewSteps.map((step, index) => (
-            <StepperContent key={index} value={index + 1}>
-              {step.id === 'review' && (
-                <ReviewPostView
-                  posts={draft?.posts || []}
-                  isLoading={isLoading}
-                  selectedPosts={selectedPosts}
-                  onSelectionChange={setSelectedPosts}
-                />
-              )}
+      <div className="mx-auto mt-8 max-w-4xl px-4 pb-10">
+        <Stepper
+          value={currentStep}
+          onValueChange={setCurrentStep}
+          indicators={{
+            completed: <Check className="size-4" />,
+            loading: <LoaderCircleIcon className="size-4 animate-spin" />,
+          }}
+          className="mt-4 space-y-8"
+        >
+          {/* Stepper Header */}
+          <ReviewStepperNav
+            steps={postViewSteps}
+            loadingStep={
+              isLoading
+                ? 'review'
+                : publishDraft.isPending || scheduleDraft.isPending
+                  ? 'publish'
+                  : undefined
+            }
+          />
 
-              {step.id === 'schedule' && (
-                <SchedulePost setSelectedUTCDate={setSelectedUTCDate} />
-              )}
+          {/* Stepper Content */}
+          <StepperPanel className="text-sm">
+            {postViewSteps.map((step, index) => (
+              <StepperContent key={index} value={index + 1}>
+                {step.id === 'review' && (
+                  <ReviewPostView
+                    posts={draft?.posts || []}
+                    isLoading={isLoading}
+                    selectedPosts={selectedPosts}
+                    onSelectionChange={setSelectedPosts}
+                  />
+                )}
 
-              {step.id === 'publish' && (
-                <ConnectPublish
-                  user={userState}
-                  channels={selectedChannels}
-                  hideQuickShare={!!search.schedule || allChannelsConnected}
-                  selectedPosts={selectedPosts}
-                />
-              )}
-            </StepperContent>
-          ))}
-        </StepperPanel>
+                {step.id === 'schedule' && (
+                  <SchedulePost setSelectedUTCDate={setSelectedUTCDate} />
+                )}
 
-        {/* Stepper Navigation */}
-        <StepperNavigation
-          isLoading={isLoading}
-          currentStep={currentStep}
-          totalSteps={postViewSteps.length}
-          isPublishDisabled={isPublishDisabled}
-          onPrevious={() => setCurrentStep(prev => prev - 1)}
-          onNext={() => setCurrentStep(prev => prev + 1)}
-          publishDraft={publishDraft}
-          selectedPosts={selectedPosts}
-          draftId={draftId}
-          isSchedule={!!search.schedule}
-          selectedUTCDate={selectedUTCDate}
-          currentStepId={postViewSteps[currentStep - 1]?.id}
-          scheduleDraft={scheduleDraft}
-        />
-      </Stepper>
-    </div>
+                {step.id === 'publish' && (
+                  <ConnectPublish
+                    user={userState}
+                    channels={selectedChannels}
+                    hideQuickShare={!!search.schedule || allChannelsConnected}
+                    selectedPosts={selectedPosts}
+                  />
+                )}
+              </StepperContent>
+            ))}
+          </StepperPanel>
+
+          {/* Stepper Navigation */}
+          <StepperNavigation
+            isLoading={isLoading}
+            currentStep={currentStep}
+            totalSteps={postViewSteps.length}
+            isPublishDisabled={isPublishDisabled}
+            onPrevious={() => setCurrentStep(prev => prev - 1)}
+            onNext={() => setCurrentStep(prev => prev + 1)}
+            publishDraft={publishDraft}
+            selectedPosts={selectedPosts}
+            draftId={draftId}
+            isSchedule={!!search.schedule}
+            selectedUTCDate={selectedUTCDate}
+            currentStepId={postViewSteps[currentStep - 1]?.id}
+            scheduleDraft={scheduleDraft}
+          />
+        </Stepper>
+      </div>
+    </>
   )
 }
 

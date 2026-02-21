@@ -57,11 +57,7 @@ export function AppContent() {
     error,
   } = useQuery({
     queryKey: [QUERY_KEYS.user],
-    queryFn: () =>
-      userApi.getUser().then(x => {
-        x.data.plan = 'Pro'
-        return x
-      }),
+    queryFn: () => userApi.getUser(),
     enabled: !!isLoggedIn && !isLoginRoute,
   })
 
