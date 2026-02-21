@@ -1,7 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
-  Bookmark,
   Bot,
   Calendar,
   ChevronDown,
@@ -18,7 +17,6 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-import BookmarkPreviewModal from '@/core/components/bookmark-preview-modal'
 import Post from '@/core/components/Post'
 import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
@@ -52,12 +50,6 @@ interface DraftsProps {
 }
 
 const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
-  // --- Bookmark preview modal state ---
-  const [bookmarkModalOpen, setBookmarkModalOpen] = useState(false)
-  const [bookmarkInspirationId, setBookmarkInspirationId] = useState<
-    string | null
-  >(null)
-
   // --- Hooks ---
   const {
     dateRange,
@@ -80,6 +72,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
     pendingDeletePost,
     deletingIds,
     isDeleting,
+    renameDraft,
   } = useDraftList(showOnlyAutoPilot, inspirationId)
   const navigate = useNavigate()
 
@@ -171,25 +164,24 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
       >
         <div className="mt-4 flex flex-col gap-4">
           {/* Skeleton */}
-          {isLoading &&
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-card rounded-lg border">
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <Skeleton className="size-4 rounded" />
-                  <Skeleton className="h-4 w-44 rounded" />
-                  <Skeleton className="ml-2 h-4 w-24 rounded" />
-                  <div className="ml-auto flex gap-1.5">
-                    <Skeleton className="h-8 w-14 rounded-md" />
-                    <Skeleton className="size-8 rounded-md" />
-                  </div>
-                </div>
-                <Separator />
-                <div className="grid grid-cols-2 gap-4 p-4">
-                  <Skeleton className="h-40 rounded-lg" />
-                  <Skeleton className="h-40 rounded-lg" />
+          {isLoading && (
+            <div className="bg-card rounded-lg border">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Skeleton className="size-4 rounded" />
+                <Skeleton className="h-4 w-44 rounded" />
+                <Skeleton className="ml-2 h-4 w-24 rounded" />
+                <div className="ml-auto flex gap-1.5">
+                  <Skeleton className="h-8 w-14 rounded-md" />
+                  <Skeleton className="size-8 rounded-md" />
                 </div>
               </div>
-            ))}
+              <Separator />
+              <div className="grid grid-cols-2 gap-4 p-4">
+                <Skeleton className="h-40 rounded-lg" />
+                <Skeleton className="h-40 rounded-lg" />
+              </div>
+            </div>
+          )}
 
           {/* Empty state */}
           {!isLoading && drafts.length === 0 && (
