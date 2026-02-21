@@ -1,11 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDown, ArrowUp, BarChart3 } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { type IAnalyticsMetric } from '@/core/models/post.model'
+import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/shared/ui/tooltip'
 
 // ---------------------------------------------------------------------------
 // Sparkline — simple inline SVG chart
@@ -17,7 +24,7 @@ function Sparkline({
   data: number[]
   color?: string
 }) {
-  if (!data.length || data.every(v => v === 0)) {
+  if (data.length < 2 || data.every(v => v === 0)) {
     return <div className="h-10 w-full" />
   }
 
@@ -104,6 +111,7 @@ function AnalyticsCard({ metric }: { metric: IAnalyticsMetric }) {
       <div className="flex items-end justify-between">
         <p className="text-foreground text-2xl leading-none font-semibold">
           {formatMetricValue(metric.value)}
+          {metric.label === 'Engagement Rate' && '%'}
         </p>
         {hasChange && (
           <span
@@ -116,7 +124,7 @@ function AnalyticsCard({ metric }: { metric: IAnalyticsMetric }) {
             ) : (
               <ArrowDown className="size-3" />
             )}
-            {Math.abs(metric.change_percent!)}%
+            {Math.abs(metric.change_percent!).toFixed(1)}%
           </span>
         )}
       </div>
@@ -145,7 +153,7 @@ function AnalyticsCardSkeleton() {
 // AnalyticsCards (exported)
 // ---------------------------------------------------------------------------
 export default function AnalyticsCards() {
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: [QUERY_KEYS.analytics],
     queryFn: () => postsApi.getAnalytics(),
     staleTime: 5 * 60_000, // 5 minutes
@@ -154,15 +162,11 @@ export default function AnalyticsCards() {
   const metrics = data?.data?.metrics ?? []
   const totalPosts = data?.data?.total_posts ?? 0
 
-  // Don't render anything if no published posts
-  if (!isPending && totalPosts === 0) return null
+  // Don't render anything if no published posts (but still show on error)
+  if (!isPending && !isError && totalPosts === 0) return null
 
   return (
-    <div className="mx-auto max-w-5xl px-6">
-      <h2 className="mb-4 flex gap-2 text-sm font-medium">
-        <BarChart3 className="size-5" /> Analytics
-      </h2>
-
+    <div className="mx-auto mb-6 max-w-5xl px-6">
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {isPending
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -171,6 +175,21 @@ export default function AnalyticsCards() {
           : metrics.map(metric => (
               <AnalyticsCard key={metric.label} metric={metric} />
             ))}
+      </div>
+
+      <div className="flex justify-end pt-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="link" className="text-xs">
+                View more
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Detailed analytics coming soon!</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   )
