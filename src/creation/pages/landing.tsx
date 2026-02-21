@@ -11,6 +11,7 @@ import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import { type DraftItem } from '@/core/models/draft.model'
 import { type channelType } from '@/core/models/social.model'
 import { creationTabsActions } from '@/core/store/creation-tabs-slice'
+import AnalyticsCards from '@/creation/components/analytics-cards'
 import RenameDraftPopover from '@/creation/components/rename-draft-popover'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardFooter } from '@/shared/ui/card'
@@ -223,6 +224,8 @@ function CreationLanding() {
 
   return (
     <div className="bg-accent/60 min-h-screen pt-8">
+      <AnalyticsCards />
+      <div className="mt-6" />
       <div className="mx-auto max-w-5xl px-6">
         <h1 className="mb-4 flex gap-2 text-sm font-medium">
           <FolderEdit className="size-5" /> Pick Up Where You Left Off
