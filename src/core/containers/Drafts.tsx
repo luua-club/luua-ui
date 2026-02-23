@@ -24,6 +24,7 @@ import { DraftItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import ErrorBanner from '@/shared/components/error-banner'
+import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import {
   Collapsible,
@@ -236,7 +237,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
           isInspirationView && 'mt-0'
         )}
       >
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="mt-4 flex flex-col gap-8">
           {/* Skeleton */}
           {isLoading && (
             <div className="bg-card rounded-lg border">
@@ -266,12 +267,16 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
               <p className="text-sm font-medium">
                 {showOnlyAutoPilot
                   ? 'No generated drafts yet'
-                  : 'No drafts yet'}
+                  : isInspirationView
+                    ? 'No drafts found for the given bookmark'
+                    : 'No drafts yet'}
               </p>
               <p className="text-muted-foreground text-xs">
                 {showOnlyAutoPilot
                   ? 'Your Autopilot generated drafts will appear here'
-                  : 'Your saved drafts will appear here.'}
+                  : isInspirationView
+                    ? 'It could be either deleted or published'
+                    : ' Your saved drafts will appear here.'}
               </p>
             </div>
           )}
@@ -281,7 +286,6 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
             drafts.map((draft: DraftItem, idx: number) => {
               const isOpen = isDraftOpen(draft.id)
               const isRenaming = renamingId === draft.id
-              const postCount = draft.posts.length
 
               return (
                 <Collapsible
@@ -289,7 +293,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                   open={isOpen}
                   onOpenChange={() => toggleOpen(draft.id)}
                   className={cn(
-                    'bg-card rounded-lg border',
+                    'bg-card rounded-lg border shadow',
                     deletingIds.has(draft.id) &&
                       'pointer-events-none opacity-40'
                   )}
@@ -376,27 +380,18 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                           </TooltipTrigger>
                           <TooltipContent>Rename</TooltipContent>
                         </Tooltip>
+
+                        <Badge className="text-primary rounded-full bg-blue-100">
+                          <FileText /> Draft
+                        </Badge>
                       </div>
                     )}
 
                     <div className="text-muted-foreground flex w-full min-w-0 items-center justify-between gap-2 text-xs sm:ml-auto sm:w-auto sm:shrink-0 sm:justify-end">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <span
-                          className="max-w-[7.5rem] truncate sm:max-w-none"
-                          title={new Date(draft.updated_at).toString()}
-                        >
-                          {format(new Date(draft.updated_at), 'MMM d, h:mm a')}
-                        </span>
-                        <span className="text-muted-foreground/40">·</span>
-                        <span className="shrink-0">
-                          {postCount} {postCount === 1 ? 'post' : 'posts'}
-                        </span>
-                      </div>
-
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="h-8 gap-1.5 px-2 text-xs sm:px-3"
+                        className="h-7 gap-1.5 px-2 text-xs sm:px-3"
                         onClick={() =>
                           navigate({
                             to: `/creation/create`,
@@ -457,12 +452,12 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                   </div>
 
                   {/* Expanded content */}
-                  <CollapsibleContent className="bg-muted/60 rounded-b-lg">
+                  <CollapsibleContent className="bg-muted/60 relative rounded-b-lg shadow">
                     <Separator />
                     <div
                       className={cn(
                         'grid grid-cols-1 gap-4 p-3 sm:p-4',
-                        draft.posts.length > 1 && 'lg:grid-cols-2'
+                        'lg:grid-cols-2'
                       )}
                     >
                       {(['LinkedIn', 'Twitter'] as channelType[]).map(
@@ -490,6 +485,15 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                           )
                         }
                       )}
+                    </div>
+
+                    <div className="text-accent-foreground/40 absolute top-0 right-0 flex items-center justify-end gap-2 p-4 font-medium">
+                      <span
+                        className="text-xs"
+                        title={new Date(draft.updated_at).toString()}
+                      >
+                        {format(new Date(draft.updated_at), 'MMM d, h:mm a')}
+                      </span>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
