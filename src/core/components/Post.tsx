@@ -105,7 +105,9 @@ function Post({
 
           {/** SOCIAL LOGO */}
           {platform && platform.logo && (
-            <platform.logo className="dark:bg-card size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
+            <div className="dark:bg-card rounded-full border-1 border-dashed p-3">
+              <platform.logo className="size-5" />
+            </div>
           )}
         </div>
 
