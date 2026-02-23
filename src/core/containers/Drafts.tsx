@@ -233,7 +233,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
 
       <div
         className={cn(
-          'mx-auto mt-4 flex w-full max-w-5xl flex-col px-3 sm:px-4 md:px-6',
+          'mx-auto mt-4 mb-8 flex w-full max-w-5xl flex-col px-3 sm:px-4 md:px-6',
           isInspirationView && 'mt-0'
         )}
       >
@@ -381,7 +381,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                           <TooltipContent>Rename</TooltipContent>
                         </Tooltip>
 
-                        <Badge className="text-primary rounded-full bg-blue-100">
+                        <Badge className="text-primary rounded-full bg-blue-100 dark:bg-blue-500">
                           <FileText /> Draft
                         </Badge>
                       </div>
