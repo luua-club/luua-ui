@@ -15,7 +15,7 @@ import {
 import AppSideBarItem from './sidebar-item'
 
 const savedWorkItem: ISidebarItem = {
-  title: 'Saved Work',
+  title: 'Saved Drafts',
   url: '/drafts',
   icon: FolderClosed,
 }
