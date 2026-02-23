@@ -33,29 +33,25 @@ const STATUS_CONFIG: Record<
     label: 'Published',
     icon: CheckCircle,
     textClass: 'text-emerald-700 dark:text-emerald-200',
-    chipClass:
-      'border-emerald-200 bg-emerald-100/85 dark:border-emerald-400/45 dark:bg-emerald-500/20',
+    chipClass: 'border-none',
   },
   Scheduled: {
     label: 'Scheduled',
     icon: Clock,
     textClass: 'text-blue-700 dark:text-blue-200',
-    chipClass:
-      'border-blue-200 bg-blue-100/85 dark:border-blue-400/45 dark:bg-blue-500/20',
+    chipClass: 'border-none',
   },
   Queued: {
     label: 'Queued',
     icon: Loader,
     textClass: 'text-amber-700 dark:text-amber-200',
-    chipClass:
-      'border-amber-200 bg-amber-100/85 dark:border-amber-400/45 dark:bg-amber-500/20',
+    chipClass: 'border-none',
   },
   Failed: {
     label: 'Failed',
     icon: XCircle,
     textClass: 'text-red-700 dark:text-red-200',
-    chipClass:
-      'border-red-200 bg-red-100/85 dark:border-red-400/45 dark:bg-red-500/20',
+    chipClass: 'border-none',
   },
 }
 
@@ -122,7 +118,7 @@ export function MonthEventBadge({
         role="button"
         tabIndex={0}
         className={cn(
-          'bg-card text-card-foreground focus-visible:ring-ring hover:bg-accent/50 ring-border relative mx-1 h-11 w-[calc(100%-8px)] cursor-pointer overflow-hidden rounded-xs shadow-sm ring-1 transition-all select-none hover:shadow-md focus-visible:ring-2 focus-visible:outline-none',
+          'bg-card focus-visible:ring-ring hover:bg-accent/50 ring-border relative mx-1 h-11 w-[calc(100%-8px)] cursor-pointer overflow-hidden rounded-sm ring-1 transition-all select-none focus-visible:ring-2 focus-visible:outline-none',
           positionClass,
           className
         )}
@@ -130,7 +126,7 @@ export function MonthEventBadge({
       >
         {/* Card body */}
         <div className="flex h-full w-full flex-col justify-center gap-0.5 overflow-hidden px-1.5 pt-1 pb-[3px]">
-          {/* Row 1 — icon + title */}
+          {/* Row 1 — platform logo + title */}
           <div className="flex w-full min-w-0 items-center gap-1.5 overflow-hidden">
             {PlatformLogo && (
               <PlatformLogo width={14} height={14} className="shrink-0" />
@@ -143,7 +139,7 @@ export function MonthEventBadge({
             </p>
           </div>
 
-          {/* Row 2 — status (left) + time (right) */}
+          {/* Row 2 — status badge (left) + time (right) */}
           {showContent && status && (
             <div className="flex w-full items-center justify-between pl-3">
               <span
@@ -162,18 +158,18 @@ export function MonthEventBadge({
                       : undefined
                   }
                 />
-                <span className="text-[9px] leading-none font-semibold">
+                <span className="hidden text-[9px] leading-none font-semibold xl:inline">
                   {status.label}
                 </span>
               </span>
-              <span className="text-foreground/85 dark:text-foreground/90 bg-muted/60 dark:bg-muted/45 hidden rounded-sm px-1 py-[1px] text-[9px] font-semibold tabular-nums xl:inline">
+              <span className="text-foreground/70 dark:text-foreground/90 dark:bg-muted/45 rounded-sm px-1 py-[1px] text-[9px] font-semibold tabular-nums">
                 {format(new Date(event.startDate), 'h:mm a')}
               </span>
             </div>
           )}
         </div>
 
-        {/* Thin colored accent bar */}
+        {/* Bottom colored accent bar */}
         <div
           className="absolute inset-x-0 bottom-0 h-[2px]"
           style={{ backgroundColor: accentColor }}
