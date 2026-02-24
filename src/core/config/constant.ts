@@ -55,13 +55,15 @@ export const EDIT_PROMPT_TEXT = [
 export const SOCIAL_PLATFORM: ISocialChannel[] = [
   {
     name: 'LinkedIn',
+    label: 'LinkedIn',
     logo: BrandLinkedIn,
     tooltip: 'Linkedin',
   },
   {
     name: 'Twitter',
+    label: 'X / Twitter',
     logo: BrandX,
-    tooltip: 'Twitter / X.com',
+    tooltip: 'X / Twitter',
   },
 ]
 

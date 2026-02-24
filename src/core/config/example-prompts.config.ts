@@ -10,7 +10,7 @@ const standardPrompts: ExamplePrompt = {
   title: 'General Query',
   prompt: [
     'Write a post sharing my insights and opinions on the Netflix tech blog https://netflixtechblog.com/building-a-resilient-data-platform-with-write-ahead-log-at-netflix-127b6712359a',
-    'Write a post on how using AI for writing posts on social media platforms like LinkedIn and Twitter is a good idea',
+    'Write a post on how using AI for writing posts on social media platforms like LinkedIn and X / Twitter is a good idea',
     'Post summarizing the key points from this Google Blog, on how the AI will shape the future of work https: https://blog.google/products/google-cloud/ai-trends-business-2025/',
     'Write a post discussing how upcoming AR/VR glasses might revolutionize social media experiences.',
   ],
@@ -33,7 +33,7 @@ const linkedinPrompts: ExamplePrompt = {
 }
 
 const twitterPrompts: ExamplePrompt = {
-  title: 'From Twitter / X',
+  title: 'From X / Twitter',
   prompt: [
     'Write a congratulatory post about this SpaceX update on the Starship flight test — https://x.com/SpaceX/status/1977925739979612203',
     'Summarize the key insight from this tweet by Sam Altman on the pace of AI progress — https://x.com/pascal_bornet/status/1970518812660506720',

@@ -69,7 +69,7 @@ export function SocialFilter() {
             <StackedIcons size={24} />
           )}
           <span className="text-foreground text-sm font-medium">
-            {selectedPlatform ? selectedPlatform.name : 'All'}
+            {selectedPlatform ? selectedPlatform.label : 'All'}
           </span>
           <ChevronDown className="text-muted-foreground h-3.5 w-3.5" />
         </button>
@@ -113,7 +113,7 @@ export function SocialFilter() {
           >
             <PlatformAvatar channel={platform.name} size={26} />
             <span className="flex-1 text-left font-medium">
-              {platform.name}
+              {platform.label}
             </span>
             {selectedChannel === platform.name && (
               <Check className="text-foreground h-4 w-4 shrink-0" />

@@ -75,10 +75,10 @@ function SocialCard({
         {platform?.logo && <platform.logo className="size-5" />}
         <span>
           {isConnected
-            ? `${platform.name} connected`
+            ? `${platform.label} connected`
             : isLinkedInPending
-              ? `${platform.name} pending setup`
-              : `${platform.name} not connected`}
+              ? `${platform.label} pending setup`
+              : `${platform.label} not connected`}
         </span>
       </div>
 
@@ -99,10 +99,10 @@ function SocialCard({
         <div className="space-y-2 px-2">
           <h3 className="text-lg leading-tight font-semibold">
             {isConnected
-              ? `Your ${platform.name} is connected`
+              ? `Your ${platform.label} is connected`
               : isLinkedInPending
-                ? `Finish your ${platform.name} setup`
-                : `Connect your ${platform.name} account`}
+                ? `Finish your ${platform.label} setup`
+                : `Connect your ${platform.label} account`}
           </h3>
           <p className="text-muted-foreground text-sm leading-relaxed text-balance">
             {isConnected

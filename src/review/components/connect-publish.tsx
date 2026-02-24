@@ -49,7 +49,7 @@ function ConnectPublish({
           Connect your socials <ChevronRight className="size-5" />
         </h2>
         <p className="text-muted-foreground text-sm font-medium text-balance">
-          Connect your LinkedIn or X/Twitter safely — we use official
+          Connect your LinkedIn or X / Twitter safely — we use official
           integrations and never access your personal data. Every post goes live
           only after you approve it.
         </p>
@@ -73,7 +73,7 @@ function ConnectPublish({
                     className="text-card-foreground cursor-pointer text-xs"
                   >
                     <Icon className="size-4" />
-                    Share to {platform.name}
+                    Share to {platform.label}
                   </Button>
                 )
               })}
