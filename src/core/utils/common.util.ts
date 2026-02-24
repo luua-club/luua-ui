@@ -2,7 +2,11 @@ import posthog from 'posthog-js'
 
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
 
-import { LUUA_USER_KEY } from '../config/constant'
+import {
+  LUUA_SELECTED_ORG_KEY,
+  LUUA_SELECTED_PROJECT_KEY,
+  LUUA_USER_KEY,
+} from '../config/constant'
 
 /**
  * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
@@ -11,6 +15,8 @@ import { LUUA_USER_KEY } from '../config/constant'
 const logout = () => {
   posthog.reset()
   removeLocalStorageItem(LUUA_USER_KEY)
+  removeLocalStorageItem(LUUA_SELECTED_ORG_KEY)
+  removeLocalStorageItem(LUUA_SELECTED_PROJECT_KEY)
   window.location.href = '/login'
 }
 

@@ -27,7 +27,7 @@ class UserApi extends BaseApiService {
    * @returns Promise<ApiResponse<userStyleResponseType>> The user style
    */
   async getUserStyle() {
-    return this.get<userStyleResponseType>('/user_style_prefs')
+    return this.get<userStyleResponseType>('/project_style_prefs')
   }
 
   /**
@@ -37,7 +37,7 @@ class UserApi extends BaseApiService {
    * @returns Promise<ApiResponse<userStyleResponseType>> The response from the server
    */
   async setUserStyle(data: IUserStyleRequest) {
-    return this.post<userStyleResponseType>(data, '/user_style_prefs')
+    return this.post<userStyleResponseType>(data, '/project_style_prefs')
   }
 
   /**

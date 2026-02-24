@@ -30,6 +30,7 @@ import {
 } from '@/core/models/auth.model'
 import { User } from '@/core/models/user.model'
 import { clearUser, setUser } from '@/core/store/auth-slice'
+import { setOrganizations } from '@/core/store/org-slice'
 import { getPostLoginRoute } from '@/core/utils/post-login-route.util'
 import { useTheme } from '@/shared/provider/theme-provider'
 import { Button } from '@/shared/ui/button'
@@ -192,6 +193,12 @@ function Login() {
       })
 
       dispatch(setUser(response.data))
+      dispatch(
+        setOrganizations({
+          organizations: response.data.organizations ?? [],
+          projects: response.data.projects ?? [],
+        })
+      )
       setLocalStorageItem(key, {
         ...getLocalStorageItem<LoginResponse>(key),
         user: response.data,
