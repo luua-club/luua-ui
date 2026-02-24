@@ -206,7 +206,8 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
       {!isInspirationView && (
         <div
           className={cn(
-            !showOnlyAutoPilot && 'bg-muted/40 border-t border-b py-3',
+            !showOnlyAutoPilot &&
+              'bg-secondary dark:bg-secondary/70 border-t border-b py-3',
             showOnlyAutoPilot && 'mx-auto w-full max-w-5xl px-3 sm:px-4 md:px-6'
           )}
         >
