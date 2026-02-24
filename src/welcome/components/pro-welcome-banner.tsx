@@ -100,9 +100,9 @@ function ProWelcomeBanner({ open, onOpenChange }: ProWelcomeBannerProps) {
     },
     {
       title: 'Multi-Platform Reach',
-      description: 'Twitter/ X is Unlocked, All Socials in One Place',
+      description: 'X / Twitter is Unlocked, All Socials in One Place',
       longDescription:
-        'Expand your reach by publishing directly to Twitter also, managing all channels seamlessly from one platform.',
+        'Expand your reach by publishing directly to X / Twitter also, managing all channels seamlessly from one platform.',
       color: 'bg-black',
       image: (
         <img

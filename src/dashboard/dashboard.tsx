@@ -33,7 +33,7 @@ function StackedPlatformIcons({ channels }: { channels: channelType[] }) {
             key={platform.name}
             className="flex items-center justify-center rounded-full border border-dashed"
             style={{ width: 26, height: 26, marginLeft: i === 0 ? 0 : -4 }}
-            title={platform.name}
+            title={platform.label}
           >
             <Logo width={14} height={14} />
           </span>

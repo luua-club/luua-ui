@@ -94,7 +94,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
       {!isProPlan && (
         <div className={overlayClassNames}>
           <p className="font-semibold">
-            Upgrade plan to post content for Twitter/X
+            Upgrade plan to post content for X / Twitter
           </p>
           <UpgradePlanCta
             onClick={() =>

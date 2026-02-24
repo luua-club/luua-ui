@@ -6,6 +6,7 @@ export type LinkedInAccountType = 'personal' | 'page'
 
 export interface ISocialChannel {
   name: channelType
+  label: string
   logo: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
   tooltip: string
 }

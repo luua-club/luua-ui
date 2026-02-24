@@ -103,7 +103,7 @@ const Settings = () => {
             </div>
             <Separator />
             <p className="text-muted-foreground mt-4 mb-8 text-sm text-balance lg:max-w-2xl">
-              Connect your LinkedIn or X/Twitter safely — we use official
+              Connect your LinkedIn or X / Twitter safely — we use official
               integrations and never access your personal data. Every post goes
               live only after you approve it.
             </p>

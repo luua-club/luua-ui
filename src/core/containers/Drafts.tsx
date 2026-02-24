@@ -477,7 +477,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                               <div className="flex items-center gap-1.5">
                                 <platform.logo className="size-4" />
                                 <p className="text-sm font-semibold">
-                                  {platform.name}
+                                  {platform.label}
                                 </p>
                               </div>
                               {post}

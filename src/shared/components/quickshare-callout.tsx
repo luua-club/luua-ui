@@ -13,7 +13,7 @@ const QuickShareCallout = ({ children }: QuickShareCalloutProps) => {
       <AlertTitle>Prefer to post manually?</AlertTitle>
       <AlertDescription className="mt-2 flex flex-col gap-4">
         Post instantly without connecting your account. This opens the native
-        LinkedIn/Twitter editor with your text ready to go.
+        LinkedIn / X / Twitter editor with your text ready to go.
         {children}
       </AlertDescription>
     </Alert>

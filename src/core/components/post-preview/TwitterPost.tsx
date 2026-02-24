@@ -79,7 +79,7 @@ const TwitterPost = (props: PostPreviewProps) => {
       {!isProPlan && (
         <div className={overlayClassNames}>
           <p className="font-semibold">
-            Upgrade plan to post content on twitter
+            Upgrade plan to post content on X / Twitter
           </p>
           <Button
             variant="default"
@@ -218,7 +218,7 @@ const TwitterPostHeader = ({
             <TriangleAlert className="size-4 animate-pulse text-yellow-500" />
           </TooltipTrigger>
           <TooltipContent>
-            <p>Twitter not connected</p>
+            <p>X / Twitter not connected</p>
           </TooltipContent>
         </Tooltip>
       )}
