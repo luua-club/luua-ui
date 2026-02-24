@@ -17,6 +17,7 @@ type PostProps = IPost & {
   isLoading?: boolean
   tileView?: boolean
   maintainFormatting?: boolean
+  noBorder?: boolean
 }
 
 function Post({
@@ -26,6 +27,7 @@ function Post({
   isLoading = false,
   tileView = false,
   maintainFormatting = false,
+  noBorder = false,
 }: PostProps) {
   // Read-more toggle for not-editable view
   const [expanded, setExpanded] = useState(false)
@@ -76,10 +78,11 @@ function Post({
     <Card
       className={cn(
         'bg-card relative flex flex-col rounded-md p-0 shadow-none',
-        tileView ? 'min-h-auto' : 'h-fit'
+        tileView ? 'min-h-auto' : 'h-fit',
+        noBorder && 'border-none'
       )}
     >
-      <CardContent className="flex flex-1 flex-col p-0">
+      <CardContent className="flex flex-1 flex-col border-none p-0">
         {/** USER INFO */}
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3">
           {/** AVATAR */}
@@ -167,12 +170,19 @@ function Post({
   )
 }
 
-export const PostSkeleton = ({ tileView = false }: { tileView?: boolean }) => {
+export const PostSkeleton = ({
+  tileView = false,
+  noBorder = false,
+}: {
+  tileView?: boolean
+  noBorder?: boolean
+}) => {
   return (
     <Card
       className={cn(
         'relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none',
-        tileView ? 'min-h-36' : 'h-fit'
+        tileView ? 'min-h-36' : 'h-fit',
+        noBorder && 'border-none'
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">

@@ -258,7 +258,7 @@ function StepperNavigation({
             scheduleDate: selectedUTCDate,
           })
           toast.success('Posts scheduled successfully!')
-          navigate({ to: '/schedule' })
+          navigate({ to: '/posts-view/list', search: { status: 'Scheduled' } })
           return
         } else {
           await publishDraft.mutateAsync({
@@ -272,7 +272,7 @@ function StepperNavigation({
         }
 
         showConfetti()
-        navigate({ to: '/published' })
+        navigate({ to: '/posts-view/list', search: { status: 'Published' } })
       } catch {
         toast.error(
           isSchedule ? 'Failed to schedule posts' : 'Failed to publish posts'

@@ -22,7 +22,7 @@ type StatusOption = {
   dot: string
 }
 
-const STATUS_OPTIONS: StatusOption[] = [
+export const STATUS_OPTIONS: StatusOption[] = [
   {
     value: 'Scheduled',
     label: 'Scheduled',
@@ -61,8 +61,17 @@ const STATUS_OPTIONS: StatusOption[] = [
   },
 ]
 
-export function StatusFilter() {
-  const { selectedStatus, setSelectedStatus } = useCalendar()
+interface StatusFilterBaseProps {
+  value: postStatusType | 'all'
+  onChange: (status: postStatusType | 'all') => void
+  align?: 'start' | 'center' | 'end'
+}
+
+export function StatusFilterBase({
+  value: selectedStatus,
+  onChange,
+  align = 'end',
+}: StatusFilterBaseProps) {
   const [open, setOpen] = useState(false)
 
   const active = STATUS_OPTIONS.find(s => s.value === selectedStatus) ?? null
@@ -92,13 +101,13 @@ export function StatusFilter() {
 
       <PopoverContent
         className="bg-popover text-popover-foreground w-56 border p-2 shadow-lg"
-        align="end"
+        align={align}
         sideOffset={6}
       >
         {/* All / reset row */}
         <button
           onClick={() => {
-            setSelectedStatus('all')
+            onChange('all')
             setOpen(false)
           }}
           className={`mb-2 flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
@@ -126,7 +135,7 @@ export function StatusFilter() {
               <button
                 key={option.value}
                 onClick={() => {
-                  setSelectedStatus(isSelected ? 'all' : option.value)
+                  onChange(isSelected ? 'all' : option.value)
                   setOpen(false)
                 }}
                 className={cn(
@@ -152,5 +161,12 @@ export function StatusFilter() {
         </div>
       </PopoverContent>
     </Popover>
+  )
+}
+
+export function StatusFilter() {
+  const { selectedStatus, setSelectedStatus } = useCalendar()
+  return (
+    <StatusFilterBase value={selectedStatus} onChange={setSelectedStatus} />
   )
 }

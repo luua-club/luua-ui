@@ -23,4 +23,7 @@ export interface ICalendarEventsRequest {
   end: string
   status?: postStatusType
   channel?: channelType
+  sort?: 'asc' | 'desc'
+  limit?: number
+  offset?: number
 }

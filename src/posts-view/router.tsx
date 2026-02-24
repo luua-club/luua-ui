@@ -1,5 +1,7 @@
 import { type AnyRoute, createRoute, redirect } from '@tanstack/react-router'
 
+import type { postStatusType } from '@/core/models/post.model'
+
 /**
  * Posts Viewhub route tree
  */
@@ -25,6 +27,13 @@ export default function getPostsViewRoute(privateRoute: AnyRoute) {
   const postsViewListRoute = createRoute({
     getParentRoute: () => postsViewRoute,
     path: 'list',
+    validateSearch: (search: Record<string, unknown>) => ({
+      status: (search.status as postStatusType) ?? undefined,
+      from: (search.from as string) ?? undefined,
+      to: (search.to as string) ?? undefined,
+      sort: (search.sort as 'asc' | 'desc') ?? undefined,
+      offset: search.offset ? Number(search.offset) : undefined,
+    }),
   }).lazy(() => import('./pages/post-list-view').then(d => d.Route))
 
   return postsViewRoute.addChildren([
