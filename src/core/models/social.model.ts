@@ -33,15 +33,16 @@ const LinkedInMetaSchema = z
   .passthrough()
 
 /**
- * User connected channel schema
+ * Project connected channel schema
  */
-export const UserSocialSchema = z.object({
+export const ProjectSocialSchema = z.object({
   connected: z.boolean(),
   default: z.boolean(),
   user_name: z.string(),
   user_id: z.string(),
   user_email: z.string(),
   user_profile_picture: z.string().nullable(),
+  // Currently we only have meta for LinkedIn, later on we can extend this for different socials
   meta: LinkedInMetaSchema.optional().default({
     pages: [],
     account_type: null,
@@ -51,4 +52,4 @@ export const UserSocialSchema = z.object({
     organization_profile_image: null,
   }),
 })
-export type UserSocial = z.infer<typeof UserSocialSchema>
+export type ProjectSocial = z.infer<typeof ProjectSocialSchema>

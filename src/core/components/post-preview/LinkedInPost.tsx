@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { usePostComposer } from '@/core/hooks/post-preview-composer.hook'
 import { PostPreviewProps } from '@/core/models/post.model'
-import { UserSocial } from '@/core/models/social.model'
+import { ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
@@ -22,6 +22,7 @@ import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
+import { useProjectDetail } from '../../hooks/project-detail.hook'
 import { useUserState } from '../../hooks/user-state.hook'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
@@ -29,6 +30,7 @@ import PostImagePreview from './PostImagePreview'
 
 const LinkedInPost = (props: PostPreviewProps) => {
   const user = useUserState()
+  const { connectedChannels } = useProjectDetail()
 
   const {
     content,
@@ -55,12 +57,23 @@ const LinkedInPost = (props: PostPreviewProps) => {
     return <LinkedInPostSkeleton />
   }
 
-  const user_social = { ...user.connected_channels.linkedin }
-
-  user_social.user_name = user_social.user_name || user.name
-  user_social.user_id = user_social.user_id || user.email
-  user_social.user_profile_picture =
-    user_social.user_profile_picture || user.profile_image
+  const linkedin = connectedChannels?.linkedin
+  const channelProfile: ProjectSocial = {
+    connected: linkedin?.connected ?? false,
+    default: linkedin?.default ?? false,
+    user_name: linkedin?.user_name || user.name,
+    user_id: linkedin?.user_id || user.email,
+    user_email: linkedin?.user_email ?? '',
+    user_profile_picture: linkedin?.user_profile_picture || user.profile_image,
+    meta: linkedin?.meta ?? {
+      pages: [],
+      account_type: null,
+      organization_id: null,
+      organizaion_name: null,
+      organization_name: null,
+      organization_profile_image: null,
+    },
+  }
 
   // Prepare truncated display text (300 characters)
   const MAX_CHARS = 300
@@ -97,8 +110,8 @@ const LinkedInPost = (props: PostPreviewProps) => {
       >
         {/* Header */}
         <LinkedInPostHeader
-          user={user_social}
-          notConnected={!user_social.connected}
+          channel={channelProfile}
+          notConnected={!channelProfile.connected}
         />
 
         {/* Content */}
@@ -164,10 +177,10 @@ const LinkedInPost = (props: PostPreviewProps) => {
 }
 
 const LinkedInPostHeader = ({
-  user,
+  channel,
   notConnected,
 }: {
-  user: UserSocial
+  channel: ProjectSocial
   notConnected: boolean
 }) => {
   return (
@@ -175,14 +188,16 @@ const LinkedInPostHeader = ({
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <Avatar className={cn('shrink-0 rounded-full', 'h-12 w-12')}>
           <AvatarImage
-            src={user.user_profile_picture ?? undefined}
-            alt={user.user_name}
+            src={channel.user_profile_picture ?? undefined}
+            alt={channel.user_name}
           />
-          <AvatarFallback>{extractUserInitial(user.user_name)}</AvatarFallback>
+          <AvatarFallback>
+            {extractUserInitial(channel.user_name)}
+          </AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-col">
           <h6 className="block max-w-full min-w-0 truncate text-sm font-medium whitespace-nowrap sm:text-base">
-            {user.user_name}
+            {channel.user_name}
           </h6>
         </div>
       </div>

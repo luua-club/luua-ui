@@ -7,9 +7,10 @@ import { Skeleton } from '@/shared/ui/skeleton'
 import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
+import { useProjectDetail } from '../hooks/project-detail.hook'
 import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
-import { UserSocial } from '../models/social.model'
+import { ProjectSocial } from '../models/social.model'
 import { extractUserInitial } from '../utils/common.util'
 import ThumbnailImage from './ThumbnailImage'
 
@@ -34,15 +35,16 @@ function Post({
 
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
   const userState = useUserState()
+  const { connectedChannels } = useProjectDetail()
 
   if (!userState || isLoading) {
     return <PostSkeleton tileView={tileView} />
   }
 
-  const channelUser: UserSocial | undefined =
+  const channelUser: ProjectSocial | undefined =
     platform?.name === 'LinkedIn'
-      ? userState?.connected_channels?.linkedin
-      : userState?.connected_channels?.twitter
+      ? connectedChannels?.linkedin
+      : connectedChannels?.twitter
 
   let user: {
     name: string

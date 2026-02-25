@@ -12,6 +12,16 @@ export const LUUA_USER_KEY: string =
   import.meta.env.VITE_LUUA_LS_USER || 'luua-user'
 
 /**
+ * The key to store selected org id in local storage
+ */
+export const LUUA_SELECTED_ORG_KEY = 'luua-selected-org'
+
+/**
+ * The key to store selected project id in local storage
+ */
+export const LUUA_SELECTED_PROJECT_KEY = 'luua-selected-project'
+
+/**
  * The key to store the extension id in session storage
  *
  * @default 'extensionId'
@@ -72,6 +82,10 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
  */
 export const QUERY_KEYS = {
   user: 'user',
+  orgDetails: 'org-details',
+  orgMembers: 'org-members',
+  projectDetails: 'project-details',
+  projectMembers: 'project-members',
   drafts: 'drafts',
   draft: 'draft',
   generateAIPost: 'generate-ai-post',

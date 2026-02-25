@@ -7,6 +7,7 @@ import { userApi } from '@/core/api/user.api'
 import LinkedInTargetSelectorDialog from '@/core/components/linkedin-target-selector-dialog'
 import SocialCard from '@/core/components/social-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import { useProjectDetail } from '@/core/hooks/project-detail.hook'
 import { channelType, LinkedInAccountType } from '@/core/models/social.model'
 import { UserState } from '@/core/models/user.model'
 
@@ -18,6 +19,7 @@ const Socials = ({
   channels?: channelType[]
 }) => {
   const queryClient = useQueryClient()
+  const { connectedChannels } = useProjectDetail()
   const [loadingStates, setLoadingStates] = useState<
     Record<channelType, boolean>
   >({
@@ -27,7 +29,7 @@ const Socials = ({
 
   const twitter = SOCIAL_PLATFORM.find(s => s.name === 'Twitter')!
   const linkedin = SOCIAL_PLATFORM.find(s => s.name === 'LinkedIn')!
-  const linkedInChannel = user.connected_channels.linkedin
+  const linkedInChannel = connectedChannels?.linkedin
   const isLinkedInSetupPending = Boolean(
     linkedInChannel?.connected && !linkedInChannel?.meta?.account_type
   )
@@ -36,14 +38,11 @@ const Socials = ({
   const handleConnect = async (platform: channelType) => {
     try {
       setSocialLoading(platform, true)
-      // Use OAuth API service to get LinkedIn authorization URL
-      // The API service will handle adding authentication headers
       const response =
         platform === 'Twitter'
           ? await oauthApi.twitterAuthorize()
           : await oauthApi.linkedinAuthorize()
 
-      // Backend returns the authorization URL, redirect to it
       if (response.data) {
         window.location.href = response.data.authorization_url
       }
@@ -61,7 +60,7 @@ const Socials = ({
       return payload
     },
     onSuccess: (payload: channelType) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.projectDetails] })
       toast.success(`Disconnected from ${payload}`)
     },
     onError: (_error: Error, payload: channelType) => {
@@ -82,7 +81,7 @@ const Socials = ({
       organization_id: string | null
     }) => userApi.setLinkedInTarget(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.projectDetails] })
       toast.success('LinkedIn account setup completed')
       setIsLinkedInSelectorOpen(false)
     },
@@ -109,7 +108,7 @@ const Socials = ({
         {(!channels || channels.includes('LinkedIn')) && (
           <SocialCard
             platform={linkedin}
-            userChannel={linkedInChannel}
+            channel={linkedInChannel}
             isLoading={
               loadingStates.LinkedIn || linkedInTargetMutation.isPending
             }
@@ -125,7 +124,7 @@ const Socials = ({
         {(!channels || channels.includes('Twitter')) && (
           <SocialCard
             platform={twitter}
-            userChannel={user.connected_channels.twitter}
+            channel={connectedChannels?.twitter}
             isLoading={loadingStates.Twitter}
             onConnect={() => handleConnect('Twitter')}
             onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}

@@ -2,21 +2,20 @@ import z from 'zod'
 
 import { UserStyleStatus } from '../config/constant'
 import { writingStyles } from '../config/user-preferences.config'
-import { UserSocialSchema } from './social.model'
+import { OrganizationSchema, ProjectSchema } from './org.model'
 
 /**
  * User schema
  */
 export const UserSchema = z.object({
+  id: z.string().optional(),
   email: z.string(),
   name: z.string(),
   profile_image: z.string().nullable(),
   deactivated: z.boolean(),
-  plan: z.enum(['Free', 'Pro']),
-  connected_channels: z.object({
-    linkedin: UserSocialSchema,
-    twitter: UserSocialSchema,
-  }),
+  plan: z.enum(['Free', 'Pro']).catch('Free'),
+  organizations: z.array(OrganizationSchema).catch([]),
+  projects: z.array(ProjectSchema).catch([]),
 })
 export type User = z.infer<typeof UserSchema>
 
