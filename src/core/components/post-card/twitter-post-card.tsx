@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react'
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { usePostCardComposer } from '@/core/hooks/post-card-composer.hook'
+import { useProjectDetail } from '@/core/hooks/project-detail.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { MediaObject } from '@/core/models/post.model'
+import { ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import UpgradePlanCta from '@/shared/components/upgrade-plan-cta'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
@@ -35,6 +37,7 @@ export interface TwitterPostCardProps {
 function TwitterPostCard(props: TwitterPostCardProps) {
   // --- Hooks ---
   const user = useUserState()
+  const { connectedChannels } = useProjectDetail()
   const { content, setContent, textareaRef, updateSelectionRef, addEmoji } =
     usePostCardComposer()
   const router = useRouter()
@@ -76,11 +79,24 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   }
 
   // --- Computed Variables ---
-  const user_social = { ...user.connected_channels.twitter }
-  user_social.user_name = user_social.user_name || user.name
-  user_social.user_id = user_social.user_id || user.email
-  user_social.user_profile_picture =
-    user_social.user_profile_picture || user.profile_image
+  const twitterChannel = connectedChannels?.twitter
+  const channelProfile: ProjectSocial = {
+    connected: twitterChannel?.connected ?? false,
+    default: twitterChannel?.default ?? false,
+    user_name: twitterChannel?.user_name || user.name,
+    user_id: twitterChannel?.user_id || user.email,
+    user_email: twitterChannel?.user_email ?? '',
+    user_profile_picture:
+      twitterChannel?.user_profile_picture || user.profile_image,
+    meta: twitterChannel?.meta ?? {
+      pages: [],
+      account_type: null,
+      organization_id: null,
+      organizaion_name: null,
+      organization_name: null,
+      organization_profile_image: null,
+    },
+  }
   const overlayClassNames =
     'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
   const isProPlan = user.plan === 'Pro'
@@ -130,17 +146,17 @@ function TwitterPostCard(props: TwitterPostCardProps) {
         {/* Avatar */}
         <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
           <AvatarImage
-            src={user_social.user_profile_picture ?? undefined}
-            alt={user_social.user_name}
+            src={channelProfile.user_profile_picture ?? undefined}
+            alt={channelProfile.user_name}
           />
           <AvatarFallback>
-            {extractUserInitial(user_social.user_name)}
+            {extractUserInitial(channelProfile.user_name)}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
-          <TwitterPostCardHeader user={user_social} />
+          <TwitterPostCardHeader channel={channelProfile} />
 
           {/* Text area */}
           <div className="pt-1 pb-2">

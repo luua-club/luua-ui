@@ -1,19 +1,19 @@
 import { format } from 'date-fns/format'
 import { Dot } from 'lucide-react'
 
-import { UserSocial } from '@/core/models/social.model'
+import { ProjectSocial } from '@/core/models/social.model'
 
-function TwitterPostCardHeader({ user }: { user: UserSocial }) {
+function TwitterPostCardHeader({ channel }: { channel: ProjectSocial }) {
   return (
     <div className="flex w-fit min-w-0 items-center text-sm sm:text-base">
       {/* Name */}
       <span className="max-w-[120px] truncate font-semibold sm:max-w-[160px]">
-        {user.user_name}
+        {channel.user_name}
       </span>
 
       {/* Username */}
       <span className="max-w-[140px] truncate pl-2 text-gray-500 sm:max-w-[200px] dark:text-gray-400">
-        @{user.user_id}
+        @{channel.user_id}
       </span>
 
       {/* Date */}

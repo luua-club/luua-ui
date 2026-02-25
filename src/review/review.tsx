@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { useProjectDetail } from '@/core/hooks/project-detail.hook'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -40,6 +41,7 @@ function Review() {
     from: '/review/$draftId',
   })
   const userState = useUserState()
+  const { connectedChannels } = useProjectDetail()
   const navigate = useNavigate()
   const { mutation: publishDraft } = usePublishDraft()
   const { mutation: scheduleDraft } = useScheduleDraft()
@@ -92,9 +94,9 @@ function Review() {
     new Set(selectedPosts.map(p => p.channel))
   )
 
-  const allChannelsConnected = userState
-    ? selectedChannels.every(channel => isSocialConnected(channel, userState))
-    : false
+  const allChannelsConnected = selectedChannels.every(channel =>
+    isSocialConnected(channel, connectedChannels)
+  )
 
   const isPublishDisabled =
     currentStep > postViewSteps.length ||

@@ -1,5 +1,16 @@
 import z from 'zod'
 
+import { ProjectSocialSchema } from './social.model'
+
+/**
+ * Connected channels schema (linkedin + twitter)
+ */
+export const ConnectedChannelsSchema = z.object({
+  linkedin: ProjectSocialSchema,
+  twitter: ProjectSocialSchema,
+})
+export type ConnectedChannels = z.infer<typeof ConnectedChannelsSchema>
+
 /**
  * Organization schema from profile API
  */
@@ -25,6 +36,14 @@ export const ProjectSchema = z.object({
   project_role: z.string().default(''),
 })
 export type Project = z.infer<typeof ProjectSchema>
+
+/**
+ * Project detail schema from /projects/current (includes connected channels)
+ */
+export const ProjectDetailSchema = ProjectSchema.extend({
+  connected_channels: ConnectedChannelsSchema,
+})
+export type ProjectDetail = z.infer<typeof ProjectDetailSchema>
 
 /**
  * Member schema for org/project members

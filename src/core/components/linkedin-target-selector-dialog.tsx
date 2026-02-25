@@ -1,7 +1,7 @@
 import { Building2, Loader, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-import { LinkedInAccountType, UserSocial } from '@/core/models/social.model'
+import { LinkedInAccountType, ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
@@ -19,7 +19,7 @@ import { cn } from '@/shared/utils'
 type LinkedInTargetSelectorDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  linkedInChannel: UserSocial
+  linkedInChannel?: ProjectSocial
   isSubmitting?: boolean
   onSubmit: (payload: {
     account_type: LinkedInAccountType
@@ -40,13 +40,13 @@ function LinkedInTargetSelectorDialog({
         id: 'personal',
         accountType: 'personal' as const,
         organizationId: null,
-        name: linkedInChannel.user_name || 'Personal profile',
+        name: linkedInChannel?.user_name || 'Personal profile',
         subtitle: 'Personal profile',
-        profileImage: linkedInChannel.user_profile_picture,
+        profileImage: linkedInChannel?.user_profile_picture,
         viewLabel: 'View profile',
         viewUrl: 'https://www.linkedin.com/in/me/',
       },
-      ...((linkedInChannel.meta?.pages ?? []).map(page => ({
+      ...((linkedInChannel?.meta?.pages ?? []).map(page => ({
         id: `page:${page.id}`,
         accountType: 'page' as const,
         organizationId: page.id,
@@ -62,13 +62,13 @@ function LinkedInTargetSelectorDialog({
 
   const initialValue = useMemo(() => {
     if (
-      linkedInChannel.meta?.account_type === 'page' &&
-      linkedInChannel.meta.organization_id
+      linkedInChannel?.meta?.account_type === 'page' &&
+      linkedInChannel?.meta.organization_id
     ) {
       return `page:${linkedInChannel.meta.organization_id}`
     }
     return 'personal'
-  }, [linkedInChannel.meta])
+  }, [linkedInChannel?.meta])
 
   const [selectedOptionId, setSelectedOptionId] = useState(initialValue)
 

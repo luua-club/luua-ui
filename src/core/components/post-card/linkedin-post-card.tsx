@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react'
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { MediaObject } from '@/core/models/post.model'
+import { ProjectSocial } from '@/core/models/social.model'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
 import { usePostCardComposer } from '../../hooks/post-card-composer.hook'
+import { useProjectDetail } from '../../hooks/project-detail.hook'
 import { useUserState } from '../../hooks/user-state.hook'
 import PostImagePreview from '../post-preview/PostImagePreview'
 import {
@@ -32,6 +34,7 @@ export interface LinkedInPostCardProps {
 function LinkedInPostCard(props: LinkedInPostCardProps) {
   // --- Hooks ---
   const user = useUserState()
+  const { connectedChannels } = useProjectDetail()
   const { content, setContent, textareaRef, updateSelectionRef, addEmoji } =
     usePostCardComposer()
 
@@ -72,11 +75,23 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
   }
 
   // --- Computed Variables ---
-  const user_social = { ...user.connected_channels.linkedin }
-  user_social.user_name = user_social.user_name || user.name
-  user_social.user_id = user_social.user_email || user.email
-  user_social.user_profile_picture =
-    user_social.user_profile_picture || user.profile_image
+  const linkedin = connectedChannels?.linkedin
+  const channelProfile: ProjectSocial = {
+    connected: linkedin?.connected ?? false,
+    default: linkedin?.default ?? false,
+    user_name: linkedin?.user_name || user.name,
+    user_id: linkedin?.user_email || user.email,
+    user_email: linkedin?.user_email ?? '',
+    user_profile_picture: linkedin?.user_profile_picture || user.profile_image,
+    meta: linkedin?.meta ?? {
+      pages: [],
+      account_type: null,
+      organization_id: null,
+      organizaion_name: null,
+      organization_name: null,
+      organization_profile_image: null,
+    },
+  }
 
   // Calculate remaining upload slots
   const maxAllowedFiles = UPLOAD_CONFIGS.LinkedIn.maxFiles
@@ -106,7 +121,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
         )}
       >
         {/* Header */}
-        <LinkedInPostCardHeader user={user_social} />
+        <LinkedInPostCardHeader channel={channelProfile} />
 
         {/* Text area */}
         <div className="px-4 pt-1 pb-2">

@@ -1,7 +1,7 @@
 import { useRouter } from '@tanstack/react-router'
 import { Loader, Trash } from 'lucide-react'
 
-import { ISocialChannel, UserSocial } from '@/core/models/social.model'
+import { ISocialChannel, ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 
 import UpgradePlanCta from '../../shared/components/upgrade-plan-cta'
@@ -17,7 +17,7 @@ import { cn } from '../../shared/utils'
 
 interface SocialCardProps {
   platform: ISocialChannel
-  userChannel: UserSocial
+  channel?: ProjectSocial
   isLoading?: boolean
   showUpgradePlan?: boolean
   onConnect?: () => void
@@ -26,7 +26,7 @@ interface SocialCardProps {
 
 function SocialCard({
   platform,
-  userChannel,
+  channel,
   isLoading,
   showUpgradePlan,
   onConnect,
@@ -35,25 +35,25 @@ function SocialCard({
   const router = useRouter()
   const isLinkedInPending =
     platform.name === 'LinkedIn' &&
-    userChannel.connected &&
-    !userChannel.meta?.account_type
-  const isConnected = userChannel.connected && !isLinkedInPending
+    channel?.connected &&
+    !channel?.meta?.account_type
+  const isConnected = channel?.connected && !isLinkedInPending
   const isPageAccount =
-    platform.name === 'LinkedIn' && userChannel.meta?.account_type === 'page'
-  const selectedLinkedInPage = userChannel.meta?.pages?.find(
-    page => page.id === userChannel.meta?.organization_id
+    platform.name === 'LinkedIn' && channel?.meta?.account_type === 'page'
+  const selectedLinkedInPage = channel?.meta?.pages?.find(
+    page => page.id === channel?.meta?.organization_id
   )
   const accountName = isPageAccount
-    ? userChannel.meta?.organization_name ||
-      userChannel.meta?.organizaion_name ||
+    ? channel?.meta?.organization_name ||
+      channel?.meta?.organizaion_name ||
       selectedLinkedInPage?.name ||
-      userChannel.user_name
-    : userChannel.user_name
+      channel?.user_name
+    : channel?.user_name
   const accountImage = isPageAccount
-    ? userChannel.meta?.organization_profile_image ||
+    ? channel?.meta?.organization_profile_image ||
       selectedLinkedInPage?.profile_image ||
-      userChannel.user_profile_picture
-    : userChannel.user_profile_picture
+      channel?.user_profile_picture
+    : channel?.user_profile_picture
 
   return (
     <div
@@ -119,7 +119,7 @@ function SocialCard({
               <Avatar className="dark:border-card h-10 w-10 border border-gray-100">
                 <AvatarImage src={accountImage ?? undefined} />
                 <AvatarFallback className="dark:bg-card-foreground dark:text-card bg-gray-100 text-gray-600">
-                  {extractUserInitial(accountName)}
+                  {extractUserInitial(accountName ?? '')}
                 </AvatarFallback>
               </Avatar>
               <div>
