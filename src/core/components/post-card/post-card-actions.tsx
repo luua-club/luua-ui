@@ -123,10 +123,10 @@ function PostCardActions({
       {/* Generate Image */}
       <Button
         variant="outline"
-        className="size-7 border-primary/50 bg-primary/10 hover:bg-primary/20"
+        className="border-primary/50 bg-primary/10 hover:bg-primary/20 size-7"
         onClick={() => setImageGenOpen(true)}
       >
-        <Sparkles className="size-3 text-primary" />
+        <Sparkles className="text-primary size-3" />
       </Button>
 
       {/* Upload Dialog */}
@@ -235,7 +235,7 @@ function PostCardActions({
       <ImageGenerationModal
         open={imageGenOpen}
         onOpenChange={setImageGenOpen}
-        onImageGenerated={(url) => onFilesUploaded?.([url])}
+        onImageGenerated={url => onFilesUploaded?.([url])}
         postContent={postContent}
       />
     </div>

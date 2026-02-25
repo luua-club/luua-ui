@@ -65,11 +65,11 @@ function ImageGenerationModal({
         },
         signal
       ),
-    onSuccess: (res) => {
+    onSuccess: res => {
       setGeneratedImageUrl(res.data.image_url)
       setStep('result')
     },
-    onError: (error) => {
+    onError: error => {
       if ((error as Error).name === 'CanceledError') return
       toast.error('Failed to generate image. Please try again.')
       setStep('select')
@@ -187,7 +187,7 @@ function ImageGenerationModal({
             <Textarea
               placeholder="Describe the image you want to generate..."
               value={customPrompt}
-              onChange={(e) => setCustomPrompt(e.target.value)}
+              onChange={e => setCustomPrompt(e.target.value)}
               rows={4}
               className="resize-none"
             />
