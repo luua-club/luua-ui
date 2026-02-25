@@ -116,6 +116,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
               ...UPLOAD_CONFIGS.Twitter,
               maxFiles: remainingSlots,
             }}
+            postContent={content}
           />
         </div>
       )}

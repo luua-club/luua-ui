@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
-import { CloudUpload, Paperclip, SmilePlus, X } from 'lucide-react'
+import { CloudUpload, Paperclip, SmilePlus, Sparkles, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { filesApi } from '@/core/api/files.api'
+import ImageGenerationModal from '@/core/components/image-generation/image-generation-modal'
 import EmojiPopover from '@/shared/components/emoji-popover'
 import { Button } from '@/shared/ui/button'
 import {
@@ -35,15 +36,18 @@ interface IPostCardActionsProps {
   onEmojiSelect: (emoji: string) => void
   onFilesUploaded?: (fileUrls: string[]) => void
   uploadConfig?: UploadConfig
+  postContent?: string
 }
 
 function PostCardActions({
   onEmojiSelect,
   onFilesUploaded,
   uploadConfig = { maxFiles: 5, maxSizePerFile: 5 * 1024 * 1024 }, // Default: 5 files, 5MB each
+  postContent,
 }: IPostCardActionsProps) {
   // --- State ---
   const [open, setOpen] = useState(false)
+  const [imageGenOpen, setImageGenOpen] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string>('')
@@ -116,6 +120,15 @@ function PostCardActions({
 
   return (
     <div className="flex gap-2 lg:flex-col">
+      {/* Generate Image */}
+      <Button
+        variant="outline"
+        className="size-7 border-primary/50 bg-primary/10 hover:bg-primary/20"
+        onClick={() => setImageGenOpen(true)}
+      >
+        <Sparkles className="size-3 text-primary" />
+      </Button>
+
       {/* Upload Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="inline-flex size-7">
@@ -217,6 +230,14 @@ function PostCardActions({
           <SmilePlus className="size-3" />
         </Button>
       </EmojiPopover>
+
+      {/* Image Generation Modal */}
+      <ImageGenerationModal
+        open={imageGenOpen}
+        onOpenChange={setImageGenOpen}
+        onImageGenerated={(url) => onFilesUploaded?.([url])}
+        postContent={postContent}
+      />
     </div>
   )
 }

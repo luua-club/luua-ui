@@ -94,6 +94,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
               ...UPLOAD_CONFIGS.LinkedIn,
               maxFiles: remainingSlots,
             }}
+            postContent={content}
           />
         </div>
       )}
