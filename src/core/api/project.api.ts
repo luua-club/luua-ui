@@ -1,4 +1,4 @@
-import { Project } from '../models/org.model'
+import { Member, Project } from '../models/org.model'
 import { BaseApiService } from './base.api'
 
 class ProjectApi extends BaseApiService {
@@ -12,6 +12,27 @@ class ProjectApi extends BaseApiService {
    */
   async createProject(data: { name: string }) {
     return this.post<Project>(data, '/')
+  }
+
+  /**
+   * Get project details for the currently selected project.
+   */
+  async getProjectDetails() {
+    return this.get<Project>('/current')
+  }
+
+  /**
+   * Update project details (e.g. rename).
+   */
+  async updateProject(data: { name?: string }) {
+    return this.patch<Project>(data, '/current')
+  }
+
+  /**
+   * Get members of the currently selected project.
+   */
+  async getProjectMembers() {
+    return this.get<Member[]>('/current/members')
   }
 }
 
