@@ -179,6 +179,14 @@ function OrgSettings() {
               <Badge variant="secondary">{org?.plan ?? '-'}</Badge>
             </div>
           </div>
+          <div>
+            <label className="text-muted-foreground text-sm font-medium">
+              Seats
+            </label>
+            <p className="mt-1 text-sm">
+              {org ? `${org.seat_used} / ${org.seat_limit} used` : '-'}
+            </p>
+          </div>
         </div>
       </div>
 

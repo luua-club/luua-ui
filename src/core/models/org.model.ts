@@ -9,6 +9,8 @@ export const OrganizationSchema = z.object({
   status: z.string().default(''),
   org_role: z.string().default(''),
   plan: z.enum(['Free', 'Pro']).catch('Free'),
+  seat_limit: z.number(),
+  seat_used: z.number(),
 })
 export type Organization = z.infer<typeof OrganizationSchema>
 
