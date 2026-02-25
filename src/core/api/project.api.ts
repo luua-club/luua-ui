@@ -1,4 +1,4 @@
-import { Member, Project } from '../models/org.model'
+import { Member, Project, ProjectDetail } from '../models/org.model'
 import { BaseApiService } from './base.api'
 
 class ProjectApi extends BaseApiService {
@@ -11,14 +11,14 @@ class ProjectApi extends BaseApiService {
    * Requires x-luua-org-id header (set by interceptor).
    */
   async createProject(data: { name: string }) {
-    return this.post<Project>(data, '/')
+    return this.post<Project>(data)
   }
 
   /**
    * Get project details for the currently selected project.
    */
   async getProjectDetails() {
-    return this.get<Project>('/current')
+    return this.get<ProjectDetail>('/current')
   }
 
   /**

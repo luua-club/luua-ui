@@ -50,7 +50,7 @@ export const UserSchema = z.object({
           organization_id: null,
           organizaion_name: null,
           organization_name: null,
-          organization_profile_picture: null,
+          organization_profile_image: null,
         },
       },
     }),
