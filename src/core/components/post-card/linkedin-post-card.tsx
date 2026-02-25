@@ -18,6 +18,7 @@ import {
 import LinkedInPostCardHeader from './linkedin-post-card-header'
 import LinkedInPostCardSkeleton from './linkedin-post-card-skeleton'
 import PostCardActions from './post-card-actions'
+import { PostFormatToolbar } from './post-format-toolbar'
 
 export interface LinkedInPostCardProps {
   // Content
@@ -100,7 +101,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
   return (
     <div className="relative">
       {/* Actions */}
-      {!props.isActionLoading && (
+      {/* {!props.isActionLoading && (
         <div className="absolute top-2 right-2 z-2 lg:top-0 lg:-right-9">
           <PostCardActions
             onEmojiSelect={addEmoji}
@@ -111,7 +112,17 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
             }}
           />
         </div>
-      )}
+      )} */}
+
+      <PostFormatToolbar
+        textareaRef={textareaRef}
+        content={content}
+        setContent={val => {
+          setContent(val)
+          props.onContentChange(val)
+        }}
+        onContentChange={props.onContentChange}
+      />
 
       {/* Post Card */}
       <div

@@ -1,4 +1,3 @@
-import { useRouter } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { POST_WORD_COUNT } from '@/core/config/constant'
@@ -9,13 +8,12 @@ import { useUserState } from '@/core/hooks/user-state.hook'
 import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
-import UpgradePlanCta from '@/shared/components/upgrade-plan-cta'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
 import PostImagePreview from '../post-preview/PostImagePreview'
-import PostCardActions from './post-card-actions'
+import { PostFormatToolbar } from './post-format-toolbar'
 import {
   TwitterPostCardFooter,
   TwitterPostCardFooterActions,
@@ -40,33 +38,20 @@ function TwitterPostCard(props: TwitterPostCardProps) {
   const { connectedChannels } = useProjectDetail()
   const { content, setContent, textareaRef, updateSelectionRef, addEmoji } =
     usePostCardComposer()
-  const router = useRouter()
 
   // --- State ---
   const [imagePreviews, setImagePreviews] = useState<MediaObject[]>([])
 
   // --- Effects ---
-  /**
-   * Syncs content with initialContent prop (including clearing when undefined)
-   */
   useEffect(() => {
     setContent(props.initialContent ?? '')
   }, [props.initialContent, setContent])
 
-  /**
-   * Syncs images with initialImages prop (including clearing when undefined/empty)
-   */
   useEffect(() => {
     setImagePreviews(props.initialImages ?? [])
   }, [props.initialImages])
 
   // --- Handlers ---
-  const handleFilesUploaded = (fileUrls: string[]) => {
-    const newImages = [...imagePreviews, ...fileUrls.map(url => ({ url }))]
-    setImagePreviews(newImages)
-    props.onImagesChange(newImages)
-  }
-
   const removeImageAt = (index: number) => {
     const newImages = imagePreviews.filter((_, i) => i !== index)
     setImagePreviews(newImages)
@@ -107,34 +92,15 @@ function TwitterPostCard(props: TwitterPostCardProps) {
 
   return (
     <div className="relative">
-      {!isProPlan && (
-        <div className={overlayClassNames}>
-          <p className="font-semibold">
-            Upgrade plan to post content for X / Twitter
-          </p>
-          <UpgradePlanCta
-            onClick={() =>
-              router.navigate({
-                to: '/payments',
-              })
-            }
-          />
-        </div>
-      )}
-
-      {/* Actions */}
-      {!props.isActionLoading && (
-        <div className="absolute top-2 right-2 z-2 lg:top-0 lg:-right-9">
-          <PostCardActions
-            onEmojiSelect={addEmoji}
-            onFilesUploaded={handleFilesUploaded}
-            uploadConfig={{
-              ...UPLOAD_CONFIGS.Twitter,
-              maxFiles: remainingSlots,
-            }}
-          />
-        </div>
-      )}
+      <PostFormatToolbar
+        textareaRef={textareaRef}
+        content={content}
+        setContent={val => {
+          setContent(val)
+          props.onContentChange(val)
+        }}
+        onContentChange={props.onContentChange}
+      />
 
       {/* Post Card */}
       <div
