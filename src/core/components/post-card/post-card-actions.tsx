@@ -115,13 +115,20 @@ function PostCardActions({
   }
 
   return (
-    <div className="flex gap-2 lg:flex-col">
+    <div className="flex">
+      {/* Emoji Popover */}
+      <EmojiPopover onEmojiSelect={emoji => onEmojiSelect(emoji)}>
+        <Button variant="ghost" className="size-7">
+          <SmilePlus className="size-3" />
+        </Button>
+      </EmojiPopover>
+
       {/* Upload Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="inline-flex size-7">
           <Button
             asChild
-            variant="outline"
+            variant="ghost"
             disabled={uploadConfig.maxFiles === 0}
           >
             <span className="inline-flex h-full w-full items-center justify-center">
@@ -210,13 +217,6 @@ function PostCardActions({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Emoji Popover */}
-      <EmojiPopover onEmojiSelect={emoji => onEmojiSelect(emoji)}>
-        <Button variant="outline" className="size-7">
-          <SmilePlus className="size-3" />
-        </Button>
-      </EmojiPopover>
     </div>
   )
 }

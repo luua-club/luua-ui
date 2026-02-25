@@ -1,84 +1,122 @@
 import { createLazyRoute, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
+import { PostCardMode } from '@/core/components/post-card/post-card.types'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
-import { MediaObject } from '@/core/models/post.model'
 import type { channelType } from '@/core/models/social.model'
-import { Button } from '@/shared/ui/button'
 
 import CreateHeader from './components/create-header'
 import { CreateHeaderOptions } from './components/create-header-options'
+import { useDraft } from './hooks/use-draft.hook'
 
 type SocialTab = channelType | 'all'
+type PreviewMode = 'editor' | 'preview'
 
-type PostDrafts = Partial<
-  Record<channelType, { content: string; images: MediaObject[] }>
->
+function formatUpdatedAt(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Unsaved changes'
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date)
+}
 
 function Create() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<SocialTab>('all')
-  const [postDrafts, setPostDrafts] = useState<PostDrafts>({})
+  const [activeTab, setActiveTab] = useState<SocialTab>('LinkedIn')
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('editor')
+  const draft = useDraft()
+  const cardMode: PostCardMode =
+    previewMode === 'preview' ? 'preview' : 'editor'
 
-  const handleContentChange = useCallback(
-    (val: string, channel: channelType) => {
-      setPostDrafts(prev => ({
-        ...prev,
-        [channel]: { ...(prev[channel] ?? { images: [] }), content: val },
-      }))
-    },
-    []
-  )
-
-  const handleImagesChange = useCallback(
-    (images: MediaObject[], channel: channelType) => {
-      setPostDrafts(prev => ({
-        ...prev,
-        [channel]: { ...(prev[channel] ?? { content: '' }), images },
-      }))
-    },
-    []
-  )
-
+  // All socials are always available; tabs only control visibility.
   const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
   const showTwitter = activeTab === 'all' || activeTab === 'Twitter'
+  const reviewActionsDisabled =
+    !draft.hasContent || draft.saveStatus === 'pending' || !draft.draftId
+
+  const saveStatusLabel = draft.draftId
+    ? draft.updatedAt
+      ? `Updated ${formatUpdatedAt(draft.updatedAt)}`
+      : 'Updated recently'
+    : 'Unsaved changes'
+
+  const openReviewFlow = (schedule: boolean) => {
+    if (!draft.hasContent) {
+      toast.error('Add some content before continuing')
+      return
+    }
+
+    if (!draft.draftId) {
+      draft.handleSaveDraft()
+      toast.info('Saving your draft first. Try again in a second.')
+      return
+    }
+
+    navigate({
+      to: '/review/$draftId',
+      params: { draftId: draft.draftId },
+      search: schedule ? { schedule: 'true' } : {},
+    })
+  }
 
   return (
-    <div className="bg-secondary dark:bg-background flex h-full min-h-screen flex-col">
-      <CreateHeader
-        title="The SEO strategy that made Google's CEO ..."
-        updatedAt="Updated less than a minute ago"
-      />
+    <div className="bg-secondary flex h-full min-h-screen flex-col dark:bg-[#0b0d12]">
+      <div className="sticky top-0 z-20 shadow">
+        <CreateHeader
+          title={draft.draftName || 'Untitled'}
+          updatedAt={saveStatusLabel}
+          canRename={!!draft.draftId}
+          onSave={draft.handleSaveDraft}
+          saveStatus={draft.saveStatus}
+          saveDisabled={!draft.hasContent || draft.saveStatus === 'pending'}
+          onSchedule={() => openReviewFlow(true)}
+          scheduleDisabled={reviewActionsDisabled}
+          onPublish={() => openReviewFlow(false)}
+          publishDisabled={reviewActionsDisabled}
+          onTitleChange={draft.handleRenameDraft}
+        />
 
-      <CreateHeaderOptions onChange={setActiveTab} />
+        <CreateHeaderOptions
+          selected={activeTab}
+          onChange={setActiveTab}
+          previewMode={previewMode}
+          onPreviewModeChange={setPreviewMode}
+          onBackToDashboard={() => navigate({ to: '/dashboard' })}
+        />
+      </div>
 
-      <div className="relative flex-1 p-4">
-        <Button
-          variant="link"
-          size="sm"
-          className="absolute top-2 left-2 text-xs"
-          onClick={() => navigate({ to: '/dashboard' })}
+      <div className="flex-1 p-4 pt-6">
+        <div
+          className={
+            activeTab === 'all'
+              ? 'mx-auto grid max-w-6xl grid-cols-1 gap-6 xl:grid-cols-2'
+              : 'mx-auto flex max-w-6xl gap-6'
+          }
         >
-          <ArrowLeft className="size-3" />
-          Dashboard
-        </Button>
-
-        <div className="mx-auto mt-8 flex max-w-5xl gap-4">
           {showLinkedIn && (
             <div
               className={
-                activeTab === 'all' ? 'flex-1' : 'mx-auto w-full max-w-2xl'
+                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
               }
             >
               <LinkedInPostCard
-                loading={false}
-                initialContent={postDrafts.LinkedIn?.content}
-                initialImages={postDrafts.LinkedIn?.images}
-                onContentChange={val => handleContentChange(val, 'LinkedIn')}
+                loading={draft.isLoading}
+                initialContent={draft.postDrafts.LinkedIn?.content}
+                initialImages={draft.postDrafts.LinkedIn?.attached_media}
+                mode={cardMode}
+                onRequestEdit={() => setPreviewMode('editor')}
+                onContentChange={val =>
+                  draft.handleContentChange(val, 'LinkedIn')
+                }
                 onImagesChange={images =>
-                  handleImagesChange(images, 'LinkedIn')
+                  draft.handleImagesChange(images, 'LinkedIn')
                 }
               />
             </div>
@@ -87,15 +125,21 @@ function Create() {
           {showTwitter && (
             <div
               className={
-                activeTab === 'all' ? 'flex-1' : 'mx-auto w-full max-w-2xl'
+                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
               }
             >
               <TwitterPostCard
-                loading={false}
-                initialContent={postDrafts.Twitter?.content}
-                initialImages={postDrafts.Twitter?.images}
-                onContentChange={val => handleContentChange(val, 'Twitter')}
-                onImagesChange={images => handleImagesChange(images, 'Twitter')}
+                loading={draft.isLoading}
+                initialContent={draft.postDrafts.Twitter?.content}
+                initialImages={draft.postDrafts.Twitter?.attached_media}
+                mode={cardMode}
+                onRequestEdit={() => setPreviewMode('editor')}
+                onContentChange={val =>
+                  draft.handleContentChange(val, 'Twitter')
+                }
+                onImagesChange={images =>
+                  draft.handleImagesChange(images, 'Twitter')
+                }
               />
             </div>
           )}

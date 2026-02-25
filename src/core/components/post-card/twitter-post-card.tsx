@@ -1,19 +1,26 @@
-import { useEffect, useState } from 'react'
+import { type RefObject, useEffect, useState } from 'react'
 
+import BrandX from '@/assets/icons/offcial-x.svg?react'
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
-import { usePostCardComposer } from '@/core/hooks/post-card-composer.hook'
+import {
+  type UsePostCardComposer,
+  usePostCardComposer,
+} from '@/core/hooks/post-card-composer.hook'
 import { useProjectDetail } from '@/core/hooks/project-detail.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
+import { hasStylizedUnicodeFormatting } from '@/core/utils/text-format.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
 import PostImagePreview from '../post-preview/PostImagePreview'
+import { PostCardMode } from './post-card.types'
 import { PostFormatToolbar } from './post-format-toolbar'
+import { PostPlatformLabel } from './post-platform-label'
 import {
   TwitterPostCardFooter,
   TwitterPostCardFooterActions,
@@ -21,28 +28,173 @@ import {
 import TwitterPostCardHeader from './twitter-post-card-header'
 import TwitterPostCardSkeleton from './twitter-post-card-skeleton'
 
+interface CommonCardProps {
+  content: string
+  imagePreviews: MediaObject[]
+  channelProfile: ProjectSocial
+  textareaRef: RefObject<HTMLTextAreaElement | null>
+  isActionLoading?: boolean
+  onContentChange?: (value: string) => void
+  onRemoveImage?: (index: number) => void
+  onSelectionUpdate?: UsePostCardComposer['updateSelectionRef']
+  hasUnicodeFormatting?: boolean
+  onRequestEdit?: () => void
+}
+
 export interface TwitterPostCardProps {
-  // Content
   initialContent?: string
   initialImages?: MediaObject[]
   onContentChange: (content: string) => void
   onImagesChange: (images: MediaObject[]) => void
-  // Loading states
   loading: boolean
   isActionLoading?: boolean
+  mode?: PostCardMode
+  showPreviewDetails?: boolean
+  onRequestEdit?: () => void
+}
+
+function TwitterEditorCard({
+  content,
+  imagePreviews,
+  channelProfile,
+  textareaRef,
+  isActionLoading,
+  onContentChange,
+  onRemoveImage,
+  onSelectionUpdate,
+  hasUnicodeFormatting,
+}: CommonCardProps) {
+  return (
+    <>
+      <div
+        className={cn(
+          'bg-card/95 dark:bg-card relative flex h-fit gap-2 rounded-md border p-3',
+          isActionLoading && 'opacity-50'
+        )}
+      >
+        <div className="bg-card absolute top-3 right-4 flex items-center gap-1.5 rounded-md px-2 py-1">
+          <BrandX className="size-3" />
+          <span className="text-xs font-medium">X (Twitter)</span>
+        </div>
+
+        <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
+          <AvatarImage
+            src={channelProfile.user_profile_picture ?? undefined}
+            alt={channelProfile.user_name}
+          />
+          <AvatarFallback>
+            {extractUserInitial(channelProfile.user_name)}
+          </AvatarFallback>
+        </Avatar>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <TwitterPostCardHeader channel={channelProfile} />
+
+          <div className="pt-1 pb-2">
+            <Textarea
+              className={cn(
+                'min-h-52 resize-none text-sm md:min-h-28',
+                'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
+                'transition-colors duration-200',
+                'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
+                'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
+              )}
+              placeholder="Your post starts here — Type or ask AI to help..."
+              ref={textareaRef}
+              value={content}
+              maxLength={POST_WORD_COUNT.Twitter}
+              onChange={e => onContentChange?.(e.target.value)}
+              onSelect={onSelectionUpdate}
+              onKeyUp={onSelectionUpdate}
+              onClick={onSelectionUpdate}
+              disabled={isActionLoading}
+            />
+          </div>
+
+          {imagePreviews.length > 0 && (
+            <div className="my-2 overflow-hidden rounded-2xl">
+              <PostImagePreview
+                imagePreviews={imagePreviews.map(img => img.url)}
+                onRemove={isActionLoading ? undefined : onRemoveImage}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <TwitterPostCardFooterActions
+        content={content}
+        showUnicodeHint={hasUnicodeFormatting}
+      />
+    </>
+  )
+}
+
+function TwitterPreviewCard({
+  content,
+  imagePreviews,
+  channelProfile,
+  textareaRef,
+  onRequestEdit,
+}: CommonCardProps) {
+  return (
+    <>
+      <PostPlatformLabel
+        icon={<BrandX className="size-3" />}
+        label="X (Twitter)"
+      />
+
+      <div className="bg-card/95 dark:bg-card relative flex h-fit gap-2 rounded-md border p-3">
+        <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
+          <AvatarImage
+            src={channelProfile.user_profile_picture ?? undefined}
+            alt={channelProfile.user_name}
+          />
+          <AvatarFallback>
+            {extractUserInitial(channelProfile.user_name)}
+          </AvatarFallback>
+        </Avatar>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <TwitterPostCardHeader channel={channelProfile} />
+
+          <Textarea
+            className="resize-none border-0 border-transparent !bg-transparent p-0 pt-1 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
+            placeholder="Your written content will appear here"
+            ref={textareaRef}
+            value={content}
+            maxLength={POST_WORD_COUNT.Twitter}
+            readOnly
+            tabIndex={-1}
+            onMouseDown={e => {
+              e.preventDefault()
+              onRequestEdit?.()
+            }}
+          />
+
+          {imagePreviews.length > 0 && (
+            <div className="my-2 overflow-hidden rounded-2xl">
+              <PostImagePreview
+                imagePreviews={imagePreviews.map(img => img.url)}
+              />
+            </div>
+          )}
+
+          <TwitterPostCardFooter />
+        </div>
+      </div>
+    </>
+  )
 }
 
 function TwitterPostCard(props: TwitterPostCardProps) {
-  // --- Hooks ---
   const user = useUserState()
   const { connectedChannels } = useProjectDetail()
-  const { content, setContent, textareaRef, updateSelectionRef, addEmoji } =
+  const { content, setContent, textareaRef, updateSelectionRef } =
     usePostCardComposer()
 
-  // --- State ---
   const [imagePreviews, setImagePreviews] = useState<MediaObject[]>([])
 
-  // --- Effects ---
   useEffect(() => {
     setContent(props.initialContent ?? '')
   }, [props.initialContent, setContent])
@@ -51,19 +203,16 @@ function TwitterPostCard(props: TwitterPostCardProps) {
     setImagePreviews(props.initialImages ?? [])
   }, [props.initialImages])
 
-  // --- Handlers ---
-  const removeImageAt = (index: number) => {
-    const newImages = imagePreviews.filter((_, i) => i !== index)
-    setImagePreviews(newImages)
-    props.onImagesChange(newImages)
-  }
-
-  // --- Early Returns ---
   if (!user || props.loading) {
     return <TwitterPostCardSkeleton />
   }
 
-  // --- Computed Variables ---
+  const mode: PostCardMode = props.mode
+    ? props.mode
+    : props.showPreviewDetails
+      ? 'preview'
+      : 'editor'
+
   const twitterChannel = connectedChannels?.twitter
   const channelProfile: ProjectSocial = {
     connected: twitterChannel?.connected ?? false,
@@ -82,93 +231,67 @@ function TwitterPostCard(props: TwitterPostCardProps) {
       organization_profile_image: null,
     },
   }
-  const overlayClassNames =
-    'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
-  const isProPlan = user.plan === 'Pro'
 
-  // Calculate remaining upload slots
-  const maxAllowedFiles = UPLOAD_CONFIGS.Twitter.maxFiles
-  const remainingSlots = Math.max(0, maxAllowedFiles - imagePreviews.length)
+  const remainingSlots = Math.max(
+    0,
+    UPLOAD_CONFIGS.Twitter.maxFiles - imagePreviews.length
+  )
+
+  const handleFilesUploaded = (fileUrls: string[]) => {
+    const newImages = [...imagePreviews, ...fileUrls.map(url => ({ url }))]
+    setImagePreviews(newImages)
+    props.onImagesChange(newImages)
+  }
+
+  const removeImageAt = (index: number) => {
+    const newImages = imagePreviews.filter((_, i) => i !== index)
+    setImagePreviews(newImages)
+    props.onImagesChange(newImages)
+  }
+
+  const isEditorMode = mode === 'editor'
+  const hasUnicodeFormatting = hasStylizedUnicodeFormatting(content)
 
   return (
     <div className="relative">
-      <PostFormatToolbar
-        textareaRef={textareaRef}
-        content={content}
-        setContent={val => {
-          setContent(val)
-          props.onContentChange(val)
-        }}
-        onContentChange={props.onContentChange}
-      />
+      {isEditorMode && (
+        <PostFormatToolbar
+          textareaRef={textareaRef}
+          content={content}
+          setContent={val => {
+            setContent(val)
+            props.onContentChange(val)
+          }}
+          onContentChange={props.onContentChange}
+          onFilesUploaded={handleFilesUploaded}
+          uploadConfig={{ ...UPLOAD_CONFIGS.Twitter, maxFiles: remainingSlots }}
+        />
+      )}
 
-      {/* Post Card */}
-      <div
-        className={cn(
-          'bg-card relative flex h-fit gap-2 rounded-lg border-1 p-4',
-          props.isActionLoading && 'opacity-50'
-        )}
-      >
-        {/* Avatar */}
-        <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
-          <AvatarImage
-            src={channelProfile.user_profile_picture ?? undefined}
-            alt={channelProfile.user_name}
-          />
-          <AvatarFallback>
-            {extractUserInitial(channelProfile.user_name)}
-          </AvatarFallback>
-        </Avatar>
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* Header */}
-          <TwitterPostCardHeader channel={channelProfile} />
-
-          {/* Text area */}
-          <div className="pt-1 pb-2">
-            <Textarea
-              className={cn(
-                'min-h-52 resize-none text-sm md:min-h-28',
-                'border-1 border-dashed',
-                'caret-primary selection:bg-brand-accent-yellow selection:text-black',
-                'transition-colors duration-200',
-                'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
-                'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
-              )}
-              placeholder="Your post starts here — Type or ask AI to help..."
-              ref={textareaRef}
-              autoFocus
-              value={content}
-              maxLength={POST_WORD_COUNT.Twitter}
-              onChange={e => {
-                const val = e.target.value
-                setContent(val)
-                props.onContentChange(val)
-              }}
-              onSelect={updateSelectionRef}
-              onKeyUp={updateSelectionRef}
-              onClick={updateSelectionRef}
-              disabled={props.isActionLoading}
-            />
-          </div>
-
-          {/* Image Preview */}
-          {imagePreviews.length > 0 && (
-            <div className="my-2 overflow-hidden rounded-2xl">
-              <PostImagePreview
-                imagePreviews={imagePreviews.map(img => img.url)}
-                onRemove={props.isActionLoading ? undefined : removeImageAt}
-              />
-            </div>
-          )}
-
-          {/* Cosmetic Footer */}
-          <TwitterPostCardFooter />
-        </div>
-      </div>
-
-      {/* Footer Actions */}
-      <TwitterPostCardFooterActions content={content} />
+      {isEditorMode ? (
+        <TwitterEditorCard
+          content={content}
+          imagePreviews={imagePreviews}
+          channelProfile={channelProfile}
+          textareaRef={textareaRef}
+          isActionLoading={props.isActionLoading}
+          onContentChange={val => {
+            setContent(val)
+            props.onContentChange(val)
+          }}
+          onRemoveImage={removeImageAt}
+          onSelectionUpdate={updateSelectionRef}
+          hasUnicodeFormatting={hasUnicodeFormatting}
+        />
+      ) : (
+        <TwitterPreviewCard
+          content={content}
+          imagePreviews={imagePreviews}
+          channelProfile={channelProfile}
+          textareaRef={textareaRef}
+          onRequestEdit={props.onRequestEdit}
+        />
+      )}
     </div>
   )
 }

@@ -1,6 +1,9 @@
-import { List, ListOrdered, Paperclip, SmilePlus, Sparkles } from 'lucide-react'
+import { List, ListOrdered } from 'lucide-react'
 import type React from 'react'
 
+import PostCardActions, {
+  type UploadConfig,
+} from '@/core/components/post-card/post-card-actions'
 import {
   applyBold,
   applyBullet,
@@ -8,6 +11,7 @@ import {
   applyNumbered,
   applyStrikethrough,
 } from '@/core/utils/text-format.util'
+import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 
@@ -16,6 +20,9 @@ interface PostFormatToolbarProps {
   content: string
   setContent: (val: string) => void
   onContentChange: (val: string) => void
+  onEmojiSelect?: (emoji: string) => void
+  onFilesUploaded?: (fileUrls: string[]) => void
+  uploadConfig?: UploadConfig
 }
 
 export function PostFormatToolbar({
@@ -23,7 +30,28 @@ export function PostFormatToolbar({
   content,
   setContent,
   onContentChange,
+  onEmojiSelect,
+  onFilesUploaded,
+  uploadConfig,
 }: PostFormatToolbarProps) {
+  function insertEmoji(emoji: string) {
+    const el = textareaRef.current
+    const start = el?.selectionStart ?? content.length
+    const end = el?.selectionEnd ?? content.length
+    const next = content.slice(0, start) + emoji + content.slice(end)
+    setContent(next)
+    onContentChange(next)
+    onEmojiSelect?.(emoji)
+    requestAnimationFrame(() => {
+      if (!el) return
+      el.focus()
+      try {
+        el.selectionStart = start + emoji.length
+        el.selectionEnd = start + emoji.length
+      } catch {}
+    })
+  }
+
   function applyFormat(transform: (text: string) => string) {
     const el = textareaRef.current
     const start = el?.selectionStart ?? 0
@@ -60,12 +88,12 @@ export function PostFormatToolbar({
   }
 
   return (
-    <div className="bg-card mb-3 flex items-center gap-0.5 rounded-lg border px-1.5 py-1">
+    <div className="bg-card/95 mb-2 flex items-center gap-0.5 rounded-md border">
       {/* Text formatting */}
       <Button
         variant="ghost"
         size="icon"
-        className="h-7 w-7 text-sm font-bold"
+        className="h-7 w-7 pl-1.5 text-sm font-bold"
         onClick={() => applyFormat(applyBold)}
         title="Bold"
         type="button"
@@ -92,9 +120,7 @@ export function PostFormatToolbar({
       >
         S
       </Button>
-
-      <Separator orientation="vertical" className="mx-1 h-4" />
-
+      <Separator orientation="vertical" className="mx-1 !h-8" />
       {/* List formatting */}
       <Button
         variant="ghost"
@@ -116,41 +142,27 @@ export function PostFormatToolbar({
       >
         <ListOrdered className="size-3.5" />
       </Button>
+      <Separator orientation="vertical" className="mx-1 !h-8" />
 
-      <Separator orientation="vertical" className="mx-1 h-4" />
+      <div className="ml-auto flex items-center gap-1">
+        <Separator orientation="vertical" className="!h-8" />
 
-      {/* Tools */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 gap-1 px-2 text-xs"
-        type="button"
-        disabled
-      >
-        <Sparkles className="size-3" />
-        Enhance
-      </Button>
+        <PostCardActions
+          onEmojiSelect={insertEmoji}
+          onFilesUploaded={onFilesUploaded}
+          uploadConfig={uploadConfig}
+        />
 
-      <div className="ml-auto flex items-center gap-0.5">
+        <Separator orientation="vertical" className="!h-8" />
+
         <Button
           variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          type="button"
-          disabled
-          title="Upload file"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground h-7 px-2 text-xs hover:cursor-pointer"
         >
-          <Paperclip className="size-3.5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          type="button"
-          disabled
-          title="Emoji"
-        >
-          <SmilePlus className="size-3.5" />
+          <AnimatedGradientText className="font-medium">
+            ✨ Enhance
+          </AnimatedGradientText>
         </Button>
       </div>
     </div>
