@@ -2,19 +2,40 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createLazyRoute, Link, useNavigate } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
 import { FileText, FolderEdit, Pencil, Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
-import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import {
+  LUUA_USER_KEY,
+  QUERY_KEYS,
+  SOCIAL_PLATFORM,
+} from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
+import { LoginResponse } from '@/core/models/auth.model'
 import { type DraftItem } from '@/core/models/draft.model'
 import { type channelType } from '@/core/models/social.model'
+import { removeQueryParams } from '@/core/utils/common.util'
 import AnalyticsCards from '@/dashboard/components/analytics-cards'
 import RenameDraftPopover from '@/dashboard/components/rename-draft-popover'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardFooter } from '@/shared/ui/card'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/shared/ui/drawer'
 import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '@/shared/utils/localstorage.util'
+import FeaturesGrid from '@/welcome/components/features-grid'
+import ProWelcomeBanner from '@/welcome/components/pro-welcome-banner'
+
+const LUUA_WELCOME_SHOWN = 'LUUA_WELCOME_SHOWN'
 
 // ---------------------------------------------------------------------------
 // StackedPlatformIcons
@@ -171,6 +192,28 @@ function DraftCardSkeleton() {
 function DashboardPage() {
   const navigate = useNavigate()
 
+  // --- States ---
+  const [isWelcomeDrawerOpen, setIsWelcomeDrawerOpen] = useState(false)
+  const [isProBannerOpen, setIsProBannerOpen] = useState(false)
+
+  // --- Effects ---
+  useEffect(() => {
+    // First-time user: show welcome drawer once
+    const authData = getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
+    const alreadyShown = getLocalStorageItem<boolean>(LUUA_WELCOME_SHOWN)
+    if (authData?.new_user === true && !alreadyShown) {
+      setLocalStorageItem(LUUA_WELCOME_SHOWN, true)
+      setIsWelcomeDrawerOpen(true)
+    }
+
+    // Pro banner: triggered by ?pro query param
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('pro')) {
+      setIsProBannerOpen(true)
+      removeQueryParams(params, ['pro'])
+    }
+  }, [])
+
   const { data, isPending } = useQuery({
     queryKey: [QUERY_KEYS.drafts, 'dashboard', 7],
     queryFn: () => draftsApi.getDrafts({ limit: 7, offset: 0, sort: 'desc' }),
@@ -206,48 +249,74 @@ function DashboardPage() {
   }
 
   return (
-    <div className="bg-secondary dark:bg-secondary/70 min-h-screen pt-12">
-      <AnalyticsCards />
+    <>
+      <div className="bg-secondary dark:bg-secondary/70 min-h-screen pt-12">
+        <AnalyticsCards />
 
-      <div className="mx-auto max-w-5xl px-4 md:px-6">
-        <h1 className="mb-4 flex gap-2 text-sm font-semibold">
-          <FolderEdit className="size-5" /> Pick Up Where You Left Off
-        </h1>
+        <div className="mx-auto max-w-5xl px-4 md:px-6">
+          <h1 className="mb-4 flex gap-2 text-sm font-semibold">
+            <FolderEdit className="size-5" /> Pick Up Where You Left Off
+          </h1>
 
-        <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <NewPostCard onClick={handleNewPost} />
+          <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <NewPostCard onClick={handleNewPost} />
 
-          {isPending && <DraftCardSkeleton />}
+            {isPending && <DraftCardSkeleton />}
 
-          {!isPending &&
-            drafts.map(draft => (
-              <DraftCard
-                key={draft.id}
-                draft={draft}
-                onClick={() => handleDraftClick(draft.id)}
-                onRenameSave={name =>
-                  renameMutation.mutate({ id: draft.id, name })
-                }
-                isRenaming={renameMutation.isPending}
-              />
-            ))}
-        </div>
-
-        {!isPending && drafts.length === 0 && (
-          <p className="text-muted-foreground mt-2 text-xs">
-            No drafts yet. Click &quot;New Draft&quot; to get started.
-          </p>
-        )}
-
-        {drafts.length >= 1 && (
-          <div className="flex justify-end">
-            <Button variant={'link'} className="text-xs" asChild>
-              <Link to="/drafts">View all</Link>
-            </Button>
+            {!isPending &&
+              drafts.map(draft => (
+                <DraftCard
+                  key={draft.id}
+                  draft={draft}
+                  onClick={() => handleDraftClick(draft.id)}
+                  onRenameSave={name =>
+                    renameMutation.mutate({ id: draft.id, name })
+                  }
+                  isRenaming={renameMutation.isPending}
+                />
+              ))}
           </div>
-        )}
+
+          {!isPending && drafts.length === 0 && (
+            <p className="text-muted-foreground mt-2 text-xs">
+              No drafts yet. Click &quot;New Draft&quot; to get started.
+            </p>
+          )}
+
+          {drafts.length >= 1 && (
+            <div className="flex justify-end">
+              <Button variant={'link'} className="text-xs" asChild>
+                <Link to="/drafts">View all</Link>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* Welcome drawer for first-time users */}
+      <Drawer
+        open={isWelcomeDrawerOpen}
+        onOpenChange={setIsWelcomeDrawerOpen}
+        direction="bottom"
+      >
+        <DrawerContent className="max-h-[90vh] overflow-y-auto">
+          <DrawerHeader>
+            <DrawerTitle>Welcome. What&apos;s the focus today?</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6">
+            <FeaturesGrid />
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Pro banner after plan upgrade */}
+      {isProBannerOpen && (
+        <ProWelcomeBanner
+          open={isProBannerOpen}
+          onOpenChange={setIsProBannerOpen}
+        />
+      )}
+    </>
   )
 }
 

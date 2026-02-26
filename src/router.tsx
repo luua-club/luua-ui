@@ -6,29 +6,30 @@ import {
 
 import { AppContent } from '@/App'
 import getAuthRoute from '@/auth/router'
+import getAutoPilotRoute from '@/autopilot/router'
+import getBookmarksRoute from '@/bookmarks/router'
 import MainLayout from '@/core/layouts/main-layout'
 import getCreationRouteTree from '@/creation/router'
+import getDashboardRoute from '@/dashboard/router'
+import getDraftsRoute from '@/drafts/router'
+import { AuthGuard } from '@/guards'
+import getOrgSettingsRoute from '@/org-settings/router'
 import getPaymentsRoute from '@/payments/router'
+import getPostsViewRoute from '@/posts-view/router'
 import getPreferencesRoute from '@/preferences/router'
+import getProjectSettingsRoute from '@/project-settings/router'
 import getReviewRoute from '@/review/router'
 import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
-import getWelcomeRoute from '@/welcome/router'
 
-import getAutoPilotRoute from './autopilot/router'
-import getBookmarksRoute from './bookmarks/router'
-import getDashboardRoute from './dashboard/router'
-import getDraftsRoute from './drafts/router'
-import { AuthGuard } from './guards'
-import getOrgSettingsRoute from './org-settings/router'
-import getPostsViewRoute from './posts-view/router'
-import getProjectSettingsRoute from './project-settings/router'
-
+// This is root, it sets up auth guard.
+// only few pages like login page works without guard
 export const rootRoute = createRootRoute({
   component: AppContent,
   loader: ({ location }) => AuthGuard({ location }),
 })
 
+// These are all your routes, guarded
 export const privateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
@@ -42,7 +43,6 @@ const dashboardRoute = getDashboardRoute(privateRoute)
 const draftsRoute = getDraftsRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
 const paymentsRoute = getPaymentsRoute(privateRoute)
-const welcomeRoute = getWelcomeRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
@@ -59,7 +59,6 @@ const routeTree = rootRoute.addChildren([
     draftsRoute,
     preferencesRoute,
     paymentsRoute,
-    welcomeRoute,
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,

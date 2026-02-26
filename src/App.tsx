@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 
 import { Toaster } from '@/shared/ui/sonner'
 
-import { orgApi } from './core/api/org.api'
 import { userApi } from './core/api/user.api'
 import {
   API_CONSTANTS,
@@ -18,13 +17,12 @@ import {
   QUERY_KEYS,
 } from './core/config/constant'
 import { queryClient } from './core/config/global.config'
-import { useAppDispatch, useAppSelector } from './core/hooks/global-state.hook'
+import { useAppDispatch } from './core/hooks/global-state.hook'
 import { LoginResponse } from './core/models/auth.model'
-import { OrganizationSchema } from './core/models/org.model'
 import { UserSchema } from './core/models/user.model'
 import { store } from './core/store'
 import { setUser } from './core/store/auth-slice'
-import { setOrganizations, setOrgPlan } from './core/store/org-slice'
+import { syncSelectionFromProfile } from './core/store/org-slice'
 import { logout } from './core/utils/common.util'
 import router from './router'
 import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
@@ -51,7 +49,6 @@ export function AppContent() {
   const dispatch = useAppDispatch()
   const location = useLocation()
   const isLoginRoute = location.pathname === '/login'
-  const selectedOrgId = useAppSelector(state => state.orgState.selectedOrgId)
 
   // GET user profile, Do not run login route (the same is also ran there)
   const {
@@ -63,13 +60,6 @@ export function AppContent() {
     queryKey: [QUERY_KEYS.user],
     queryFn: () => userApi.getUser(),
     enabled: !!isLoggedIn && !isLoginRoute,
-  })
-
-  // GET org details (plan, etc.) after org is selected
-  const { data: orgData } = useQuery({
-    queryKey: [QUERY_KEYS.orgDetails, selectedOrgId],
-    queryFn: () => orgApi.getOrgDetails(),
-    enabled: !!isLoggedIn && !isLoginRoute && !!selectedOrgId,
   })
 
   // ---- Effects ----
@@ -85,7 +75,7 @@ export function AppContent() {
 
       // Initialize org/project state
       dispatch(
-        setOrganizations({
+        syncSelectionFromProfile({
           organizations: parsed.data.organizations,
           projects: parsed.data.projects,
         })
@@ -103,15 +93,6 @@ export function AppContent() {
       logout()
     }
   }, [userData, dispatch])
-
-  // Update org plan when org details are fetched
-  useEffect(() => {
-    if (!orgData?.data) return
-    const parsed = OrganizationSchema.safeParse(orgData.data)
-    if (parsed.success) {
-      dispatch(setOrgPlan(parsed.data.plan))
-    }
-  }, [orgData, dispatch])
 
   // If User profile API fails and is also enabled then run this effect
   // Note: isEnabled is used because the same query is also ran in login page

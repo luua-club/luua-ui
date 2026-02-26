@@ -1,4 +1,4 @@
-import { Member, Organization } from '../models/org.model'
+import { Member, OrganizationDetail } from '../models/org.model'
 import { BaseApiService } from './base.api'
 
 class OrgApi extends BaseApiService {
@@ -11,14 +11,14 @@ class OrgApi extends BaseApiService {
    * Requires x-luua-org-id header (set by interceptor).
    */
   async getOrgDetails() {
-    return this.get<Organization>('/current')
+    return this.get<OrganizationDetail>('/current')
   }
 
   /**
    * Update org details (e.g. rename).
    */
   async updateOrg(data: { name?: string }) {
-    return this.patch<Organization>(data, '/current')
+    return this.patch<OrganizationDetail>(data, '/current')
   }
 
   /**

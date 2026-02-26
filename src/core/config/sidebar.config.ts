@@ -1,7 +1,6 @@
 import {
   Bookmark,
   Gauge,
-  House,
   LucideLayoutDashboard,
   Network,
   Paintbrush,
@@ -10,11 +9,6 @@ import {
 import { ISidebarItem } from '../models/sidebar.model'
 
 export const ungroupedItems: ISidebarItem[] = [
-  {
-    title: 'Welcome',
-    url: '/welcome',
-    icon: House,
-  },
   {
     title: 'Dashboard',
     url: '/dashboard',
