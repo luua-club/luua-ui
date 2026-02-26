@@ -85,15 +85,15 @@ export const useGeneratePosts = (
    * Shows the fallback message if it exists
    */
   useEffect(() => {
-    if (query.data?.data.fallback_message) {
-      toast.info(query.data.data.fallback_message, {
+    if (query.data?.data.llm_response?.is_error) {
+      toast.info(query.data.data.llm_response.message, {
         icon: null,
         duration: 8000,
         closeButton: true,
         className: 'text-xs text-balance',
       })
     }
-  }, [query.data?.data.fallback_message])
+  }, [query.data?.data.llm_response])
 
   /**
    * Ran when genAI API error
@@ -130,8 +130,8 @@ export const useGeneratePosts = (
       return previousPostsRef.current
     }
 
-    // If fallback message is present, return previous state
-    if (query.data.data.fallback_message) {
+    // If llm_response is an error (off-topic/failure), return previous posts
+    if (query.data.data.llm_response?.is_error) {
       return previousPostsRef.current
     }
 
