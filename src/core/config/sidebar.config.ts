@@ -1,37 +1,66 @@
+import { Bookmark, Gauge, LayoutDashboard, Network, Plus } from 'lucide-react'
+
 import {
-  Bookmark,
-  Gauge,
-  LucideLayoutDashboard,
-  Network,
-  Paintbrush,
-} from 'lucide-react'
+  SidebarActionItem,
+  SidebarGroupItem,
+  SidebarLayoutSection,
+  SidebarLinkItem,
+} from '../models/sidebar.model'
 
-import { ISidebarItem } from '../models/sidebar.model'
-
-export const ungroupedItems: ISidebarItem[] = [
+export const workActions: Array<SidebarActionItem | SidebarLinkItem> = [
   {
+    kind: 'action',
+    title: 'Create Post',
+    url: '/creation/create',
+    icon: Plus,
+    emphasis: 'medium',
+  },
+]
+
+export const coreLinks: SidebarLinkItem[] = [
+  {
+    kind: 'link',
     title: 'Dashboard',
     url: '/dashboard',
     icon: Gauge,
   },
   {
-    title: 'Bookmarks',
-    url: '/bookmarks',
-    icon: Bookmark,
-  },
-  {
-    title: 'Autopilot',
-    url: '/autopilot',
-    icon: Network,
-  },
-  {
-    title: 'All Posts',
+    kind: 'link',
+    title: 'Posts',
     url: '/posts-view',
-    icon: LucideLayoutDashboard,
+    icon: LayoutDashboard,
+  },
+]
+
+export const automationGroup: SidebarGroupItem = {
+  kind: 'group',
+  title: 'Automation',
+  icon: Network,
+  activePrefixes: ['/autopilot', '/bookmarks'],
+  defaultOpen: true,
+  children: [
+    {
+      kind: 'link',
+      title: 'Autopilot',
+      url: '/autopilot',
+      icon: Network,
+    },
+    {
+      kind: 'link',
+      title: 'Bookmarks',
+      url: '/bookmarks',
+      icon: Bookmark,
+    },
+  ],
+}
+
+export const sidebarLayoutSections: SidebarLayoutSection[] = [
+  {
+    id: 'work-actions',
+    items: [...workActions],
   },
   {
-    title: 'Your Styles',
-    url: '/preferences',
-    icon: Paintbrush,
+    id: 'core-navigation',
+    items: [...coreLinks, automationGroup],
   },
 ]

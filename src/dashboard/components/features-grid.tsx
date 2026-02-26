@@ -11,7 +11,7 @@ import {
 import { BentoGrid, BentoGridItem } from '@/shared/components/bento-grid'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 
-function FeaturesGrid() {
+function FeaturesGrid({ gridClassName }: { gridClassName?: string }) {
   // --- Hooks ---
   const router = useRouter()
   const isMobile = useIsMobile()
@@ -73,7 +73,9 @@ function FeaturesGrid() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
     >
-      <BentoGrid className="mx-auto max-w-4xl md:auto-rows-[20rem]">
+      <BentoGrid
+        className={`mx-auto max-w-4xl md:auto-rows-[20rem] ${gridClassName ?? ''}`}
+      >
         {items.map((item, i) => (
           <BentoGridItem key={i} {...item} />
         ))}

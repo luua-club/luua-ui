@@ -1,60 +1,56 @@
 import { PanelRightOpen } from 'lucide-react'
 
-import { ungroupedItems } from '@/core/config/sidebar.config'
+import { coreLinks } from '@/core/config/sidebar.config'
 import { Button } from '@/shared/ui/button'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarRail,
   useSidebar,
 } from '@/shared/ui/sidebar'
 
 import AppSidebarAllPosts from './sidebar-all-posts'
 import AppSidebarAutomation from './sidebar-automation'
-import AppSidebarCreateBox from './sidebar-create-box'
 import AppSidebarFooter from './sidebar-footer'
 import AppSidebarHeader from './sidebar-header'
 import AppSidebarUngrouped from './sidebar-ungrouped'
 
-const dashboardItem = ungroupedItems.find(item => item.url === '/dashboard')!
+const dashboardItem = coreLinks.find(item => item.url === '/dashboard')!
+const allPostsItem = coreLinks.find(item => item.url === '/posts-view')!
 
 function AppSidebar() {
-  const { isMobile, toggleSidebar } = useSidebar()
+  const { isMobile, openMobile, toggleSidebar } = useSidebar()
 
   return (
     <>
-      {isMobile && (
+      {isMobile && !openMobile && (
         <Button
           type="button"
-          variant="outline"
-          size="icon"
+          variant="ghost"
+          size="sm"
           onClick={toggleSidebar}
-          className="bg-background/95 fixed top-3 left-3 z-40 size-8 shadow-sm md:hidden"
+          className="bg-background/90 fixed top-1/2 left-0 z-30 h-18 w-4 -translate-y-1/2 rounded-r-md border border-l-0 px-0 shadow-sm md:hidden"
           aria-label="Open sidebar"
         >
-          <PanelRightOpen className="size-4" />
+          <PanelRightOpen className="size-3" />
         </Button>
       )}
 
       <Sidebar collapsible="icon">
         {/* Header */}
-        <SidebarHeader className="mb-1">
+        <SidebarHeader className="hover:bg-secondary border-b py-0">
           <AppSidebarHeader />
         </SidebarHeader>
 
         {/* Content */}
         <SidebarContent>
-          {/* Dashboard */}
+          {/* Core Navigation */}
           <AppSidebarUngrouped ungroupedItems={[dashboardItem]} />
+          <AppSidebarAllPosts item={allPostsItem} />
 
-          {/* Create Box */}
-          <AppSidebarCreateBox />
-
-          {/* 3. All Posts */}
-          <AppSidebarAllPosts />
-
-          {/* 5. Automation */}
+          {/* Automation */}
           <AppSidebarAutomation />
         </SidebarContent>
 
@@ -62,6 +58,8 @@ function AppSidebar() {
         <SidebarFooter>
           <AppSidebarFooter />
         </SidebarFooter>
+
+        <SidebarRail />
       </Sidebar>
     </>
   )

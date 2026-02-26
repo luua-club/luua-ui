@@ -2,40 +2,20 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { createLazyRoute, Link, useNavigate } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
 import { FileText, FolderEdit, Pencil, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
-import {
-  LUUA_USER_KEY,
-  QUERY_KEYS,
-  SOCIAL_PLATFORM,
-} from '@/core/config/constant'
+import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
-import { LoginResponse } from '@/core/models/auth.model'
 import { type DraftItem } from '@/core/models/draft.model'
 import { type channelType } from '@/core/models/social.model'
-import { removeQueryParams } from '@/core/utils/common.util'
 import AnalyticsCards from '@/dashboard/components/analytics-cards'
 import RenameDraftPopover from '@/dashboard/components/rename-draft-popover'
+import WelcomeDrawer from '@/dashboard/components/welcome-drawer'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardFooter } from '@/shared/ui/card'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/shared/ui/drawer'
 import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
-import {
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '@/shared/utils/localstorage.util'
-import FeaturesGrid from '@/welcome/components/features-grid'
-import ProWelcomeBanner from '@/welcome/components/pro-welcome-banner'
-
-const LUUA_WELCOME_SHOWN = 'LUUA_WELCOME_SHOWN'
 
 // ---------------------------------------------------------------------------
 // StackedPlatformIcons
@@ -120,15 +100,9 @@ function DraftCard({
               <button
                 type="button"
                 aria-label="Rename draft"
-                onPointerDown={e => {
-                  e.stopPropagation()
-                }}
-                onMouseDown={e => {
-                  e.stopPropagation()
-                }}
-                onClick={e => {
-                  e.stopPropagation()
-                }}
+                onPointerDown={e => e.stopPropagation()}
+                onMouseDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
                 className="hover:bg-muted cursor-pointer rounded p-1"
               >
                 <Pencil className="size-3" />
@@ -192,28 +166,6 @@ function DraftCardSkeleton() {
 function DashboardPage() {
   const navigate = useNavigate()
 
-  // --- States ---
-  const [isWelcomeDrawerOpen, setIsWelcomeDrawerOpen] = useState(false)
-  const [isProBannerOpen, setIsProBannerOpen] = useState(false)
-
-  // --- Effects ---
-  useEffect(() => {
-    // First-time user: show welcome drawer once
-    const authData = getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
-    const alreadyShown = getLocalStorageItem<boolean>(LUUA_WELCOME_SHOWN)
-    if (authData?.new_user === true && !alreadyShown) {
-      setLocalStorageItem(LUUA_WELCOME_SHOWN, true)
-      setIsWelcomeDrawerOpen(true)
-    }
-
-    // Pro banner: triggered by ?pro query param
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('pro')) {
-      setIsProBannerOpen(true)
-      removeQueryParams(params, ['pro'])
-    }
-  }, [])
-
   const { data, isPending } = useQuery({
     queryKey: [QUERY_KEYS.drafts, 'dashboard', 7],
     queryFn: () => draftsApi.getDrafts({ limit: 7, offset: 0, sort: 'desc' }),
@@ -224,10 +176,7 @@ function DashboardPage() {
 
   const renameMutation = useMutation({
     mutationFn: (payload: { id: string; name: string }) =>
-      draftsApi.renameDraft({
-        id: payload.id,
-        name: payload.name,
-      }),
+      draftsApi.renameDraft({ id: payload.id, name: payload.name }),
     onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
       queryClient.invalidateQueries({
@@ -250,7 +199,8 @@ function DashboardPage() {
 
   return (
     <>
-      <div className="bg-secondary dark:bg-secondary/70 min-h-screen pt-12">
+      <div className="bg-secondary dark:bg-secondary/70 relative min-h-screen p-8">
+        <WelcomeDrawer />
         <AnalyticsCards />
 
         <div className="mx-auto max-w-5xl px-4 md:px-6">
@@ -292,30 +242,6 @@ function DashboardPage() {
           )}
         </div>
       </div>
-
-      {/* Welcome drawer for first-time users */}
-      <Drawer
-        open={isWelcomeDrawerOpen}
-        onOpenChange={setIsWelcomeDrawerOpen}
-        direction="bottom"
-      >
-        <DrawerContent className="max-h-[90vh] overflow-y-auto">
-          <DrawerHeader>
-            <DrawerTitle>Welcome. What&apos;s the focus today?</DrawerTitle>
-          </DrawerHeader>
-          <div className="px-4 pb-6">
-            <FeaturesGrid />
-          </div>
-        </DrawerContent>
-      </Drawer>
-
-      {/* Pro banner after plan upgrade */}
-      {isProBannerOpen && (
-        <ProWelcomeBanner
-          open={isProBannerOpen}
-          onOpenChange={setIsProBannerOpen}
-        />
-      )}
     </>
   )
 }
