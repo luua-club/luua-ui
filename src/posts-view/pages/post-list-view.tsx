@@ -253,7 +253,7 @@ function PostListView() {
       <div className="mx-auto mt-4 mb-8 w-full max-w-5xl px-3 sm:px-4 md:px-6">
         {/* Shimmer — shown on every fetch */}
         {showSkeletons && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
@@ -275,7 +275,7 @@ function PostListView() {
         {!showSkeletons && posts.length > 0 && (
           <div
             className={cn(
-              'grid grid-cols-1 gap-4 md:grid-cols-2',
+              'grid grid-cols-1 gap-4',
               isBgFetching &&
                 'pointer-events-none opacity-50 transition-opacity'
             )}

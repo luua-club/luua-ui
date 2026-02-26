@@ -60,12 +60,12 @@ const routeTree = rootRoute.addChildren([
     scheduleRoute,
     settingsRouteTree,
     creationRouteTree,
-    dashboardRoute, //
+    dashboardRoute,
     draftsRoute,
     publishedRoute,
     preferencesRoute,
     paymentsRoute,
-    welcomeRoute, //
+    welcomeRoute,
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,

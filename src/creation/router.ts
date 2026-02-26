@@ -1,6 +1,6 @@
 import { type AnyRoute, createRoute, redirect } from '@tanstack/react-router'
 
-import { createSearchSchema } from './models/create-search.model'
+import { createSearchSchema } from './models/url.model'
 
 export default function getCreationRouteTree(privateRoute: AnyRoute) {
   const creationRoute = createRoute({
