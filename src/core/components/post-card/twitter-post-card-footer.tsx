@@ -1,7 +1,6 @@
 import {
   Bookmark,
   ChartNoAxesColumn,
-  CircleAlert,
   CirclePlus,
   Heart,
   MessageCircle,

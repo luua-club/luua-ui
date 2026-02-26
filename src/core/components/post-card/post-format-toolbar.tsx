@@ -11,7 +11,6 @@ import {
   applyNumbered,
   applyStrikethrough,
 } from '@/core/utils/text-format.util'
-import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 
@@ -144,7 +143,7 @@ export function PostFormatToolbar({
       </Button>
       <Separator orientation="vertical" className="mx-1 !h-8" />
 
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-1 pr-1.5">
         <Separator orientation="vertical" className="!h-8" />
 
         <PostCardActions
@@ -152,18 +151,6 @@ export function PostFormatToolbar({
           onFilesUploaded={onFilesUploaded}
           uploadConfig={uploadConfig}
         />
-
-        <Separator orientation="vertical" className="!h-8" />
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground h-7 px-2 text-xs hover:cursor-pointer"
-        >
-          <AnimatedGradientText className="font-medium">
-            ✨ Enhance
-          </AnimatedGradientText>
-        </Button>
       </div>
     </div>
   )

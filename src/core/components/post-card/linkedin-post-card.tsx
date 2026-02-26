@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'motion/react'
 import { type RefObject, useEffect, useState } from 'react'
 
 import BrandLinkedIn from '@/assets/icons/offcial-linkedin.svg?react'
@@ -6,6 +7,8 @@ import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
 import { hasStylizedUnicodeFormatting } from '@/core/utils/text-format.util'
+import ImageGenerationModal from '@/create/components/image-generation-modal'
+import GenerateImagePostHolder from '@/shared/components/generate-image-post-holder'
 import { GeneratedGlow } from '@/shared/ui/generated-glow'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
@@ -39,6 +42,7 @@ interface CommonCardProps {
   hasUnicodeFormatting?: boolean
   onRequestEdit?: () => void
   shimmer?: boolean
+  onFilesUploaded?: (urls: string[]) => void
 }
 
 export interface LinkedInPostCardProps {
@@ -65,7 +69,10 @@ function LinkedInEditorCard({
   onSelectionUpdate,
   hasUnicodeFormatting,
   shimmer,
+  onFilesUploaded,
 }: CommonCardProps) {
+  const [imageGenOpen, setImageGenOpen] = useState(false)
+
   return (
     <>
       <GeneratedGlow active={shimmer ?? false} className="rounded-md">
@@ -98,6 +105,16 @@ function LinkedInEditorCard({
             />
           </div>
 
+          <AnimatePresence>
+            {!!content && (
+              <div className="mx-4">
+                <GenerateImagePostHolder
+                  handleOnClick={() => setImageGenOpen(true)}
+                />
+              </div>
+            )}
+          </AnimatePresence>
+
           {imagePreviews.length > 0 && (
             <div className="mt-2">
               <PostImagePreview
@@ -112,6 +129,13 @@ function LinkedInEditorCard({
       <LinkedInPostCardFooterActions
         content={content}
         showUnicodeHint={hasUnicodeFormatting}
+      />
+
+      <ImageGenerationModal
+        open={imageGenOpen}
+        onOpenChange={setImageGenOpen}
+        onImageGenerated={url => onFilesUploaded?.([url])}
+        postContent={content}
       />
     </>
   )
@@ -263,6 +287,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
           onSelectionUpdate={updateSelectionRef}
           hasUnicodeFormatting={hasUnicodeFormatting}
           shimmer={props.shimmer}
+          onFilesUploaded={handleFilesUploaded}
         />
       ) : (
         <LinkedInPreviewCard

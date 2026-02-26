@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'motion/react'
 import { type RefObject, useEffect, useState } from 'react'
 
 import BrandX from '@/assets/icons/offcial-x.svg?react'
@@ -13,6 +14,8 @@ import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { hasStylizedUnicodeFormatting } from '@/core/utils/text-format.util'
+import ImageGenerationModal from '@/create/components/image-generation-modal'
+import GenerateImagePostHolder from '@/shared/components/generate-image-post-holder'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { GeneratedGlow } from '@/shared/ui/generated-glow'
 import { Textarea } from '@/shared/ui/textarea'
@@ -41,6 +44,7 @@ interface CommonCardProps {
   hasUnicodeFormatting?: boolean
   onRequestEdit?: () => void
   shimmer?: boolean
+  onFilesUploaded?: (urls: string[]) => void
 }
 
 export interface TwitterPostCardProps {
@@ -67,7 +71,10 @@ function TwitterEditorCard({
   onSelectionUpdate,
   hasUnicodeFormatting,
   shimmer,
+  onFilesUploaded,
 }: CommonCardProps) {
+  const [imageGenOpen, setImageGenOpen] = useState(false)
+
   return (
     <>
       <GeneratedGlow active={shimmer ?? false} className="rounded-md">
@@ -115,6 +122,14 @@ function TwitterEditorCard({
               />
             </div>
 
+            <AnimatePresence>
+              {!!content && (
+                <GenerateImagePostHolder
+                  handleOnClick={() => setImageGenOpen(true)}
+                />
+              )}
+            </AnimatePresence>
+
             {imagePreviews.length > 0 && (
               <div className="my-2 overflow-hidden rounded-2xl">
                 <PostImagePreview
@@ -130,6 +145,13 @@ function TwitterEditorCard({
       <TwitterPostCardFooterActions
         content={content}
         showUnicodeHint={hasUnicodeFormatting}
+      />
+
+      <ImageGenerationModal
+        open={imageGenOpen}
+        onOpenChange={setImageGenOpen}
+        onImageGenerated={url => onFilesUploaded?.([url])}
+        postContent={content}
       />
     </>
   )
@@ -291,6 +313,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
           onSelectionUpdate={updateSelectionRef}
           hasUnicodeFormatting={hasUnicodeFormatting}
           shimmer={props.shimmer}
+          onFilesUploaded={handleFilesUploaded}
         />
       ) : (
         <TwitterPreviewCard
