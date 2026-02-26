@@ -10,9 +10,7 @@ import MainLayout from '@/core/layouts/main-layout'
 import getCreationRouteTree from '@/creation/router'
 import getPaymentsRoute from '@/payments/router'
 import getPreferencesRoute from '@/preferences/router'
-import getPublishedRoute from '@/published/router'
 import getReviewRoute from '@/review/router'
-import getScheduleRoute from '@/schedule/router'
 import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
 import getWelcomeRoute from '@/welcome/router'
@@ -38,12 +36,10 @@ export const privateRoute = createRoute({
 })
 
 const authRoute = getAuthRoute(rootRoute)
-const scheduleRoute = getScheduleRoute(privateRoute)
 const settingsRouteTree = getSettingsRouteTree(privateRoute)
 const creationRouteTree = getCreationRouteTree(privateRoute)
 const dashboardRoute = getDashboardRoute(privateRoute)
 const draftsRoute = getDraftsRoute(privateRoute)
-const publishedRoute = getPublishedRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
 const paymentsRoute = getPaymentsRoute(privateRoute)
 const welcomeRoute = getWelcomeRoute(privateRoute)
@@ -57,12 +53,10 @@ const projectSettingsRoute = getProjectSettingsRoute(privateRoute)
 const routeTree = rootRoute.addChildren([
   authRoute,
   privateRoute.addChildren([
-    scheduleRoute,
     settingsRouteTree,
     creationRouteTree,
     dashboardRoute,
     draftsRoute,
-    publishedRoute,
     preferencesRoute,
     paymentsRoute,
     welcomeRoute,

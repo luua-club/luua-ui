@@ -1,9 +1,7 @@
 import {
   Bookmark,
-  FileCheck,
   Gauge,
   House,
-  LucideCalendar,
   LucideLayoutDashboard,
   Network,
   Paintbrush,
@@ -41,18 +39,5 @@ export const ungroupedItems: ISidebarItem[] = [
     title: 'Your Styles',
     url: '/preferences',
     icon: Paintbrush,
-  },
-]
-
-export const postsItems: ISidebarItem[] = [
-  {
-    title: 'Scheduled',
-    url: '/schedule',
-    icon: LucideCalendar,
-  },
-  {
-    title: 'Published',
-    url: '/published',
-    icon: FileCheck,
   },
 ]
