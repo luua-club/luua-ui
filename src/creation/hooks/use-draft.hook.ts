@@ -27,7 +27,7 @@ function hasDraftContent(draft?: WithOptional<PostItem, 'id'>) {
 
 export function useDraft() {
   const navigate = useNavigate()
-  const search = useSearch({ from: '/create' })
+  const search = useSearch({ from: '/creation/create' })
   const draftId = search.draftId
 
   const [postDrafts, setPostDrafts] = useState<PostDrafts>({})
@@ -254,7 +254,7 @@ export function useDraft() {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
 
         navigate({
-          to: '/create',
+          to: '/creation/create',
           search: { draftId: saved.id },
           replace: true,
         })

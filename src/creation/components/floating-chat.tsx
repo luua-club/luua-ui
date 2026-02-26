@@ -210,6 +210,9 @@ interface FloatingChatProps {
   channel?: ChannelFilter
   onChannelChange?: (channel: ChannelFilter) => void
   currentState?: { linkedin: string | null; twitter: string | null } | null
+  initialOpen?: boolean
+  autoSubmitPrompt?: string
+  onAutoSubmitStart?: () => void
 }
 
 export function FloatingChat({
@@ -218,8 +221,11 @@ export function FloatingChat({
   channel = 'all',
   onChannelChange,
   currentState,
+  initialOpen = false,
+  autoSubmitPrompt,
+  onAutoSubmitStart,
 }: FloatingChatProps) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(initialOpen)
   const [value, setValue] = useState('')
   const [searchEnabled, setSearchEnabled] = useState(false)
   const [channelOpen, setChannelOpen] = useState(false)
@@ -228,6 +234,7 @@ export function FloatingChat({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const autoSubmittedRef = useRef(false)
 
   const selectedPlatform =
     channel !== 'all' ? SOCIAL_PLATFORM.find(p => p.name === channel) : null
@@ -239,8 +246,8 @@ export function FloatingChat({
     }
   }, [messages, isLoading])
 
-  const handleSubmit = async () => {
-    const trimmed = value.trim()
+  const submitWithPrompt = async (prompt: string) => {
+    const trimmed = prompt.trim()
     if (!trimmed || isLoading) return
 
     setMessages(prev => [
@@ -306,6 +313,24 @@ export function FloatingChat({
       onGeneratingChange?.(false)
     }
   }
+
+  const handleSubmit = () => submitWithPrompt(value)
+
+  // Auto-open and auto-submit when a source prompt is provided
+  useEffect(() => {
+    if (!autoSubmitPrompt || autoSubmittedRef.current) return
+    autoSubmittedRef.current = true
+    const timer = setTimeout(() => {
+      onAutoSubmitStart?.()
+      void submitWithPrompt(autoSubmitPrompt)
+    }, 300)
+    return () => {
+      clearTimeout(timer)
+      // Reset so React Strict Mode's simulated remount can re-run the effect
+      autoSubmittedRef.current = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const hasMessages = messages.length > 0
 
