@@ -209,6 +209,7 @@ interface FloatingChatProps {
   onGeneratingChange?: (isGenerating: boolean) => void
   channel?: ChannelFilter
   onChannelChange?: (channel: ChannelFilter) => void
+  currentState?: { linkedin: string | null; twitter: string | null } | null
 }
 
 export function FloatingChat({
@@ -216,6 +217,7 @@ export function FloatingChat({
   onGeneratingChange,
   channel = 'all',
   onChannelChange,
+  currentState,
 }: FloatingChatProps) {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState('')
@@ -254,6 +256,7 @@ export function FloatingChat({
         user_prompt: trimmed,
         is_search_enabled: searchEnabled,
         post_channels: channel === 'all' ? undefined : [channel],
+        current_state: currentState ?? null,
       })
 
       // Populate post editors with generated content

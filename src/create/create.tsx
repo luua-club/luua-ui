@@ -163,6 +163,10 @@ function Create() {
         onGeneratingChange={setIsAiGenerating}
         channel={activeTab}
         onChannelChange={setActiveTab}
+        currentState={{
+          linkedin: draft.postDrafts.LinkedIn?.content ?? null,
+          twitter: draft.postDrafts.Twitter?.content ?? null,
+        }}
       />
     </div>
   )
