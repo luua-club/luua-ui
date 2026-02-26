@@ -6,6 +6,7 @@ import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import { PostCardMode } from '@/core/components/post-card/post-card.types'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
 import type { channelType } from '@/core/models/social.model'
+import { FloatingChat } from '@/create/components/floating-chat'
 
 import CreateHeader from './components/create-header'
 import { CreateHeaderOptions } from './components/create-header-options'
@@ -31,6 +32,7 @@ function Create() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<SocialTab>('LinkedIn')
   const [previewMode, setPreviewMode] = useState<PreviewMode>('editor')
+  const [isAiGenerating, setIsAiGenerating] = useState(false)
   const draft = useDraft()
   const cardMode: PostCardMode =
     previewMode === 'preview' ? 'preview' : 'editor'
@@ -111,6 +113,11 @@ function Create() {
                 initialContent={draft.postDrafts.LinkedIn?.content}
                 initialImages={draft.postDrafts.LinkedIn?.attached_media}
                 mode={cardMode}
+                isActionLoading={isAiGenerating}
+                shimmer={
+                  isAiGenerating &&
+                  (activeTab === 'all' || activeTab === 'LinkedIn')
+                }
                 onRequestEdit={() => setPreviewMode('editor')}
                 onContentChange={val =>
                   draft.handleContentChange(val, 'LinkedIn')
@@ -133,6 +140,11 @@ function Create() {
                 initialContent={draft.postDrafts.Twitter?.content}
                 initialImages={draft.postDrafts.Twitter?.attached_media}
                 mode={cardMode}
+                isActionLoading={isAiGenerating}
+                shimmer={
+                  isAiGenerating &&
+                  (activeTab === 'all' || activeTab === 'Twitter')
+                }
                 onRequestEdit={() => setPreviewMode('editor')}
                 onContentChange={val =>
                   draft.handleContentChange(val, 'Twitter')
@@ -145,6 +157,13 @@ function Create() {
           )}
         </div>
       </div>
+
+      <FloatingChat
+        onPostsGenerated={draft.handleContentChange}
+        onGeneratingChange={setIsAiGenerating}
+        channel={activeTab}
+        onChannelChange={setActiveTab}
+      />
     </div>
   )
 }

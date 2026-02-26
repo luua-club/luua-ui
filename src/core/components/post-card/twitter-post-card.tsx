@@ -14,6 +14,7 @@ import { ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { hasStylizedUnicodeFormatting } from '@/core/utils/text-format.util'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { GeneratedGlow } from '@/shared/ui/generated-glow'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
@@ -39,6 +40,7 @@ interface CommonCardProps {
   onSelectionUpdate?: UsePostCardComposer['updateSelectionRef']
   hasUnicodeFormatting?: boolean
   onRequestEdit?: () => void
+  shimmer?: boolean
 }
 
 export interface TwitterPostCardProps {
@@ -48,6 +50,7 @@ export interface TwitterPostCardProps {
   onImagesChange: (images: MediaObject[]) => void
   loading: boolean
   isActionLoading?: boolean
+  shimmer?: boolean
   mode?: PostCardMode
   showPreviewDetails?: boolean
   onRequestEdit?: () => void
@@ -63,64 +66,66 @@ function TwitterEditorCard({
   onRemoveImage,
   onSelectionUpdate,
   hasUnicodeFormatting,
+  shimmer,
 }: CommonCardProps) {
   return (
     <>
-      <div
-        className={cn(
-          'bg-card/95 dark:bg-card relative flex h-fit gap-2 rounded-md border p-3',
-          isActionLoading && 'opacity-50'
-        )}
-      >
-        <div className="bg-card absolute top-3 right-4 flex items-center gap-1.5 rounded-md px-2 py-1">
-          <BrandX className="size-3" />
-          <span className="text-xs font-medium">X (Twitter)</span>
-        </div>
-
-        <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
-          <AvatarImage
-            src={channelProfile.user_profile_picture ?? undefined}
-            alt={channelProfile.user_name}
-          />
-          <AvatarFallback>
-            {extractUserInitial(channelProfile.user_name)}
-          </AvatarFallback>
-        </Avatar>
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          <TwitterPostCardHeader channel={channelProfile} />
-
-          <div className="pt-1 pb-2">
-            <Textarea
-              className={cn(
-                'min-h-52 resize-none text-sm md:min-h-28',
-                'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
-                'transition-colors duration-200',
-                'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
-                'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
-              )}
-              placeholder="Your post starts here — Type or ask AI to help..."
-              ref={textareaRef}
-              value={content}
-              maxLength={POST_WORD_COUNT.Twitter}
-              onChange={e => onContentChange?.(e.target.value)}
-              onSelect={onSelectionUpdate}
-              onKeyUp={onSelectionUpdate}
-              onClick={onSelectionUpdate}
-              disabled={isActionLoading}
-            />
+      <GeneratedGlow active={shimmer ?? false} className="rounded-md">
+        <div
+          className={cn(
+            'bg-card/95 dark:bg-card relative flex h-fit gap-2 rounded-md border p-3'
+          )}
+        >
+          <div className="bg-card absolute top-3 right-4 flex items-center gap-1.5 rounded-md px-2 py-1">
+            <BrandX className="size-3" />
+            <span className="text-xs font-medium">X (Twitter)</span>
           </div>
 
-          {imagePreviews.length > 0 && (
-            <div className="my-2 overflow-hidden rounded-2xl">
-              <PostImagePreview
-                imagePreviews={imagePreviews.map(img => img.url)}
-                onRemove={isActionLoading ? undefined : onRemoveImage}
+          <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
+            <AvatarImage
+              src={channelProfile.user_profile_picture ?? undefined}
+              alt={channelProfile.user_name}
+            />
+            <AvatarFallback>
+              {extractUserInitial(channelProfile.user_name)}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex min-w-0 flex-1 flex-col">
+            <TwitterPostCardHeader channel={channelProfile} />
+
+            <div className="pt-1 pb-2">
+              <Textarea
+                className={cn(
+                  'min-h-52 resize-none text-sm md:min-h-28',
+                  'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
+                  'transition-colors duration-200',
+                  'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
+                  'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
+                )}
+                placeholder="Your post starts here — Type or ask AI to help..."
+                ref={textareaRef}
+                value={content}
+                maxLength={POST_WORD_COUNT.Twitter}
+                onChange={e => onContentChange?.(e.target.value)}
+                onSelect={onSelectionUpdate}
+                onKeyUp={onSelectionUpdate}
+                onClick={onSelectionUpdate}
+                disabled={isActionLoading}
               />
             </div>
-          )}
+
+            {imagePreviews.length > 0 && (
+              <div className="my-2 overflow-hidden rounded-2xl">
+                <PostImagePreview
+                  imagePreviews={imagePreviews.map(img => img.url)}
+                  onRemove={isActionLoading ? undefined : onRemoveImage}
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </GeneratedGlow>
 
       <TwitterPostCardFooterActions
         content={content}
@@ -136,6 +141,7 @@ function TwitterPreviewCard({
   channelProfile,
   textareaRef,
   onRequestEdit,
+  shimmer,
 }: CommonCardProps) {
   return (
     <>
@@ -144,45 +150,47 @@ function TwitterPreviewCard({
         label="X (Twitter)"
       />
 
-      <div className="bg-card/95 dark:bg-card relative flex h-fit gap-2 rounded-md border p-3">
-        <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
-          <AvatarImage
-            src={channelProfile.user_profile_picture ?? undefined}
-            alt={channelProfile.user_name}
-          />
-          <AvatarFallback>
-            {extractUserInitial(channelProfile.user_name)}
-          </AvatarFallback>
-        </Avatar>
+      <GeneratedGlow active={shimmer ?? false} className="rounded-md">
+        <div className="bg-card/95 dark:bg-card relative flex h-fit gap-2 rounded-md border p-3">
+          <Avatar className="!h-10 !w-10 md:!h-12 md:!w-12">
+            <AvatarImage
+              src={channelProfile.user_profile_picture ?? undefined}
+              alt={channelProfile.user_name}
+            />
+            <AvatarFallback>
+              {extractUserInitial(channelProfile.user_name)}
+            </AvatarFallback>
+          </Avatar>
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <TwitterPostCardHeader channel={channelProfile} />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <TwitterPostCardHeader channel={channelProfile} />
 
-          <Textarea
-            className="resize-none border-0 border-transparent !bg-transparent p-0 pt-1 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
-            placeholder="Your written content will appear here"
-            ref={textareaRef}
-            value={content}
-            maxLength={POST_WORD_COUNT.Twitter}
-            readOnly
-            tabIndex={-1}
-            onMouseDown={e => {
-              e.preventDefault()
-              onRequestEdit?.()
-            }}
-          />
+            <Textarea
+              className="resize-none border-0 border-transparent !bg-transparent p-0 pt-1 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
+              placeholder="Your written content will appear here"
+              ref={textareaRef}
+              value={content}
+              maxLength={POST_WORD_COUNT.Twitter}
+              readOnly
+              tabIndex={-1}
+              onMouseDown={e => {
+                e.preventDefault()
+                onRequestEdit?.()
+              }}
+            />
 
-          {imagePreviews.length > 0 && (
-            <div className="my-2 overflow-hidden rounded-2xl">
-              <PostImagePreview
-                imagePreviews={imagePreviews.map(img => img.url)}
-              />
-            </div>
-          )}
+            {imagePreviews.length > 0 && (
+              <div className="my-2 overflow-hidden rounded-2xl">
+                <PostImagePreview
+                  imagePreviews={imagePreviews.map(img => img.url)}
+                />
+              </div>
+            )}
 
-          <TwitterPostCardFooter />
+            <TwitterPostCardFooter />
+          </div>
         </div>
-      </div>
+      </GeneratedGlow>
     </>
   )
 }
@@ -282,6 +290,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
           onRemoveImage={removeImageAt}
           onSelectionUpdate={updateSelectionRef}
           hasUnicodeFormatting={hasUnicodeFormatting}
+          shimmer={props.shimmer}
         />
       ) : (
         <TwitterPreviewCard
@@ -290,6 +299,7 @@ function TwitterPostCard(props: TwitterPostCardProps) {
           channelProfile={channelProfile}
           textareaRef={textareaRef}
           onRequestEdit={props.onRequestEdit}
+          shimmer={props.shimmer}
         />
       )}
     </div>

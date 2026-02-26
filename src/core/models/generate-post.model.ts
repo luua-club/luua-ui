@@ -46,6 +46,13 @@ export const GeneratePostResponseSchema = z.object({
     })
     .nullable(),
   search_sources: z.array(SearchSourcesSchema).nullable(),
+  llm_response: z
+    .object({
+      message: z.string(),
+      is_error: z.boolean(),
+    })
+    .nullable()
+    .optional(),
 })
 
 export type generatePostResponseType = z.infer<

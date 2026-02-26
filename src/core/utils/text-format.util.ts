@@ -46,8 +46,8 @@ function encodeKey(base: string, bold: boolean, italic: boolean) {
 function italicLowerCodePointForIndex(index: number) {
   if (index === 7) return ITALIC_H // h
 
-  // U+1D455 is missing; i..z are shifted by +1.
-  return ITALIC_LOWER_START + (index >= 8 ? index + 1 : index)
+  // U+1D455 is missing only for h; other letters keep sequential offsets.
+  return ITALIC_LOWER_START + index
 }
 
 function registerMapping(
@@ -267,6 +267,27 @@ export function applyNumbered(text: string): string {
       return `${counter++}. ${line}`
     })
     .join('\n')
+}
+
+export function clearTextFormatting(text: string): string {
+  const chars = [...text]
+  let output = ''
+
+  for (const char of chars) {
+    if (char === STRIKE_MARK) {
+      continue
+    }
+
+    const info = STYLE_MAP.get(char)
+
+    if (info) {
+      output += info.base
+    } else {
+      output += char
+    }
+  }
+
+  return output
 }
 
 export function hasStylizedUnicodeFormatting(text: string): boolean {

@@ -6,6 +6,7 @@ import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
 import { hasStylizedUnicodeFormatting } from '@/core/utils/text-format.util'
+import { GeneratedGlow } from '@/shared/ui/generated-glow'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
@@ -37,6 +38,7 @@ interface CommonCardProps {
   onSelectionUpdate?: UsePostCardComposer['updateSelectionRef']
   hasUnicodeFormatting?: boolean
   onRequestEdit?: () => void
+  shimmer?: boolean
 }
 
 export interface LinkedInPostCardProps {
@@ -46,6 +48,7 @@ export interface LinkedInPostCardProps {
   onImagesChange: (images: MediaObject[]) => void
   loading: boolean
   isActionLoading?: boolean
+  shimmer?: boolean
   mode?: PostCardMode
   showPreviewDetails?: boolean
   onRequestEdit?: () => void
@@ -61,52 +64,50 @@ function LinkedInEditorCard({
   onRemoveImage,
   onSelectionUpdate,
   hasUnicodeFormatting,
+  shimmer,
 }: CommonCardProps) {
   return (
     <>
-      <div
-        className={cn(
-          'bg-card/95 dark:bg-card relative rounded-md border py-2',
-          isActionLoading && 'opacity-50'
-        )}
-      >
-        <div className="absolute top-4 right-4 flex items-center gap-1.5">
-          <BrandLinkedIn className="size-3" />
-          <span className="text-xs font-medium">LinkedIn</span>
-        </div>
+      <GeneratedGlow active={shimmer ?? false} className="rounded-md">
+        <div className="bg-card/95 dark:bg-card relative rounded-md border py-2">
+          <div className="absolute top-4 right-4 flex items-center gap-1.5">
+            <BrandLinkedIn className="size-3" />
+            <span className="text-xs font-medium">LinkedIn</span>
+          </div>
 
-        <LinkedInPostCardHeader channel={channelProfile} />
+          <LinkedInPostCardHeader channel={channelProfile} />
 
-        <div className="px-4 pt-1 pb-2">
-          <Textarea
-            className={cn(
-              'min-h-52 resize-none text-sm md:min-h-28',
-              'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
-              'transition-colors duration-200',
-              'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
-              'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
-            )}
-            placeholder="Your post starts here — Type or ask AI to help..."
-            ref={textareaRef}
-            value={content}
-            maxLength={POST_WORD_COUNT.LinkedIn}
-            onChange={e => onContentChange?.(e.target.value)}
-            onSelect={onSelectionUpdate}
-            onKeyUp={onSelectionUpdate}
-            onClick={onSelectionUpdate}
-            disabled={isActionLoading}
-          />
-        </div>
-
-        {imagePreviews.length > 0 && (
-          <div className="mt-2">
-            <PostImagePreview
-              imagePreviews={imagePreviews.map(img => img.url)}
-              onRemove={isActionLoading ? undefined : onRemoveImage}
+          <div className="px-4 pt-1 pb-2">
+            <Textarea
+              className={cn(
+                'min-h-52 resize-none text-sm md:min-h-28',
+                'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
+                'transition-colors duration-200',
+                'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
+                'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
+              )}
+              placeholder="Your post starts here — Type or ask AI to help..."
+              ref={textareaRef}
+              value={content}
+              maxLength={POST_WORD_COUNT.LinkedIn}
+              onChange={e => onContentChange?.(e.target.value)}
+              onSelect={onSelectionUpdate}
+              onKeyUp={onSelectionUpdate}
+              onClick={onSelectionUpdate}
+              disabled={isActionLoading}
             />
           </div>
-        )}
-      </div>
+
+          {imagePreviews.length > 0 && (
+            <div className="mt-2">
+              <PostImagePreview
+                imagePreviews={imagePreviews.map(img => img.url)}
+                onRemove={isActionLoading ? undefined : onRemoveImage}
+              />
+            </div>
+          )}
+        </div>
+      </GeneratedGlow>
 
       <LinkedInPostCardFooterActions
         content={content}
@@ -122,6 +123,7 @@ function LinkedInPreviewCard({
   channelProfile,
   textareaRef,
   onRequestEdit,
+  shimmer,
 }: CommonCardProps) {
   return (
     <>
@@ -130,33 +132,35 @@ function LinkedInPreviewCard({
         label="LinkedIn"
       />
 
-      <div className="bg-card/95 dark:bg-card relative rounded-md border">
-        <LinkedInPostCardHeader channel={channelProfile} />
+      <GeneratedGlow active={shimmer ?? false} className="rounded-md">
+        <div className="bg-card/95 dark:bg-card relative rounded-md border">
+          <LinkedInPostCardHeader channel={channelProfile} />
 
-        <Textarea
-          className="resize-none border-0 border-transparent !bg-transparent pt-0 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
-          placeholder="Your written content will appear here"
-          ref={textareaRef}
-          value={content}
-          maxLength={POST_WORD_COUNT.LinkedIn}
-          readOnly
-          tabIndex={-1}
-          onMouseDown={e => {
-            e.preventDefault()
-            onRequestEdit?.()
-          }}
-        />
+          <Textarea
+            className="resize-none border-0 border-transparent !bg-transparent pt-0 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
+            placeholder="Your written content will appear here"
+            ref={textareaRef}
+            value={content}
+            maxLength={POST_WORD_COUNT.LinkedIn}
+            readOnly
+            tabIndex={-1}
+            onMouseDown={e => {
+              e.preventDefault()
+              onRequestEdit?.()
+            }}
+          />
 
-        {imagePreviews.length > 0 && (
-          <div className="mt-2">
-            <PostImagePreview
-              imagePreviews={imagePreviews.map(img => img.url)}
-            />
-          </div>
-        )}
+          {imagePreviews.length > 0 && (
+            <div className="mt-2">
+              <PostImagePreview
+                imagePreviews={imagePreviews.map(img => img.url)}
+              />
+            </div>
+          )}
 
-        <LinkedInPostCardFooter />
-      </div>
+          <LinkedInPostCardFooter />
+        </div>
+      </GeneratedGlow>
     </>
   )
 }
@@ -258,6 +262,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
           onRemoveImage={removeImageAt}
           onSelectionUpdate={updateSelectionRef}
           hasUnicodeFormatting={hasUnicodeFormatting}
+          shimmer={props.shimmer}
         />
       ) : (
         <LinkedInPreviewCard
@@ -266,6 +271,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
           channelProfile={channelProfile}
           textareaRef={textareaRef}
           onRequestEdit={props.onRequestEdit}
+          shimmer={props.shimmer}
         />
       )}
     </div>
