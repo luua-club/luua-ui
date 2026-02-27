@@ -1,6 +1,7 @@
 import { Play, XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { cn } from '@/shared/utils/index'
 
@@ -119,43 +120,49 @@ export function HeroVideoDialog({
         </div>
       )}
 
-      <AnimatePresence>
-        {isVideoOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            role="button"
-            tabIndex={0}
-            onKeyDown={e => {
-              if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
-                setIsVideoOpen(false)
-              }
-            }}
-            onClick={() => setIsVideoOpen(false)}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex h-screen items-center justify-center bg-black/50 backdrop-blur-md"
-          >
+      {createPortal(
+        <AnimatePresence>
+          {isVideoOpen && (
             <motion.div
-              {...selectedAnimation}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                  setIsVideoOpen(false)
+                }
+              }}
+              onClick={e => {
+                e.stopPropagation()
+                setIsVideoOpen(false)
+              }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] flex h-screen items-center justify-center bg-black/50 backdrop-blur-md"
             >
-              <motion.button className="absolute -top-16 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black">
-                <XIcon className="size-5" />
-              </motion.button>
-              <div className="relative isolate z-[1] size-full overflow-hidden rounded-2xl border-2 border-white">
-                <iframe
-                  src={videoSrc}
-                  title="Hero Video player"
-                  className="size-full rounded-2xl"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                ></iframe>
-              </div>
+              <motion.div
+                {...selectedAnimation}
+                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                className="relative mx-4 aspect-video w-full max-w-4xl md:mx-0"
+              >
+                <motion.button className="absolute -top-16 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black">
+                  <XIcon className="size-5" />
+                </motion.button>
+                <div className="relative isolate z-[1] size-full overflow-hidden rounded-2xl border-2 border-white">
+                  <iframe
+                    src={videoSrc}
+                    title="Hero Video player"
+                    className="size-full rounded-2xl"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  ></iframe>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }
