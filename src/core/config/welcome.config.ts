@@ -1,9 +1,9 @@
 import {
   Download,
   LucideIcon,
-  Network,
   Paintbrush,
   PencilRuler,
+  Rocket,
 } from 'lucide-react'
 
 import autopilotPreviewLight from '@/assets/images/autopilot.webp'
@@ -57,7 +57,7 @@ export const BENTO_ITEMS: BentoItemConfig[] = [
     title: 'Autopilot content creation',
     description: 'Turn your saved bookmarks into fresh drafts automatically!',
     className: 'md:col-span-1',
-    icon: Network,
+    icon: Rocket,
     imageData: {
       src: autopilotPreviewLight,
       srcDark: autopilotPreviewDark,

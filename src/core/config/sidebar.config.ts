@@ -1,4 +1,4 @@
-import { Bookmark, Gauge, LayoutDashboard, Network, Plus } from 'lucide-react'
+import { Bookmark, Files, Gauge, Network, Plus, Rocket } from 'lucide-react'
 
 import {
   SidebarActionItem,
@@ -28,7 +28,7 @@ export const coreLinks: SidebarLinkItem[] = [
     kind: 'link',
     title: 'Posts',
     url: '/posts-view',
-    icon: LayoutDashboard,
+    icon: Files,
   },
 ]
 
@@ -43,7 +43,7 @@ export const automationGroup: SidebarGroupItem = {
       kind: 'link',
       title: 'Autopilot',
       url: '/autopilot',
-      icon: Network,
+      icon: Rocket,
     },
     {
       kind: 'link',

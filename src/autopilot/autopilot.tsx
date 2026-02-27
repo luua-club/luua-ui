@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createLazyRoute, Link } from '@tanstack/react-router'
-import { Network } from 'lucide-react'
+import { Rocket } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import AutoPilotImage from '@/assets/images/autopilot.webp'
@@ -63,7 +63,7 @@ function AutoPilot() {
         {/* Header */}
         <div className="flex flex-col items-center justify-between gap-4 p-4 md:flex-row">
           <h1 className="flex items-center gap-3 text-lg font-medium">
-            <Network className="size-5" />
+            <Rocket className="size-5" />
             Autopilot
           </h1>
 

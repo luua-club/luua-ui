@@ -1,5 +1,5 @@
 import { useRouter } from '@tanstack/react-router'
-import { Calendar, HardDriveUpload, Network, PlugZap } from 'lucide-react'
+import { Calendar, HardDriveUpload, PlugZap, Rocket } from 'lucide-react'
 
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -67,7 +67,7 @@ function ProWelcomeBanner({ open, onOpenChange }: ProWelcomeBannerProps) {
       ),
       customAction: (
         <Badge className="dark:bg-primary-foreground dark:text-primary mt-4 px-3 py-2 text-sm">
-          <Network className="size-4" /> Add Inspiration
+          <Rocket className="size-4" /> Add Inspiration
         </Badge>
       ),
     },
