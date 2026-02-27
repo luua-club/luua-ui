@@ -250,7 +250,7 @@ function ImageGenerationModal({
               />
             </div>
             <Textarea
-              placeholder="Optional: guide the regeneration (e.g. &quot;make it more playful&quot; or &quot;use a dark theme&quot;)"
+              placeholder='Optional: guide the regeneration (e.g. "make it more playful" or "use a dark theme")'
               value={customInstruction}
               onChange={e => setCustomInstruction(e.target.value)}
               rows={2}
