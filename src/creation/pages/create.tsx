@@ -55,7 +55,10 @@ function Create() {
   const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
   const showTwitter = activeTab === 'all' || activeTab === 'Twitter'
   const reviewActionsDisabled =
-    !draft.hasContent || draft.saveStatus === 'pending' || !draft.draftId
+    !draft.hasContent ||
+    draft.saveStatus === 'pending' ||
+    !draft.draftId ||
+    draft.hasExceededCharLimit
 
   const saveStatusLabel = draft.draftId
     ? draft.updatedAt
