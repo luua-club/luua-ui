@@ -2,7 +2,7 @@ import z from 'zod'
 
 import { UserStyleStatus } from '../config/constant'
 import { writingStyles } from '../config/user-preferences.config'
-import { OrganizationSchema, ProjectSchema } from './org.model'
+import { OrganizationSummarySchema, ProjectSchema } from './org.model'
 
 /**
  * User schema
@@ -14,7 +14,7 @@ export const UserSchema = z.object({
   profile_image: z.string().nullable(),
   deactivated: z.boolean(),
   plan: z.enum(['Free', 'Pro']).catch('Free'),
-  organizations: z.array(OrganizationSchema).catch([]),
+  organizations: z.array(OrganizationSummarySchema).catch([]),
   projects: z.array(ProjectSchema).catch([]),
 })
 export type User = z.infer<typeof UserSchema>

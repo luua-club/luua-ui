@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useState } from 'react'
 
-import luuaIconLogo from '@/assets/logos/luua-icon-logo.svg'
+import luuaIconLogo from '@/assets/logos/luua-black-icon-logo.svg'
 import luuaWhiteIconLogo from '@/assets/logos/luua-white-icon-logo.svg'
 import { inspirationApi } from '@/core/api/inspiration.api'
 import { QUERY_KEYS } from '@/core/config/constant'

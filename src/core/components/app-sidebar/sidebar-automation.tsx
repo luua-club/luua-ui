@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router'
-import { ChevronRight, Network } from 'lucide-react'
+import { Link, useRouterState } from '@tanstack/react-router'
+import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { ungroupedItems } from '@/core/config/sidebar.config'
+import { automationGroup } from '@/core/config/sidebar.config'
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,22 +19,32 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/shared/ui/sidebar'
-
-const automationItems = ungroupedItems.filter(
-  item => item.url === '/bookmarks' || item.url === '/autopilot'
-)
+import { cn } from '@/shared/utils'
 
 function AppSidebarAutomation() {
   const { isMobile, setOpenMobile, state: sidebarState } = useSidebar()
+  const pathname = useRouterState({ select: s => s.location.pathname })
   const [open, setOpen] = useState(true)
 
+  const activePrefixes = automationGroup.activePrefixes ?? []
+  const isAnyChildActive = activePrefixes.some(prefix =>
+    pathname.startsWith(prefix)
+  )
+
   useEffect(() => {
-    setOpen(sidebarState === 'expanded')
+    if (sidebarState !== 'expanded') {
+      setOpen(false)
+      return
+    }
+
+    setOpen(Boolean(automationGroup.defaultOpen))
   }, [sidebarState])
 
   const handleMobileClose = () => {
     if (isMobile) setOpenMobile(false)
   }
+
+  const ParentIcon = automationGroup.icon
 
   return (
     <SidebarGroup className="py-0 pt-2">
@@ -48,16 +58,23 @@ function AppSidebarAutomation() {
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip="Automation">
-                  <Network />
-                  <span className="truncate">Automation</span>
+                <SidebarMenuButton
+                  tooltip={automationGroup.title}
+                  className={cn(
+                    'cursor-pointer',
+                    isAnyChildActive &&
+                      'dark:bg-sidebar-accent font-semibold text-black dark:font-bold dark:text-white'
+                  )}
+                >
+                  {ParentIcon && <ParentIcon />}
+                  <span className="truncate">{automationGroup.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
 
               <CollapsibleContent className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up overflow-hidden">
                 <SidebarMenuSub>
-                  {automationItems.map(item => (
+                  {automationGroup.children.map(item => (
                     <SidebarMenuSubItem key={item.title}>
                       <SidebarMenuSubButton asChild>
                         <Link

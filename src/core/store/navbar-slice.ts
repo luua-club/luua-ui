@@ -1,9 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-
-export type NavbarRightComponentKey = 'welcome' | null
+import { createSlice } from '@reduxjs/toolkit'
 
 interface INavbarState {
-  rightSideComponentKey: NavbarRightComponentKey
+  rightSideComponentKey: null
 }
 
 const initialState: INavbarState = {
@@ -13,20 +11,7 @@ const initialState: INavbarState = {
 const navbarSlice = createSlice({
   name: 'navbar',
   initialState,
-  reducers: {
-    setNavbarRightComponent: (
-      state,
-      action: PayloadAction<NavbarRightComponentKey>
-    ) => {
-      state.rightSideComponentKey = action.payload
-    },
-    clearNavbarRightComponent: state => {
-      state.rightSideComponentKey = null
-    },
-  },
+  reducers: {},
 })
-
-export const { setNavbarRightComponent, clearNavbarRightComponent } =
-  navbarSlice.actions
 
 export default navbarSlice.reducer

@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import { Edit2, PencilRuler, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-import luuaIconLogo from '@/assets/logos/luua-icon-logo.svg'
+import luuaIconLogo from '@/assets/logos/luua-black-icon-logo.svg'
 import luuaWhiteIconLogo from '@/assets/logos/luua-white-icon-logo.svg'
 
 import { Badge } from '../ui/badge'

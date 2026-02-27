@@ -4,102 +4,134 @@ import {
   LUUA_SELECTED_ORG_KEY,
   LUUA_SELECTED_PROJECT_KEY,
 } from '@/core/config/constant'
-import { Organization, Project } from '@/core/models/org.model'
+import { OrganizationSummary, Project } from '@/core/models/org.model'
 import {
   getLocalStorageItem,
+  removeLocalStorageItem,
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
 
 interface IOrgState {
-  organizations: Organization[]
-  projects: Project[]
   selectedOrgId: string | null
   selectedProjectId: string | null
-  orgPlan: 'Free' | 'Pro'
 }
 
 const initialState: IOrgState = {
-  organizations: [],
-  projects: [],
   selectedOrgId: getLocalStorageItem<string>(LUUA_SELECTED_ORG_KEY),
   selectedProjectId: getLocalStorageItem<string>(LUUA_SELECTED_PROJECT_KEY),
-  orgPlan: 'Free',
+}
+
+type ProfileSelectionPayload = {
+  organizations: OrganizationSummary[]
+  projects: Project[]
+}
+
+const persistSelectedOrgId = (orgId: string | null) => {
+  if (orgId) {
+    setLocalStorageItem(LUUA_SELECTED_ORG_KEY, orgId)
+    return
+  }
+
+  removeLocalStorageItem(LUUA_SELECTED_ORG_KEY)
+}
+
+const persistSelectedProjectId = (projectId: string | null) => {
+  if (projectId) {
+    setLocalStorageItem(LUUA_SELECTED_PROJECT_KEY, projectId)
+    return
+  }
+
+  removeLocalStorageItem(LUUA_SELECTED_PROJECT_KEY)
+}
+
+const resolveSelectedOrgId = (
+  selectedOrgId: string | null,
+  organizations: OrganizationSummary[]
+) => {
+  const hasValidOrg = organizations.some(org => org.id === selectedOrgId)
+  if (hasValidOrg) return selectedOrgId
+
+  return organizations[0]?.id ?? null
+}
+
+const resolveSelectedProjectId = (
+  selectedProjectId: string | null,
+  selectedOrgId: string | null,
+  projects: Project[]
+) => {
+  if (!selectedOrgId) {
+    return null
+  }
+
+  const orgProjects = projects.filter(
+    project => project.org_id === selectedOrgId
+  )
+  const hasValidProject = orgProjects.some(
+    project => project.id === selectedProjectId
+  )
+  if (hasValidProject) return selectedProjectId
+
+  return orgProjects[0]?.id ?? null
 }
 
 const orgSlice = createSlice({
   name: 'org',
   initialState,
   reducers: {
-    setOrganizations: (
+    syncSelectionFromProfile: (
       state,
-      action: PayloadAction<{
-        organizations: Organization[]
-        projects: Project[]
-      }>
+      action: PayloadAction<ProfileSelectionPayload>
     ) => {
-      state.organizations = action.payload.organizations
-      state.projects = action.payload.projects
+      const nextSelectedOrgId = resolveSelectedOrgId(
+        state.selectedOrgId,
+        action.payload.organizations
+      )
+      state.selectedOrgId = nextSelectedOrgId
+      persistSelectedOrgId(nextSelectedOrgId)
 
-      // If no org is selected or stored org is no longer valid, pick first
-      const validOrg = state.organizations.find(
-        o => o.id === state.selectedOrgId
+      const nextSelectedProjectId = resolveSelectedProjectId(
+        state.selectedProjectId,
+        nextSelectedOrgId,
+        action.payload.projects
       )
-      if (!validOrg && state.organizations.length > 0) {
-        state.selectedOrgId = state.organizations[0].id
-        setLocalStorageItem(LUUA_SELECTED_ORG_KEY, state.selectedOrgId)
-      }
-
-      // Resolve project: must belong to the selected org
-      const orgProjects = state.projects.filter(
-        p => p.org_id === state.selectedOrgId
-      )
-      const validProject = orgProjects.find(
-        p => p.id === state.selectedProjectId
-      )
-      if (!validProject) {
-        state.selectedProjectId =
-          orgProjects.length > 0 ? orgProjects[0].id : null
-        setLocalStorageItem(LUUA_SELECTED_PROJECT_KEY, state.selectedProjectId)
-      }
+      state.selectedProjectId = nextSelectedProjectId
+      persistSelectedProjectId(nextSelectedProjectId)
     },
 
-    setSelectedOrg: (state, action: PayloadAction<string>) => {
-      state.selectedOrgId = action.payload
-      setLocalStorageItem(LUUA_SELECTED_ORG_KEY, action.payload)
+    setSelectedOrg: (
+      state,
+      action: PayloadAction<{ orgId: string; projects: Project[] }>
+    ) => {
+      state.selectedOrgId = action.payload.orgId
+      persistSelectedOrgId(action.payload.orgId)
 
-      // Reset project to first project of new org (or null)
-      const orgProjects = state.projects.filter(
-        p => p.org_id === action.payload
+      const nextSelectedProjectId = resolveSelectedProjectId(
+        state.selectedProjectId,
+        action.payload.orgId,
+        action.payload.projects
       )
-      state.selectedProjectId =
-        orgProjects.length > 0 ? orgProjects[0].id : null
-      setLocalStorageItem(LUUA_SELECTED_PROJECT_KEY, state.selectedProjectId)
+      state.selectedProjectId = nextSelectedProjectId
+      persistSelectedProjectId(nextSelectedProjectId)
     },
 
     setSelectedProject: (state, action: PayloadAction<string | null>) => {
       state.selectedProjectId = action.payload
-      setLocalStorageItem(LUUA_SELECTED_PROJECT_KEY, action.payload)
-    },
-
-    setOrgPlan: (state, action: PayloadAction<'Free' | 'Pro'>) => {
-      state.orgPlan = action.payload
+      persistSelectedProjectId(action.payload)
     },
 
     clearOrg: state => {
-      state.organizations = []
-      state.projects = []
       state.selectedOrgId = null
       state.selectedProjectId = null
-      state.orgPlan = 'Free'
+      removeLocalStorageItem(LUUA_SELECTED_ORG_KEY)
+      removeLocalStorageItem(LUUA_SELECTED_PROJECT_KEY)
     },
   },
 })
 
 export const {
-  setOrganizations,
+  syncSelectionFromProfile,
   setSelectedOrg,
   setSelectedProject,
-  setOrgPlan,
   clearOrg,
 } = orgSlice.actions
 export default orgSlice.reducer

@@ -2,7 +2,7 @@ import { ArrowUp, Check, ChevronDown, Globe, Loader2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 
-import luuaIcon from '@/assets/logos/luua-icon-logo.svg'
+import luuaIcon from '@/assets/logos/luua-black-icon-logo.svg'
 import { generateApi } from '@/core/api/generate-post.api'
 import { AppIconLogo } from '@/core/components/app-logo'
 import { SOCIAL_PLATFORM } from '@/core/config/constant'

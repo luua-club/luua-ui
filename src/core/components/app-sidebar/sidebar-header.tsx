@@ -115,15 +115,15 @@ function AppSidebarHeader() {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className="bg-sidebar-accent/60 hover:bg-sidebar-accent group-data-[collapsible=icon]:p-2!"
+                className="bg-transparent group-data-[collapsible=icon]:p-1.5! hover:cursor-pointer hover:bg-transparent"
               >
                 <span className="bg-primary text-primary-foreground inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-[10px] font-semibold">
                   {displayName.charAt(0)}
                 </span>
-                <span className="font-semibold group-data-[collapsible=icon]:hidden">
+                <span className="min-w-0 truncate font-semibold transition-opacity duration-200 ease-linear group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0">
                   {displayName}
                 </span>
-                <ChevronsUpDown className="ml-auto size-4 opacity-70 group-data-[collapsible=icon]:hidden" />
+                <ChevronsUpDown className="ml-auto size-4 opacity-70 transition-opacity duration-200 ease-linear group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
 

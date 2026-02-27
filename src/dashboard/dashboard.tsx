@@ -11,6 +11,7 @@ import { type DraftItem } from '@/core/models/draft.model'
 import { type channelType } from '@/core/models/social.model'
 import AnalyticsCards from '@/dashboard/components/analytics-cards'
 import RenameDraftPopover from '@/dashboard/components/rename-draft-popover'
+import WelcomeDrawer from '@/dashboard/components/welcome-drawer'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardFooter } from '@/shared/ui/card'
 import { Separator } from '@/shared/ui/separator'
@@ -99,15 +100,9 @@ function DraftCard({
               <button
                 type="button"
                 aria-label="Rename draft"
-                onPointerDown={e => {
-                  e.stopPropagation()
-                }}
-                onMouseDown={e => {
-                  e.stopPropagation()
-                }}
-                onClick={e => {
-                  e.stopPropagation()
-                }}
+                onPointerDown={e => e.stopPropagation()}
+                onMouseDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
                 className="hover:bg-muted cursor-pointer rounded p-1"
               >
                 <Pencil className="size-3" />
@@ -181,10 +176,7 @@ function DashboardPage() {
 
   const renameMutation = useMutation({
     mutationFn: (payload: { id: string; name: string }) =>
-      draftsApi.renameDraft({
-        id: payload.id,
-        name: payload.name,
-      }),
+      draftsApi.renameDraft({ id: payload.id, name: payload.name }),
     onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
       queryClient.invalidateQueries({
@@ -206,48 +198,51 @@ function DashboardPage() {
   }
 
   return (
-    <div className="bg-secondary dark:bg-secondary/70 min-h-screen pt-12">
-      <AnalyticsCards />
+    <>
+      <div className="bg-secondary dark:bg-secondary/70 relative min-h-screen p-8">
+        <WelcomeDrawer />
+        <AnalyticsCards />
 
-      <div className="mx-auto max-w-5xl px-4 md:px-6">
-        <h1 className="mb-4 flex gap-2 text-sm font-semibold">
-          <FolderEdit className="size-5" /> Pick Up Where You Left Off
-        </h1>
+        <div className="mx-auto max-w-5xl px-4 md:px-6">
+          <h1 className="mb-4 flex gap-2 text-sm font-semibold">
+            <FolderEdit className="size-5" /> Pick Up Where You Left Off
+          </h1>
 
-        <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <NewPostCard onClick={handleNewPost} />
+          <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <NewPostCard onClick={handleNewPost} />
 
-          {isPending && <DraftCardSkeleton />}
+            {isPending && <DraftCardSkeleton />}
 
-          {!isPending &&
-            drafts.map(draft => (
-              <DraftCard
-                key={draft.id}
-                draft={draft}
-                onClick={() => handleDraftClick(draft.id)}
-                onRenameSave={name =>
-                  renameMutation.mutate({ id: draft.id, name })
-                }
-                isRenaming={renameMutation.isPending}
-              />
-            ))}
-        </div>
-
-        {!isPending && drafts.length === 0 && (
-          <p className="text-muted-foreground mt-2 text-xs">
-            No drafts yet. Click &quot;New Draft&quot; to get started.
-          </p>
-        )}
-
-        {drafts.length >= 1 && (
-          <div className="flex justify-end">
-            <Button variant={'link'} className="text-xs" asChild>
-              <Link to="/drafts">View all</Link>
-            </Button>
+            {!isPending &&
+              drafts.map(draft => (
+                <DraftCard
+                  key={draft.id}
+                  draft={draft}
+                  onClick={() => handleDraftClick(draft.id)}
+                  onRenameSave={name =>
+                    renameMutation.mutate({ id: draft.id, name })
+                  }
+                  isRenaming={renameMutation.isPending}
+                />
+              ))}
           </div>
-        )}
+
+          {!isPending && drafts.length === 0 && (
+            <p className="text-muted-foreground mt-2 text-xs">
+              No drafts yet. Click &quot;New Draft&quot; to get started.
+            </p>
+          )}
+
+          {drafts.length >= 1 && (
+            <div className="flex justify-end">
+              <Button variant={'link'} className="text-xs" asChild>
+                <Link to="/drafts">View all</Link>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

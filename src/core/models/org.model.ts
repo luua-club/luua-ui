@@ -12,18 +12,25 @@ export const ConnectedChannelsSchema = z.object({
 export type ConnectedChannels = z.infer<typeof ConnectedChannelsSchema>
 
 /**
- * Organization schema from profile API
+ * Organization summary schema from /user/profile
  */
-export const OrganizationSchema = z.object({
+export const OrganizationSummarySchema = z.object({
   id: z.string(),
   name: z.string().default(''),
   status: z.string().default(''),
   org_role: z.string().default(''),
+})
+export type OrganizationSummary = z.infer<typeof OrganizationSummarySchema>
+
+/**
+ * Organization detail schema from /organizations/current
+ */
+export const OrganizationDetailSchema = OrganizationSummarySchema.extend({
   plan: z.enum(['Free', 'Pro']).catch('Free'),
   seat_limit: z.number(),
   seat_used: z.number(),
 })
-export type Organization = z.infer<typeof OrganizationSchema>
+export type OrganizationDetail = z.infer<typeof OrganizationDetailSchema>
 
 /**
  * Project schema from profile API

@@ -1,13 +1,9 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import {
-  CalendarDays,
-  ChevronRight,
-  FileCheck,
-  LayoutDashboard,
-} from 'lucide-react'
+import { CalendarDays, ChevronRight, FolderClosed, List } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { useAppDispatch } from '@/core/hooks/global-state.hook'
+import { useAppDispatch, useAppSelector } from '@/core/hooks/global-state.hook'
+import { SidebarLinkItem } from '@/core/models/sidebar.model'
 import {
   clearStatusFilter,
   setStatusFilter,
@@ -30,29 +26,53 @@ import {
 } from '@/shared/ui/sidebar'
 import { cn } from '@/shared/utils'
 
-function AppSidebarAllPosts() {
+interface AppSidebarAllPostsProps {
+  item: SidebarLinkItem
+}
+
+function AppSidebarAllPosts({ item }: AppSidebarAllPostsProps) {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { isMobile, setOpenMobile, state: sidebarState } = useSidebar()
+  const statusFilter = useAppSelector(
+    state => state.postsViewState.statusFilter
+  )
+  const pathname = useRouterState({ select: s => s.location.pathname })
+
   const [open, setOpen] = useState(true)
 
-  const pathname = useRouterState({ select: s => s.location.pathname })
-  const isActive = pathname.startsWith('/posts-view')
+  const isPostsRoute = pathname.startsWith('/posts-view')
+  const isDraftsRoute = pathname.startsWith('/drafts')
+  const isParentActive = isPostsRoute || isDraftsRoute
 
-  // Sync collapsible open state with sidebar icon collapse
   useEffect(() => {
-    setOpen(sidebarState === 'expanded')
+    if (sidebarState !== 'expanded') {
+      setOpen(false)
+      return
+    }
+
+    setOpen(true)
   }, [sidebarState])
 
   const handleMobileClose = () => {
     if (isMobile) setOpenMobile(false)
   }
 
-  const handleAllPostsClick = () => {
+  const handleAllClick = () => {
     dispatch(clearStatusFilter())
     navigate({ to: '/posts-view/calendar' })
     handleMobileClose()
   }
+
+  const handleScheduledClick = () => {
+    dispatch(setStatusFilter('Scheduled'))
+    navigate({ to: '/posts-view/calendar' })
+    handleMobileClose()
+  }
+
+  const ParentIcon = item.icon
+  const isAllActive = isPostsRoute && statusFilter === 'all'
+  const isScheduledActive = isPostsRoute && statusFilter === 'Scheduled'
 
   return (
     <SidebarGroup className="py-0">
@@ -67,16 +87,15 @@ function AppSidebarAllPosts() {
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
-                  tooltip="All Posts"
-                  onClick={handleAllPostsClick}
+                  tooltip={item.title}
                   className={cn(
                     'cursor-pointer',
-                    isActive &&
+                    isParentActive &&
                       'dark:bg-sidebar-accent font-semibold text-black dark:font-bold dark:text-white'
                   )}
                 >
-                  <LayoutDashboard />
-                  <span className="truncate">All Posts</span>
+                  {ParentIcon && <ParentIcon />}
+                  <span className="truncate">{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
@@ -84,31 +103,42 @@ function AppSidebarAllPosts() {
               <CollapsibleContent className="data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up overflow-hidden">
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
-                    <SidebarMenuSubButton asChild>
-                      <Link
-                        to="/posts-view/calendar"
-                        onClick={() => {
-                          dispatch(setStatusFilter('Scheduled'))
-                          handleMobileClose()
-                        }}
-                      >
-                        <CalendarDays />
-                        <span>Schedule</span>
-                      </Link>
+                    <SidebarMenuSubButton
+                      onClick={handleAllClick}
+                      className={cn(
+                        'cursor-pointer',
+                        isAllActive &&
+                          'bg-sidebar-accent font-semibold text-black dark:font-bold dark:text-white'
+                      )}
+                    >
+                      <List />
+                      <span>All</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton
+                      onClick={handleScheduledClick}
+                      className={cn(
+                        'cursor-pointer',
+                        isScheduledActive &&
+                          'bg-sidebar-accent font-semibold text-black dark:font-bold dark:text-white'
+                      )}
+                    >
+                      <CalendarDays />
+                      <span>Schedule</span>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
 
                   <SidebarMenuSubItem>
                     <SidebarMenuSubButton asChild>
                       <Link
-                        to="/posts-view/calendar"
-                        onClick={() => {
-                          dispatch(setStatusFilter('Published'))
-                          handleMobileClose()
-                        }}
+                        to="/drafts"
+                        onClick={handleMobileClose}
+                        className="dark:[&.active]:bg-sidebar-accent [&.active]:font-semibold [&.active]:text-black dark:[&.active]:font-bold dark:[&.active]:text-white"
                       >
-                        <FileCheck />
-                        <span>Published</span>
+                        <FolderClosed />
+                        <span>Saved Drafts</span>
                       </Link>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>

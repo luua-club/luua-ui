@@ -30,8 +30,7 @@ import {
 } from '@/core/models/auth.model'
 import { User } from '@/core/models/user.model'
 import { clearUser, setUser } from '@/core/store/auth-slice'
-import { setOrganizations } from '@/core/store/org-slice'
-import { getPostLoginRoute } from '@/core/utils/post-login-route.util'
+import { syncSelectionFromProfile } from '@/core/store/org-slice'
 import { useTheme } from '@/shared/provider/theme-provider'
 import { Button } from '@/shared/ui/button'
 import { Highlighter } from '@/shared/ui/highlighter'
@@ -79,7 +78,15 @@ function Login() {
   const { theme } = useTheme()
   const router = useRouter()
   const dispatch = useAppDispatch()
+
+  // ---- Query ----
   const queryClient = useQueryClient()
+  const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
+
+  // ---- Mutation ----
+  /**
+   * Will login user
+   */
   const loginMutation = useMutation({
     mutationFn: (token: string) =>
       authApi.login({
@@ -92,6 +99,10 @@ function Login() {
       toast.error('Something went wrong, Please try again !')
     },
   })
+
+  /**
+   * Will send OTP to user
+   */
   const magicLinkMutation = useMutation({
     mutationFn: (email: string) => authApi.requestMagicLink({ email }),
     onSuccess: () => {
@@ -104,13 +115,13 @@ function Login() {
       )
     },
   })
-  const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
 
   // --- Derived Variables ---
   const isLoading = loginMutation.isPending || isFetchingUser > 0
 
   // ---- Effects ----
   /**
+   * USED FOR EXTENSION LOGIN REDIRECT, NOT PART OF MAIN APP
    * Store extension info and handle already logged in case
    */
   useEffect(() => {
@@ -139,6 +150,7 @@ function Login() {
   }, [isExtensionLogin, extensionId, key])
 
   /**
+   * USED FOR EXTENSION LOGIN REDIRECT, NOT PART OF MAIN APP
    * Clear user and local storage on mount (only if not extension login or not already logged in)
    */
   useEffect(() => {
@@ -194,7 +206,7 @@ function Login() {
 
       dispatch(setUser(response.data))
       dispatch(
-        setOrganizations({
+        syncSelectionFromProfile({
           organizations: response.data.organizations ?? [],
           projects: response.data.projects ?? [],
         })
@@ -232,11 +244,8 @@ function Login() {
         return
       }
 
-      // Normal web app redirect (clear query params)
-      router.navigate({
-        to: getPostLoginRoute({ loginResponse: res, user: response.data }),
-        search: {},
-      })
+      // Normal web app redirect
+      router.navigate({ to: '/dashboard', search: {} })
     } catch {
       removeLocalStorageItem(key)
       toast.error('Something went wrong, Please try again !')

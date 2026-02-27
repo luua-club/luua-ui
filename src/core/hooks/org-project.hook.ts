@@ -9,8 +9,16 @@ import { useAppDispatch, useAppSelector } from './global-state.hook'
 export const useOrgProject = () => {
   const dispatch = useAppDispatch()
   const queryClient = useQueryClient()
-  const { organizations, projects, selectedOrgId, selectedProjectId, orgPlan } =
-    useAppSelector(state => state.orgState)
+  const user = useAppSelector(state => state.authState.user)
+  const { selectedOrgId, selectedProjectId } = useAppSelector(
+    state => state.orgState
+  )
+
+  const organizations = useMemo(
+    () => user?.organizations ?? [],
+    [user?.organizations]
+  )
+  const projects = useMemo(() => user?.projects ?? [], [user?.projects])
 
   const selectedOrg = useMemo(
     () => organizations.find(o => o.id === selectedOrgId) ?? null,
@@ -35,7 +43,7 @@ export const useOrgProject = () => {
   }
 
   const changeOrg = (orgId: string) => {
-    dispatch(setSelectedOrg(orgId))
+    dispatch(setSelectedOrg({ orgId, projects }))
     invalidateAllQueries()
   }
 
@@ -51,7 +59,6 @@ export const useOrgProject = () => {
     selectedProject,
     selectedOrgId,
     selectedProjectId,
-    orgPlan,
     changeOrg,
     changeProject,
   }

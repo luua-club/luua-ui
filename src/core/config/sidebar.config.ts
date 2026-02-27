@@ -1,58 +1,66 @@
+import { Bookmark, Gauge, LayoutDashboard, Network, Plus } from 'lucide-react'
+
 import {
-  Bookmark,
-  FileCheck,
-  Gauge,
-  House,
-  LucideCalendar,
-  LucideLayoutDashboard,
-  Network,
-  Paintbrush,
-} from 'lucide-react'
+  SidebarActionItem,
+  SidebarGroupItem,
+  SidebarLayoutSection,
+  SidebarLinkItem,
+} from '../models/sidebar.model'
 
-import { ISidebarItem } from '../models/sidebar.model'
-
-export const ungroupedItems: ISidebarItem[] = [
+export const workActions: Array<SidebarActionItem | SidebarLinkItem> = [
   {
-    title: 'Welcome',
-    url: '/welcome',
-    icon: House,
+    kind: 'action',
+    title: 'Create Post',
+    url: '/creation/create',
+    icon: Plus,
+    emphasis: 'medium',
   },
+]
+
+export const coreLinks: SidebarLinkItem[] = [
   {
+    kind: 'link',
     title: 'Dashboard',
     url: '/dashboard',
     icon: Gauge,
   },
   {
-    title: 'Bookmarks',
-    url: '/bookmarks',
-    icon: Bookmark,
-  },
-  {
-    title: 'Autopilot',
-    url: '/autopilot',
-    icon: Network,
-  },
-  {
-    title: 'All Posts',
+    kind: 'link',
+    title: 'Posts',
     url: '/posts-view',
-    icon: LucideLayoutDashboard,
-  },
-  {
-    title: 'Your Styles',
-    url: '/preferences',
-    icon: Paintbrush,
+    icon: LayoutDashboard,
   },
 ]
 
-export const postsItems: ISidebarItem[] = [
+export const automationGroup: SidebarGroupItem = {
+  kind: 'group',
+  title: 'Automation',
+  icon: Network,
+  activePrefixes: ['/autopilot', '/bookmarks'],
+  defaultOpen: true,
+  children: [
+    {
+      kind: 'link',
+      title: 'Autopilot',
+      url: '/autopilot',
+      icon: Network,
+    },
+    {
+      kind: 'link',
+      title: 'Bookmarks',
+      url: '/bookmarks',
+      icon: Bookmark,
+    },
+  ],
+}
+
+export const sidebarLayoutSections: SidebarLayoutSection[] = [
   {
-    title: 'Scheduled',
-    url: '/schedule',
-    icon: LucideCalendar,
+    id: 'work-actions',
+    items: [...workActions],
   },
   {
-    title: 'Published',
-    url: '/published',
-    icon: FileCheck,
+    id: 'core-navigation',
+    items: [...coreLinks, automationGroup],
   },
 ]
