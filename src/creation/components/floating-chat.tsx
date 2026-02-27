@@ -2,7 +2,6 @@ import { ArrowUp, Check, ChevronDown, Globe, Loader2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 
-import luuaIcon from '@/assets/logos/luua-black-icon-logo.svg'
 import { generateApi } from '@/core/api/generate-post.api'
 import { AppIconLogo } from '@/core/components/app-logo'
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
@@ -407,7 +406,7 @@ export function FloatingChat({
                 >
                   <div className="flex flex-col items-start gap-3">
                     <div className="bg-muted flex size-10 items-center justify-center rounded-full border select-none">
-                      <img src={luuaIcon} alt="Luua" className="size-5" />
+                      <AppIconLogo className="!size-5" />
                     </div>
                     <p className="text-foreground text-base font-semibold">
                       How can I help you today?
@@ -452,7 +451,7 @@ export function FloatingChat({
                     >
                       {msg.role === 'assistant' && (
                         <div className="bg-muted mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border select-none">
-                          <img src={luuaIcon} alt="Luua" className="size-3.5" />
+                          <AppIconLogo className="!size-3.5" />
                         </div>
                       )}
 
@@ -478,8 +477,8 @@ export function FloatingChat({
 
                   {isLoading && (
                     <div className="flex justify-start gap-2.5">
-                      <div className="bg-muted mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border text-xs select-none">
-                        ✦
+                      <div className="bg-muted mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border select-none">
+                        <AppIconLogo className="!size-3.5" />
                       </div>
                       <div className="bg-muted rounded-2xl px-3.5 py-1">
                         <ThinkingIndicator />
@@ -497,18 +496,18 @@ export function FloatingChat({
                 onValueChange={setValue}
                 onSubmit={handleSubmit}
                 maxHeight={160}
-                className="border-input bg-muted/40 rounded-xl px-1 py-1 shadow-none"
+                className="border-input bg-muted/40 dark:bg-muted rounded-xl px-1 pt-1 pb-2 shadow-none"
               >
                 <PromptInputTextarea
                   placeholder="Do anything with AI..."
-                  className="px-2 text-xs"
+                  className="!bg-transparent px-2 pt-1 text-xs"
                 />
 
-                <PromptInputActions className="items-center justify-between px-2 pb-1">
+                <PromptInputActions className="items-center justify-between px-2 pt-2">
                   {/* Channel filter */}
                   <Popover open={channelOpen} onOpenChange={setChannelOpen}>
                     <PopoverTrigger asChild>
-                      <button className="hover:bg-accent text-foreground flex cursor-pointer items-center gap-1.5 rounded-md border bg-transparent px-2 py-1 text-xs font-medium transition-colors outline-none">
+                      <button className="hover:bg-accent text-foreground bg-background flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors outline-none">
                         {selectedPlatform ? (
                           <PlatformAvatar channel={selectedPlatform.name} />
                         ) : (

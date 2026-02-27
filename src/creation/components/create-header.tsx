@@ -5,7 +5,43 @@ import { DraftBadge } from '@/shared/components/post-state-badge'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Separator } from '@/shared/ui/separator'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
+
+function ActionButton({
+  disabled,
+  children,
+  className,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  if (!disabled) {
+    return (
+      <Button className={className} {...props}>
+        {children}
+      </Button>
+    )
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="inline-flex cursor-not-allowed">
+          <Button
+            disabled
+            className={cn('pointer-events-none', className)}
+            {...props}
+          >
+            {children}
+          </Button>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="text-balance">
+        <span>
+          Content cannot be empty <br /> or exceed the character limit
+        </span>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 type SaveStatus = 'idle' | 'pending' | 'saved'
 
@@ -124,7 +160,7 @@ function CreateHeader({
           onClick={onSave}
           disabled={saveDisabled}
           className={cn(
-            'min-w-[88px] justify-center disabled:opacity-100',
+            'min-w-[88px] justify-center disabled:opacity-60',
             saveStatus === 'saved' && 'text-green-600 dark:text-green-400'
           )}
         >
@@ -140,26 +176,26 @@ function CreateHeader({
 
         <Separator orientation="vertical" className="!h-6" />
 
-        <Button
+        <ActionButton
           variant="outline"
           size="sm"
           onClick={onSchedule}
           disabled={scheduleDisabled}
-          className="dark:border-input/60 dark:bg-input/30 dark:hover:bg-input/45 border disabled:opacity-100"
+          className="dark:border-input/60 dark:bg-input/30 dark:hover:bg-input/45 border disabled:opacity-60"
         >
           <Calendar className="size-3.5" />
           <span className="hidden lg:inline">Schedule</span>
-        </Button>
+        </ActionButton>
 
-        <Button
+        <ActionButton
           size="sm"
           onClick={onPublish}
           disabled={publishDisabled}
-          className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-100"
+          className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
         >
           <span className="hidden lg:inline">Publish</span>
           <Send className="size-3.5" />
-        </Button>
+        </ActionButton>
       </div>
     </header>
   )

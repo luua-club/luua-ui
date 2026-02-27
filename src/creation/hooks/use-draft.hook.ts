@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
-import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
+import {
+  POST_WORD_COUNT,
+  QUERY_KEYS,
+  SOCIAL_PLATFORM,
+} from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
 import { WithOptional } from '@/core/models/common.model'
 import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
@@ -166,6 +170,13 @@ export function useDraft() {
     hasDraftContent(postDrafts[name as channelType])
   )
 
+  // True when any post's content exceeds its platform character limit.
+  const hasExceededCharLimit = SOCIAL_PLATFORM.some(({ name }) => {
+    const channel = name as channelType
+    const content = postDrafts[channel]?.content ?? ''
+    return content.length > POST_WORD_COUNT[channel]
+  })
+
   const hasContentRef = useRef(hasContent)
   hasContentRef.current = hasContent
 
@@ -317,7 +328,13 @@ export function useDraft() {
   // ─── Auto-save debounce ────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!isDirtyRef.current || !hasContent) return
+    if (!isDirtyRef.current) return
+
+    if (!hasContent) {
+      clearAutoSaveTimer()
+      setSaveStatus('idle')
+      return
+    }
 
     clearAutoSaveTimer()
     setSaveStatus('pending')
@@ -360,6 +377,7 @@ export function useDraft() {
     isLoading: Boolean(draftId) && draftQuery.isPending,
     isRenaming: renameMutation.isPending,
     hasContent,
+    hasExceededCharLimit,
     handleContentChange,
     handleImagesChange,
     handleSaveDraft,
