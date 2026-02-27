@@ -31,8 +31,7 @@ import {
 import { cn } from '@/shared/utils'
 
 // ── Dummy response for testing ────────────────────────────────────────────────
-const DUMMY_RESPONSE = {
-  message: `## Great insights on this topic!
+const DUMMY_RESPONSE = `## Great insights on this topic!
 
 **Here's a quick breakdown:**
 - AI writing tools reduce content creation time by up to **70%**
@@ -44,9 +43,7 @@ const DUMMY_RESPONSE = {
 2. Use bullet points for scannability
 3. End with a clear call-to-action
 
-Want me to generate a full post based on this?`,
-  is_error: false,
-}
+Want me to generate a full post based on this?`
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ChannelFilter = channelType | 'all'
@@ -55,7 +52,6 @@ type ChatMessage = {
   id: string
   role: 'user' | 'assistant'
   content: string
-  isError?: boolean
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -273,7 +269,6 @@ export function FloatingChat({
         onPostsGenerated?.(res.data.generated_twitter_post.content, 'Twitter')
       }
 
-      // llm_response not yet in API — hardcode a confirmation message
       const channels = [
         res.data.generated_linkedin_post && 'LinkedIn',
         res.data.generated_twitter_post && 'X / Twitter',
@@ -281,20 +276,18 @@ export function FloatingChat({
         .filter(Boolean)
         .join(' & ')
 
-      const llm = res.data.llm_response ?? {
-        message: channels
+      const message =
+        res.data.llm_response ??
+        (channels
           ? `Done! I've generated your **${channels}** post${channels.includes('&') ? 's' : ''}. Check the editor above.`
-          : (res.data.fallback_message ?? DUMMY_RESPONSE.message),
-        is_error: false,
-      }
+          : DUMMY_RESPONSE)
 
       setMessages(prev => [
         ...prev,
         {
           id: `ai-${Date.now()}`,
           role: 'assistant',
-          content: llm.message,
-          isError: llm.is_error,
+          content: message,
         },
       ])
     } catch {
@@ -304,7 +297,6 @@ export function FloatingChat({
           id: `err-${Date.now()}`,
           role: 'assistant',
           content: 'Something went wrong. Please try again.',
-          isError: true,
         },
       ])
     } finally {
@@ -460,13 +452,11 @@ export function FloatingChat({
                           'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs break-all',
                           msg.role === 'user'
                             ? 'bg-primary text-primary-foreground'
-                            : msg.isError
-                              ? 'bg-destructive/10 text-destructive border-destructive/20 border'
-                              : 'bg-muted/60 text-foreground',
+                            : 'bg-muted/60 text-foreground',
                           msg.role === 'assistant' && 'bg-muted'
                         )}
                       >
-                        {msg.role === 'assistant' && !msg.isError ? (
+                        {msg.role === 'assistant' ? (
                           <MarkdownMessage content={msg.content} />
                         ) : (
                           <p>{msg.content}</p>

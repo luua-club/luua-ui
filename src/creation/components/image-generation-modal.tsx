@@ -37,6 +37,7 @@ function ImageGenerationModal({
     useState<ImageTemplate | null>(null)
   const [customPrompt, setCustomPrompt] = useState('')
   const [generatedImageUrl, setGeneratedImageUrl] = useState('')
+  const [customInstruction, setCustomInstruction] = useState('')
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const templatesQuery = useQuery({
@@ -52,16 +53,19 @@ function ImageGenerationModal({
     mutationFn: ({
       templateId,
       customPrompt,
+      customInstruction,
       signal,
     }: {
       templateId: string
       customPrompt?: string
+      customInstruction?: string
       signal?: AbortSignal
     }) =>
       imageGenerationApi.generateImage(
         {
           template_id: templateId,
           custom_prompt: customPrompt,
+          custom_instruction: customInstruction || undefined,
         },
         signal
       ),
@@ -88,13 +92,18 @@ function ImageGenerationModal({
     startGeneration(template.id, postContent?.trim() || undefined)
   }
 
-  const startGeneration = (templateId: string, prompt?: string) => {
+  const startGeneration = (
+    templateId: string,
+    prompt?: string,
+    instruction?: string
+  ) => {
     setStep('generating')
     const controller = new AbortController()
     abortControllerRef.current = controller
     generateMutation.mutate({
       templateId,
       customPrompt: prompt,
+      customInstruction: instruction,
       signal: controller.signal,
     })
   }
@@ -126,13 +135,16 @@ function ImageGenerationModal({
       selectedTemplate.category === 'custom'
         ? customPrompt.trim()
         : postContent?.trim() || undefined
-    startGeneration(selectedTemplate.id, prompt)
+    const instruction = customInstruction.trim() || undefined
+    startGeneration(selectedTemplate.id, prompt, instruction)
+    setCustomInstruction('')
   }
 
   const handleClose = () => {
     setStep('select')
     setSelectedTemplate(null)
     setCustomPrompt('')
+    setCustomInstruction('')
     setGeneratedImageUrl('')
     generateMutation.reset()
     abortControllerRef.current?.abort()
@@ -237,6 +249,13 @@ function ImageGenerationModal({
                 className="h-auto w-full object-contain"
               />
             </div>
+            <Textarea
+              placeholder="Optional: guide the regeneration (e.g. &quot;make it more playful&quot; or &quot;use a dark theme&quot;)"
+              value={customInstruction}
+              onChange={e => setCustomInstruction(e.target.value)}
+              rows={2}
+              className="resize-none text-sm"
+            />
             <div className="flex gap-2">
               <Button
                 variant="outline"
