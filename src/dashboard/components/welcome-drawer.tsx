@@ -1,8 +1,8 @@
 import { LampDeskIcon, Lightbulb, Telescope, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { EXTERNAL_URLS, LUUA_USER_KEY } from '@/core/config/constant'
-import { LoginResponse } from '@/core/models/auth.model'
+import { EXTERNAL_URLS, LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
+import { AuthInfo } from '@/core/models/auth.model'
 import { removeQueryParams } from '@/core/utils/common.util'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { Button } from '@/shared/ui/button'
@@ -28,7 +28,7 @@ function WelcomeDrawer() {
 
   // --- Effects ---
   useEffect(() => {
-    const authData = getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
+    const authData = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
     const alreadyShown = getLocalStorageItem<boolean>(LUUA_WELCOME_SHOWN)
     if (authData?.new_user === true && !alreadyShown) {
       setLocalStorageItem(LUUA_WELCOME_SHOWN, true)

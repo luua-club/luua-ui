@@ -7,7 +7,6 @@ import { Skeleton } from '@/shared/ui/skeleton'
 import { cn } from '@/shared/utils'
 
 import { SOCIAL_PLATFORM } from '../config/constant'
-import { useProjectDetail } from '../hooks/project-detail.hook'
 import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
 import { ProjectSocial } from '../models/social.model'
@@ -35,7 +34,7 @@ function Post({
 
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
   const userState = useUserState()
-  const { connectedChannels } = useProjectDetail()
+  const connectedChannels = userState?.connectedChannels
 
   if (!userState || isLoading) {
     return <PostSkeleton tileView={tileView} />

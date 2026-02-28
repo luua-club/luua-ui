@@ -12,7 +12,6 @@ import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { useProjectDetail } from '@/core/hooks/project-detail.hook'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -41,7 +40,7 @@ function Review() {
     from: '/review/$draftId',
   })
   const userState = useUserState()
-  const { connectedChannels } = useProjectDetail()
+  const connectedChannels = userState?.connectedChannels
   const navigate = useNavigate()
   const { mutation: publishDraft } = usePublishDraft()
   const { mutation: scheduleDraft } = useScheduleDraft()
@@ -163,7 +162,6 @@ function Review() {
 
                 {step.id === 'publish' && (
                   <ConnectPublish
-                    user={userState}
                     channels={selectedChannels}
                     hideQuickShare={!!search.schedule || allChannelsConnected}
                     selectedPosts={selectedPosts}

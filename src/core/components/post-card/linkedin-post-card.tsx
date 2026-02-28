@@ -17,7 +17,6 @@ import {
   type UsePostCardComposer,
   usePostCardComposer,
 } from '../../hooks/post-card-composer.hook'
-import { useProjectDetail } from '../../hooks/project-detail.hook'
 import { useUserState } from '../../hooks/user-state.hook'
 import PostImagePreview from '../post-preview/PostImagePreview'
 import {
@@ -191,7 +190,7 @@ function LinkedInPreviewCard({
 
 function LinkedInPostCard(props: LinkedInPostCardProps) {
   const user = useUserState()
-  const { connectedChannels } = useProjectDetail()
+  const connectedChannels = user?.connectedChannels
   const { content, setContent, textareaRef, updateSelectionRef } =
     usePostCardComposer()
 

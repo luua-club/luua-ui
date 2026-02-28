@@ -7,19 +7,13 @@ import { userApi } from '@/core/api/user.api'
 import LinkedInTargetSelectorDialog from '@/core/components/linkedin-target-selector-dialog'
 import SocialCard from '@/core/components/social-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
-import { useProjectDetail } from '@/core/hooks/project-detail.hook'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { channelType, LinkedInAccountType } from '@/core/models/social.model'
-import { UserState } from '@/core/models/user.model'
 
-const Socials = ({
-  user,
-  channels,
-}: {
-  user: UserState
-  channels?: channelType[]
-}) => {
+const Socials = ({ channels }: { channels?: channelType[] }) => {
   const queryClient = useQueryClient()
-  const { connectedChannels } = useProjectDetail()
+  const userState = useUserState()
+  const connectedChannels = userState?.connectedChannels
   const [loadingStates, setLoadingStates] = useState<
     Record<channelType, boolean>
   >({
@@ -59,8 +53,8 @@ const Socials = ({
       await userApi.disconnectSocial(payload)
       return payload
     },
-    onSuccess: (payload: channelType) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.projectDetails] })
+    onSuccess: async (payload: channelType) => {
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
       toast.success(`Disconnected from ${payload}`)
     },
     onError: (_error: Error, payload: channelType) => {
@@ -80,8 +74,8 @@ const Socials = ({
       account_type: LinkedInAccountType
       organization_id: string | null
     }) => userApi.setLinkedInTarget(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.projectDetails] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
       toast.success('LinkedIn account setup completed')
       setIsLinkedInSelectorOpen(false)
     },
@@ -128,7 +122,7 @@ const Socials = ({
             isLoading={loadingStates.Twitter}
             onConnect={() => handleConnect('Twitter')}
             onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
-            showUpgradePlan={user?.plan === 'Free'}
+            showUpgradePlan={userState?.plan === 'Free'}
           />
         )}
       </div>

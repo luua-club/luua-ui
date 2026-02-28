@@ -13,11 +13,9 @@ import getCreationRouteTree from '@/creation/router'
 import getDashboardRoute from '@/dashboard/router'
 import getDraftsRoute from '@/drafts/router'
 import { AuthGuard } from '@/guards'
-import getOrgSettingsRoute from '@/org-settings/router'
 import getPaymentsRoute from '@/payments/router'
 import getPostsViewRoute from '@/posts-view/router'
 import getPreferencesRoute from '@/preferences/router'
-import getProjectSettingsRoute from '@/project-settings/router'
 import getReviewRoute from '@/review/router'
 import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
@@ -47,8 +45,6 @@ const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
 const postsViewhubRoute = getPostsViewRoute(privateRoute)
-const orgSettingsRoute = getOrgSettingsRoute(privateRoute)
-const projectSettingsRoute = getProjectSettingsRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -63,8 +59,6 @@ const routeTree = rootRoute.addChildren([
     autopilotRoute,
     reviewRoute,
     postsViewhubRoute,
-    orgSettingsRoute,
-    projectSettingsRoute,
   ]),
 ])
 

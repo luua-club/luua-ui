@@ -28,7 +28,6 @@ import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
-import { useProjectDetail } from '../../hooks/project-detail.hook'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
 import PostImagePreview from './PostImagePreview'
@@ -36,7 +35,7 @@ import PostImagePreview from './PostImagePreview'
 const TwitterPost = (props: PostPreviewProps) => {
   // -- HOOKS --
   const user = useUserState()
-  const { connectedChannels } = useProjectDetail()
+  const connectedChannels = user?.connectedChannels
   const router = useRouter()
   const {
     content,
