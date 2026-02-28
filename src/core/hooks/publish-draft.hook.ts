@@ -12,15 +12,12 @@ import { channelType } from '../models/social.model'
  * Performs a sequential flow using React Query mutation:
  * 1) Create/Update a draft via draftsApi.postDraft
  * 2) Publish the created draft via postsApi.publishDraft
- *
- * Usage:
- * const publishDraft = usePublishDraft()
- * publishDraft.mutate({ posts: [...], id: 'draftId' })
  */
 export function usePublishDraft() {
   type Params = {
     draftRequest: IDraftRequest
     forChannel: channelType[]
+    version: number
   }
 
   const mutation = useMutation({
@@ -28,6 +25,7 @@ export function usePublishDraft() {
       let draftId: string
       let postIds: string[]
       let draftData: DraftItem | IDraftRequest
+      let currentVersion = params.version
 
       if (params.draftRequest.id) {
         draftId = params.draftRequest.id
@@ -48,6 +46,7 @@ export function usePublishDraft() {
 
         draftId = draftRes.data.draft.id
         draftData = draftRes.data.draft
+        currentVersion = draftRes.data.draft.version
 
         // Filter postIds based on forChannel
         const forChannelSet = new Set(params.forChannel)
@@ -60,6 +59,7 @@ export function usePublishDraft() {
       const publishRes = await postsApi.publishDraft({
         draft_id: draftId,
         post_ids: postIds,
+        version: currentVersion,
       })
 
       // POSTHOG

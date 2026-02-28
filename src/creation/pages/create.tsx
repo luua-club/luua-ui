@@ -7,6 +7,7 @@ import { PostCardMode } from '@/core/components/post-card/post-card.types'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
 import type { channelType } from '@/core/models/social.model'
 import { FloatingChat } from '@/creation/components/floating-chat'
+import { DraftLockedBanner } from '@/shared/components/draft-locked-banner'
 
 import CreateHeader from '../components/create-header'
 import { CreateHeaderOptions } from '../components/create-header-options'
@@ -48,8 +49,10 @@ function Create() {
     })
   }
 
+  // Force preview mode when draft is read-only (lock not acquired)
+  const effectivePreviewMode = draft.isReadOnly ? 'preview' : previewMode
   const cardMode: PostCardMode =
-    previewMode === 'preview' ? 'preview' : 'editor'
+    effectivePreviewMode === 'preview' ? 'preview' : 'editor'
 
   // All socials are always available; tabs only control visibility.
   const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
@@ -58,7 +61,8 @@ function Create() {
     !draft.hasContent ||
     draft.saveStatus === 'pending' ||
     !draft.draftId ||
-    draft.hasExceededCharLimit
+    draft.hasExceededCharLimit ||
+    draft.isReadOnly
 
   const saveStatusLabel = draft.draftId
     ? draft.updatedAt
@@ -94,22 +98,36 @@ function Create() {
           canRename={!!draft.draftId}
           onSave={draft.handleSaveDraft}
           saveStatus={draft.saveStatus}
-          saveDisabled={!draft.hasContent || draft.saveStatus === 'pending'}
+          saveDisabled={
+            !draft.hasContent ||
+            draft.saveStatus === 'pending' ||
+            draft.isReadOnly
+          }
           onSchedule={() => openReviewFlow(true)}
           scheduleDisabled={reviewActionsDisabled}
           onPublish={() => openReviewFlow(false)}
           publishDisabled={reviewActionsDisabled}
-          onTitleChange={draft.handleRenameDraft}
+          onTitleChange={draft.isReadOnly ? undefined : draft.handleRenameDraft}
+          isReadOnly={draft.isReadOnly}
         />
 
         <CreateHeaderOptions
           selected={activeTab}
           onChange={setActiveTab}
-          previewMode={previewMode}
-          onPreviewModeChange={setPreviewMode}
+          previewMode={effectivePreviewMode}
+          onPreviewModeChange={draft.isReadOnly ? undefined : setPreviewMode}
           onBackToDashboard={() => navigate({ to: '/dashboard' })}
         />
       </div>
+
+      {draft.lockedByUser && (
+        <div className="px-4 pt-4">
+          <DraftLockedBanner
+            name={draft.lockedByUser.user_name}
+            email={draft.lockedByUser.email}
+          />
+        </div>
+      )}
 
       <div className="flex-1 p-4 pt-6">
         <div
@@ -135,7 +153,9 @@ function Create() {
                   isAiGenerating &&
                   (activeTab === 'all' || activeTab === 'LinkedIn')
                 }
-                onRequestEdit={() => setPreviewMode('editor')}
+                onRequestEdit={
+                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
+                }
                 onContentChange={val =>
                   draft.handleContentChange(val, 'LinkedIn')
                 }
@@ -162,7 +182,9 @@ function Create() {
                   isAiGenerating &&
                   (activeTab === 'all' || activeTab === 'Twitter')
                 }
-                onRequestEdit={() => setPreviewMode('editor')}
+                onRequestEdit={
+                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
+                }
                 onContentChange={val =>
                   draft.handleContentChange(val, 'Twitter')
                 }
@@ -175,19 +197,21 @@ function Create() {
         </div>
       </div>
 
-      <FloatingChat
-        onPostsGenerated={draft.handleContentChange}
-        onGeneratingChange={setIsAiGenerating}
-        channel={activeTab}
-        onChannelChange={setActiveTab}
-        currentState={{
-          linkedin: draft.postDrafts.LinkedIn?.content ?? null,
-          twitter: draft.postDrafts.Twitter?.content ?? null,
-        }}
-        initialOpen={!!initialSource}
-        autoSubmitPrompt={initialSource}
-        onAutoSubmitStart={handleAutoSubmitStart}
-      />
+      {!draft.isReadOnly && (
+        <FloatingChat
+          onPostsGenerated={draft.handleContentChange}
+          onGeneratingChange={setIsAiGenerating}
+          channel={activeTab}
+          onChannelChange={setActiveTab}
+          currentState={{
+            linkedin: draft.postDrafts.LinkedIn?.content ?? null,
+            twitter: draft.postDrafts.Twitter?.content ?? null,
+          }}
+          initialOpen={!!initialSource}
+          autoSubmitPrompt={initialSource}
+          onAutoSubmitStart={handleAutoSubmitStart}
+        />
+      )}
     </div>
   )
 }

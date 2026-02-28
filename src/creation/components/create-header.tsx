@@ -10,10 +10,11 @@ import { cn } from '@/shared/utils'
 
 function ActionButton({
   disabled,
+  disabledReason,
   children,
   className,
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & { disabledReason?: string }) {
   if (!disabled) {
     return (
       <Button className={className} {...props}>
@@ -36,7 +37,11 @@ function ActionButton({
       </TooltipTrigger>
       <TooltipContent className="text-balance">
         <span>
-          Content cannot be empty <br /> or exceed the character limit
+          {disabledReason ?? (
+            <>
+              Content cannot be empty <br /> or exceed the character limit
+            </>
+          )}
         </span>
       </TooltipContent>
     </Tooltip>
@@ -57,6 +62,7 @@ interface CreateHeaderProps {
   onPublish?: () => void
   publishDisabled?: boolean
   onTitleChange?: (title: string) => void
+  isReadOnly?: boolean
 }
 
 function CreateHeader({
@@ -71,6 +77,7 @@ function CreateHeader({
   onPublish,
   publishDisabled,
   onTitleChange,
+  isReadOnly,
 }: CreateHeaderProps) {
   // --- State ---
   const [isEditing, setIsEditing] = useState(false)
@@ -132,7 +139,7 @@ function CreateHeader({
               <span className="text-foreground max-w-[140px] truncate text-sm font-semibold tracking-tight sm:max-w-xs">
                 {title}
               </span>
-              {canRename && (
+              {canRename && !isReadOnly && (
                 <button
                   onClick={handleEditClick}
                   className="text-muted-foreground hover:text-foreground transition-colors hover:cursor-pointer"
@@ -181,6 +188,9 @@ function CreateHeader({
           size="sm"
           onClick={onSchedule}
           disabled={scheduleDisabled}
+          disabledReason={
+            isReadOnly ? 'This draft is locked by another user' : undefined
+          }
           className="dark:border-input/60 dark:bg-input/30 dark:hover:bg-input/45 border disabled:opacity-60"
         >
           <Calendar className="size-3.5" />
@@ -191,6 +201,9 @@ function CreateHeader({
           size="sm"
           onClick={onPublish}
           disabled={publishDisabled}
+          disabledReason={
+            isReadOnly ? 'This draft is locked by another user' : undefined
+          }
           className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
         >
           <span className="hidden lg:inline">Publish</span>

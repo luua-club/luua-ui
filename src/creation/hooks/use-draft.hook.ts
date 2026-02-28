@@ -5,13 +5,20 @@ import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
 import {
+  API_CONSTANTS,
   POST_WORD_COUNT,
   QUERY_KEYS,
   SOCIAL_PLATFORM,
 } from '@/core/config/constant'
 import { queryClient } from '@/core/config/global.config'
+import { ApiError } from '@/core/models/api.model'
 import { WithOptional } from '@/core/models/common.model'
-import { DraftItem, IDraftRequest, PostItem } from '@/core/models/draft.model'
+import {
+  DraftItem,
+  IDraftRequest,
+  ILockedByUser,
+  PostItem,
+} from '@/core/models/draft.model'
 import { MediaObject } from '@/core/models/post.model'
 import { channelType } from '@/core/models/social.model'
 
@@ -22,6 +29,7 @@ export type SaveStatus = 'idle' | 'pending' | 'saved'
 
 const AUTO_SAVE_DELAY_MS = 1500
 const SAVED_INDICATOR_DURATION_MS = 2000
+const LOCK_RENEWAL_INTERVAL_MS = 30 * 1000 // 30 seconds
 
 function hasDraftContent(draft?: WithOptional<PostItem, 'id'>) {
   return Boolean(
@@ -38,6 +46,8 @@ export function useDraft() {
   const [draftName, setDraftName] = useState('')
   const [updatedAt, setUpdatedAt] = useState<string | null>(null)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
+  const [isLocked, setIsLocked] = useState<boolean | null>(null)
+  const [lockedByUser, setLockedByUser] = useState<ILockedByUser | null>(null)
   // Source-of-truth ID used during save orchestration. This prevents duplicate
   // draft creation when a queued save runs before router search params update.
   const activeDraftIdRef = useRef<string | null>(draftId ?? null)
@@ -49,6 +59,16 @@ export function useDraft() {
   const queuedSaveSourceRef = useRef<SaveSource | null>(null)
   // Hydrate a draft exactly once per draft ID; afterwards local editor state wins.
   const hydratedDraftIdRef = useRef<string | null>(null)
+
+  // Version tracking
+  const versionRef = useRef<number | null>(null)
+  // Lock tracking
+  const lockAcquiredRef = useRef(false)
+  const lockRenewalTimerRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  )
+  // Tracks which draftId we've already attempted to lock — prevents re-runs.
+  const lockAttemptedForRef = useRef<string | null>(null)
 
   // Debounce + UI indicator timers.
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -64,6 +84,12 @@ export function useDraft() {
     if (!saveStatusTimerRef.current) return
     clearTimeout(saveStatusTimerRef.current)
     saveStatusTimerRef.current = null
+  }, [])
+
+  const clearLockRenewalTimer = useCallback(() => {
+    if (!lockRenewalTimerRef.current) return
+    clearInterval(lockRenewalTimerRef.current)
+    lockRenewalTimerRef.current = null
   }, [])
 
   useEffect(() => {
@@ -96,6 +122,9 @@ export function useDraft() {
     clearSaveStatusTimer()
     setSaveStatus('idle')
 
+    // Track version from server
+    versionRef.current = draftQuery.data.version
+
     const nextDrafts: PostDrafts = {}
 
     draftQuery.data.posts.forEach(post => {
@@ -107,6 +136,85 @@ export function useDraft() {
     setUpdatedAt(draftQuery.data.updated_at ?? null)
   }, [clearAutoSaveTimer, clearSaveStatusTimer, draftQuery.data])
 
+  // ─── Lock lifecycle ─────────────────────────────────────────────────────────
+
+  // Acquire lock once per draftId (after the draft query succeeds).
+  // Using `draftQuery.isSuccess` (boolean) instead of `draftQuery.data` (object)
+  // to avoid re-running on every refetch / setQueryData.
+  useEffect(() => {
+    if (!draftId || !draftQuery.isSuccess) return
+    // Only attempt lock once per draft — avoid re-acquiring on effect re-runs.
+    if (lockAttemptedForRef.current === draftId) return
+    lockAttemptedForRef.current = draftId
+
+    let cancelled = false
+
+    const handleLockFailure = (res?: {
+      data: { locked_by: ILockedByUser }
+    }) => {
+      lockAcquiredRef.current = false
+      setIsLocked(false)
+      setLockedByUser(
+        res?.data?.locked_by ?? {
+          user_id: '',
+          user_name: 'Another user',
+          email: '',
+        }
+      )
+    }
+
+    const acquireLock = async () => {
+      try {
+        const res = await draftsApi.lockDraft(draftId)
+        if (cancelled) return
+
+        if (!res.data.lock_acquired) {
+          handleLockFailure(res)
+          return
+        }
+
+        lockAcquiredRef.current = true
+        setIsLocked(true)
+
+        // Set up periodic renewal
+        clearLockRenewalTimer()
+        lockRenewalTimerRef.current = setInterval(async () => {
+          try {
+            const renewRes = await draftsApi.lockDraft(draftId)
+            if (!renewRes.data.lock_acquired) {
+              clearLockRenewalTimer()
+              handleLockFailure(renewRes)
+            }
+          } catch {
+            // Lock renewal failed — another user may have taken over
+            clearLockRenewalTimer()
+            handleLockFailure()
+          }
+        }, LOCK_RENEWAL_INTERVAL_MS)
+      } catch {
+        if (cancelled) return
+        handleLockFailure()
+      }
+    }
+
+    acquireLock()
+
+    return () => {
+      cancelled = true
+      clearLockRenewalTimer()
+      lockAttemptedForRef.current = null
+
+      // Release lock on unmount — only if we actually hold it
+      if (lockAcquiredRef.current) {
+        lockAcquiredRef.current = false
+        draftsApi.unlockDraft(draftId).catch(() => {
+          // Best effort — ignore unlock errors on unmount
+        })
+      }
+      setIsLocked(null)
+    }
+  }, [draftId, draftQuery.isSuccess, clearLockRenewalTimer])
+
   // Reset state when navigating to a fresh /create (no draftId).
   useEffect(() => {
     if (draftId) return
@@ -115,23 +223,29 @@ export function useDraft() {
     isDirtyRef.current = false
     isSavingRef.current = false
     queuedSaveSourceRef.current = null
+    versionRef.current = null
+    lockAttemptedForRef.current = null
+    setIsLocked(null)
+    setLockedByUser(null)
 
     clearAutoSaveTimer()
     clearSaveStatusTimer()
+    clearLockRenewalTimer()
 
     setPostDrafts({})
     setDraftName('')
     setUpdatedAt(null)
     setSaveStatus('idle')
-  }, [clearAutoSaveTimer, clearSaveStatusTimer, draftId])
+  }, [clearAutoSaveTimer, clearSaveStatusTimer, clearLockRenewalTimer, draftId])
 
   // Clean up timers on unmount.
   useEffect(() => {
     return () => {
       clearAutoSaveTimer()
       clearSaveStatusTimer()
+      clearLockRenewalTimer()
     }
-  }, [clearAutoSaveTimer, clearSaveStatusTimer])
+  }, [clearAutoSaveTimer, clearSaveStatusTimer, clearLockRenewalTimer])
 
   // ─── Content handlers ──────────────────────────────────────────────────────
 
@@ -180,6 +294,11 @@ export function useDraft() {
   const hasContentRef = useRef(hasContent)
   hasContentRef.current = hasContent
 
+  // Read-only when we have an existing draft and lock is not confirmed acquired.
+  // This covers: lock pending (null), lock failed (false).
+  // New drafts (no draftId) are never read-only.
+  const isReadOnly = Boolean(draftId) && isLocked !== true
+
   // ─── Payload builder (shared by manual + auto save) ───────────────────────
 
   const buildPayload = useCallback((): IDraftRequest => {
@@ -187,9 +306,12 @@ export function useDraft() {
 
     const activeDraftId = activeDraftIdRef.current
 
-    if (activeDraftId) payload.id = activeDraftId
-    if (draftName) payload.name = draftName
-
+    if (activeDraftId) {
+      payload.id = activeDraftId
+      if (versionRef.current !== null) {
+        payload.version = versionRef.current
+      }
+    }
     // Always evaluate all socials; include only posts that have content/media.
     SOCIAL_PLATFORM.forEach(({ name }) => {
       const channel = name as channelType
@@ -218,9 +340,12 @@ export function useDraft() {
   })
 
   const renameMutation = useMutation({
-    mutationFn: (name: string) =>
+    mutationFn: ({ name }: { name: string }) =>
       draftsApi.renameDraft({ id: draftId as string, name }),
-    onSuccess: () => toast.success('Draft renamed'),
+    onSuccess: res => {
+      versionRef.current = res.data.draft.version
+      toast.success('Draft renamed')
+    },
     onError: () => toast.error('Failed to rename draft'),
   })
 
@@ -245,6 +370,8 @@ export function useDraft() {
 
         isDirtyRef.current = false
         activeDraftIdRef.current = saved.id
+        // Update version from server response
+        versionRef.current = saved.version
         // Mark this ID as already hydrated so post-save query updates never
         // clobber local typing.
         hydratedDraftIdRef.current = saved.id
@@ -285,9 +412,22 @@ export function useDraft() {
             }
           }, SAVED_INDICATOR_DURATION_MS)
         }
-      } catch {
+      } catch (err) {
         setSaveStatus('idle')
-        if (source === 'manual') {
+
+        const apiErr = err as ApiError
+        if (apiErr.status === API_CONSTANTS.statusCode.notFound) {
+          // Draft was deleted server-side — stop all auto-save retries.
+          isDirtyRef.current = false
+          queuedSaveSourceRef.current = null
+          toast.error('This draft no longer exists. It may have been deleted.')
+        } else if (apiErr.status === API_CONSTANTS.statusCode.conflict) {
+          // Handle 409 conflict: re-fetch draft to get latest version
+          hydratedDraftIdRef.current = null
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.draft, activeDraftIdRef.current],
+          })
+        } else if (source === 'manual') {
           toast.error('Failed to save draft')
         }
       } finally {
@@ -329,6 +469,8 @@ export function useDraft() {
 
   useEffect(() => {
     if (!isDirtyRef.current) return
+    // Skip auto-save when read-only (lock not acquired)
+    if (isReadOnly) return
 
     if (!hasContent) {
       clearAutoSaveTimer()
@@ -344,7 +486,7 @@ export function useDraft() {
     }, AUTO_SAVE_DELAY_MS)
 
     return () => clearAutoSaveTimer()
-  }, [clearAutoSaveTimer, hasContent, postDrafts, requestSave])
+  }, [clearAutoSaveTimer, hasContent, isReadOnly, postDrafts, requestSave])
 
   // ─── Manual save ───────────────────────────────────────────────────────────
 
@@ -361,7 +503,9 @@ export function useDraft() {
   const handleRenameDraft = useCallback(
     (name: string) => {
       setDraftName(name)
-      if (draftId) renameMutation.mutate(name)
+      if (draftId) {
+        renameMutation.mutate({ name })
+      }
     },
     [draftId, renameMutation]
   )
@@ -376,6 +520,10 @@ export function useDraft() {
     saveStatus,
     isLoading: Boolean(draftId) && draftQuery.isPending,
     isRenaming: renameMutation.isPending,
+    isLocked,
+    isReadOnly,
+    lockedByUser,
+    version: versionRef.current,
     hasContent,
     hasExceededCharLimit,
     handleContentChange,

@@ -5,6 +5,7 @@ import {
   IDraftRenameRequest,
   IDraftRequest,
   IDraftResponse,
+  ILockResponse,
 } from '../models/draft.model'
 import { BaseApiService } from './base.api'
 
@@ -66,6 +67,14 @@ class DraftsApi extends BaseApiService {
 
   async deletePost(draftId: string, postId: string) {
     return this.delete(`${draftId}/posts/${postId}`)
+  }
+
+  async lockDraft(draftId: string) {
+    return this.post<ILockResponse>({}, `${draftId}/lock`)
+  }
+
+  async unlockDraft(draftId: string) {
+    return this.delete(`${draftId}/lock`)
   }
 }
 
