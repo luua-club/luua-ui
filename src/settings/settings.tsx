@@ -107,7 +107,7 @@ const Settings = () => {
               integrations and never access your personal data. Every post goes
               live only after you approve it.
             </p>
-            <Socials user={user} />
+            <Socials />
           </SettingLazySubPages>
         </TabsContent>
 

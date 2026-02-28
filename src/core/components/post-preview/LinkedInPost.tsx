@@ -22,7 +22,6 @@ import { Textarea } from '@/shared/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
-import { useProjectDetail } from '../../hooks/project-detail.hook'
 import { useUserState } from '../../hooks/user-state.hook'
 import PostActions from './PostActions'
 import PostAttachmentPreview from './PostAttachmentPreview'
@@ -30,7 +29,7 @@ import PostImagePreview from './PostImagePreview'
 
 const LinkedInPost = (props: PostPreviewProps) => {
   const user = useUserState()
-  const { connectedChannels } = useProjectDetail()
+  const connectedChannels = user?.connectedChannels
 
   const {
     content,

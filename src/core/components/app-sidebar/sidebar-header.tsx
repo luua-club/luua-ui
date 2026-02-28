@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 
 import { projectApi } from '@/core/api/project.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { useOrgProject } from '@/core/hooks/org-project.hook'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { Button } from '@/shared/ui/button'
 import {
   Dialog,
@@ -50,22 +50,37 @@ const formatRole = (role: string) =>
     .join(' ')
 
 function AppSidebarHeader() {
-  const {
-    organizations,
-    projects,
-    selectedOrg,
-    selectedProject,
-    changeOrg,
-    changeProject,
-  } = useOrgProject()
-
+  const userState = useUserState()
   const router = useRouter()
   const queryClient = useQueryClient()
-
   const [projectSearch, setProjectSearch] = useState('')
   const [orgSearch, setOrgSearch] = useState('')
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
+
+  const createProjectMutation = useMutation({
+    mutationFn: (name: string) => projectApi.createProject({ name }),
+    onSuccess: () => {
+      toast.success('Project created')
+      setCreateDialogOpen(false)
+      setNewProjectName('')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
+    },
+    onError: () => {
+      toast.error('Failed to create project')
+    },
+  })
+
+  if (!userState) return null
+
+  const {
+    organizations,
+    orgProjects: projects,
+    selectedOrg,
+    selectedProject,
+    changeOrg,
+    changeProject,
+  } = userState
 
   const displayName = selectedProject?.name ?? selectedOrg?.name ?? 'Select'
 
@@ -75,20 +90,6 @@ function AppSidebarHeader() {
   const filteredOrgs = organizations.filter(o =>
     o.name.toLowerCase().includes(orgSearch.toLowerCase())
   )
-
-  const createProjectMutation = useMutation({
-    mutationFn: (name: string) => projectApi.createProject({ name }),
-    onSuccess: () => {
-      toast.success('Project created')
-      setCreateDialogOpen(false)
-      setNewProjectName('')
-      // Refresh profile to get updated project list
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
-    },
-    onError: () => {
-      toast.error('Failed to create project')
-    },
-  })
 
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault()
@@ -213,7 +214,7 @@ function AppSidebarHeader() {
                 <span>Invite members</span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => router.navigate({ to: '/project-settings' })}
+                onClick={() => router.navigate({ to: '/settings' })}
               >
                 <Settings className="size-4" />
                 <span>Project settings</span>
@@ -285,7 +286,7 @@ function AppSidebarHeader() {
 
               {/* Org actions */}
               <DropdownMenuItem
-                onClick={() => router.navigate({ to: '/org-settings' })}
+                onClick={() => router.navigate({ to: '/settings' })}
               >
                 <Settings className="size-4" />
                 <span>Organization settings</span>

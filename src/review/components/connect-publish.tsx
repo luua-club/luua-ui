@@ -4,19 +4,16 @@ import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import Socials from '@/core/containers/socials'
 import { PostItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
-import { UserState } from '@/core/models/user.model'
 import QuickShareCallout from '@/shared/components/quickshare-callout'
 import { Button } from '@/shared/ui/button'
 
 interface ConnectPublishProps {
-  user: UserState
   channels?: channelType[]
   hideQuickShare?: boolean
   selectedPosts: PostItem[]
 }
 
 function ConnectPublish({
-  user,
   channels,
   hideQuickShare = true,
   selectedPosts,
@@ -55,7 +52,7 @@ function ConnectPublish({
         </p>
       </div>
 
-      <Socials user={user} channels={channels} />
+      <Socials channels={channels} />
 
       {/* Quick share */}
       {!hideQuickShare && (

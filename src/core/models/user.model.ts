@@ -13,16 +13,17 @@ export const UserSchema = z.object({
   name: z.string(),
   profile_image: z.string().nullable(),
   deactivated: z.boolean(),
-  plan: z.enum(['Free', 'Pro']).catch('Free'),
+  has_pending_invites: z.boolean().optional(),
   organizations: z.array(OrganizationSummarySchema).catch([]),
   projects: z.array(ProjectSchema).catch([]),
 })
 export type User = z.infer<typeof UserSchema>
 
 /**
- * User state interface
+ * User state interface (plan comes from currentOrg, injected by useUserState hook)
  */
 export interface UserState extends User {
+  plan: 'Free' | 'Pro'
   logout: () => void
 }
 

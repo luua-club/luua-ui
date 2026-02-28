@@ -8,7 +8,6 @@ import {
   type UsePostCardComposer,
   usePostCardComposer,
 } from '@/core/hooks/post-card-composer.hook'
-import { useProjectDetail } from '@/core/hooks/project-detail.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
@@ -219,7 +218,7 @@ function TwitterPreviewCard({
 
 function TwitterPostCard(props: TwitterPostCardProps) {
   const user = useUserState()
-  const { connectedChannels } = useProjectDetail()
+  const connectedChannels = user?.connectedChannels
   const { content, setContent, textareaRef, updateSelectionRef } =
     usePostCardComposer()
 

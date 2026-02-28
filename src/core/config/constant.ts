@@ -4,22 +4,9 @@ import BrandX from '@/assets/icons/offcial-x.svg?react'
 import { channelType, ISocialChannel } from '../models/social.model'
 
 /**
- * The key to store the user in local storage
- *
- * @default 'luua-user'
+ * The key to store auth info (token + user + org + project) in local storage
  */
-export const LUUA_USER_KEY: string =
-  import.meta.env.VITE_LUUA_LS_USER || 'luua-user'
-
-/**
- * The key to store selected org id in local storage
- */
-export const LUUA_SELECTED_ORG_KEY = 'luua-selected-org'
-
-/**
- * The key to store selected project id in local storage
- */
-export const LUUA_SELECTED_PROJECT_KEY = 'luua-selected-project'
+export const LUUA_AUTH_INFO_KEY = 'luua-auth-info'
 
 /**
  * The key to store the extension id in session storage
@@ -82,9 +69,7 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
  */
 export const QUERY_KEYS = {
   user: 'user',
-  orgDetails: 'org-details',
   orgMembers: 'org-members',
-  projectDetails: 'project-details',
   projectMembers: 'project-members',
   drafts: 'drafts',
   draft: 'draft',

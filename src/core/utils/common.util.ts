@@ -2,21 +2,15 @@ import posthog from 'posthog-js'
 
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
 
-import {
-  LUUA_SELECTED_ORG_KEY,
-  LUUA_SELECTED_PROJECT_KEY,
-  LUUA_USER_KEY,
-} from '../config/constant'
+import { LUUA_AUTH_INFO_KEY } from '../config/constant'
 
 /**
- * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
+ * Handles unauthorized requests by removing auth info from local storage and redirecting to the login page
  * this redirection will also clear all state in redux store and cancel all pending requests
  */
 const logout = () => {
   posthog.reset()
-  removeLocalStorageItem(LUUA_USER_KEY)
-  removeLocalStorageItem(LUUA_SELECTED_ORG_KEY)
-  removeLocalStorageItem(LUUA_SELECTED_PROJECT_KEY)
+  removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
   window.location.href = '/login'
 }
 
