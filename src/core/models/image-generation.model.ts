@@ -12,6 +12,7 @@ export interface ImageGenerateRequest {
   template_id: string
   custom_prompt?: string
   image_size?: string
+  custom_instruction?: string
 }
 
 export interface ImageGenerateResponse {
