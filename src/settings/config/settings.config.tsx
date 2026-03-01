@@ -1,13 +1,26 @@
 import type { LucideIcon } from 'lucide-react'
-import { CableIcon, CircleUser, DollarSign } from 'lucide-react'
+import {
+  Building2,
+  CableIcon,
+  CircleUser,
+  DollarSign,
+  Users,
+} from 'lucide-react'
 import type { ComponentType } from 'react'
 
 import type { UserState } from '@/core/models/user.model'
 import SocialsSettings from '@/settings/components/socials-settings'
 import Account from '@/settings/containers/accounts'
 import BillingAndCredits from '@/settings/containers/billing-and-credits'
+import OrgGeneral from '@/settings/containers/org-general'
+import OrgMembers from '@/settings/containers/org-members'
 
-export type settingsTabType = 'account' | 'socials' | 'billing'
+export type settingsTabType =
+  | 'account'
+  | 'socials'
+  | 'billing'
+  | 'org-general'
+  | 'org-members'
 
 type settingsMainContentType = ComponentType<{ user: UserState }>
 
@@ -67,6 +80,26 @@ export const SETTINGS_GROUPS: Array<settingsGroupType> = [
     id: 'organisation',
     label: 'Organisation',
     items: [
+      {
+        id: 'org-general',
+        kind: 'link',
+        icon: Building2,
+        label: 'General',
+        search: {
+          tab: 'org-general',
+        },
+        contentComponent: OrgGeneral,
+      },
+      {
+        id: 'org-members',
+        kind: 'link',
+        icon: Users,
+        label: 'Members',
+        search: {
+          tab: 'org-members',
+        },
+        contentComponent: OrgMembers,
+      },
       {
         id: 'billing',
         kind: 'link',

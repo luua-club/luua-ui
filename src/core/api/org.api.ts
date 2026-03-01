@@ -27,6 +27,20 @@ class OrgApi extends BaseApiService {
   async getOrgMembers() {
     return this.get<Member[]>('/current/members')
   }
+
+  /**
+   * Remove a member from the currently selected org.
+   */
+  async removeMember(userId: string) {
+    return this.post<void>({ user_id: userId }, '/current/members/remove')
+  }
+
+  /**
+   * Change the role of a member in the currently selected org.
+   */
+  async changeMemberRole(userId: string, role: 'admin' | 'member') {
+    return this.patch<void>({ user_id: userId, role }, '/current/members/role')
+  }
 }
 
 export const orgApi = new OrgApi()
