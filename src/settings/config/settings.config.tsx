@@ -5,6 +5,7 @@ import {
   CircleUser,
   DollarSign,
   FolderOpen,
+  MailPlus,
   Users,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
@@ -14,6 +15,7 @@ import SocialsSettings from '@/settings/components/socials-settings'
 import Account from '@/settings/containers/accounts'
 import BillingAndCredits from '@/settings/containers/billing-and-credits'
 import OrgGeneral from '@/settings/containers/org-general'
+import OrgInvitations from '@/settings/containers/org-invitations'
 import OrgMembers from '@/settings/containers/org-members'
 import ProjectGeneral from '@/settings/containers/project-general'
 import ProjectMembers from '@/settings/containers/project-members'
@@ -24,6 +26,7 @@ export type settingsTabType =
   | 'billing'
   | 'org-general'
   | 'org-members'
+  | 'org-invitations'
   | 'project-general'
   | 'project-members'
 
@@ -124,6 +127,16 @@ export const SETTINGS_GROUPS: Array<settingsGroupType> = [
           tab: 'org-members',
         },
         contentComponent: OrgMembers,
+      },
+      {
+        id: 'org-invitations',
+        kind: 'link',
+        icon: MailPlus,
+        label: 'Invitations',
+        search: {
+          tab: 'org-invitations',
+        },
+        contentComponent: OrgInvitations,
       },
       {
         id: 'billing',
