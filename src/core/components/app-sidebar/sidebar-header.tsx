@@ -116,7 +116,7 @@ function AppSidebarHeader() {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className="bg-transparent group-data-[collapsible=icon]:p-1.5! hover:cursor-pointer hover:bg-transparent"
+                className="bg-transparent group-data-[collapsible=icon]:p-1.5! hover:cursor-pointer hover:bg-transparent focus-visible:ring-0"
               >
                 <span className="bg-primary text-primary-foreground inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-[10px] font-semibold">
                   {displayName.charAt(0)}
@@ -209,12 +209,24 @@ function AppSidebarHeader() {
               )}
 
               {/* Project actions */}
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  router.navigate({
+                    to: '/settings',
+                    search: { tab: 'org-invitations' },
+                  })
+                }
+              >
                 <UserPlus className="size-4" />
                 <span>Invite members</span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => router.navigate({ to: '/settings' })}
+                onClick={() =>
+                  router.navigate({
+                    to: '/settings',
+                    search: { tab: 'project-general' },
+                  })
+                }
               >
                 <Settings className="size-4" />
                 <span>Project settings</span>
@@ -286,7 +298,12 @@ function AppSidebarHeader() {
 
               {/* Org actions */}
               <DropdownMenuItem
-                onClick={() => router.navigate({ to: '/settings' })}
+                onClick={() =>
+                  router.navigate({
+                    to: '/settings',
+                    search: { tab: 'org-general' },
+                  })
+                }
               >
                 <Settings className="size-4" />
                 <span>Organization settings</span>

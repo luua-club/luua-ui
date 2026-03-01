@@ -62,7 +62,7 @@ function PlanCards() {
    * Handle manage plan click
    */
   const handleManagePlanClick = () => {
-    router.navigate({ to: '/settings', search: { tabs: 'billing' } })
+    router.navigate({ to: '/settings', search: { tab: 'billing' } })
   }
 
   return (

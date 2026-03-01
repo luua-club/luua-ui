@@ -51,17 +51,10 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
   const isFreePlan = user.plan === 'Free'
 
   const openSettingsPage = (tab: 'account' | 'billing' = 'account') => {
-    if (tab === 'billing') {
-      void router.navigate({
-        to: '/settings',
-        search: { tabs: 'billing' },
-      })
-    } else {
-      void router.navigate({
-        to: '/settings',
-        search: { tab: 'account' },
-      })
-    }
+    void router.navigate({
+      to: '/settings',
+      search: { tab },
+    })
 
     if (isMobile) {
       toggleSidebar()

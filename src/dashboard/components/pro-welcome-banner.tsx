@@ -122,7 +122,7 @@ function ProWelcomeBanner({ open, onOpenChange }: ProWelcomeBannerProps) {
         <Button
           className="dark:bg-destructive z-50 mt-4 w-fit border-none text-sm dark:text-white"
           onClick={() =>
-            router.navigate({ to: '/settings', search: { tabs: 'socials' } })
+            router.navigate({ to: '/settings', search: { tab: 'socials' } })
           }
         >
           <PlugZap className="size-4" /> Connect
