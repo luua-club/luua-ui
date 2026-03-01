@@ -1,0 +1,104 @@
+import type { LucideIcon } from 'lucide-react'
+import { CableIcon, CircleUser, DollarSign } from 'lucide-react'
+import type { ComponentType } from 'react'
+
+import type { UserState } from '@/core/models/user.model'
+import SocialsSettings from '@/settings/components/socials-settings'
+import Account from '@/settings/containers/accounts'
+import BillingAndCredits from '@/settings/containers/billing-and-credits'
+
+export type settingsTabType = 'account' | 'socials' | 'billing'
+
+type settingsMainContentType = ComponentType<{ user: UserState }>
+
+export type settingAsideType = {
+  id: settingsTabType
+  kind: 'profile' | 'link'
+  icon: LucideIcon
+  label: string | ((user: UserState | null) => string)
+  search: {
+    tab: settingsTabType
+  }
+  contentComponent: settingsMainContentType
+}
+
+export type settingsGroupType = {
+  id: string
+  label: string
+  items: Array<settingAsideType>
+}
+
+export const DEFAULT_SETTINGS_TAB: settingsTabType = 'account'
+
+export const SETTINGS_GROUPS: Array<settingsGroupType> = [
+  {
+    id: 'accounts',
+    label: 'Account',
+    items: [
+      {
+        id: 'account',
+        kind: 'profile',
+        icon: CircleUser,
+        label: user => user?.name ?? 'Profile',
+        search: {
+          tab: 'account',
+        },
+        contentComponent: Account,
+      },
+    ],
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    items: [
+      {
+        id: 'socials',
+        kind: 'link',
+        icon: CableIcon,
+        label: 'Socials',
+        search: {
+          tab: 'socials',
+        },
+        contentComponent: SocialsSettings,
+      },
+    ],
+  },
+  {
+    id: 'organisation',
+    label: 'Organisation',
+    items: [
+      {
+        id: 'billing',
+        kind: 'link',
+        icon: DollarSign,
+        label: 'Billing',
+        search: {
+          tab: 'billing',
+        },
+        contentComponent: BillingAndCredits,
+      },
+    ],
+  },
+]
+
+export function resolveSettingTab(tab: unknown): settingsTabType {
+  const tabValue = String(tab ?? '').trim()
+
+  if (
+    SETTINGS_GROUPS.some(group =>
+      group.items.some(item => item.id === tabValue)
+    )
+  ) {
+    return tabValue as settingsTabType
+  }
+
+  return DEFAULT_SETTINGS_TAB
+}
+
+export function getSettingsItemByTab(tab: settingsTabType) {
+  return (
+    SETTINGS_GROUPS.flatMap(group => group.items).find(
+      item => item.id === tab
+    ) ?? SETTINGS_GROUPS[0].items[0]
+  )
+}

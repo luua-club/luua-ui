@@ -98,7 +98,7 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {(!channels || channels.includes('LinkedIn')) && (
           <SocialCard
             platform={linkedin}

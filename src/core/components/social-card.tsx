@@ -58,7 +58,7 @@ function SocialCard({
   return (
     <div
       className={cn(
-        'w-full rounded-2xl border-1 p-2 pt-0 pb-2',
+        'max-w-[450px] rounded-2xl border-1 p-2 pt-0 pb-2',
         isConnected &&
           'border-brand-border-success bg-brand-background-success dark:bg-card dark:border-card',
         !isConnected &&
