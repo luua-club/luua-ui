@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { Check, ChevronLeft, LoaderCircleIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
@@ -15,11 +15,13 @@ import { QUERY_KEYS } from '@/core/config/constant'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import { DraftItem, PostItem } from '@/core/models/draft.model'
+import { DraftItem, ILockedByUser, PostItem } from '@/core/models/draft.model'
 import { isSocialConnected } from '@/core/utils/social.utils'
+import { DraftLockedBanner } from '@/shared/components/draft-locked-banner'
 import GlobalLoader from '@/shared/components/global-loader'
 import { Button } from '@/shared/ui/button'
 import { Stepper, StepperContent, StepperPanel } from '@/shared/ui/stepper'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn, showConfetti } from '@/shared/utils'
 
 import ConnectPublish from './components/connect-publish'
@@ -33,6 +35,13 @@ function Review() {
   const [selectedPosts, setSelectedPosts] = useState<PostItem[]>([])
   const [selectedUTCDate, setSelectedUTCDate] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
+  const [isLocked, setIsLocked] = useState<boolean | null>(null)
+  const [lockedByUser, setLockedByUser] = useState<ILockedByUser | null>(null)
+
+  // --- Refs ---
+  const lockAcquiredRef = useRef(false)
+  const versionRef = useRef<number | null>(null)
+  const lockAttemptedForRef = useRef<string | null>(null)
 
   // --- Hooks ---
   const { draftId } = useParams({ from: '/review/$draftId' })
@@ -67,13 +76,67 @@ function Review() {
 
   // --- Effects ---
   /**
-   * Set selected posts
+   * Set selected posts and track version
    */
   useEffect(() => {
     if (draft?.posts) {
       setSelectedPosts(draft.posts)
+      versionRef.current = draft.version
     }
   }, [draft])
+
+  /**
+   * Acquire lock on mount, release on unmount
+   */
+  useEffect(() => {
+    if (!draftId || !draft) return
+    if (lockAttemptedForRef.current === draftId) return
+    lockAttemptedForRef.current = draftId
+
+    let cancelled = false
+
+    const acquireLock = async () => {
+      try {
+        const res = await draftsApi.lockDraft(draftId)
+        if (cancelled) return
+
+        if (!res.data.lock_acquired) {
+          lockAcquiredRef.current = false
+          setIsLocked(false)
+          setLockedByUser(
+            res.data.locked_by ?? {
+              user_id: '',
+              user_name: 'Another user',
+              email: '',
+            }
+          )
+          return
+        }
+
+        lockAcquiredRef.current = true
+        setIsLocked(true)
+      } catch {
+        if (cancelled) return
+        lockAcquiredRef.current = false
+        setIsLocked(false)
+        setLockedByUser({ user_id: '', user_name: 'Another user', email: '' })
+      }
+    }
+
+    acquireLock()
+
+    return () => {
+      cancelled = true
+      lockAttemptedForRef.current = null
+      if (lockAcquiredRef.current) {
+        lockAcquiredRef.current = false
+        draftsApi.unlockDraft(draftId).catch(() => {
+          // Best effort
+        })
+      }
+      setIsLocked(null)
+    }
+  }, [draftId, draft])
 
   /**
    * Handle error
@@ -100,7 +163,8 @@ function Review() {
   const isPublishDisabled =
     currentStep > postViewSteps.length ||
     selectedPosts.length === 0 ||
-    (currentStep >= postViewSteps.length && !allChannelsConnected)
+    (currentStep >= postViewSteps.length && !allChannelsConnected) ||
+    isLocked === false
 
   // Early return
   if (!userState) {
@@ -120,6 +184,15 @@ function Review() {
         <ChevronLeft className="size-3.5" />
         Back to editing
       </Button>
+
+      {lockedByUser && (
+        <div className="mx-auto mt-4 max-w-4xl px-4">
+          <DraftLockedBanner
+            name={lockedByUser.user_name}
+            email={lockedByUser.email}
+          />
+        </div>
+      )}
 
       <div className="mx-auto mt-8 max-w-4xl px-4 pb-10">
         <Stepper
@@ -186,6 +259,8 @@ function Review() {
             selectedUTCDate={selectedUTCDate}
             currentStepId={postViewSteps[currentStep - 1]?.id}
             scheduleDraft={scheduleDraft}
+            version={versionRef.current}
+            isLocked={isLocked}
           />
         </Stepper>
       </div>
@@ -211,6 +286,8 @@ interface StepperNavigationProps {
   isSchedule: boolean
   currentStepId?: Step['id']
   scheduleDraft: ReturnType<typeof useScheduleDraft>['mutation']
+  version: number | null
+  isLocked: boolean | null
 }
 
 function StepperNavigation({
@@ -227,6 +304,8 @@ function StepperNavigation({
   isSchedule,
   currentStepId,
   scheduleDraft,
+  version,
+  isLocked,
 }: StepperNavigationProps) {
   const navigate = useNavigate()
 
@@ -256,6 +335,7 @@ function StepperNavigation({
             },
             forChannel: channels,
             scheduleDate: selectedUTCDate,
+            version: version ?? 0,
           })
           toast.success('Posts scheduled successfully!')
           navigate({ to: '/posts-view/list', search: { status: 'Scheduled' } })
@@ -267,6 +347,7 @@ function StepperNavigation({
               id: draftId,
             },
             forChannel: channels,
+            version: version ?? 0,
           })
           toast.success('Posts published successfully!')
         }
@@ -313,20 +394,39 @@ function StepperNavigation({
             </div>
           )}
 
-          <Button
-            variant="default"
-            onClick={handleNext}
-            disabled={
-              isPublishDisabled ||
-              publishDraft.isPending ||
-              scheduleDraft.isPending ||
-              (isSchedule &&
-                !selectedUTCDate &&
-                (currentStepId === 'schedule' || currentStep >= totalSteps))
-            }
-          >
-            {getButtonText()}
-          </Button>
+          {isLocked === false ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex cursor-not-allowed">
+                  <Button
+                    variant="default"
+                    disabled
+                    className="pointer-events-none"
+                  >
+                    {getButtonText()}
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                This draft is locked by another user
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="default"
+              onClick={handleNext}
+              disabled={
+                isPublishDisabled ||
+                publishDraft.isPending ||
+                scheduleDraft.isPending ||
+                (isSchedule &&
+                  !selectedUTCDate &&
+                  (currentStepId === 'schedule' || currentStep >= totalSteps))
+              }
+            >
+              {getButtonText()}
+            </Button>
+          )}
         </div>
       </div>
     </div>

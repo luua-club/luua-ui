@@ -13,6 +13,7 @@ export type DraftItem = {
   posts: PostItem[]
   autopilot?: boolean
   inspiration_ids?: string[]
+  version: number
   created_at: string
   updated_at: string
 }
@@ -20,6 +21,7 @@ export type DraftItem = {
 export interface IDraftRequest {
   id?: string
   name?: string
+  version?: number
   posts: WithOptional<PostItem, 'id'>[]
 }
 
@@ -46,4 +48,16 @@ export interface IDraftListResponse extends IPagination {
 export interface IPublishDraftRequest {
   draft_id: string
   post_ids: string[]
+  version: number
+}
+
+export interface ILockedByUser {
+  user_id: string
+  user_name: string
+  email: string
+}
+
+export interface ILockResponse {
+  lock_acquired: boolean
+  locked_by: ILockedByUser
 }

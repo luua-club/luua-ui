@@ -12,10 +12,6 @@ import { channelType } from '../models/social.model'
  * Performs a sequential flow using React Query mutation:
  * 1) Create a draft via draftsApi.postDraft
  * 2) Schedule the created draft via postsApi.scheduleDraft
- *
- * Usage:
- * const scheduleDraft = useScheduleDraft()
- * scheduleDraft.mutate({ draftRequest: {...}, scheduleDate: '2025-08-19T12:00:00Z' })
  */
 export function useScheduleDraft() {
   type Params = {
@@ -23,6 +19,7 @@ export function useScheduleDraft() {
     forChannel: channelType[]
     /** ISO string date to apply to all created posts */
     scheduleDate: string
+    version: number
   }
 
   const mutation = useMutation({
@@ -30,6 +27,7 @@ export function useScheduleDraft() {
       let draftId: string
       let postIds: string[]
       let draftData: DraftItem | IDraftRequest
+      let currentVersion = params.version
 
       if (params.draftRequest.id) {
         draftId = params.draftRequest.id
@@ -50,6 +48,7 @@ export function useScheduleDraft() {
 
         draftId = draftRes.data.draft.id
         draftData = draftRes.data.draft
+        currentVersion = draftRes.data.draft.version
 
         // Filter postIds based on forChannel
         const forChannelSet = new Set(params.forChannel)
@@ -65,6 +64,7 @@ export function useScheduleDraft() {
 
       const scheduleRes = await postsApi.scheduleDraft({
         draft_id: draftId,
+        version: currentVersion,
         schedules,
       })
 
