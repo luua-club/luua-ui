@@ -353,7 +353,7 @@ function StepperNavigation({
         }
 
         showConfetti()
-        navigate({ to: '/posts-view/list', search: { status: 'Published' } })
+        navigate({ to: '/posts-view/list' })
       } catch {
         toast.error(
           isSchedule ? 'Failed to schedule posts' : 'Failed to publish posts'

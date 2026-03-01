@@ -5,9 +5,12 @@ import { type DateRange } from 'react-day-picker'
 
 import { postsApi } from '@/core/api/posts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { type postStatusType } from '@/core/models/post.model'
+import {
+  type IPostListResponse,
+  type postStatusType,
+} from '@/core/models/post.model'
+import { type channelType } from '@/core/models/social.model'
 import { toEndOfDayIso, toStartOfDayIso } from '@/core/utils/common.util'
-import { type ICalendarEventsResponse } from '@/posts-view/models/calendar.model'
 
 export type PostListStatus = postStatusType | 'all'
 
@@ -16,7 +19,8 @@ export function usePostList(
   initialFrom?: string,
   initialTo?: string,
   initialSort?: 'asc' | 'desc',
-  initialOffset?: number
+  initialOffset?: number,
+  initialChannel?: channelType
 ) {
   const queryClient = useQueryClient()
 
@@ -29,6 +33,9 @@ export function usePostList(
     }
   })
   const [status, setStatus] = useState<PostListStatus>(initialStatus)
+  const [channel, setChannel] = useState<channelType | undefined>(
+    initialChannel
+  )
   const [sort, setSort] = useState<'asc' | 'desc'>(initialSort ?? 'desc')
 
   // ----- Pagination -----
@@ -40,7 +47,7 @@ export function usePostList(
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
-  // Stable defaults — computed once so the query key never changes spuriously.
+  // Stable defaults — wide range so all posts show when no date filter is set.
   const defaultFrom = useMemo(() => subYears(new Date(), 2).toISOString(), [])
   const defaultTo = useMemo(() => addYears(new Date(), 2).toISOString(), [])
 
@@ -49,21 +56,23 @@ export function usePostList(
   const to = toEndOfDayIso(dateRange?.to ?? dateRange?.from) ?? defaultTo
 
   // ----- Query -----
-  const query = useQuery<ICalendarEventsResponse>({
+  const query = useQuery<IPostListResponse>({
     queryKey: [
-      QUERY_KEYS.calendarEvents,
+      QUERY_KEYS.postList,
       from,
       to,
       status,
+      channel,
       sort,
       limit,
       offset,
     ],
     queryFn: async () => {
-      const res = await postsApi.getCalendarEvents({
-        start: from,
-        end: to,
+      const res = await postsApi.listPosts({
+        from,
+        to,
         status: status === 'all' ? undefined : status,
+        channel,
         sort,
         limit,
         offset,
@@ -74,17 +83,17 @@ export function usePostList(
     refetchOnMount: 'always',
   })
 
-  const posts = query.data?.events ?? []
+  const posts = query.data?.posts ?? []
   const total: number = query.data?.total ?? 0
 
   // Reset to first page when filters change
   useEffect(() => {
     setOffset(0)
-  }, [from, to, status, sort])
+  }, [from, to, status, channel, sort])
 
   // Auto-correct empty page
   useEffect(() => {
-    const list = query.data?.events ?? []
+    const list = query.data?.posts ?? []
     const totalCount = query.data?.total ?? 0
     if (offset > 0 && totalCount > 0 && list.length === 0) {
       setOffset(Math.max(0, offset - limit))
@@ -103,7 +112,7 @@ export function usePostList(
   const retryMutation = useMutation({
     mutationFn: (postId: string) => postsApi.retryPost(postId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.calendarEvents] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.postList] })
     },
   })
 
@@ -128,7 +137,7 @@ export function usePostList(
           next.delete(id)
           return next
         })
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.calendarEvents] })
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.postList] })
       },
     })
   }
@@ -139,6 +148,8 @@ export function usePostList(
     setDateRange,
     status,
     setStatus,
+    channel,
+    setChannel,
     sort,
     setSort,
     // Pagination

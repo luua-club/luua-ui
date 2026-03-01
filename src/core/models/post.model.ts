@@ -49,21 +49,32 @@ export interface IAnalyticsResponse {
   total_posts: number
 }
 
-export interface IDailyDataPoint {
-  date: string
-  value: number
+export interface IPostListItem {
+  id: string
+  channel: channelType
+  content: string
+  status: postStatusType
+  attached_media?: MediaObject[] | null
+  external_id: string | null
+  scheduled_at: string | null
+  published_at: string | null
+  created_at: string
+  updated_at: string
 }
 
-export interface IAnalyticsMetric {
-  label: string
-  value: number
-  change_percent: number | null
-  daily_data: IDailyDataPoint[]
+export interface IPostListRequest {
+  status?: postStatusType
+  channel?: channelType
+  from?: string
+  to?: string
+  limit?: number
+  offset?: number
+  sort?: 'asc' | 'desc'
 }
 
-export interface IAnalyticsResponse {
-  metrics: IAnalyticsMetric[]
-  period_start: string
-  period_end: string
-  total_posts: number
+export interface IPostListResponse {
+  posts: IPostListItem[]
+  limit: number
+  offset: number
+  total: number
 }

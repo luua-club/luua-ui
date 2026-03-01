@@ -11,7 +11,11 @@ import {
 import { toast } from 'sonner'
 
 import Post, { PostSkeleton } from '@/core/components/Post'
-import { type postStatusType } from '@/core/models/post.model'
+import {
+  type IPostListItem,
+  type postStatusType,
+} from '@/core/models/post.model'
+import { type channelType } from '@/core/models/social.model'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import DateRangePicker from '@/shared/components/date-range-picker'
 import ErrorBanner from '@/shared/components/error-banner'
@@ -38,7 +42,6 @@ import { cn } from '@/shared/utils'
 
 import { StatusFilterBase } from '../components/header/status-filter'
 import { type PostListStatus, usePostList } from '../hooks/use-post-list.hook'
-import { type ICalendarEvent } from '../models/calendar.model'
 import { getPublishedUrl } from '../utils/helpers'
 
 function getStatusBadgeClass(status: postStatusType) {
@@ -56,7 +59,7 @@ function getStatusBadgeClass(status: postStatusType) {
   }
 }
 
-function getPostDate(post: ICalendarEvent): string | null {
+function getPostDate(post: IPostListItem): string | null {
   if (post.status === 'Published') return post.published_at
   if (post.status === 'Scheduled' || post.status === 'Queued')
     return post.scheduled_at
@@ -100,6 +103,24 @@ function CardSkeleton() {
   )
 }
 
+type ListSearch = {
+  status?: postStatusType
+  channel?: channelType
+  from?: string
+  to?: string
+  sort?: 'asc' | 'desc'
+  offset?: number
+}
+
+type SyncUpdates = {
+  status?: PostListStatus
+  channel?: channelType | 'all'
+  from?: string
+  to?: string
+  sort?: 'asc' | 'desc'
+  offset?: number
+}
+
 function PostListView() {
   const search = useSearch({ from: '/posts-view/list' })
   const navigate = useNavigate()
@@ -109,6 +130,8 @@ function PostListView() {
     setDateRange,
     status,
     setStatus,
+    channel,
+    setChannel,
     sort,
     setSort,
     posts,
@@ -131,24 +154,9 @@ function PostListView() {
     search.from,
     search.to,
     search.sort,
-    search.offset
+    search.offset,
+    search.channel as channelType | undefined
   )
-
-  type ListSearch = {
-    status?: postStatusType
-    from?: string
-    to?: string
-    sort?: 'asc' | 'desc'
-    offset?: number
-  }
-
-  type SyncUpdates = {
-    status?: PostListStatus
-    from?: string
-    to?: string
-    sort?: 'asc' | 'desc'
-    offset?: number
-  }
 
   const syncUrl = (updates: SyncUpdates) => {
     const next: ListSearch = { ...search }
@@ -162,12 +170,22 @@ function PostListView() {
     } else if ('status' in updates) {
       delete next.status
     }
+    if (updates.channel && updates.channel !== 'all') {
+      next.channel = updates.channel
+    } else if ('channel' in updates) {
+      delete next.channel
+    }
     navigate({ to: '/posts-view/list', search: next, replace: true })
   }
 
   const handleStatusChange = (newStatus: postStatusType | 'all') => {
     setStatus(newStatus)
     syncUrl({ status: newStatus, offset: undefined })
+  }
+
+  const handleChannelChange = (newChannel: channelType | 'all') => {
+    setChannel(newChannel === 'all' ? undefined : newChannel)
+    syncUrl({ channel: newChannel, offset: undefined })
   }
 
   const handleDateRangeChange = (range: typeof dateRange) => {
@@ -222,12 +240,27 @@ function PostListView() {
               </Tooltip>
             </div>
 
-            {/* Status filter — same component as calendar header */}
+            {/* Status filter */}
             <StatusFilterBase
               value={status}
               onChange={handleStatusChange}
               align="start"
             />
+
+            {/* Channel filter */}
+            <Select
+              value={channel ?? 'all'}
+              onValueChange={(v: channelType | 'all') => handleChannelChange(v)}
+            >
+              <SelectTrigger className="bg-background w-[130px]">
+                <SelectValue placeholder="Channel" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All channels</SelectItem>
+                <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                <SelectItem value="Twitter">Twitter</SelectItem>
+              </SelectContent>
+            </Select>
 
             {/* Sort */}
             <div className="ml-auto flex items-center gap-2 whitespace-nowrap">
@@ -271,7 +304,7 @@ function PostListView() {
           </div>
         )}
 
-        {/* Post cards — 2-column grid on md+ */}
+        {/* Post cards */}
         {!showSkeletons && posts.length > 0 && (
           <div
             className={cn(

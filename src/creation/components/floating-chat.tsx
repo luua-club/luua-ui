@@ -368,7 +368,7 @@ export function FloatingChat({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className={cn(
               'fixed right-4 bottom-4 z-50',
-              'min-h-[480px] w-[380px] md:w-[460px]',
+              'min-h-[480px] w-[380px] md:w-[480px]',
               'bg-card rounded-xl border shadow-xl',
               'flex flex-col overflow-hidden'
             )}
@@ -431,7 +431,7 @@ export function FloatingChat({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="flex max-h-[420px] flex-1 flex-col gap-3 overflow-y-auto px-4 pt-2 pb-2"
+                  className="flex max-h-[40vh] flex-1 flex-col gap-3 overflow-y-auto px-4 pt-2 pb-2 sm:max-h-[50vh] lg:max-h-[50vh]"
                 >
                   {messages.map(msg => (
                     <div
@@ -449,7 +449,7 @@ export function FloatingChat({
 
                       <div
                         className={cn(
-                          'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs break-all',
+                          'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs wrap-break-word',
                           msg.role === 'user'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted/60 text-foreground',

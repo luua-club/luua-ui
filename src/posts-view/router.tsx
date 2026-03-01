@@ -1,6 +1,7 @@
 import { type AnyRoute, createRoute, redirect } from '@tanstack/react-router'
 
 import type { postStatusType } from '@/core/models/post.model'
+import type { channelType } from '@/core/models/social.model'
 
 /**
  * Posts Viewhub route tree
@@ -29,6 +30,7 @@ export default function getPostsViewRoute(privateRoute: AnyRoute) {
     path: 'list',
     validateSearch: (search: Record<string, unknown>) => ({
       status: (search.status as postStatusType) ?? undefined,
+      channel: (search.channel as channelType) ?? undefined,
       from: (search.from as string) ?? undefined,
       to: (search.to as string) ?? undefined,
       sort: (search.sort as 'asc' | 'desc') ?? undefined,

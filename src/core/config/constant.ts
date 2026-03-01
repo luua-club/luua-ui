@@ -82,6 +82,7 @@ export const QUERY_KEYS = {
   subscriptionDetails: 'subscription-details',
   usageSummary: 'usage-summary',
   calendarEvents: 'calendar-events',
+  postList: 'post-list',
   analytics: 'analytics',
 }
 

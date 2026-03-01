@@ -1,4 +1,5 @@
-import { isToday, startOfDay } from 'date-fns'
+import { useNavigate } from '@tanstack/react-router'
+import { endOfDay, isToday, startOfDay } from 'date-fns'
 import { useMemo } from 'react'
 
 import { useCalendar } from '@/posts-view/contexts/calendar-context'
@@ -19,6 +20,7 @@ const MAX_VISIBLE_EVENTS = 2
 
 export function DayCell({ cell, events, eventPositions }: IProps) {
   const { setSelectedDate } = useCalendar()
+  const navigate = useNavigate()
 
   const { day, currentMonth, date } = cell
 
@@ -31,6 +33,13 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
 
   const handleClick = () => {
     setSelectedDate(date)
+    navigate({
+      to: '/posts-view/list',
+      search: {
+        from: startOfDay(date).toISOString(),
+        to: endOfDay(date).toISOString(),
+      },
+    })
   }
 
   return (
