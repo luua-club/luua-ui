@@ -216,14 +216,32 @@ export class BaseApiService {
       logout()
     }
 
-    /**
-     * Limit reached on 403
-     */
+    if (status === API_CONSTANTS.statusCode.conflict) {
+      toast.error(
+        this.getErrorMessage(
+          apiError,
+          'Draft has been modified by another user. Please reload.'
+        )
+      )
+    }
+
     if (status === API_CONSTANTS.statusCode.forbidden) {
-      toast.error('You Have Reached Your Current Plan Limit')
+      toast.error(
+        this.getErrorMessage(
+          apiError,
+          'You Have Reached Your Current Plan Limit'
+        )
+      )
     }
 
     return apiError
+  }
+
+  private getErrorMessage(apiError: ApiError, defaultMessage: string): string {
+    if (typeof apiError.detail === 'string') return apiError.detail
+    if (typeof apiError.detail === 'object' && apiError.detail?.error)
+      return apiError.detail.error
+    return defaultMessage
   }
 
   /**

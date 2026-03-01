@@ -1,5 +1,8 @@
 import z from 'zod'
 
+import { OrganizationDetailSchema, ProjectDetailSchema } from './org.model'
+import { UserSchema } from './user.model'
+
 /**
  * Login request schema
  */
@@ -15,8 +18,24 @@ export const LoginResponseSchema = z.object({
   access_token: z.string(),
   token_type: z.string(),
   new_user: z.boolean(),
+  user: UserSchema.optional(),
 })
 export type LoginResponse = z.infer<typeof LoginResponseSchema>
+
+/**
+ * Full auth info stored in localStorage under LUUA_AUTH_INFO_KEY.
+ * user/currentOrg/currentProject are optional during the partial write phase
+ * (token saved first, then populated after the 3-API cascade).
+ */
+export const AuthInfoSchema = z.object({
+  access_token: z.string(),
+  token_type: z.string(),
+  new_user: z.boolean().optional(),
+  user: UserSchema.optional(),
+  currentOrg: OrganizationDetailSchema.optional(),
+  currentProject: ProjectDetailSchema.optional(),
+})
+export type AuthInfo = z.infer<typeof AuthInfoSchema>
 
 /**
  * Magic link request schema

@@ -1,61 +1,66 @@
+import { Bookmark, Files, Gauge, Network, Plus, Rocket } from 'lucide-react'
+
 import {
-  Bookmark,
-  FileCheck,
-  FolderClosed,
-  House,
-  LucideCalendar,
-  Network,
-  Paintbrush,
-  PencilRuler,
-} from 'lucide-react'
+  SidebarActionItem,
+  SidebarGroupItem,
+  SidebarLayoutSection,
+  SidebarLinkItem,
+} from '../models/sidebar.model'
 
-import { ISidebarItem } from '../models/sidebar.model'
-
-export const ungroupedItems: ISidebarItem[] = [
+export const workActions: Array<SidebarActionItem | SidebarLinkItem> = [
   {
-    title: 'Welcome',
-    url: '/welcome',
-    icon: House,
-  },
-  {
-    title: 'Bookmarks',
-    url: '/bookmarks',
-    icon: Bookmark,
-  },
-  {
-    title: 'Autopilot',
-    url: '/autopilot',
-    icon: Network,
-  },
-  {
-    title: 'Your Styles',
-    url: '/preferences',
-    icon: Paintbrush,
-  },
-]
-
-export const creationItems: ISidebarItem[] = [
-  {
-    title: 'Create New',
+    kind: 'action',
+    title: 'Create Post',
     url: '/creation/create',
-    icon: PencilRuler,
-  },
-  {
-    title: 'Saved Drafts',
-    url: '/creation/drafts',
-    icon: FolderClosed,
+    icon: Plus,
+    emphasis: 'medium',
   },
 ]
 
-export const postsItems: ISidebarItem[] = [
+export const coreLinks: SidebarLinkItem[] = [
   {
-    title: 'Scheduled',
-    url: '/schedule',
-    icon: LucideCalendar,
+    kind: 'link',
+    title: 'Dashboard',
+    url: '/dashboard',
+    icon: Gauge,
   },
   {
-    title: 'Published',
-    url: '/published',
-    icon: FileCheck,
+    kind: 'link',
+    title: 'Posts',
+    url: '/posts-view',
+    icon: Files,
+  },
+]
+
+export const automationGroup: SidebarGroupItem = {
+  kind: 'group',
+  title: 'Automation',
+  icon: Network,
+  activePrefixes: ['/autopilot', '/bookmarks'],
+  defaultOpen: true,
+  children: [
+    {
+      kind: 'link',
+      title: 'Autopilot',
+      url: '/autopilot',
+      icon: Rocket,
+    },
+    {
+      kind: 'link',
+      title: 'Bookmarks',
+      url: '/bookmarks',
+      icon: Bookmark,
+    },
+  ],
+}
+
+export const sidebarLayoutSections: SidebarLayoutSection[] = [
+  {
+    id: 'work-actions',
+    items: [...workActions],
+  },
+  {
+    id: 'core-navigation',
+    items: [...coreLinks, automationGroup],
   },
 ]

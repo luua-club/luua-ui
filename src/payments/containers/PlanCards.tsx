@@ -62,7 +62,7 @@ function PlanCards() {
    * Handle manage plan click
    */
   const handleManagePlanClick = () => {
-    router.navigate({ to: '/settings', search: { tabs: 'billing' } })
+    router.navigate({ to: '/settings', search: { tab: 'billing' } })
   }
 
   return (
@@ -99,7 +99,7 @@ function PlanCards() {
               <X className="size-4" /> Advance Style Config not available
             </li>
             <li className="flex items-center gap-2">
-              <X className="size-4" /> Twitter not available
+              <X className="size-4" /> X / Twitter not available
             </li>
           </ul>
 
@@ -175,7 +175,7 @@ function PlanCards() {
             </li>
             <li className="flex items-center gap-2">
               <Check className="size-4" />
-              Supports LinkedIn + Twitter
+              Supports LinkedIn + X / Twitter
               <span className="text-muted-foreground text-xs">
                 (threads coming soon)
               </span>

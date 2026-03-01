@@ -2,15 +2,15 @@ import posthog from 'posthog-js'
 
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
 
-import { LUUA_USER_KEY } from '../config/constant'
+import { LUUA_AUTH_INFO_KEY } from '../config/constant'
 
 /**
- * Handles unauthorized requests by removing the user from local storage and redirecting to the login page
+ * Handles unauthorized requests by removing auth info from local storage and redirecting to the login page
  * this redirection will also clear all state in redux store and cancel all pending requests
  */
 const logout = () => {
   posthog.reset()
-  removeLocalStorageItem(LUUA_USER_KEY)
+  removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
   window.location.href = '/login'
 }
 
@@ -30,6 +30,24 @@ const toStartOfDayIso = (d?: Date): string | undefined => {
   // Construct a Date at UTC midnight for the same calendar day
   const utcMidnight = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
   return utcMidnight.toISOString()
+}
+
+/**
+ * Normalize a calendar day to 23:59:59.999Z (UTC) and return ISO string
+ *
+ * @example
+ * toEndOfDayIso(new Date('2025-08-21T12:34:56.789Z')) // '2025-08-21T23:59:59.999Z'
+ * @param d The date to normalize
+ * @returns The normalized date in ISO string format
+ */
+const toEndOfDayIso = (d?: Date): string | undefined => {
+  if (!d) return undefined
+  const year = d.getFullYear()
+  const month = d.getMonth()
+  const date = d.getDate()
+  // Construct a Date at UTC day-end for the same calendar day
+  const utcEndOfDay = new Date(Date.UTC(year, month, date, 23, 59, 59, 999))
+  return utcEndOfDay.toISOString()
 }
 
 /**
@@ -82,5 +100,6 @@ export {
   getRandomInt,
   logout,
   removeQueryParams,
+  toEndOfDayIso,
   toStartOfDayIso,
 }

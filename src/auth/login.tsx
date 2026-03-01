@@ -1,35 +1,30 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CredentialResponse } from '@react-oauth/google'
-import {
-  useIsFetching,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { createLazyRoute, useRouter } from '@tanstack/react-router'
 import { Loader, Mail } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import LuuaBlackTextLogo from '@/assets/logos/luua-black-text-logo.svg'
 import LuuaWhiteTextLogo from '@/assets/logos/luua-white-text-logo.svg'
 import { authApi } from '@/core/api/auth.api'
-import { userApi } from '@/core/api/user.api'
 import {
   EXTERNAL_URLS,
+  LUUA_AUTH_INFO_KEY,
   LUUA_EXTENSION_ID_KEY,
   LUUA_EXTENSION_LOGIN_KEY,
-  LUUA_USER_KEY,
-  QUERY_KEYS,
 } from '@/core/config/constant'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import {
+  AuthInfo,
   LoginResponse,
   MagicLinkRequest,
   MagicLinkRequestSchema,
 } from '@/core/models/auth.model'
-import { User } from '@/core/models/user.model'
-import { clearUser, setUser } from '@/core/store/auth-slice'
+import { clearAuth } from '@/core/store/auth-slice'
+import { loadAuthData } from '@/core/utils/auth-data.util'
 import { useTheme } from '@/shared/provider/theme-provider'
 import { Button } from '@/shared/ui/button'
 import { Highlighter } from '@/shared/ui/highlighter'
@@ -68,7 +63,6 @@ function Login() {
   const email = watch('email')
 
   // ---- Variables ----
-  const key = useMemo(() => LUUA_USER_KEY, [])
   const urlParams = new URLSearchParams(window.location.search)
   const isExtensionLogin = urlParams.get('source') === 'extension'
   const extensionId = urlParams.get('extensionId')
@@ -77,7 +71,11 @@ function Login() {
   const { theme } = useTheme()
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const queryClient = useQueryClient()
+
+  // ---- Mutation ----
+  /**
+   * Will login user
+   */
   const loginMutation = useMutation({
     mutationFn: (token: string) =>
       authApi.login({
@@ -90,6 +88,10 @@ function Login() {
       toast.error('Something went wrong, Please try again !')
     },
   })
+
+  /**
+   * Will send OTP to user
+   */
   const magicLinkMutation = useMutation({
     mutationFn: (email: string) => authApi.requestMagicLink({ email }),
     onSuccess: () => {
@@ -102,13 +104,13 @@ function Login() {
       )
     },
   })
-  const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
 
   // --- Derived Variables ---
-  const isLoading = loginMutation.isPending || isFetchingUser > 0
+  const isLoading = loginMutation.isPending
 
   // ---- Effects ----
   /**
+   * USED FOR EXTENSION LOGIN REDIRECT, NOT PART OF MAIN APP
    * Store extension info and handle already logged in case
    */
   useEffect(() => {
@@ -118,9 +120,7 @@ function Login() {
       setSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY, 'true')
 
       // Check if user is already logged in
-      const existingAuth = getLocalStorageItem<LoginResponse & { user?: User }>(
-        key
-      )
+      const existingAuth = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
       if (existingAuth?.access_token && existingAuth?.user?.email) {
         // Build extension redirect URL with existing credentials
         const extensionRedirectUrl = `chrome-extension://${extensionId}/auth.html?token=${encodeURIComponent(existingAuth.access_token)}&userId=${encodeURIComponent(existingAuth.user.email)}&email=${encodeURIComponent(existingAuth.user.email)}`
@@ -134,9 +134,10 @@ function Login() {
         return
       }
     }
-  }, [isExtensionLogin, extensionId, key])
+  }, [isExtensionLogin, extensionId])
 
   /**
+   * USED FOR EXTENSION LOGIN REDIRECT, NOT PART OF MAIN APP
    * Clear user and local storage on mount (only if not extension login or not already logged in)
    */
   useEffect(() => {
@@ -150,9 +151,9 @@ function Login() {
     removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
 
     // Clear user and auth data for fresh login
-    dispatch(clearUser())
-    removeLocalStorageItem(key)
-  }, [dispatch, key, isExtensionLogin])
+    dispatch(clearAuth())
+    removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
+  }, [dispatch, isExtensionLogin])
 
   // ---- Handlers ----
   /**
@@ -175,61 +176,47 @@ function Login() {
   }
 
   /**
-   * Updates the store and redirects to the dashboard or extension
+   * Saves the token and redirects to the dashboard or extension.
    *
-   * @param res - The login response
+   * Normal web flow: saves token → redirects to /dashboard.
+   * The React Query cascade in App.tsx fires automatically on dashboard load.
+   *
+   * Extension flow: needs the user's email before redirecting, so it runs the
+   * 3-API cascade eagerly via loadAuthData().
    */
   const updateDataAndRedirect = async (res: LoginResponse) => {
-    setLocalStorageItem(key, res)
+    // Save token fields to LS (partial — cascade fills user/org/project)
+    setLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY, {
+      access_token: res.access_token,
+      token_type: res.token_type,
+      new_user: res.new_user,
+    })
 
-    try {
-      const response = await queryClient.fetchQuery({
-        queryKey: [QUERY_KEYS.user],
-        queryFn: () => userApi.getUser(),
-        staleTime: 0,
-        retry: false,
-      })
+    // Extension login: needs user email before redirecting to the extension
+    const storedExtensionId = getSessionStorageItem<string>(
+      LUUA_EXTENSION_ID_KEY
+    )
+    const extensionLoginFlag = getSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+    const isFromExtension =
+      extensionLoginFlag === 'true' ||
+      (typeof extensionLoginFlag === 'boolean' && extensionLoginFlag === true)
 
-      dispatch(setUser(response.data))
-      setLocalStorageItem(key, {
-        ...getLocalStorageItem<LoginResponse>(key),
-        user: response.data,
-      })
-
-      // Check if this login came from the extension
-      const storedExtensionId = getSessionStorageItem<string>(
-        LUUA_EXTENSION_ID_KEY
-      )
-      const extensionLoginFlag = getSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
-      // Handle both boolean true and string 'true' (JSON.parse converts "true" to true)
-      const isFromExtension =
-        extensionLoginFlag === 'true' ||
-        (typeof extensionLoginFlag === 'boolean' && extensionLoginFlag === true)
-
-      if (
-        isFromExtension &&
-        storedExtensionId &&
-        res.access_token &&
-        response.data.email
-      ) {
-        // Clear storage
+    if (isFromExtension && storedExtensionId) {
+      try {
+        const authInfo = await loadAuthData()
         removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
         removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
-
-        // Build extension redirect URL
-        const extensionRedirectUrl = `chrome-extension://${storedExtensionId}/auth.html?token=${encodeURIComponent(res.access_token)}&userId=${encodeURIComponent(response.data.email)}&email=${encodeURIComponent(response.data.email)}`
-
-        // Redirect to extension
-        window.location.href = extensionRedirectUrl
-        return
+        const email = authInfo.user?.email ?? ''
+        window.location.href = `chrome-extension://${storedExtensionId}/auth.html?token=${encodeURIComponent(res.access_token)}&userId=${encodeURIComponent(email)}&email=${encodeURIComponent(email)}`
+      } catch {
+        removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
+        toast.error('Something went wrong, Please try again !')
       }
-
-      // Normal web app redirect (clear query params)
-      router.navigate({ to: '/welcome', search: {} })
-    } catch {
-      removeLocalStorageItem(key)
-      toast.error('Something went wrong, Please try again !')
+      return
     }
+
+    // Normal web flow: redirect — App.tsx cascade fires on dashboard load
+    router.navigate({ to: '/dashboard', search: {} })
   }
 
   return (

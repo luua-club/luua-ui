@@ -4,19 +4,16 @@ import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import Socials from '@/core/containers/socials'
 import { PostItem } from '@/core/models/draft.model'
 import { channelType } from '@/core/models/social.model'
-import { UserState } from '@/core/models/user.model'
 import QuickShareCallout from '@/shared/components/quickshare-callout'
 import { Button } from '@/shared/ui/button'
 
 interface ConnectPublishProps {
-  user: UserState
   channels?: channelType[]
   hideQuickShare?: boolean
   selectedPosts: PostItem[]
 }
 
 function ConnectPublish({
-  user,
   channels,
   hideQuickShare = true,
   selectedPosts,
@@ -49,13 +46,13 @@ function ConnectPublish({
           Connect your socials <ChevronRight className="size-5" />
         </h2>
         <p className="text-muted-foreground text-sm font-medium text-balance">
-          Connect your LinkedIn or X/Twitter safely — we use official
+          Connect your LinkedIn or X / Twitter safely — we use official
           integrations and never access your personal data. Every post goes live
           only after you approve it.
         </p>
       </div>
 
-      <Socials user={user} channels={channels} />
+      <Socials channels={channels} />
 
       {/* Quick share */}
       {!hideQuickShare && (
@@ -73,7 +70,7 @@ function ConnectPublish({
                     className="text-card-foreground cursor-pointer text-xs"
                   >
                     <Icon className="size-4" />
-                    Share to {platform.name}
+                    Share to {platform.label}
                   </Button>
                 )
               })}

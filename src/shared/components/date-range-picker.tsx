@@ -44,7 +44,7 @@ export default function DateRangePicker({
           <Button
             variant="outline"
             id="dates"
-            className="w-full justify-between font-normal"
+            className="w-full justify-between font-semibold"
           >
             {selectedRange?.from && selectedRange?.to
               ? `${selectedRange.from.toLocaleDateString()} - ${selectedRange.to.toLocaleDateString()}`

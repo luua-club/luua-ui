@@ -2,28 +2,28 @@ import z from 'zod'
 
 import { UserStyleStatus } from '../config/constant'
 import { writingStyles } from '../config/user-preferences.config'
-import { UserSocialSchema } from './social.model'
+import { OrganizationSummarySchema, ProjectSchema } from './org.model'
 
 /**
  * User schema
  */
 export const UserSchema = z.object({
+  id: z.string().optional(),
   email: z.string(),
   name: z.string(),
-  profile_image: z.string(),
+  profile_image: z.string().nullable(),
   deactivated: z.boolean(),
-  plan: z.enum(['Free', 'Pro']),
-  connected_channels: z.object({
-    linkedin: UserSocialSchema,
-    twitter: UserSocialSchema,
-  }),
+  has_pending_invites: z.boolean().optional(),
+  organizations: z.array(OrganizationSummarySchema).catch([]),
+  projects: z.array(ProjectSchema).catch([]),
 })
 export type User = z.infer<typeof UserSchema>
 
 /**
- * User state interface
+ * User state interface (plan comes from currentOrg, injected by useUserState hook)
  */
 export interface UserState extends User {
+  plan: 'Free' | 'Pro'
   logout: () => void
 }
 

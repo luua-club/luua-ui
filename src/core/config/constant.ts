@@ -1,15 +1,12 @@
-import BrandLinkedIn from '@/assets/icons/brand-linkedin.svg?react'
-import BrandX from '@/assets/icons/brand-x.svg?react'
+import BrandLinkedIn from '@/assets/icons/offcial-linkedin.svg?react'
+import BrandX from '@/assets/icons/offcial-x.svg?react'
 
 import { channelType, ISocialChannel } from '../models/social.model'
 
 /**
- * The key to store the user in local storage
- *
- * @default 'luua-user'
+ * The key to store auth info (token + user + org + project) in local storage
  */
-export const LUUA_USER_KEY: string =
-  import.meta.env.VITE_LUUA_LS_USER || 'luua-user'
+export const LUUA_AUTH_INFO_KEY = 'luua-auth-info'
 
 /**
  * The key to store the extension id in session storage
@@ -55,13 +52,15 @@ export const EDIT_PROMPT_TEXT = [
 export const SOCIAL_PLATFORM: ISocialChannel[] = [
   {
     name: 'LinkedIn',
+    label: 'LinkedIn',
     logo: BrandLinkedIn,
     tooltip: 'Linkedin',
   },
   {
     name: 'Twitter',
+    label: 'X / Twitter',
     logo: BrandX,
-    tooltip: 'Twitter / X.com',
+    tooltip: 'X / Twitter',
   },
 ]
 
@@ -70,6 +69,9 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
  */
 export const QUERY_KEYS = {
   user: 'user',
+  orgMembers: 'org-members',
+  orgInvitations: 'org-invitations',
+  projectMembers: 'project-members',
   drafts: 'drafts',
   draft: 'draft',
   generateAIPost: 'generate-ai-post',
@@ -80,6 +82,9 @@ export const QUERY_KEYS = {
   inspirations: 'inspirations',
   subscriptionDetails: 'subscription-details',
   usageSummary: 'usage-summary',
+  calendarEvents: 'calendar-events',
+  postList: 'post-list',
+  analytics: 'analytics',
 }
 
 /**
@@ -101,6 +106,7 @@ export const API_CONSTANTS = {
     unauthorized: 401,
     forbidden: 403,
     notFound: 404,
+    conflict: 409,
     internalServerError: 500,
   },
   errorCode: {

@@ -1,5 +1,5 @@
-import LogoIconOnly from '@/assets/logos/luua-icon-logo.svg?react'
-import LogoTextOnly from '@/assets/logos/luua-text-logo.svg?react'
+import LogoIconOnly from '@/assets/logos/luua-black-icon-logo.svg?react'
+import LogoTextOnly from '@/assets/logos/luua-black-text-logo.svg?react'
 import LogoWhiteIconOnly from '@/assets/logos/luua-white-icon-logo.svg?react'
 import LogoWhiteTextOnly from '@/assets/logos/luua-white-text-logo.svg?react'
 import { cn } from '@/shared/utils'

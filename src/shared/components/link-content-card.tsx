@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import { Edit2, PencilRuler, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-import luuaIconLogo from '@/assets/logos/luua-icon-logo.svg'
+import luuaIconLogo from '@/assets/logos/luua-black-icon-logo.svg'
 import luuaWhiteIconLogo from '@/assets/logos/luua-white-icon-logo.svg'
 
 import { Badge } from '../ui/badge'
@@ -85,7 +85,7 @@ function SourceProfile({
         <p className="text-primary -mt-1 line-clamp-2 text-sm font-semibold break-words underline-offset-4 hover:underline">
           {title || link}
         </p>
-        {description && (
+        {!!description && (
           <Tooltip>
             <TooltipTrigger asChild>
               <p className="text-muted-foreground mt-0.5 line-clamp-1 cursor-default text-xs break-words">
@@ -151,7 +151,7 @@ function LinkContentCard({
 
           {utilized && inspirationId ? (
             <Link
-              to="/creation/drafts"
+              to="/drafts"
               search={{ inspiration_id: inspirationId }}
               className="inline-block"
             >

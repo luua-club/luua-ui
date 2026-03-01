@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { addYears, endOfYear, startOfToday } from 'date-fns'
-import { CircleX } from 'lucide-react'
+import { ChevronsDown, ChevronsUp, CircleX } from 'lucide-react'
 import { DateRange } from 'react-day-picker'
 
 import DateRangePicker from '@/shared/components/date-range-picker'
@@ -23,6 +23,8 @@ type ListControlsProps = {
   onSortChange?: (value: 'created_at' | 'updated_at') => void
   hideSort?: boolean
   allDateSelectable?: boolean
+  allExpanded?: boolean
+  onToggleExpandAll?: () => void
 }
 
 const ListControls = ({
@@ -32,6 +34,8 @@ const ListControls = ({
   onSortChange,
   hideSort = false,
   allDateSelectable = false,
+  allExpanded,
+  onToggleExpandAll,
 }: ListControlsProps) => {
   const queryClient = useQueryClient()
 
@@ -39,8 +43,8 @@ const ListControls = ({
   const maxDate = endOfYear(addYears(today, 1))
 
   return (
-    <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
-      <div className="flex w-full items-center gap-2">
+    <div className="flex flex-col items-start gap-2 md:flex-row md:items-center">
+      <div className="flex w-full items-center gap-1 md:w-auto">
         <DateRangePicker
           value={dateRange}
           onValueChange={onDateRangeChange}
@@ -58,7 +62,7 @@ const ListControls = ({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground size-8"
+              className="size-8"
               onClick={() => {
                 onDateRangeChange(undefined)
                 queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
@@ -71,20 +75,51 @@ const ListControls = ({
         </Tooltip>
       </div>
 
-      {!hideSort && onSortChange && (
-        <Select
-          value={sort}
-          onValueChange={(v: 'created_at' | 'updated_at') => onSortChange(v)}
-        >
-          <SelectTrigger className="w-full md:w-auto">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="created_at">Oldest</SelectItem>
-            <SelectItem value="updated_at">Latest</SelectItem>
-          </SelectContent>
-        </Select>
-      )}
+      <div className="ml-auto flex w-full items-center justify-end gap-2 md:w-auto md:self-auto">
+        {onToggleExpandAll && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                onClick={onToggleExpandAll}
+              >
+                {allExpanded ? (
+                  <ChevronsUp className="size-4" />
+                ) : (
+                  <ChevronsDown className="size-4" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              {allExpanded ? 'Collapse all' : 'Expand all'}
+            </TooltipContent>
+          </Tooltip>
+        )}
+
+        {!hideSort && onSortChange && (
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <p className="shrink-0 text-sm font-medium">Sort by</p>
+            <div className="bg-card flex items-center">
+              <Select
+                value={sort}
+                onValueChange={(v: 'created_at' | 'updated_at') =>
+                  onSortChange(v)
+                }
+              >
+                <SelectTrigger className="w-[140px] font-semibold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="created_at">Oldest</SelectItem>
+                  <SelectItem value="updated_at">Latest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

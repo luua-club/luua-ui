@@ -1,4 +1,4 @@
-import { WithOptional } from '../models/common.model'
+import { WithOptional } from './common.model'
 import { IPagination } from './pagination.model'
 import { IPost } from './post.model'
 
@@ -9,16 +9,25 @@ export type PostItem = Pick<
 
 export type DraftItem = {
   id: string
+  name: string
   posts: PostItem[]
   autopilot?: boolean
   inspiration_ids?: string[]
+  version: number
   created_at: string
   updated_at: string
 }
 
 export interface IDraftRequest {
   id?: string
+  name?: string
+  version?: number
   posts: WithOptional<PostItem, 'id'>[]
+}
+
+export interface IDraftRenameRequest {
+  id: string
+  name: string
 }
 
 export interface IDraftResponse {
@@ -39,4 +48,16 @@ export interface IDraftListResponse extends IPagination {
 export interface IPublishDraftRequest {
   draft_id: string
   post_ids: string[]
+  version: number
+}
+
+export interface ILockedByUser {
+  user_id: string
+  user_name: string
+  email: string
+}
+
+export interface ILockResponse {
+  lock_acquired: boolean
+  locked_by: ILockedByUser
 }

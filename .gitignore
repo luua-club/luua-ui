@@ -66,3 +66,10 @@ yarn-error.log*
 
 # Yarn Integrity file
 .yarn-integrity
+
+
+# Claude
+.claude/*
+
+# Cursor
+.cursor/*

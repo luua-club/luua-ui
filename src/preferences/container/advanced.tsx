@@ -8,12 +8,12 @@ import { QUERY_KEYS } from '@/core/config/constant'
 import { postHogStyleEnhancedCapture } from '@/core/config/posthog.config'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
+import { PREFERENCES_TAB_VALUES } from '@/preferences/constants'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleTextCapture from '../../core/components/StyleTextCapture'
 import StyleFileCapture from '../../core/containers/StyleFileCapture'
-import { tabValue } from '../preferences'
 
 function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   const queryClient = useQueryClient()
@@ -81,7 +81,7 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
                   setAdvancedUserStyleMutation.mutate({
                     gcp_storage_doc_ids: fileIds,
                   })
-                  setActiveTab(tabValue[0])
+                  setActiveTab(PREFERENCES_TAB_VALUES[0])
                 }}
               />
             </TabsContent>

@@ -10,20 +10,24 @@ import { toast } from 'sonner'
 
 import { Toaster } from '@/shared/ui/sonner'
 
-import { userApi } from './core/api/user.api'
 import {
   API_CONSTANTS,
-  LUUA_USER_KEY,
+  LUUA_AUTH_INFO_KEY,
   QUERY_KEYS,
 } from './core/config/constant'
 import { queryClient } from './core/config/global.config'
-import { useAppDispatch } from './core/hooks/global-state.hook'
-import { LoginResponse } from './core/models/auth.model'
-import { UserSchema } from './core/models/user.model'
+import { useAppDispatch, useAppSelector } from './core/hooks/global-state.hook'
+import { AuthInfo } from './core/models/auth.model'
 import { store } from './core/store'
-import { setUser } from './core/store/auth-slice'
+import {
+  clearAuth,
+  hydrateFromStorage,
+  setAuthInfo,
+} from './core/store/auth-slice'
+import { loadAuthData } from './core/utils/auth-data.util'
 import { logout } from './core/utils/common.util'
 import router from './router'
+import GlobalLoader from './shared/components/global-loader'
 import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
 import { ThemeProvider } from './shared/provider/theme-provider'
 import { getLocalStorageItem } from './shared/utils/localstorage.util'
@@ -38,70 +42,66 @@ if (import.meta.env.PROD) {
 }
 
 export function AppContent() {
-  // ---- Variables ----
-  // Check if JWT token is present in local storage
-  const loginResponse: LoginResponse | null =
-    getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
-  const isLoggedIn = !!loginResponse?.access_token
-
-  // ---- Hooks ----
   const dispatch = useAppDispatch()
   const location = useLocation()
   const isLoginRoute = location.pathname === '/login'
 
-  // GET user profile, Do not run login route (the same is also ran there)
-  const {
-    data: userData,
-    isError,
-    isEnabled,
-    error,
-  } = useQuery({
+  const authInfo = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
+  const isLoggedIn = !!authInfo?.access_token
+
+  // Reactive org/project from Redux — set by hydrateFromStorage (sync on mount)
+  // or setAuthInfo (after cascade). Used to gate Outlet rendering.
+  const currentOrg = useAppSelector(state => state.authState.currentOrg)
+  const currentProject = useAppSelector(state => state.authState.currentProject)
+
+  // Synchronous LS hydration on mount — shows stale data before any API call
+  useEffect(() => {
+    if (authInfo) dispatch(hydrateFromStorage(authInfo))
+    else dispatch(clearAuth())
+  }, [dispatch]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // React Query owns the full 3-API cascade (user profile → resolve IDs → org + project).
+  // Re-run from anywhere: queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
+  const { data, isError, error } = useQuery({
     queryKey: [QUERY_KEYS.user],
-    queryFn: () => userApi.getUser(),
-    enabled: !!isLoggedIn && !isLoginRoute,
+    queryFn: loadAuthData,
+    enabled: isLoggedIn && !isLoginRoute,
+    staleTime: Infinity,
+    retry: 1,
   })
 
-  // ---- Effects ----
-  // Update store with fresh user data when query succeeds
   useEffect(() => {
-    if (!userData?.data) {
-      return
+    if (!data) return
+    dispatch(setAuthInfo(data))
+    if (import.meta.env.PROD && data.user) {
+      posthog.identify(data.user.email, {
+        email: data.user.email,
+        name: data.user.name,
+      })
     }
+  }, [data, dispatch])
 
-    if (UserSchema.safeParse(userData.data).success) {
-      dispatch(setUser(userData.data))
-
-      // Identify user in PostHog
-      if (import.meta.env.PROD) {
-        posthog.identify(userData.data.email, {
-          email: userData.data.email,
-          name: userData.data.name,
-          plan: userData.data.plan,
-        })
-      }
+  useEffect(() => {
+    if (!isError) return
+    const err = error as AxiosError
+    if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
+      toast.error(
+        'Some error has occurred, please try again later, if the problem persists, please contact support, logging out..'
+      )
+      setTimeout(() => logout(), 3000)
     } else {
-      toast.error('Something went wrong, Please try again !')
       logout()
     }
-  }, [userData, dispatch])
+  }, [isError, error])
 
-  // If User profile API fails and is also enabled then run this effect
-  // Note: isEnabled is used because the same query is also ran in login page
-  // so to avoid conflicts and race condition it is used
-  useEffect(() => {
-    if (isError && isEnabled) {
-      const err = error as AxiosError
-
-      if (err?.status !== API_CONSTANTS.statusCode.unauthorized) {
-        toast.error(
-          'Some error has occurred, please try again later, if the problem persists, please contact support, loggin out..'
-        )
-        setTimeout(() => logout(), 3000)
-      } else {
-        logout()
-      }
-    }
-  }, [isError, isEnabled, error])
+  // On fresh login, LS only has the token — no org/project IDs yet.
+  // Block page rendering until the cascade writes them to Redux so the
+  // interceptor has valid headers before any page-level query fires.
+  // On a refresh, hydrateFromStorage sets org/project from LS immediately
+  // so this check resolves to false and there is no visible delay.
+  if (isLoggedIn && !isLoginRoute && (!currentOrg || !currentProject)) {
+    return <GlobalLoader />
+  }
 
   return (
     <div className="page-fade-in">
@@ -114,13 +114,10 @@ function App() {
   return (
     <PostHogProvider client={posthog}>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        {/* Google Auth provider */}
         <QueryClientProvider client={queryClient}>
-          {/* Query client provider */}
           <Provider store={store}>
             <ThemeProvider storageKey={THEME_LOCAL_STORAGE_KEY}>
-              {/* Redux provider */}
-              <RouterProvider router={router} /> {/* Router provider */}
+              <RouterProvider router={router} />
               <Toaster expand={true} />
             </ThemeProvider>
           </Provider>

@@ -18,6 +18,7 @@ export const autopilotSettingsSchema = z.object({
   channels: z
     .array(z.enum(['Twitter', 'LinkedIn'] as channelType[]))
     .min(1, 'Select at least one channel'),
+  auto_publish: z.boolean().optional(),
 })
 
 export type AutopilotSettingsFromValues = z.infer<

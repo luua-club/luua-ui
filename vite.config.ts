@@ -1,8 +1,24 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 import svgr from 'vite-plugin-svgr'
+
+function getPackageName(id: string) {
+  const normalizedId = id.split(path.sep).join('/')
+  const parts = normalizedId.split('node_modules/')
+  const pkgPath = parts[parts.length - 1]
+  const pkgSegments = pkgPath.split('/')
+
+  if (pkgSegments[0]?.startsWith('@')) {
+    return `${pkgSegments[0]}/${pkgSegments[1]}`
+  }
+
+  return pkgSegments[0]
+}
+
+const isAnalyze = process.env.ANALYZE === 'true'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,75 +29,88 @@ export default defineConfig({
     },
   },
   build: {
+    modulePreload: {
+      resolveDependencies: (_url, deps, context) => {
+        if (context.hostType === 'html') {
+          return deps.filter(dep => !dep.includes('/route-'))
+        }
+        return deps
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Vendor chunks
+          // -------- Vendor chunks --------
           if (id.includes('node_modules')) {
-            if (id.includes('lucide-react')) {
+            const pkg = getPackageName(id)
+
+            if (pkg === 'lucide-react') {
               return 'lucide-icons'
             }
-            if (id.includes('react') || id.includes('redux')) {
-              return 'react-vendor'
-            }
-            if (id.includes('@tanstack')) {
-              return 'tanstack'
-            }
-            if (id.includes('@radix-ui')) {
+            if (pkg === '@radix-ui/react-slot' || pkg === 'radix-ui') {
               return 'radix-ui'
             }
-            if (id.includes('motion') || id.includes('framer')) {
+            if (pkg.startsWith('@radix-ui/')) {
+              return 'radix-components'
+            }
+            if (pkg.startsWith('@tanstack/')) {
+              return 'tanstack'
+            }
+            if (pkg === 'motion') {
               return 'motion'
             }
-            if (id.includes('posthog')) {
+            if (pkg === 'posthog-js') {
               return 'posthog'
             }
-            if (id.includes('axios')) {
+            if (pkg === 'axios') {
               return 'axios'
             }
-            if (id.includes('zod')) {
+            if (pkg === 'zod') {
               return 'zod'
             }
-            if (id.includes('date-fns')) {
+            if (pkg === 'date-fns') {
               return 'date-fns'
             }
-            if (id.includes('canvas-confetti')) {
+            if (pkg === 'canvas-confetti') {
               return 'confetti'
             }
+            if (pkg === 'react-dnd' || pkg === 'react-dnd-html5-backend') {
+              return 'react-dnd'
+            }
+            if (pkg === 'react-hook-form' || pkg === '@hookform/resolvers') {
+              return 'react-forms'
+            }
+            if (
+              pkg === 'react' ||
+              pkg === 'react-dom' ||
+              pkg === 'scheduler' ||
+              pkg === 'use-sync-external-store'
+            ) {
+              return 'react-core'
+            }
+            if (
+              pkg === 'react-redux' ||
+              pkg === '@reduxjs/toolkit' ||
+              pkg === 'redux'
+            ) {
+              return 'redux'
+            }
+
             // Don't bundle other vendors together - let Vite optimize
             return undefined
           }
-
-          // Route-based chunks
-          if (id.includes('/src/auth/')) {
-            return 'route-auth'
-          }
-          if (id.includes('/src/welcome/')) {
-            return 'route-welcome'
-          }
-          if (id.includes('/src/settings/')) {
-            return 'route-settings'
-          }
-          if (id.includes('/src/creation/')) {
-            return 'route-creation'
-          }
-          if (id.includes('/src/autopilot/')) {
-            return 'route-autopilot'
-          }
-          if (id.includes('/src/payments/')) {
-            return 'route-payments'
-          }
-          if (id.includes('/src/onboarding/')) {
-            return 'route-onboarding'
-          }
-          if (id.includes('/src/bookmarks/')) {
-            return 'route-bookmarks'
-          }
-          if (id.includes('/src/review/')) {
-            return 'route-review'
-          }
         },
       },
+      plugins: [
+        isAnalyze &&
+          visualizer({
+            filename: 'dist/stats.html',
+            template: 'treemap',
+            gzipSize: true,
+            brotliSize: true,
+            open: true,
+          }),
+      ].filter(Boolean),
     },
   },
   server: {

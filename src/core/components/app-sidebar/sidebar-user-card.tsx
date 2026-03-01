@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
 import {
   ChevronsUpDown,
   Download,
@@ -15,6 +15,7 @@ import { EXTERNAL_URLS } from '@/core/config/constant'
 import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { useTheme } from '@/shared/provider/theme-provider'
+import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
   DropdownMenu,
@@ -39,6 +40,7 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
   // --- Hook ---
   const { isMobile, toggleSidebar } = useSidebar()
   const { theme, setTheme } = useTheme()
+  const router = useRouter()
 
   // --- Early return ---
   if (!user) {
@@ -47,6 +49,17 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
 
   // --- Derived variables ---
   const isFreePlan = user.plan === 'Free'
+
+  const openSettingsPage = (tab: 'account' | 'billing' = 'account') => {
+    void router.navigate({
+      to: '/settings',
+      search: { tab },
+    })
+
+    if (isMobile) {
+      toggleSidebar()
+    }
+  }
 
   return (
     <SidebarMenuItem>
@@ -63,7 +76,10 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               {/* Avatar */}
               <Avatar className="h-8 w-8 rounded-full">
-                <AvatarImage src={user.profile_image} alt={user.name} />
+                <AvatarImage
+                  src={user.profile_image ?? undefined}
+                  alt={user.name}
+                />
                 <AvatarFallback className="rounded-lg bg-amber-400 font-medium text-black">
                   {extractUserInitial(user.name)}
                 </AvatarFallback>
@@ -107,29 +123,21 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
           {/* Option:3 - Settings and billing */}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <Link to="/settings" className="w-full">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => isMobile && toggleSidebar()}
-              >
-                <Settings />
-                Settings
-              </DropdownMenuItem>
-            </Link>
-
-            <Link
-              to="/settings"
-              search={{ tabs: 'billing' }}
-              className="w-full"
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => openSettingsPage('account')}
             >
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => isMobile && toggleSidebar()}
-              >
-                <Receipt />
-                Billing
-              </DropdownMenuItem>
-            </Link>
+              <Settings />
+              Settings
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => openSettingsPage('billing')}
+            >
+              <Receipt />
+              Billing
+            </DropdownMenuItem>
           </DropdownMenuGroup>
 
           {/* Option:4 - External Links */}
@@ -189,13 +197,33 @@ const UserCardDropdownTrigger = ({ user }: UserCardDropdownProps) => {
         size="lg"
         className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer focus-visible:ring-0"
       >
-        {/** Avatar */}
-        <Avatar className="h-8 w-8 rounded-full">
-          <AvatarImage src={user.profile_image} alt={user.name} />
-          <AvatarFallback className="rounded-lg bg-amber-400 font-medium text-black">
-            {extractUserInitial(user.name)}
-          </AvatarFallback>
-        </Avatar>
+        {/** Avatar with plan badge */}
+        <div className="relative">
+          <Avatar className="h-8 w-8 rounded-full">
+            <AvatarImage
+              src={user.profile_image ?? undefined}
+              alt={user.name}
+            />
+            <AvatarFallback className="rounded-lg bg-amber-400 font-medium text-black">
+              {extractUserInitial(user.name)}
+            </AvatarFallback>
+          </Avatar>
+          {user.plan === 'Free' ? (
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-xs border border-cyan-500 bg-cyan-300 px-1 py-px text-[9px] leading-none font-semibold text-black">
+              Free
+            </span>
+          ) : (
+            <span className="bg-card absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-xs border border-purple-200 px-1 py-px text-[9px] leading-none font-bold dark:border-purple-600">
+              <AnimatedGradientText
+                colorFrom="#ffaa40"
+                colorTo="#9c40ff"
+                speed={1.5}
+              >
+                Pro
+              </AnimatedGradientText>
+            </span>
+          )}
+        </div>
 
         {/** Username and email */}
         <div className="grid flex-1 text-left text-sm leading-tight">

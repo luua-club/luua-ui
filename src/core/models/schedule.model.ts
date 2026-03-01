@@ -3,6 +3,7 @@ import { IPost } from './post.model'
 
 export interface IScheduleDraftRequest {
   draft_id: string
+  version: number
   schedules: {
     [key: string]: string
   }

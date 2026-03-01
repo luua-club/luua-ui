@@ -9,7 +9,7 @@ import { cn } from '@/shared/utils'
 import { SOCIAL_PLATFORM } from '../config/constant'
 import { useUserState } from '../hooks/user-state.hook'
 import { IPost } from '../models/post.model'
-import { UserSocial } from '../models/social.model'
+import { ProjectSocial } from '../models/social.model'
 import { extractUserInitial } from '../utils/common.util'
 import ThumbnailImage from './ThumbnailImage'
 
@@ -17,6 +17,7 @@ type PostProps = IPost & {
   isLoading?: boolean
   tileView?: boolean
   maintainFormatting?: boolean
+  noBorder?: boolean
 }
 
 function Post({
@@ -26,21 +27,23 @@ function Post({
   isLoading = false,
   tileView = false,
   maintainFormatting = false,
+  noBorder = false,
 }: PostProps) {
   // Read-more toggle for not-editable view
   const [expanded, setExpanded] = useState(false)
 
   const platform = SOCIAL_PLATFORM.find(s => s.name === channel)
   const userState = useUserState()
+  const connectedChannels = userState?.connectedChannels
 
   if (!userState || isLoading) {
     return <PostSkeleton tileView={tileView} />
   }
 
-  const channelUser: UserSocial | undefined =
+  const channelUser: ProjectSocial | undefined =
     platform?.name === 'LinkedIn'
-      ? userState?.connected_channels?.linkedin
-      : userState?.connected_channels?.twitter
+      ? connectedChannels?.linkedin
+      : connectedChannels?.twitter
 
   let user: {
     name: string
@@ -49,7 +52,7 @@ function Post({
   } = {
     name: userState.name,
     username: userState.email,
-    image: userState.profile_image,
+    image: userState.profile_image ?? '',
   }
 
   if (channelUser) {
@@ -60,7 +63,7 @@ function Post({
           ? `@${channelUser.user_id}`
           : channelUser.user_email
         : userState.email,
-      image: channelUser.user_profile_picture || userState.profile_image,
+      image: channelUser.user_profile_picture ?? userState.profile_image ?? '',
     }
   }
 
@@ -76,10 +79,11 @@ function Post({
     <Card
       className={cn(
         'bg-card relative flex flex-col rounded-md p-0 shadow-none',
-        tileView ? 'min-h-auto' : 'h-fit'
+        tileView ? 'min-h-auto' : 'h-fit',
+        noBorder && 'border-none'
       )}
     >
-      <CardContent className="flex flex-1 flex-col p-0">
+      <CardContent className="flex flex-1 flex-col border-none p-0">
         {/** USER INFO */}
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3">
           {/** AVATAR */}
@@ -105,7 +109,9 @@ function Post({
 
           {/** SOCIAL LOGO */}
           {platform && platform.logo && (
-            <platform.logo className="dark:bg-card size-10 shrink-0 rounded-full border-1 border-dashed p-2" />
+            <div className="dark:bg-card rounded-full border-1 border-dashed p-3">
+              <platform.logo className="size-5" />
+            </div>
           )}
         </div>
 
@@ -165,12 +171,19 @@ function Post({
   )
 }
 
-export const PostSkeleton = ({ tileView = false }: { tileView?: boolean }) => {
+export const PostSkeleton = ({
+  tileView = false,
+  noBorder = false,
+}: {
+  tileView?: boolean
+  noBorder?: boolean
+}) => {
   return (
     <Card
       className={cn(
         'relative flex min-h-52 flex-col overflow-hidden rounded-md p-0 shadow-none',
-        tileView ? 'min-h-36' : 'h-fit'
+        tileView ? 'min-h-36' : 'h-fit',
+        noBorder && 'border-none'
       )}
     >
       <CardContent className="flex flex-1 flex-col p-0">

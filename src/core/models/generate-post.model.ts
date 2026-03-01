@@ -33,7 +33,6 @@ export type searchSourcesType = z.infer<typeof SearchSourcesSchema>
 export const GeneratePostResponseSchema = z.object({
   original_prompt: z.string(),
   session_id: z.string(),
-  fallback_message: z.string().nullable(),
   external_sources: z.array(ExtractedLinksSchema).nullable(),
   generated_twitter_post: z
     .object({
@@ -46,6 +45,7 @@ export const GeneratePostResponseSchema = z.object({
     })
     .nullable(),
   search_sources: z.array(SearchSourcesSchema).nullable(),
+  llm_response: z.string().nullable().optional(),
 })
 
 export type generatePostResponseType = z.infer<

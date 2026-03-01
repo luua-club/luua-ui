@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useState } from 'react'
 
-import luuaIconLogo from '@/assets/logos/luua-icon-logo.svg'
+import luuaIconLogo from '@/assets/logos/luua-black-icon-logo.svg'
 import luuaWhiteIconLogo from '@/assets/logos/luua-white-icon-logo.svg'
 import { inspirationApi } from '@/core/api/inspiration.api'
 import { QUERY_KEYS } from '@/core/config/constant'
@@ -65,7 +65,7 @@ function BookmarkPreviewModal({
                   <p className="text-muted-foreground text-xs font-semibold uppercase">
                     Additional Context
                   </p>
-                  <p className="mt-1 text-sm break-words">
+                  <p className="text-primary mt-1 text-sm break-words">
                     {inspiration.additional_context}
                   </p>
                 </div>

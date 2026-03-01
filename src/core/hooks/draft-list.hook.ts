@@ -5,8 +5,11 @@ import { type DateRange } from 'react-day-picker'
 import { draftsApi } from '@/core/api/drafts.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { type ApiResponse } from '@/core/models/api.model'
-import { type IDraftListResponse } from '@/core/models/draft.model'
-import { toStartOfDayIso } from '@/core/utils/common.util'
+import {
+  type IDraftListResponse,
+  type IDraftRenameRequest,
+} from '@/core/models/draft.model'
+import { toEndOfDayIso, toStartOfDayIso } from '@/core/utils/common.util'
 
 export function useDraftList(
   showOnlyAutoGen: boolean = false,
@@ -23,7 +26,7 @@ export function useDraftList(
   const [sort, setSort] = useState<'created_at' | 'updated_at'>('updated_at')
 
   // ----- Pagination -----
-  const [limit, setLimit] = useState<number>(5)
+  const [limit, setLimit] = useState<number>(10)
   const [offset, setOffset] = useState<number>(0)
 
   // ----- Deletion flow state -----
@@ -38,9 +41,9 @@ export function useDraftList(
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
   // ----- Derived filter values -----
-  // Convert selected dates to ISO start-of-day boundaries for backend querying.
+  // Convert selected dates to UTC day boundaries for backend querying.
   const from = toStartOfDayIso(dateRange?.from)
-  const to = toStartOfDayIso(dateRange?.to ?? dateRange?.from)
+  const to = toEndOfDayIso(dateRange?.to ?? dateRange?.from)
 
   // When sorting by created_at we use ascending to show oldest -> newest creation.
   // Otherwise default to updated_at with descending to show most recently updated first.
@@ -102,6 +105,14 @@ export function useDraftList(
   // ----- Mutation: delete a draft -----
   const deleteMutation = useMutation({
     mutationFn: (draftId: string) => draftsApi.deleteDraft(draftId),
+  })
+
+  // ----- Mutation: rename a draft -----
+  const renameMutation = useMutation({
+    mutationFn: (data: IDraftRenameRequest) => draftsApi.renameDraft(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.drafts] })
+    },
   })
 
   // ----- Mutation: delete a post within a draft -----
@@ -205,5 +216,9 @@ export function useDraftList(
     deletingIds,
     // Aggregate deletion pending flag
     isDeleting: deleteMutation.isPending || deletePostMutation.isPending,
+    // Rename
+    renameDraft: (id: string, name: string) =>
+      renameMutation.mutate({ id, name }),
+    isRenaming: renameMutation.isPending,
   }
 }

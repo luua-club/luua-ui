@@ -3,22 +3,43 @@ import { AxiosRequestConfig } from 'axios'
 import { capitalize } from '@/shared/utils'
 
 import { getLocalStorageItem } from '../../shared/utils/localstorage.util'
-import { LUUA_USER_KEY } from '../config/constant'
-import { LoginResponse } from '../models/auth.model'
+import { LUUA_AUTH_INFO_KEY } from '../config/constant'
+import { AuthInfo } from '../models/auth.model'
 
 /**
- * Interceptor to add the JWT token to the request headers
+ * Interceptor to add the JWT token and org/project headers to the request
  *
  * @param config - The request config
- * @returns The request config with the JWT token
+ * @returns The request config with auth headers
  */
 export const authInterceptor = (config: AxiosRequestConfig) => {
-  const token = getLocalStorageItem<LoginResponse>(LUUA_USER_KEY)
+  const authInfo = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
 
-  if (token) {
+  if (authInfo?.access_token) {
     config.headers = {
       ...config.headers,
-      Authorization: `${capitalize(token.token_type)} ${token.access_token}`,
+      Authorization: `${capitalize(authInfo.token_type)} ${authInfo.access_token}`,
+    }
+  }
+
+  // Add org/project headers (skip for profile endpoint)
+  const isProfileRequest = config.url?.includes('/profile')
+  if (!isProfileRequest) {
+    const orgId = authInfo?.currentOrg?.id
+    const projectId = authInfo?.currentProject?.id
+
+    if (orgId) {
+      config.headers = {
+        ...config.headers,
+        'x-luua-org-id': orgId,
+      }
+    }
+
+    if (projectId) {
+      config.headers = {
+        ...config.headers,
+        'x-luua-project-id': projectId,
+      }
     }
   }
 
