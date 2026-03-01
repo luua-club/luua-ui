@@ -4,6 +4,7 @@ import {
   CableIcon,
   CircleUser,
   DollarSign,
+  FolderOpen,
   Users,
 } from 'lucide-react'
 import type { ComponentType } from 'react'
@@ -14,6 +15,8 @@ import Account from '@/settings/containers/accounts'
 import BillingAndCredits from '@/settings/containers/billing-and-credits'
 import OrgGeneral from '@/settings/containers/org-general'
 import OrgMembers from '@/settings/containers/org-members'
+import ProjectGeneral from '@/settings/containers/project-general'
+import ProjectMembers from '@/settings/containers/project-members'
 
 export type settingsTabType =
   | 'account'
@@ -21,6 +24,8 @@ export type settingsTabType =
   | 'billing'
   | 'org-general'
   | 'org-members'
+  | 'project-general'
+  | 'project-members'
 
 type settingsMainContentType = ComponentType<{ user: UserState }>
 
@@ -64,6 +69,26 @@ export const SETTINGS_GROUPS: Array<settingsGroupType> = [
     id: 'projects',
     label: 'Projects',
     items: [
+      {
+        id: 'project-general',
+        kind: 'link',
+        icon: FolderOpen,
+        label: 'General',
+        search: {
+          tab: 'project-general',
+        },
+        contentComponent: ProjectGeneral,
+      },
+      {
+        id: 'project-members',
+        kind: 'link',
+        icon: Users,
+        label: 'Members',
+        search: {
+          tab: 'project-members',
+        },
+        contentComponent: ProjectMembers,
+      },
       {
         id: 'socials',
         kind: 'link',
