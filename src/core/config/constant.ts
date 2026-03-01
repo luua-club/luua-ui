@@ -70,6 +70,7 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
 export const QUERY_KEYS = {
   user: 'user',
   orgMembers: 'org-members',
+  orgInvitations: 'org-invitations',
   projectMembers: 'project-members',
   drafts: 'drafts',
   draft: 'draft',

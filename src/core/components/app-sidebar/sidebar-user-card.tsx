@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
 import {
   ChevronsUpDown,
   Download,
@@ -40,6 +40,7 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
   // --- Hook ---
   const { isMobile, toggleSidebar } = useSidebar()
   const { theme, setTheme } = useTheme()
+  const router = useRouter()
 
   // --- Early return ---
   if (!user) {
@@ -48,6 +49,24 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
 
   // --- Derived variables ---
   const isFreePlan = user.plan === 'Free'
+
+  const openSettingsPage = (tab: 'account' | 'billing' = 'account') => {
+    if (tab === 'billing') {
+      void router.navigate({
+        to: '/settings',
+        search: { tabs: 'billing' },
+      })
+    } else {
+      void router.navigate({
+        to: '/settings',
+        search: { tab: 'account' },
+      })
+    }
+
+    if (isMobile) {
+      toggleSidebar()
+    }
+  }
 
   return (
     <SidebarMenuItem>
@@ -111,29 +130,21 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
           {/* Option:3 - Settings and billing */}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <Link to="/settings" className="w-full">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => isMobile && toggleSidebar()}
-              >
-                <Settings />
-                Settings
-              </DropdownMenuItem>
-            </Link>
-
-            <Link
-              to="/settings"
-              search={{ tabs: 'billing' }}
-              className="w-full"
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => openSettingsPage('account')}
             >
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => isMobile && toggleSidebar()}
-              >
-                <Receipt />
-                Billing
-              </DropdownMenuItem>
-            </Link>
+              <Settings />
+              Settings
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => openSettingsPage('billing')}
+            >
+              <Receipt />
+              Billing
+            </DropdownMenuItem>
           </DropdownMenuGroup>
 
           {/* Option:4 - External Links */}

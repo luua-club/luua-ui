@@ -73,8 +73,10 @@ export const useUserState = () => {
     currentProject,
 
     // Aliases used by existing components
-    selectedOrg: currentOrg,
-    selectedProject: currentProject,
+    // Only expose fully-hydrated objects (with name) to prevent
+    // crashes during the brief re-sync window after org/project switch
+    selectedOrg: currentOrg?.name ? currentOrg : undefined,
+    selectedProject: currentProject?.name ? currentProject : undefined,
     selectedOrgId: currentOrg?.id ?? null,
     selectedProjectId: currentProject?.id ?? null,
 

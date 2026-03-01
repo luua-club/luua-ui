@@ -147,7 +147,7 @@ function AppSidebarHeader() {
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="gap-2">
                     <span className="bg-primary text-primary-foreground inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-[10px] font-semibold">
-                      {selectedProject.name.charAt(0)}
+                      {selectedProject.name?.charAt(0)}
                     </span>
                     <span className="flex-1 truncate">
                       {selectedProject.name}
