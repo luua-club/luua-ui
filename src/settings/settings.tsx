@@ -8,11 +8,9 @@ import { useMemo } from 'react'
 
 import { useUserState } from '@/core/hooks/user-state.hook'
 
-import AsideGroupSetting from './components/aside-group-setting'
 import {
   getSettingsItemByTab,
   resolveSettingTab,
-  SETTINGS_GROUPS,
   settingsTabType,
 } from './config/settings.config'
 import AllSettingsLayout from './layouts/all-settings-layout'
@@ -57,19 +55,9 @@ const Settings = () => {
 
   return (
     <AllSettingsLayout
-      aside={
-        <div className="flex gap-4 overflow-x-auto lg:flex-col lg:gap-0 lg:space-y-6 lg:overflow-x-visible">
-          {SETTINGS_GROUPS.map(group => (
-            <AsideGroupSetting
-              key={group.id}
-              group={group}
-              user={user}
-              activeTab={activeTab}
-              onItemSelect={handleTabChange}
-            />
-          ))}
-        </div>
-      }
+      user={user}
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
     >
       {!user ? (
         <div className="flex min-h-40 items-center justify-center">

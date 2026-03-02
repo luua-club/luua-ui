@@ -4,7 +4,7 @@ import { Outlet, RouterProvider, useLocation } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Provider } from 'react-redux'
 import { toast } from 'sonner'
 
@@ -70,9 +70,24 @@ export function AppContent() {
     retry: 1,
   })
 
+  // Track whether we've seen at least one successful cascade result.
+  // Used to distinguish "first load" (no data yet) from "cascade completed
+  // but project is null" to avoid infinite GlobalLoader.
+  const cascadeCompleted = useRef(false)
+
   useEffect(() => {
     if (!data) return
     dispatch(setAuthInfo(data))
+    cascadeCompleted.current = true
+
+    // NOW that LS and Redux have correct org/project data, invalidate
+    // all cached queries so they refetch with correct headers.
+    // This was previously done in invalidateAndResync (before the cascade),
+    // which caused a race: dependent queries fired with stale/partial LS data.
+    queryClient.invalidateQueries({
+      predicate: q => q.queryKey[0] !== QUERY_KEYS.user,
+    })
+
     if (import.meta.env.PROD && data.user) {
       posthog.identify(data.user.email, {
         email: data.user.email,
@@ -99,7 +114,16 @@ export function AppContent() {
   // interceptor has valid headers before any page-level query fires.
   // On a refresh, hydrateFromStorage sets org/project from LS immediately
   // so this check resolves to false and there is no visible delay.
-  if (isLoggedIn && !isLoginRoute && (!currentOrg || !currentProject)) {
+  //
+  // Once the cascade has completed at least once, stop blocking — if
+  // currentProject is null it means the org genuinely has no projects,
+  // and we should render the app (not spin forever).
+  if (
+    isLoggedIn &&
+    !isLoginRoute &&
+    !cascadeCompleted.current &&
+    (!currentOrg || !currentProject)
+  ) {
     return <GlobalLoader />
   }
 

@@ -30,13 +30,15 @@ export const useUserState = () => {
 
   /**
    * Invalidate the cascade query ([QUERY_KEYS.user]) to re-run the full
-   * 3-API sequence (user → org → project) and clear all dependent caches.
+   * 3-API sequence (user → org → project).
+   *
+   * Dependent queries are NOT invalidated here — they are invalidated in
+   * App.tsx AFTER the cascade completes and setAuthInfo writes correct
+   * org/project data to localStorage. This prevents dependent queries
+   * from firing with stale/partial headers during the cascade window.
    */
   const invalidateAndResync = () => {
     queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
-    queryClient.invalidateQueries({
-      predicate: q => q.queryKey[0] !== QUERY_KEYS.user,
-    })
   }
 
   const changeOrg = (orgId: string) => {
