@@ -17,11 +17,13 @@ import BillingAndCredits from '@/settings/containers/billing-and-credits'
 import OrgGeneral from '@/settings/containers/org-general'
 import OrgInvitations from '@/settings/containers/org-invitations'
 import OrgMembers from '@/settings/containers/org-members'
+import PendingInvitations from '@/settings/containers/pending-invitations'
 import ProjectGeneral from '@/settings/containers/project-general'
 import ProjectMembers from '@/settings/containers/project-members'
 
 export type settingsTabType =
   | 'account'
+  | 'pending-invitations'
   | 'socials'
   | 'billing'
   | 'org-general'
@@ -65,6 +67,16 @@ export const SETTINGS_GROUPS: Array<settingsGroupType> = [
           tab: 'account',
         },
         contentComponent: Account,
+      },
+      {
+        id: 'pending-invitations',
+        kind: 'link',
+        icon: MailPlus,
+        label: 'Pending Invitations',
+        search: {
+          tab: 'pending-invitations',
+        },
+        contentComponent: PendingInvitations,
       },
     ],
   },
