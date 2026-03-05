@@ -267,7 +267,10 @@ function AppSidebarHeader() {
                         {filteredOrgs.map(org => (
                           <DropdownMenuItem
                             key={org.id}
-                            onClick={() => changeOrg(org.id)}
+                            onClick={() =>
+                              !org.no_projects_assigned && changeOrg(org.id)
+                            }
+                            disabled={org.no_projects_assigned}
                             className="justify-between"
                           >
                             <div className="flex items-center gap-2">
@@ -280,9 +283,15 @@ function AppSidebarHeader() {
                               />
                               <span>{org.name}</span>
                             </div>
-                            <span className="text-muted-foreground text-xs">
-                              {formatRole(org.org_role)}
-                            </span>
+                            {org.no_projects_assigned ? (
+                              <span className="text-muted-foreground text-xs">
+                                No projects assigned
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">
+                                {formatRole(org.org_role)}
+                              </span>
+                            )}
                           </DropdownMenuItem>
                         ))}
                         {filteredOrgs.length === 0 && (
