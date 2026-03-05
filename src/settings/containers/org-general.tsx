@@ -93,6 +93,8 @@ function OrgGeneral(_props: { user: UserState }) {
 
               {isCurrent ? (
                 <Badge variant="secondary">Current</Badge>
+              ) : org.no_projects_assigned ? (
+                <Badge variant="outline">No projects assigned</Badge>
               ) : (
                 <Button
                   variant="outline"
