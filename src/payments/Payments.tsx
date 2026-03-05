@@ -1,7 +1,5 @@
 import { createLazyRoute } from '@tanstack/react-router'
 
-import PlanCards from './containers/PlanCards'
-
 function Payments() {
   return (
     <div className="m-auto max-w-4xl p-2">
@@ -12,7 +10,9 @@ function Payments() {
           Best Choice!
         </p>
       </div>
-      <PlanCards />
+      <h2 className="text-muted-foreground/60 rounded-md border border-dashed p-4 text-center text-xl">
+        To be decided
+      </h2>
     </div>
   )
 }
