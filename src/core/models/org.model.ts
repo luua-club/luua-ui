@@ -19,6 +19,7 @@ export const OrganizationSummarySchema = z.object({
   name: z.string().default(''),
   status: z.string().default(''),
   org_role: z.string().default(''),
+  no_projects_assigned: z.boolean().optional().default(false),
 })
 export type OrganizationSummary = z.infer<typeof OrganizationSummarySchema>
 
