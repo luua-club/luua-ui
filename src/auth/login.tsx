@@ -195,7 +195,18 @@ function Login() {
       new_user: res.new_user,
     })
 
-    // Extension login: needs user email before redirecting to the extension
+    // Run the 3-API cascade eagerly so org/project are resolved BEFORE
+    // navigation. This ensures the extension cookie has full data by the
+    // time the dashboard tab finishes loading and the extension reconciles.
+    let authInfo: AuthInfo | null = null
+    try {
+      authInfo = await loadAuthData()
+      syncExtCookie(authInfo)
+    } catch {
+      // Cascade failed — continue to navigate; App.tsx will retry
+    }
+
+    // Extension login: redirect back to the extension with credentials
     const storedExtensionId = getSessionStorageItem<string>(
       LUUA_EXTENSION_ID_KEY
     )
@@ -205,21 +216,19 @@ function Login() {
       (typeof extensionLoginFlag === 'boolean' && extensionLoginFlag === true)
 
     if (isFromExtension && storedExtensionId) {
-      try {
-        const authInfo = await loadAuthData()
-        syncExtCookie()
-        removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
-        removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
-        const email = authInfo.user?.email ?? ''
-        window.location.href = `chrome-extension://${storedExtensionId}/auth.html?token=${encodeURIComponent(res.access_token)}&userId=${encodeURIComponent(email)}&email=${encodeURIComponent(email)}`
-      } catch {
+      if (!authInfo) {
         removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
         toast.error('Something went wrong, Please try again !')
+        return
       }
+      removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
+      removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+      const email = authInfo.user?.email ?? ''
+      window.location.href = `chrome-extension://${storedExtensionId}/auth.html?token=${encodeURIComponent(res.access_token)}&userId=${encodeURIComponent(email)}&email=${encodeURIComponent(email)}`
       return
     }
 
-    // Normal web flow: redirect — App.tsx cascade fires on dashboard load
+    // Normal web flow
     router.navigate({ to: '/dashboard', search: {} })
   }
 

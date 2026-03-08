@@ -3,8 +3,21 @@ import { AuthInfo } from '@/core/models/auth.model'
 
 import { getLocalStorageItem } from './localstorage.util'
 
-export function syncExtCookie() {
-  const authInfo = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
+/**
+ * Write a `luua-ext-session` cookie so the Chrome extension can pick up
+ * the current session without a separate login.
+ *
+ * Always writes the cookie when a token exists — even if org/project are
+ * not yet available. The extension's useSession hook resolves missing
+ * org/project via /user/profile while still in the loading state, so the
+ * "Reconnect" banner never shows for valid tokens.
+ *
+ * @param override - Pass the AuthInfo object directly when the caller
+ *   already has it (e.g. right after loadAuthData returns). If omitted
+ *   the function reads from localStorage.
+ */
+export function syncExtCookie(override?: AuthInfo) {
+  const authInfo = override ?? getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
 
   if (!authInfo?.access_token) {
     document.cookie = 'luua-ext-session=; path=/; max-age=0; SameSite=Lax'
