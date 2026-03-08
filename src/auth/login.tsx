@@ -30,6 +30,7 @@ import { Button } from '@/shared/ui/button'
 import { Highlighter } from '@/shared/ui/highlighter'
 import { Input } from '@/shared/ui/input'
 import { Spotlight } from '@/shared/ui/spotlight-new'
+import { syncExtCookie } from '@/shared/utils/extension-cookie.util'
 import {
   getLocalStorageItem,
   removeLocalStorageItem,
@@ -122,6 +123,8 @@ function Login() {
       // Check if user is already logged in
       const existingAuth = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
       if (existingAuth?.access_token && existingAuth?.user?.email) {
+        syncExtCookie()
+
         // Build extension redirect URL with existing credentials
         const extensionRedirectUrl = `chrome-extension://${extensionId}/auth.html?token=${encodeURIComponent(existingAuth.access_token)}&userId=${encodeURIComponent(existingAuth.user.email)}&email=${encodeURIComponent(existingAuth.user.email)}`
 
@@ -204,6 +207,7 @@ function Login() {
     if (isFromExtension && storedExtensionId) {
       try {
         const authInfo = await loadAuthData()
+        syncExtCookie()
         removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
         removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
         const email = authInfo.user?.email ?? ''
