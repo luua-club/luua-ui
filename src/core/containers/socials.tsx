@@ -4,11 +4,17 @@ import { toast } from 'sonner'
 
 import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
+import BlueskyConnectDialog from '@/core/components/bluesky-connect-dialog'
+import InstagramPageSelectorDialog from '@/core/components/instagram-page-selector-dialog'
 import LinkedInTargetSelectorDialog from '@/core/components/linkedin-target-selector-dialog'
 import SocialCard from '@/core/components/social-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import { channelType, LinkedInAccountType } from '@/core/models/social.model'
+import {
+  channelType,
+  InstagramAccount,
+  LinkedInAccountType,
+} from '@/core/models/social.model'
 
 const Socials = ({ channels }: { channels?: channelType[] }) => {
   const queryClient = useQueryClient()
@@ -19,25 +25,44 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
   >({
     Twitter: false,
     LinkedIn: false,
+    Instagram: false,
+    Bluesky: false,
   })
 
   const twitter = SOCIAL_PLATFORM.find(s => s.name === 'Twitter')!
   const linkedin = SOCIAL_PLATFORM.find(s => s.name === 'LinkedIn')!
+  const instagram = SOCIAL_PLATFORM.find(s => s.name === 'Instagram')!
+  const bluesky = SOCIAL_PLATFORM.find(s => s.name === 'Bluesky')!
   const linkedInChannel = connectedChannels?.linkedin
   const isLinkedInSetupPending = Boolean(
     linkedInChannel?.connected && !linkedInChannel?.meta?.account_type
   )
   const [isLinkedInSelectorOpen, setIsLinkedInSelectorOpen] = useState(false)
 
+  const instagramChannel = connectedChannels?.instagram
+  const instagramAccounts = (instagramChannel?.meta?.accounts ??
+    []) as InstagramAccount[]
+  const isInstagramSetupPending = Boolean(
+    instagramChannel?.connected &&
+      !instagramChannel?.meta?.selected_instagram_account_id
+  )
+  const [isInstagramSelectorOpen, setIsInstagramSelectorOpen] = useState(false)
+
+  const [isBlueskyDialogOpen, setIsBlueskyDialogOpen] = useState(false)
+
   const handleConnect = async (platform: channelType) => {
     try {
       setSocialLoading(platform, true)
-      const response =
-        platform === 'Twitter'
-          ? await oauthApi.twitterAuthorize()
-          : await oauthApi.linkedinAuthorize()
+      let response: { data?: { authorization_url: string } } | undefined
+      if (platform === 'Twitter') {
+        response = await oauthApi.twitterAuthorize()
+      } else if (platform === 'LinkedIn') {
+        response = await oauthApi.linkedinAuthorize()
+      } else if (platform === 'Instagram') {
+        response = await oauthApi.instagramAuthorize()
+      }
 
-      if (response.data) {
+      if (response?.data) {
         window.location.href = response.data.authorization_url
       }
     } catch {
@@ -92,6 +117,27 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
     setIsLinkedInSelectorOpen(false)
   }, [isLinkedInSetupPending])
 
+  const instagramTargetMutation = useMutation({
+    mutationFn: (instagram_account_id: string) =>
+      userApi.setInstagramTarget({ instagram_account_id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
+      toast.success('Instagram account setup completed')
+      setIsInstagramSelectorOpen(false)
+    },
+    onError: () => {
+      toast.error('Failed to save Instagram account selection')
+    },
+  })
+
+  useEffect(() => {
+    if (isInstagramSetupPending) {
+      setIsInstagramSelectorOpen(true)
+      return
+    }
+    setIsInstagramSelectorOpen(false)
+  }, [isInstagramSetupPending])
+
   const setSocialLoading = (payload: channelType, isLoading: boolean) => {
     setLoadingStates(prev => ({ ...prev, [payload]: isLoading }))
   }
@@ -125,6 +171,32 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
             showUpgradePlan={userState?.plan === 'Free'}
           />
         )}
+
+        {(!channels || channels.includes('Instagram')) && (
+          <SocialCard
+            platform={instagram}
+            channel={instagramChannel}
+            isLoading={
+              loadingStates.Instagram || instagramTargetMutation.isPending
+            }
+            onConnect={() =>
+              isInstagramSetupPending
+                ? setIsInstagramSelectorOpen(true)
+                : handleConnect('Instagram')
+            }
+            onDisconnect={() => handleDisconnectMutation.mutate('Instagram')}
+          />
+        )}
+
+        {(!channels || channels.includes('Bluesky')) && (
+          <SocialCard
+            platform={bluesky}
+            channel={connectedChannels?.bluesky}
+            isLoading={loadingStates.Bluesky}
+            onConnect={() => setIsBlueskyDialogOpen(true)}
+            onDisconnect={() => handleDisconnectMutation.mutate('Bluesky')}
+          />
+        )}
       </div>
 
       {(!channels || channels.includes('LinkedIn')) && (
@@ -136,6 +208,26 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
           onSubmit={linkedInTargetMutation.mutate}
         />
       )}
+
+      {(!channels || channels.includes('Instagram')) && (
+        <InstagramPageSelectorDialog
+          open={isInstagramSelectorOpen}
+          onOpenChange={setIsInstagramSelectorOpen}
+          accounts={instagramAccounts}
+          selectedAccountId={
+            instagramChannel?.meta?.selected_instagram_account_id as
+              | string
+              | null
+          }
+          isSubmitting={instagramTargetMutation.isPending}
+          onSubmit={instagramTargetMutation.mutate}
+        />
+      )}
+
+      <BlueskyConnectDialog
+        open={isBlueskyDialogOpen}
+        onOpenChange={setIsBlueskyDialogOpen}
+      />
     </>
   )
 }

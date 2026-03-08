@@ -204,7 +204,12 @@ interface FloatingChatProps {
   onGeneratingChange?: (isGenerating: boolean) => void
   channel?: ChannelFilter
   onChannelChange?: (channel: ChannelFilter) => void
-  currentState?: { linkedin: string | null; twitter: string | null } | null
+  currentState?: {
+    linkedin: string | null
+    twitter: string | null
+    instagram: string | null
+    bluesky: string | null
+  } | null
   initialOpen?: boolean
   autoSubmitPrompt?: string
   onAutoSubmitStart?: () => void
@@ -268,10 +273,21 @@ export function FloatingChat({
       if (res.data.generated_twitter_post?.content) {
         onPostsGenerated?.(res.data.generated_twitter_post.content, 'Twitter')
       }
+      if (res.data.generated_instagram_post?.content) {
+        onPostsGenerated?.(
+          res.data.generated_instagram_post.content,
+          'Instagram'
+        )
+      }
+      if (res.data.generated_bluesky_post?.content) {
+        onPostsGenerated?.(res.data.generated_bluesky_post.content, 'Bluesky')
+      }
 
       const channels = [
         res.data.generated_linkedin_post && 'LinkedIn',
         res.data.generated_twitter_post && 'X / Twitter',
+        res.data.generated_instagram_post && 'Instagram',
+        res.data.generated_bluesky_post && 'Bluesky',
       ]
         .filter(Boolean)
         .join(' & ')

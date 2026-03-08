@@ -18,6 +18,13 @@ const isSocialConnected = (
     )
   }
   if (name === 'Twitter') return channels.twitter?.connected
+  if (name === 'Instagram') {
+    return Boolean(
+      channels.instagram?.connected &&
+        channels.instagram?.meta?.selected_instagram_account_id
+    )
+  }
+  if (name === 'Bluesky') return channels.bluesky?.connected
   return false
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import z from 'zod'
 
-export type channelType = 'Twitter' | 'LinkedIn'
+export type channelType = 'Twitter' | 'LinkedIn' | 'Instagram' | 'Bluesky'
 export type LinkedInAccountType = 'personal' | 'page'
 
 export interface ISocialChannel {
@@ -10,6 +10,16 @@ export interface ISocialChannel {
   logo: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
   tooltip: string
 }
+
+export const InstagramAccountSchema = z.object({
+  instagram_business_account_id: z.string(),
+  ig_username: z.string(),
+  ig_name: z.string(),
+  ig_profile_picture_url: z.string().nullable().optional().default(null),
+  page_id: z.string(),
+  page_name: z.string(),
+})
+export type InstagramAccount = z.infer<typeof InstagramAccountSchema>
 
 const LinkedInPageSchema = z.object({
   id: z.string(),
