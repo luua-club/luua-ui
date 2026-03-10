@@ -81,7 +81,8 @@ function ProjectMembers(_props: { user: UserState }) {
   const user = useUserState()
   const queryClient = useQueryClient()
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
-  const [addRoles, setAddRoles] = useState<Record<string, ProjectRole>>({})
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setAddRoles] = useState<Record<string, ProjectRole>>({})
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.projectMembers],
