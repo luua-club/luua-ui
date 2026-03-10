@@ -7,6 +7,8 @@ export interface IGeneratePostRequest {
   current_state?: {
     linkedin: string | null
     twitter: string | null
+    instagram: string | null
+    bluesky: string | null
   } | null
   post_channels?: channelType[]
   is_search_enabled: boolean
@@ -44,6 +46,18 @@ export const GeneratePostResponseSchema = z.object({
       content: z.string(),
     })
     .nullable(),
+  generated_instagram_post: z
+    .object({
+      content: z.string(),
+    })
+    .nullable()
+    .optional(),
+  generated_bluesky_post: z
+    .object({
+      content: z.string(),
+    })
+    .nullable()
+    .optional(),
   search_sources: z.array(SearchSourcesSchema).nullable(),
   llm_response: z.string().nullable().optional(),
 })
