@@ -131,7 +131,6 @@ function OrgMembers(_props: { user: UserState }) {
     register,
     handleSubmit,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<InviteFormValues>({

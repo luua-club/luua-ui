@@ -254,8 +254,8 @@ function ProjectMembers(_props: { user: UserState }) {
             </h2>
             <div className="divide-border divide-y">
               {unassignableMembers.map(member => {
-                const selectedRole: ProjectRole =
-                  addRoles[member.id] ?? 'viewer'
+                // const selectedRole: ProjectRole =
+                //   addRoles[member.id] ?? 'viewer'
                 return (
                   <div
                     key={member.id}
