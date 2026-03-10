@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { userApi } from '@/core/api/user.api'
-import { ApiError } from '@/core/models/api.model'
 import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
@@ -25,7 +24,7 @@ function Account({ user }: { user: UserState }) {
     onSuccess: () => {
       user.logout()
     },
-    onError: (error: ApiError) => {
+    onError: () => {
       toast.error('Failed to delete account')
     },
     onSettled: () => {
