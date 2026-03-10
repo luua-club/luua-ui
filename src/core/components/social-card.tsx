@@ -1,10 +1,8 @@
-import { useRouter } from '@tanstack/react-router'
 import { Loader, Trash } from 'lucide-react'
 
 import { ISocialChannel, ProjectSocial } from '@/core/models/social.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 
-import UpgradePlanCta from '../../shared/components/upgrade-plan-cta'
 import { Avatar, AvatarFallback, AvatarImage } from '../../shared/ui/avatar'
 import { Button } from '../../shared/ui/button'
 import PulseCheck from '../../shared/ui/pulse-check'
@@ -19,7 +17,6 @@ interface SocialCardProps {
   platform: ISocialChannel
   channel?: ProjectSocial
   isLoading?: boolean
-  showUpgradePlan?: boolean
   onConnect?: () => void
   onDisconnect?: () => void
 }
@@ -28,11 +25,9 @@ function SocialCard({
   platform,
   channel,
   isLoading,
-  showUpgradePlan,
   onConnect,
   onDisconnect,
 }: SocialCardProps) {
-  const router = useRouter()
   const isLinkedInPending =
     platform.name === 'LinkedIn' &&
     channel?.connected &&
@@ -154,14 +149,6 @@ function SocialCard({
               </Tooltip>
             </div>
           </div>
-        ) : showUpgradePlan ? (
-          <UpgradePlanCta
-            onClick={() =>
-              router.navigate({
-                to: '/payments',
-              })
-            }
-          />
         ) : (
           <Button
             variant="default"
