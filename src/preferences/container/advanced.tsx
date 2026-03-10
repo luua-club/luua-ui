@@ -1,15 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
-import { Box } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { stylesApi } from '@/core/api/styles.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { postHogStyleEnhancedCapture } from '@/core/config/posthog.config'
-import { useUserState } from '@/core/hooks/user-state.hook'
 import { IUserAdvancedStyleRequest } from '@/core/models/user.model'
 import { PREFERENCES_TAB_VALUES } from '@/preferences/constants'
-import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
 import StyleTextCapture from '../../core/components/StyleTextCapture'
@@ -17,8 +13,6 @@ import StyleFileCapture from '../../core/containers/StyleFileCapture'
 
 function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   const queryClient = useQueryClient()
-  const user = useUserState()
-  const router = useRouter()
   const setAdvancedUserStyleMutation = useMutation({
     mutationFn: (payload: IUserAdvancedStyleRequest) =>
       stylesApi.setUserAdvancedStyle(payload),
@@ -37,10 +31,6 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
       toast.error('Failed to update advanced user style')
     },
   })
-
-  const overlayClassNames =
-    'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
-  const isProPlan = user?.plan === 'Pro'
 
   return (
     <>
@@ -87,26 +77,6 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
             </TabsContent>
           </Tabs>
         </div>
-
-        {!isProPlan && (
-          <div className={overlayClassNames}>
-            <p className="font-semibold">
-              Upgrade plan to create your own style
-            </p>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() =>
-                router.navigate({
-                  to: '/payments',
-                })
-              }
-              className="text-xs"
-            >
-              <Box /> Upgrade Plan
-            </Button>
-          </div>
-        )}
       </div>
     </>
   )

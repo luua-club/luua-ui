@@ -1,8 +1,6 @@
-import { useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import {
   Bookmark,
-  Box,
   ChartNoAxesColumn,
   CirclePlus,
   Dot,
@@ -36,7 +34,6 @@ const TwitterPost = (props: PostPreviewProps) => {
   // -- HOOKS --
   const user = useUserState()
   const connectedChannels = user?.connectedChannels
-  const router = useRouter()
   const {
     content,
     setContent,
@@ -83,33 +80,9 @@ const TwitterPost = (props: PostPreviewProps) => {
       organization_profile_image: null,
     },
   }
-  const overlayClassNames =
-    'bg-background/20 dark:bg-background/80 absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border backdrop-blur-[5px]'
-  const isProPlan = user.plan === 'Pro'
-
   // -- RENDER --
   return (
     <div className="relative">
-      {!isProPlan && (
-        <div className={overlayClassNames}>
-          <p className="font-semibold">
-            Upgrade plan to post content on X / Twitter
-          </p>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() =>
-              router.navigate({
-                to: '/payments',
-              })
-            }
-            className="text-xs"
-          >
-            <Box /> Upgrade Plan
-          </Button>
-        </div>
-      )}
-
       {!props.notEditable && channelProfile.connected && (
         <div className="my-3 flex justify-center lg:my-0 lg:justify-end">
           {!props.isActionLoading && (
@@ -146,7 +119,7 @@ const TwitterPost = (props: PostPreviewProps) => {
           {/* Header */}
           <TwitterPostHeader
             channel={channelProfile}
-            notConnected={!channelProfile.connected && isProPlan}
+            notConnected={!channelProfile.connected}
           />
 
           {/* Content */}

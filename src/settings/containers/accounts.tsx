@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { userApi } from '@/core/api/user.api'
-import { API_CONSTANTS } from '@/core/config/constant'
-import { ApiError } from '@/core/models/api.model'
 import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
@@ -26,24 +24,7 @@ function Account({ user }: { user: UserState }) {
     onSuccess: () => {
       user.logout()
     },
-    onError: (error: ApiError) => {
-      // Check if user has active subscription and show appropriate error
-      if (
-        typeof error.detail === 'object' &&
-        error.detail?.error_code ===
-          API_CONSTANTS.errorCode.activeSubscriptionFound
-      ) {
-        toast.error(
-          'You are currently subscribed to a plan. Please cancel your subscription before deleting your account.',
-          {
-            icon: null,
-            duration: 8000,
-            closeButton: true,
-          }
-        )
-        return
-      }
-
+    onError: () => {
       toast.error('Failed to delete account')
     },
     onSettled: () => {
@@ -62,9 +43,8 @@ function Account({ user }: { user: UserState }) {
   return (
     <>
       {/* Profile Section Header */}
-      <div className="py-4">
-        <h1 className="text-lg font-medium">My Profile</h1>
-      </div>
+      <h1 className="pb-4 text-lg font-medium">My Profile</h1>
+
       <Separator />
 
       {/* User Profile Display */}

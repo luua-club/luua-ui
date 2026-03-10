@@ -1,9 +1,9 @@
-import { Box } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 
 import { RainbowButton } from '../ui/rainbow-button'
 
 interface UpgradePlanCtaProps {
-  onClick: () => void
+  onClick?: () => void
 }
 
 function UpgradePlanCta({ onClick }: UpgradePlanCtaProps) {
@@ -14,7 +14,7 @@ function UpgradePlanCta({ onClick }: UpgradePlanCtaProps) {
       size="sm"
       onClick={onClick}
     >
-      <Box /> Upgrade Plan
+      <ShieldCheck /> Pro enabled
     </RainbowButton>
   )
 }

@@ -4,16 +4,15 @@ import {
   useNavigate,
 } from '@tanstack/react-router'
 import { Loader } from 'lucide-react'
-import { useMemo } from 'react'
 
 import { useUserState } from '@/core/hooks/user-state.hook'
 
+import AllSettingsLayout from './layouts/all-settings-layout'
+import { settingsTabType } from './models/settings-tabs.model'
 import {
   getSettingsItemByTab,
   resolveSettingTab,
-  settingsTabType,
-} from './config/settings.config'
-import AllSettingsLayout from './layouts/all-settings-layout'
+} from './utils/settings.helper'
 
 /**
  * Settings component - Main settings page with tabbed interface
@@ -25,17 +24,11 @@ const Settings = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // --- State Management ---
-  // Parse URL search parameters for tab navigation
-  const searchParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search]
-  )
-  const activeTab = resolveSettingTab(
-    searchParams.get('tab') ?? searchParams.get('tabs')
-  )
+  const params = new URLSearchParams(location.search)
+  const activeTab = resolveSettingTab(params.get('tab') ?? params.get('tabs'))
   const activeItem = getSettingsItemByTab(activeTab)
 
+  // --- Functions ---
   const handleTabChange = (tab: settingsTabType) => {
     navigate({
       to: '/settings',
@@ -59,13 +52,7 @@ const Settings = () => {
       activeTab={activeTab}
       onTabChange={handleTabChange}
     >
-      {!user ? (
-        <div className="flex min-h-40 items-center justify-center">
-          <Loader className="size-4 animate-spin" />
-        </div>
-      ) : (
-        <activeItem.contentComponent user={user} />
-      )}
+      <activeItem.contentComponent user={user} />
     </AllSettingsLayout>
   )
 }

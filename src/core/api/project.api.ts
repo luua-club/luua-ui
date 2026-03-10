@@ -46,9 +46,25 @@ class ProjectApi extends BaseApiService {
   }
 
   /**
+   * Add a member to the currently selected project.
+   */
+  async addProjectMember(
+    userId: string,
+    role: 'project_admin' | 'editor' | 'viewer' = 'project_admin'
+  ) {
+    return this.post<void>(
+      { user_id: userId, action: 'add', role },
+      '/current/manage-members'
+    )
+  }
+
+  /**
    * Change the role of a member in the currently selected project.
    */
-  async changeProjectMemberRole(userId: string, role: 'admin' | 'member') {
+  async changeProjectMemberRole(
+    userId: string,
+    role: 'project_admin' | 'editor' | 'viewer'
+  ) {
     return this.patch<void>({ user_id: userId, role }, '/current/members/role')
   }
 }
