@@ -62,9 +62,8 @@ function Account({ user }: { user: UserState }) {
   return (
     <>
       {/* Profile Section Header */}
-      <div className="py-4">
-        <h1 className="text-lg font-medium">My Profile</h1>
-      </div>
+      <h1 className="pb-4 text-lg font-medium">My Profile</h1>
+
       <Separator />
 
       {/* User Profile Display */}

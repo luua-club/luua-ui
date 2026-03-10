@@ -12,10 +12,8 @@ import {
 } from '@/shared/ui/select'
 
 import AsideGroupSetting from '../components/aside-group-setting'
-import {
-  SETTINGS_GROUPS,
-  type settingsTabType,
-} from '../config/settings.config'
+import { SETTINGS_GROUPS } from '../config/settings.config'
+import { settingsTabType } from '../models/settings-tabs.model'
 
 type AllSettingsLayoutProps = {
   user: UserState
@@ -79,7 +77,7 @@ function AllSettingsLayout({
           ))}
         </div>
       </aside>
-      <section className="flex-1 p-4 sm:p-6 lg:p-8">{children}</section>
+      <section className="flex-1 p-4 sm:p-6 lg:p-8"> {children}</section>
     </div>
   )
 }

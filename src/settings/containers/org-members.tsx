@@ -1,7 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { MailPlus, ShieldOff, UserPlus, X } from 'lucide-react'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 
+import { invitationApi } from '@/core/api/invitation.api'
 import { orgApi } from '@/core/api/org.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -12,6 +17,7 @@ import ConfirmDialog from '@/shared/components/confirm-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
+import { Input } from '@/shared/ui/input'
 import {
   Select,
   SelectContent,
@@ -23,6 +29,12 @@ import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
 
 type MemberRole = 'owner' | 'admin' | 'member'
+
+const inviteSchema = z.object({
+  email: z.string().email('Enter a valid email address'),
+  role: z.enum(['admin', 'member']),
+})
+type InviteFormValues = z.infer<typeof inviteSchema>
 
 /** Roles that the viewer can assign, given their own role */
 function assignableRoles(viewerRole: string): Array<'admin' | 'member'> {
@@ -75,9 +87,14 @@ function OrgMembers(_props: { user: UserState }) {
   const user = useUserState()
   const queryClient = useQueryClient()
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
+  const [showInviteForm, setShowInviteForm] = useState(false)
 
   const viewerRole: MemberRole =
     (user?.currentOrg?.org_role as MemberRole) ?? 'member'
+  const canInvite = viewerRole === 'owner' || viewerRole === 'admin'
+  const invitableRoles = assignableRoles(viewerRole)
+  const roles = invitableRoles
+  const hasActions = roles.length > 0
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.orgMembers],
@@ -110,17 +127,115 @@ function OrgMembers(_props: { user: UserState }) {
     onError: () => toast.error('Failed to update role'),
   })
 
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<InviteFormValues>({
+    resolver: zodResolver(inviteSchema),
+    defaultValues: { email: '', role: 'admin' },
+  })
+
+  const inviteMutation = useMutation({
+    mutationFn: (data: InviteFormValues) => invitationApi.invite(data),
+    onSuccess: (_, variables) => {
+      toast.success(`Invitation sent to ${variables.email}`)
+      reset()
+      setShowInviteForm(false)
+    },
+    onError: () => toast.error('Failed to send invitation'),
+  })
+
   const members = data?.data ?? []
-  const roles = assignableRoles(viewerRole)
-  const hasActions = roles.length > 0
 
   return (
     <>
       {/* Header */}
-      <div className="py-4">
+      <div className="flex items-center justify-between py-4">
         <h1 className="text-lg font-medium">Members</h1>
+        {canInvite && (
+          <Button
+            variant={showInviteForm ? 'outline' : 'default'}
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              setShowInviteForm(v => !v)
+              if (showInviteForm) reset()
+            }}
+          >
+            {showInviteForm ? (
+              <>
+                <X className="size-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <UserPlus className="size-4" />
+                Invite member
+              </>
+            )}
+          </Button>
+        )}
       </div>
       <Separator />
+
+      {/* Invite form */}
+      {showInviteForm && (
+        <div className="border-border bg-muted/30 mt-4 rounded-lg border p-4">
+          <p className="mb-3 text-sm font-medium">Invite to organisation</p>
+          <form
+            onSubmit={handleSubmit(d => inviteMutation.mutate(d))}
+            className="space-y-2"
+          >
+            <div className="flex gap-2">
+              <Input
+                className="flex-1"
+                type="email"
+                placeholder="colleague@example.com"
+                {...register('email')}
+              />
+              <Select
+                value="admin"
+                onValueChange={v => setValue('role', v as 'admin' | 'member')}
+                disabled
+              >
+                <SelectTrigger className="w-32 shrink-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {invitableRoles.map(r => (
+                    <SelectItem key={r} value={r}>
+                      {r.charAt(0).toUpperCase() + r.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="submit"
+                disabled={inviteMutation.isPending}
+                className="shrink-0 gap-2"
+              >
+                <MailPlus className="size-4" />
+                Send invite
+              </Button>
+            </div>
+            {errors.email && (
+              <p className="text-destructive text-xs">{errors.email.message}</p>
+            )}
+          </form>
+        </div>
+      )}
+
+      {/* No permission notice */}
+      {!canInvite && (
+        <div className="text-muted-foreground flex items-center gap-2 py-4 text-sm">
+          <ShieldOff className="size-4 shrink-0" />
+          Only admins and owners can invite members.
+        </div>
+      )}
 
       <div className="py-4">
         {isLoading ? (
@@ -178,7 +293,7 @@ function OrgMembers(_props: { user: UserState }) {
                           role: role as 'admin' | 'member',
                         })
                       }
-                      disabled={changeRoleMutation.isPending}
+                      disabled
                     >
                       <SelectTrigger size="sm" className="w-28">
                         <SelectValue />

@@ -1,11 +1,12 @@
 import type { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
-import type {
-  settingsGroupType,
-  settingsTabType,
-} from '@/settings/config/settings.config'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { cn } from '@/shared/utils'
+
+import {
+  settingsGroupType,
+  settingsTabType,
+} from '../models/settings-tabs.model'
 
 type AsideGroupSettingProps = {
   group: settingsGroupType
@@ -44,7 +45,7 @@ function AsideGroupSetting({
                 isActive && 'bg-sidebar-accent'
               )}
             >
-              {item.kind === 'profile' ? (
+              {item.profile ? (
                 <>
                   <Avatar className="size-5 rounded-full">
                     <AvatarImage
