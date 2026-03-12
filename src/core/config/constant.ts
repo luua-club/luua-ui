@@ -1,4 +1,4 @@
-import BrandInstagram from '@/assets/icons/brand-instagram.svg?react'
+import BrandInstagram from '@/assets/icons/offcial-instagram.svg?react'
 import BrandLinkedIn from '@/assets/icons/offcial-linkedin.svg?react'
 import BrandX from '@/assets/icons/offcial-x.svg?react'
 

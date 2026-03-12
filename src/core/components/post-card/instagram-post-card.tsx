@@ -2,15 +2,13 @@ import {
   Bookmark,
   Heart,
   ImagePlus,
-  List,
-  ListOrdered,
   MessageCircle,
   MoreHorizontal,
   Send,
 } from 'lucide-react'
 import { type RefObject, useEffect, useRef, useState } from 'react'
 
-import BrandInstagram from '@/assets/icons/brand-instagram.svg?react'
+import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { POST_WORD_COUNT } from '@/core/config/constant'
 import { UPLOAD_CONFIGS } from '@/core/config/upload.config'
 import {
@@ -20,29 +18,18 @@ import {
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { MediaObject } from '@/core/models/post.model'
 import { ProjectSocial } from '@/core/models/social.model'
-import {
-  applyBold,
-  applyBullet,
-  applyItalic,
-  applyNumbered,
-  applyStrikethrough,
-} from '@/core/utils/text-format.util'
 import { AnimatedCircularProgressBar } from '@/shared/ui/animated-circular-progress-bar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
-import { Button } from '@/shared/ui/button'
 import { GeneratedGlow } from '@/shared/ui/generated-glow'
-import { Separator } from '@/shared/ui/separator'
 import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
 import { extractUserInitial } from '../../utils/common.util'
 import PostImagePreview from '../post-preview/PostImagePreview'
 import { PostCardMode } from './post-card.types'
-import PostCardActions, {
-  type PostCardActionsHandle,
-  type UploadConfig,
-} from './post-card-actions'
+import type { PostCardActionsHandle, UploadConfig } from './post-card-actions'
 import { PostPlatformLabel } from './post-platform-label'
+import { PostTextarea } from './post-textarea'
 import TwitterPostCardSkeleton from './twitter-post-card-skeleton'
 
 interface CommonCardProps {
@@ -51,6 +38,7 @@ interface CommonCardProps {
   channelProfile: ProjectSocial
   textareaRef: RefObject<HTMLTextAreaElement | null>
   isActionLoading?: boolean
+  setContent?: (value: string) => void
   onContentChange?: (value: string) => void
   onRemoveImage?: (index: number) => void
   onSelectionUpdate?: UsePostCardComposer['updateSelectionRef']
@@ -162,144 +150,13 @@ function InstagramActionBar() {
   )
 }
 
-function InlineFormatBar({
-  textareaRef,
-  content,
-  setContent,
-  onFilesUploaded,
-  uploadActionsRef,
-  uploadConfig,
-  className,
-}: {
-  textareaRef: RefObject<HTMLTextAreaElement | null>
-  content: string
-  setContent: (val: string) => void
-  onFilesUploaded?: (urls: string[]) => void
-  uploadActionsRef: RefObject<PostCardActionsHandle | null>
-  uploadConfig?: UploadConfig
-  className?: string
-}) {
-  function applyFormat(transform: (text: string) => string) {
-    const el = textareaRef.current
-    const start = el?.selectionStart ?? 0
-    const end = el?.selectionEnd ?? 0
-    const hasSelection = start !== end
-
-    let next: string
-    let newStart: number
-    let newEnd: number
-
-    if (hasSelection) {
-      const selected = content.slice(start, end)
-      const transformed = transform(selected)
-      next = content.slice(0, start) + transformed + content.slice(end)
-      newStart = start
-      newEnd = start + transformed.length
-    } else {
-      next = transform(content)
-      newStart = 0
-      newEnd = next.length
-    }
-
-    setContent(next)
-
-    requestAnimationFrame(() => {
-      if (!el) return
-      el.focus()
-      try {
-        el.selectionStart = hasSelection ? newStart : newEnd
-        el.selectionEnd = hasSelection ? newEnd : newEnd
-      } catch {}
-    })
-  }
-
-  function insertEmoji(emoji: string) {
-    const el = textareaRef.current
-    const start = el?.selectionStart ?? content.length
-    const end = el?.selectionEnd ?? content.length
-    const next = content.slice(0, start) + emoji + content.slice(end)
-    setContent(next)
-    requestAnimationFrame(() => {
-      if (!el) return
-      el.focus()
-      try {
-        el.selectionStart = start + emoji.length
-        el.selectionEnd = start + emoji.length
-      } catch {}
-    })
-  }
-
-  return (
-    <div className={cn('mt-1.5 flex items-center gap-0.5', className)}>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-sm font-bold"
-        onClick={() => applyFormat(applyBold)}
-        title="Bold"
-        type="button"
-      >
-        B
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-sm italic"
-        onClick={() => applyFormat(applyItalic)}
-        title="Italic"
-        type="button"
-      >
-        I
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-sm line-through"
-        onClick={() => applyFormat(applyStrikethrough)}
-        title="Strikethrough"
-        type="button"
-      >
-        S
-      </Button>
-      <Separator orientation="vertical" className="mx-0.5 !h-5" />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7"
-        onClick={() => applyFormat(applyBullet)}
-        title="Bullet list"
-        type="button"
-      >
-        <List className="size-3.5" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7"
-        onClick={() => applyFormat(applyNumbered)}
-        title="Numbered list"
-        type="button"
-      >
-        <ListOrdered className="size-3.5" />
-      </Button>
-      <div className="ml-auto">
-        <PostCardActions
-          ref={uploadActionsRef}
-          onEmojiSelect={insertEmoji}
-          onFilesUploaded={onFilesUploaded}
-          uploadConfig={uploadConfig}
-        />
-      </div>
-    </div>
-  )
-}
-
 function InstagramEditorCard({
   content,
   imagePreviews,
   channelProfile,
   textareaRef,
   isActionLoading,
+  setContent,
   onContentChange,
   onRemoveImage,
   onSelectionUpdate,
@@ -308,6 +165,8 @@ function InstagramEditorCard({
   uploadConfig,
 }: CommonCardProps) {
   const uploadActionsRef = useRef<PostCardActionsHandle>(null)
+  const instagramPlatform = SOCIAL_PLATFORM.find(p => p.name === 'Instagram')
+  const InstagramLogo = instagramPlatform?.logo
 
   return (
     <div className="max-w-[470px]">
@@ -327,8 +186,10 @@ function InstagramEditorCard({
               </span>
             </div>
             <div className="bg-card flex flex-shrink-0 items-center gap-1.5 rounded-md px-2 py-1">
-              <BrandInstagram className="size-3" />
-              <span className="text-xs font-medium">Instagram</span>
+              {InstagramLogo ? <InstagramLogo className="size-3" /> : null}
+              <span className="text-xs font-medium">
+                {instagramPlatform?.label ?? 'Instagram'}
+              </span>
             </div>
           </div>
 
@@ -353,13 +214,13 @@ function InstagramEditorCard({
                   <ImagePlus className="text-muted-foreground size-6" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold">Upload photos</p>
+                  <p className="text-sm font-semibold">Upload photo</p>
                   <p className="text-muted-foreground text-xs">
-                    JPG, PNG • up to 10 images
+                    JPG, PNG • 8MB max • 1 image
                   </p>
                 </div>
                 <span className="bg-card/80 text-foreground/80 border-muted-foreground/20 rounded-full border px-3 py-1 text-xs font-medium">
-                  Choose files
+                  Choose file
                 </span>
               </div>
             </button>
@@ -367,32 +228,21 @@ function InstagramEditorCard({
 
           {/* Comment area (inside card) */}
           <div className="border-border/60 border-t px-3 pb-3">
-            <InlineFormatBar
+            <PostTextarea
               textareaRef={textareaRef}
-              content={content}
-              setContent={val => onContentChange?.(val)}
-              onFilesUploaded={onFilesUploaded}
               uploadActionsRef={uploadActionsRef}
+              content={content}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              setContent={setContent ?? (() => {})}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              onContentChange={onContentChange ?? (() => {})}
+              onFilesUploaded={onFilesUploaded}
               uploadConfig={uploadConfig}
-              className="mb-2"
-            />
-            <Textarea
-              className={cn(
-                'min-h-20 resize-none text-sm',
-                'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
-                'transition-colors duration-200',
-                'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
-                'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
-              )}
-              placeholder="Write your caption..."
-              ref={textareaRef}
-              value={content}
+              placeholder="Write your caption... (max 2200 chars)"
               maxLength={POST_WORD_COUNT.Instagram}
-              onChange={e => onContentChange?.(e.target.value)}
-              onSelect={onSelectionUpdate}
-              onKeyUp={onSelectionUpdate}
-              onClick={onSelectionUpdate}
               disabled={isActionLoading}
+              onSelectionUpdate={onSelectionUpdate}
+              textareaClassName="min-h-20"
             />
           </div>
         </div>
@@ -414,11 +264,14 @@ function InstagramPreviewCard({
   onRequestEdit,
   shimmer,
 }: CommonCardProps) {
+  const instagramPlatform = SOCIAL_PLATFORM.find(p => p.name === 'Instagram')
+  const InstagramLogo = instagramPlatform?.logo
+
   return (
     <div className="max-w-[470px]">
       <PostPlatformLabel
-        icon={<BrandInstagram className="size-3" />}
-        label="Instagram"
+        icon={InstagramLogo ? <InstagramLogo className="size-3" /> : null}
+        label={instagramPlatform?.label ?? 'Instagram'}
       />
 
       <GeneratedGlow active={shimmer ?? false} className="rounded-md">
@@ -557,6 +410,7 @@ function InstagramPostCard(props: InstagramPostCardProps) {
           channelProfile={channelProfile}
           textareaRef={textareaRef}
           isActionLoading={props.isActionLoading}
+          setContent={setContent}
           onContentChange={val => {
             setContent(val)
             props.onContentChange(val)
