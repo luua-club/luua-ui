@@ -202,7 +202,7 @@ function Create() {
           {showInstagram && (
             <div
               className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
+                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-[470px]'
               }
             >
               <InstagramPostCard
