@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
-import { Box, CircleAlert, Loader, Play, Settings2 } from 'lucide-react'
+import { CircleAlert, Loader, Play, Settings2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -33,7 +32,6 @@ function AutopilotActions({
   // --- Hooks ---
   const queryClient = useQueryClient()
   const user = useUserState()
-  const router = useRouter()
   const [isTriggerModalOpen, setIsTriggerModalOpen] = useState(false)
 
   /**
@@ -60,8 +58,7 @@ function AutopilotActions({
 
     if (enabled) {
       payload.frequency_days = 5
-      payload.channels =
-        user?.plan === 'Pro' ? ['Twitter', 'LinkedIn'] : ['LinkedIn']
+      payload.channels = ['Twitter', 'LinkedIn']
     }
 
     return payload
@@ -77,14 +74,6 @@ function AutopilotActions({
         <p className="text-destructive flex items-center gap-1 text-xs font-bold">
           <CircleAlert className="size-3.5" /> Limit Reached
         </p>
-        <Button
-          onClick={() => router.navigate({ to: '/payments' })}
-          size="sm"
-          className="text-xs"
-        >
-          <Box className="size-3.5" />
-          Upgrade Plan
-        </Button>
       </div>
     )
   }

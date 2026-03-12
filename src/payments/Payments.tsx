@@ -6,10 +6,9 @@ function Payments() {
   return (
     <div className="m-auto max-w-4xl p-2">
       <div className="mt-4 py-4 text-center">
-        <h1 className="text-3xl font-bold">Pricing Details</h1>
+        <h1 className="text-3xl font-bold">Pro Is Included</h1>
         <p className="text-muted-foreground my-2">
-          A Comprehensive Breakdown of Our Pricing Plans to Help You Make the
-          Best Choice!
+          Everyone gets full Pro access by default.
         </p>
       </div>
       <PlanCards />

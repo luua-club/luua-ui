@@ -1,11 +1,8 @@
-import { useRouter } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { Box } from 'lucide-react'
 
 import { ISubscriptionDetails } from '@/core/models/payment.model'
 import { UserState } from '@/core/models/user.model'
 import { Badge } from '@/shared/ui/badge'
-import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 import { Skeleton } from '@/shared/ui/skeleton'
 import {
@@ -23,12 +20,6 @@ interface ISubscriptionProps {
 }
 
 function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
-  // --- Hooks ---
-  const router = useRouter()
-
-  // --- Variables ---
-  const isFreePlan = user.plan === 'Free'
-
   // --- Early Return ---
   // Show skeleton while subscription data is loading
   if (!subscriptionDetails) {
@@ -97,8 +88,8 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
         </p>
       </div>
 
-      {/* Show upgrade prompt for free plan users with no subscription history */}
-      {isFreePlan && subscriptionDetails.length === 0 ? (
+      {/* Show empty state when no subscription history is available */}
+      {subscriptionDetails.length === 0 ? (
         <div className="mt-1 rounded-md border">
           <Table>
             <TableHeader className="bg-muted">
@@ -115,22 +106,7 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
                   colSpan={5}
                   className="p-4 text-center font-semibold"
                 >
-                  <p className="flex flex-col items-center justify-center gap-3">
-                    No Active Subscription Found
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() =>
-                        router.navigate({
-                          to: '/payments',
-                        })
-                      }
-                    >
-                      <Box />
-                      Upgrade Plan
-                    </Button>
-                  </p>
+                  No subscription history available
                 </TableCell>
               </TableRow>
             </TableBody>

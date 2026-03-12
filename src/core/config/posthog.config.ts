@@ -107,38 +107,6 @@ export const postHogPublishCapture = (
 
 /**
  * -------------------------------
- * Payments Analytics
- * -------------------------------
- */
-/**
- * It runs when user starts the checkout process for a subscription plan.
- *
- * @param plan - The current plan the user is on (optional).
- */
-export const postHogCheckoutCapture = (plan?: string) => {
-  posthog.capture('payments:checkout_started', {
-    current_plan: plan,
-  })
-}
-
-/**
- * It runs when user cancels their subscription plan.
- */
-export const postHogCancelledPlanCapture = () => {
-  posthog.capture('payments:subscription_cancelled')
-}
-
-/**
- * It runs when user clicks on upgrade button to upgrade their subscription plan.
- *
- * @param plan - The current plan the user is on (optional).
- */
-export const postHogUpgradeCapture = (plan?: string) => {
-  posthog.capture('payments:upgrade_clicked', { current_plan: plan })
-}
-
-/**
- * -------------------------------
  * Error Captures
  * -------------------------------
  */

@@ -1,10 +1,9 @@
-import { Link, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import {
   ChevronsUpDown,
   Download,
   LogOut,
   LucideMoon,
-  LucideSparkles,
   LucideSun,
   MessageCircleQuestionMark,
   Receipt,
@@ -15,7 +14,6 @@ import { EXTERNAL_URLS } from '@/core/config/constant'
 import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { useTheme } from '@/shared/provider/theme-provider'
-import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import {
   DropdownMenu,
@@ -46,9 +44,6 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
   if (!user) {
     return null
   }
-
-  // --- Derived variables ---
-  const isFreePlan = user.plan === 'Free'
 
   const openSettingsPage = (tab: 'account' | 'billing' = 'account') => {
     void router.navigate({
@@ -96,21 +91,6 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
           {/* Option:2 - General options */}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            {isFreePlan && (
-              <>
-                <DropdownMenuGroup>
-                  <Link to="/payments" className="w-full">
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={() => isMobile && toggleSidebar()}
-                    >
-                      <LucideSparkles />
-                      Go Pro
-                    </DropdownMenuItem>
-                  </Link>
-                </DropdownMenuGroup>
-              </>
-            )}
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -208,7 +188,7 @@ const UserCardDropdownTrigger = ({ user }: UserCardDropdownProps) => {
               {extractUserInitial(user.name)}
             </AvatarFallback>
           </Avatar>
-          {user.plan === 'Free' ? (
+          {/*{user.plan === 'Free' ? (
             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-xs border border-cyan-500 bg-cyan-300 px-1 py-px text-[9px] leading-none font-semibold text-black">
               Free
             </span>
@@ -222,7 +202,7 @@ const UserCardDropdownTrigger = ({ user }: UserCardDropdownProps) => {
                 Pro
               </AnimatedGradientText>
             </span>
-          )}
+          )}*/}
         </div>
 
         {/** Username and email */}

@@ -13,7 +13,6 @@ import getCreationRouteTree from '@/creation/router'
 import getDashboardRoute from '@/dashboard/router'
 import getDraftsRoute from '@/drafts/router'
 import { AuthGuard } from '@/guards'
-import getPaymentsRoute from '@/payments/router'
 import getPostsViewRoute from '@/posts-view/router'
 import getPreferencesRoute from '@/preferences/router'
 import getReviewRoute from '@/review/router'
@@ -40,7 +39,6 @@ const creationRouteTree = getCreationRouteTree(privateRoute)
 const dashboardRoute = getDashboardRoute(privateRoute)
 const draftsRoute = getDraftsRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
-const paymentsRoute = getPaymentsRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
@@ -54,7 +52,6 @@ const routeTree = rootRoute.addChildren([
     dashboardRoute,
     draftsRoute,
     preferencesRoute,
-    paymentsRoute,
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 
 import { EXTERNAL_URLS, LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
 import { AuthInfo } from '@/core/models/auth.model'
-import { removeQueryParams } from '@/core/utils/common.util'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { Button } from '@/shared/ui/button'
 import { Drawer, DrawerContent } from '@/shared/ui/drawer'
@@ -14,14 +13,12 @@ import {
 } from '@/shared/utils/localstorage.util'
 
 import FeaturesGrid from './features-grid'
-import ProWelcomeBanner from './pro-welcome-banner'
 
 const LUUA_WELCOME_SHOWN = 'LUUA_WELCOME_SHOWN'
 
 function WelcomeDrawer() {
   // --- States ---
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
-  const [isProBannerOpen, setIsProBannerOpen] = useState(false)
 
   // --- Hooks ---
   const isMobile = useIsMobile()
@@ -33,12 +30,6 @@ function WelcomeDrawer() {
     if (authData?.new_user === true && !alreadyShown) {
       setLocalStorageItem(LUUA_WELCOME_SHOWN, true)
       setIsWelcomeOpen(true)
-    }
-
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('pro')) {
-      setIsProBannerOpen(true)
-      removeQueryParams(params, ['pro'])
     }
   }, [])
 
@@ -94,14 +85,6 @@ function WelcomeDrawer() {
           </div>
         </DrawerContent>
       </Drawer>
-
-      {/** If User upgraded to pro plan then show pro banner */}
-      {isProBannerOpen && (
-        <ProWelcomeBanner
-          open={isProBannerOpen}
-          onOpenChange={setIsProBannerOpen}
-        />
-      )}
     </>
   )
 }

@@ -57,7 +57,7 @@ function ProjectGeneral(_props: { user: UserState }) {
     <>
       {/* Header */}
       <div className="py-4">
-        <h1 className="text-lg font-medium">General</h1>
+        <h1 className="text-lg font-medium">Overview</h1>
       </div>
       <Separator />
 

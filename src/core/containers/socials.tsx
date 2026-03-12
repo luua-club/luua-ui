@@ -168,7 +168,6 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
             isLoading={loadingStates.Twitter}
             onConnect={() => handleConnect('Twitter')}
             onDisconnect={() => handleDisconnectMutation.mutate('Twitter')}
-            showUpgradePlan={userState?.plan === 'Free'}
           />
         )}
 
