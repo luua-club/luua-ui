@@ -1,5 +1,5 @@
 import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
+import { type ReactElement, useState } from 'react'
 import { toast } from 'sonner'
 
 import InstagramPostCard from '@/core/components/post-card/instagram-post-card'
@@ -9,6 +9,13 @@ import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
 import type { channelType } from '@/core/models/social.model'
 import { FloatingChat } from '@/creation/components/floating-chat'
 import { DraftLockedBanner } from '@/shared/components/draft-locked-banner'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/shared/ui/carousel'
 
 import CreateHeader from '../components/create-header'
 import { CreateHeaderOptions } from '../components/create-header-options'
@@ -16,6 +23,7 @@ import { useDraft } from '../hooks/use-draft.hook'
 
 type SocialTab = channelType | 'all'
 type PreviewMode = 'editor' | 'preview'
+type LayoutMode = 'grid' | 'row'
 
 function formatUpdatedAt(value: string) {
   const date = new Date(value)
@@ -37,6 +45,7 @@ function Create() {
   const [initialSource] = useState(source)
   const [activeTab, setActiveTab] = useState<SocialTab>('all')
   const [previewMode, setPreviewMode] = useState<PreviewMode>('editor')
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid')
   const [isAiGenerating, setIsAiGenerating] = useState(false)
   const draft = useDraft()
 
@@ -59,6 +68,8 @@ function Create() {
   const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
   const showTwitter = activeTab === 'all' || activeTab === 'Twitter'
   const showInstagram = activeTab === 'all' || activeTab === 'Instagram'
+  const isAllTab = activeTab === 'all'
+  const effectiveLayoutMode = isAllTab ? layoutMode : 'grid'
   const reviewActionsDisabled =
     !draft.hasContent ||
     draft.saveStatus === 'pending' ||
@@ -118,6 +129,8 @@ function Create() {
           onChange={setActiveTab}
           previewMode={effectivePreviewMode}
           onPreviewModeChange={draft.isReadOnly ? undefined : setPreviewMode}
+          layoutMode={effectiveLayoutMode}
+          onLayoutModeChange={setLayoutMode}
           onBackToDashboard={() => navigate({ to: '/dashboard' })}
         />
       </div>
@@ -132,100 +145,176 @@ function Create() {
       )}
 
       <div className="flex-1 p-4 pt-6">
-        <div
-          className={
-            activeTab === 'all'
-              ? 'mx-auto grid max-w-6xl grid-cols-1 gap-6 xl:grid-cols-2'
-              : 'mx-auto flex max-w-6xl gap-6'
+        {(() => {
+          const cardItems = [
+            showLinkedIn
+              ? {
+                  key: 'linkedin',
+                  node: (
+                    <div
+                      className={
+                        isAllTab ? 'w-full' : 'mx-auto w-full max-w-2xl'
+                      }
+                    >
+                      <LinkedInPostCard
+                        loading={draft.isLoading}
+                        initialContent={draft.postDrafts.LinkedIn?.content}
+                        initialImages={
+                          draft.postDrafts.LinkedIn?.attached_media
+                        }
+                        mode={cardMode}
+                        isActionLoading={isAiGenerating}
+                        shimmer={
+                          isAiGenerating &&
+                          (activeTab === 'all' || activeTab === 'LinkedIn')
+                        }
+                        onRequestEdit={
+                          draft.isReadOnly
+                            ? undefined
+                            : () => setPreviewMode('editor')
+                        }
+                        onContentChange={val =>
+                          draft.handleContentChange(val, 'LinkedIn')
+                        }
+                        onImagesChange={images =>
+                          draft.handleImagesChange(images, 'LinkedIn')
+                        }
+                      />
+                    </div>
+                  ),
+                }
+              : null,
+            showTwitter
+              ? {
+                  key: 'twitter',
+                  node: (
+                    <div
+                      className={
+                        isAllTab ? 'w-full' : 'mx-auto w-full max-w-2xl'
+                      }
+                    >
+                      <TwitterPostCard
+                        loading={draft.isLoading}
+                        initialContent={draft.postDrafts.Twitter?.content}
+                        initialImages={draft.postDrafts.Twitter?.attached_media}
+                        mode={cardMode}
+                        isActionLoading={isAiGenerating}
+                        shimmer={
+                          isAiGenerating &&
+                          (activeTab === 'all' || activeTab === 'Twitter')
+                        }
+                        onRequestEdit={
+                          draft.isReadOnly
+                            ? undefined
+                            : () => setPreviewMode('editor')
+                        }
+                        onContentChange={val =>
+                          draft.handleContentChange(val, 'Twitter')
+                        }
+                        onImagesChange={images =>
+                          draft.handleImagesChange(images, 'Twitter')
+                        }
+                      />
+                    </div>
+                  ),
+                }
+              : null,
+            showInstagram
+              ? {
+                  key: 'instagram',
+                  node: (
+                    <div
+                      className={
+                        isAllTab ? 'w-full' : 'mx-auto w-full max-w-[470px]'
+                      }
+                    >
+                      <InstagramPostCard
+                        loading={draft.isLoading}
+                        initialContent={draft.postDrafts.Instagram?.content}
+                        initialImages={
+                          draft.postDrafts.Instagram?.attached_media
+                        }
+                        mode={cardMode}
+                        isActionLoading={isAiGenerating}
+                        shimmer={
+                          isAiGenerating &&
+                          (activeTab === 'all' || activeTab === 'Instagram')
+                        }
+                        onRequestEdit={
+                          draft.isReadOnly
+                            ? undefined
+                            : () => setPreviewMode('editor')
+                        }
+                        onContentChange={val =>
+                          draft.handleContentChange(val, 'Instagram')
+                        }
+                        onImagesChange={images =>
+                          draft.handleImagesChange(images, 'Instagram')
+                        }
+                      />
+                    </div>
+                  ),
+                }
+              : null,
+          ].filter(
+            (item): item is { key: string; node: ReactElement } => item !== null
+          )
+
+          if (isAllTab && effectiveLayoutMode === 'row') {
+            return (
+              <>
+                <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 lg:hidden">
+                  {cardItems.map(item => (
+                    <div key={item.key}>{item.node}</div>
+                  ))}
+                </div>
+                <Carousel
+                  opts={{
+                    align: 'start',
+                    slidesToScroll: 1,
+                    breakpoints: {
+                      '(min-width: 768px)': { slidesToScroll: 2 },
+                    },
+                  }}
+                  className="mx-auto hidden max-w-6xl lg:block"
+                >
+                  <CarouselContent className="overflow-visible">
+                    {cardItems.map(item => (
+                      <CarouselItem
+                        key={item.key}
+                        className="basis-full md:basis-[45%]"
+                      >
+                        {item.node}
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="-left-5 h-8 w-8" />
+                  <CarouselNext className="-right-5 h-8 w-8" />
+                </Carousel>
+              </>
+            )
           }
-        >
-          {showLinkedIn && (
-            <div
-              className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
-              }
-            >
-              <LinkedInPostCard
-                loading={draft.isLoading}
-                initialContent={draft.postDrafts.LinkedIn?.content}
-                initialImages={draft.postDrafts.LinkedIn?.attached_media}
-                mode={cardMode}
-                isActionLoading={isAiGenerating}
-                shimmer={
-                  isAiGenerating &&
-                  (activeTab === 'all' || activeTab === 'LinkedIn')
-                }
-                onRequestEdit={
-                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
-                }
-                onContentChange={val =>
-                  draft.handleContentChange(val, 'LinkedIn')
-                }
-                onImagesChange={images =>
-                  draft.handleImagesChange(images, 'LinkedIn')
-                }
-              />
-            </div>
-          )}
 
-          {showTwitter && (
-            <div
-              className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
-              }
-            >
-              <TwitterPostCard
-                loading={draft.isLoading}
-                initialContent={draft.postDrafts.Twitter?.content}
-                initialImages={draft.postDrafts.Twitter?.attached_media}
-                mode={cardMode}
-                isActionLoading={isAiGenerating}
-                shimmer={
-                  isAiGenerating &&
-                  (activeTab === 'all' || activeTab === 'Twitter')
-                }
-                onRequestEdit={
-                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
-                }
-                onContentChange={val =>
-                  draft.handleContentChange(val, 'Twitter')
-                }
-                onImagesChange={images =>
-                  draft.handleImagesChange(images, 'Twitter')
-                }
-              />
-            </div>
-          )}
+          if (isAllTab) {
+            return (
+              <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 xl:grid-cols-2">
+                {cardItems.map(item => (
+                  <div key={item.key}>{item.node}</div>
+                ))}
+              </div>
+            )
+          }
 
-          {showInstagram && (
-            <div
-              className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-[470px]'
-              }
-            >
-              <InstagramPostCard
-                loading={draft.isLoading}
-                initialContent={draft.postDrafts.Instagram?.content}
-                initialImages={draft.postDrafts.Instagram?.attached_media}
-                mode={cardMode}
-                isActionLoading={isAiGenerating}
-                shimmer={
-                  isAiGenerating &&
-                  (activeTab === 'all' || activeTab === 'Instagram')
-                }
-                onRequestEdit={
-                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
-                }
-                onContentChange={val =>
-                  draft.handleContentChange(val, 'Instagram')
-                }
-                onImagesChange={images =>
-                  draft.handleImagesChange(images, 'Instagram')
-                }
-              />
+          return (
+            <div className="mx-auto flex w-full max-w-6xl justify-center">
+              {cardItems.map(item => (
+                <div key={item.key} className="w-full">
+                  {item.node}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
+          )
+        })()}
       </div>
 
       {!draft.isReadOnly && (

@@ -1,4 +1,4 @@
-import { ArrowLeft, LayoutGrid, Rows3 } from 'lucide-react'
+import { ArrowLeft, Eye, LayoutGrid, PencilLine, Rows3 } from 'lucide-react'
 
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import type { channelType } from '@/core/models/social.model'
@@ -8,12 +8,15 @@ import { cn } from '@/shared/utils'
 
 type SocialTab = channelType | 'all'
 type PreviewMode = 'editor' | 'preview'
+type LayoutMode = 'grid' | 'row'
 
 interface CreateSocialTabsProps {
   selected?: SocialTab
   onChange?: (tab: SocialTab) => void
   previewMode?: PreviewMode
   onPreviewModeChange?: (mode: PreviewMode) => void
+  layoutMode?: LayoutMode
+  onLayoutModeChange?: (mode: LayoutMode) => void
   onBackToDashboard?: () => void
 }
 
@@ -22,6 +25,8 @@ export function CreateHeaderOptions({
   onChange,
   previewMode = 'editor',
   onPreviewModeChange,
+  layoutMode = 'grid',
+  onLayoutModeChange,
   onBackToDashboard,
 }: CreateSocialTabsProps) {
   function handleSelect(tab: SocialTab) {
@@ -73,37 +78,72 @@ export function CreateHeaderOptions({
         </Tabs>
       </div>
 
-      <div className="bg-muted/60 dark:bg-card/80 flex shrink-0 items-center gap-1 rounded-md border p-1">
-        <Button
-          type="button"
-          size="sm"
-          variant={previewMode === 'editor' ? 'default' : 'ghost'}
-          onClick={() => onPreviewModeChange?.('editor')}
-          className={cn(
-            'h-7 px-2 text-xs',
-            previewMode === 'editor'
-              ? 'dark:bg-input/70 dark:text-foreground'
-              : 'text-muted-foreground'
-          )}
-        >
-          <Rows3 className="size-3.5" />
-          <span className="hidden lg:inline">Editor</span>
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={previewMode === 'preview' ? 'default' : 'ghost'}
-          onClick={() => onPreviewModeChange?.('preview')}
-          className={cn(
-            'h-7 px-2 text-xs',
-            previewMode === 'preview'
-              ? 'dark:bg-input/70 dark:text-foreground'
-              : 'text-muted-foreground'
-          )}
-        >
-          <LayoutGrid className="size-3.5" />
-          <span className="hidden lg:inline">Preview</span>
-        </Button>
+      <div className="flex shrink-0 items-center gap-2">
+        {selected === 'all' && (
+          <div className="bg-muted/60 dark:bg-card/80 hidden items-center gap-1 rounded-md border p-1 lg:flex">
+            <Button
+              type="button"
+              size="sm"
+              variant={layoutMode === 'grid' ? 'default' : 'ghost'}
+              onClick={() => onLayoutModeChange?.('grid')}
+              className={cn(
+                'h-7 px-2 text-xs',
+                layoutMode === 'grid'
+                  ? 'dark:bg-input/70 dark:text-foreground'
+                  : 'text-muted-foreground'
+              )}
+            >
+              <LayoutGrid className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={layoutMode === 'row' ? 'default' : 'ghost'}
+              onClick={() => onLayoutModeChange?.('row')}
+              className={cn(
+                'h-7 px-2 text-xs',
+                layoutMode === 'row'
+                  ? 'dark:bg-input/70 dark:text-foreground'
+                  : 'text-muted-foreground'
+              )}
+            >
+              <Rows3 className="size-3.5" />
+            </Button>
+          </div>
+        )}
+
+        <div className="bg-muted/60 dark:bg-card/80 flex items-center gap-1 rounded-md border p-1">
+          <Button
+            type="button"
+            size="sm"
+            variant={previewMode === 'editor' ? 'default' : 'ghost'}
+            onClick={() => onPreviewModeChange?.('editor')}
+            className={cn(
+              'h-7 px-2 text-xs',
+              previewMode === 'editor'
+                ? 'dark:bg-input/70 dark:text-foreground'
+                : 'text-muted-foreground'
+            )}
+          >
+            <PencilLine className="size-3.5" />
+            <span className="hidden lg:inline">Editor</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={previewMode === 'preview' ? 'default' : 'ghost'}
+            onClick={() => onPreviewModeChange?.('preview')}
+            className={cn(
+              'h-7 px-2 text-xs',
+              previewMode === 'preview'
+                ? 'dark:bg-input/70 dark:text-foreground'
+                : 'text-muted-foreground'
+            )}
+          >
+            <Eye className="size-3.5" />
+            <span className="hidden lg:inline">Preview</span>
+          </Button>
+        </div>
       </div>
     </div>
   )
