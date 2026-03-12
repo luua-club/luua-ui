@@ -24,7 +24,6 @@ const isSocialConnected = (
         channels.instagram?.meta?.selected_instagram_account_id
     )
   }
-  if (name === 'Bluesky') return channels.bluesky?.connected
   return false
 }
 

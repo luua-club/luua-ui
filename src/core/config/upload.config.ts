@@ -17,8 +17,4 @@ export const UPLOAD_CONFIGS: Record<channelType, UploadConfig> = {
     maxFiles: 10,
     maxSizePerFile: 8 * 1024 * 1024, // 8MB
   },
-  Bluesky: {
-    maxFiles: 4,
-    maxSizePerFile: 1000000, // 1MB
-  },
 }

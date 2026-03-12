@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 
 import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
-import BlueskyConnectDialog from '@/core/components/bluesky-connect-dialog'
 import InstagramPageSelectorDialog from '@/core/components/instagram-page-selector-dialog'
 import LinkedInTargetSelectorDialog from '@/core/components/linkedin-target-selector-dialog'
 import SocialCard from '@/core/components/social-card'
@@ -26,13 +25,11 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
     Twitter: false,
     LinkedIn: false,
     Instagram: false,
-    Bluesky: false,
   })
 
   const twitter = SOCIAL_PLATFORM.find(s => s.name === 'Twitter')!
   const linkedin = SOCIAL_PLATFORM.find(s => s.name === 'LinkedIn')!
   const instagram = SOCIAL_PLATFORM.find(s => s.name === 'Instagram')!
-  const bluesky = SOCIAL_PLATFORM.find(s => s.name === 'Bluesky')!
   const linkedInChannel = connectedChannels?.linkedin
   const isLinkedInSetupPending = Boolean(
     linkedInChannel?.connected && !linkedInChannel?.meta?.account_type
@@ -47,8 +44,6 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
       !instagramChannel?.meta?.selected_instagram_account_id
   )
   const [isInstagramSelectorOpen, setIsInstagramSelectorOpen] = useState(false)
-
-  const [isBlueskyDialogOpen, setIsBlueskyDialogOpen] = useState(false)
 
   const handleConnect = async (platform: channelType) => {
     try {
@@ -186,16 +181,6 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
             onDisconnect={() => handleDisconnectMutation.mutate('Instagram')}
           />
         )}
-
-        {(!channels || channels.includes('Bluesky')) && (
-          <SocialCard
-            platform={bluesky}
-            channel={connectedChannels?.bluesky}
-            isLoading={loadingStates.Bluesky}
-            onConnect={() => setIsBlueskyDialogOpen(true)}
-            onDisconnect={() => handleDisconnectMutation.mutate('Bluesky')}
-          />
-        )}
       </div>
 
       {(!channels || channels.includes('LinkedIn')) && (
@@ -222,11 +207,6 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
           onSubmit={instagramTargetMutation.mutate}
         />
       )}
-
-      <BlueskyConnectDialog
-        open={isBlueskyDialogOpen}
-        onOpenChange={setIsBlueskyDialogOpen}
-      />
     </>
   )
 }

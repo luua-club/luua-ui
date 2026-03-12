@@ -462,12 +462,7 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                       )}
                     >
                       {(
-                        [
-                          'LinkedIn',
-                          'Twitter',
-                          'Instagram',
-                          'Bluesky',
-                        ] as channelType[]
+                        ['LinkedIn', 'Twitter', 'Instagram'] as channelType[]
                       ).map((channel, i) => {
                         const platform = SOCIAL_PLATFORM.find(
                           p => p.name === channel

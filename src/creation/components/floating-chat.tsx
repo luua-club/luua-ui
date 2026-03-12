@@ -208,7 +208,6 @@ interface FloatingChatProps {
     linkedin: string | null
     twitter: string | null
     instagram: string | null
-    bluesky: string | null
   } | null
   initialOpen?: boolean
   autoSubmitPrompt?: string
@@ -279,15 +278,10 @@ export function FloatingChat({
           'Instagram'
         )
       }
-      if (res.data.generated_bluesky_post?.content) {
-        onPostsGenerated?.(res.data.generated_bluesky_post.content, 'Bluesky')
-      }
-
       const channels = [
         res.data.generated_linkedin_post && 'LinkedIn',
         res.data.generated_twitter_post && 'X / Twitter',
         res.data.generated_instagram_post && 'Instagram',
-        res.data.generated_bluesky_post && 'Bluesky',
       ]
         .filter(Boolean)
         .join(' & ')

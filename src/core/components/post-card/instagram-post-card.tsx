@@ -310,7 +310,7 @@ function InstagramEditorCard({
   const uploadActionsRef = useRef<PostCardActionsHandle>(null)
 
   return (
-    <div className="mx-auto max-w-[470px]">
+    <div className="max-w-[470px]">
       {/* === THE CARD === */}
       <GeneratedGlow active={shimmer ?? false} className="rounded-md">
         <div className="bg-card/95 dark:bg-card relative overflow-hidden rounded-md border">
@@ -415,7 +415,7 @@ function InstagramPreviewCard({
   shimmer,
 }: CommonCardProps) {
   return (
-    <div className="mx-auto max-w-[470px]">
+    <div className="max-w-[470px]">
       <PostPlatformLabel
         icon={<BrandInstagram className="size-3" />}
         label="Instagram"

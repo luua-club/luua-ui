@@ -1,4 +1,3 @@
-import BrandBluesky from '@/assets/icons/brand-bluesky.svg?react'
 import BrandInstagram from '@/assets/icons/brand-instagram.svg?react'
 import BrandLinkedIn from '@/assets/icons/offcial-linkedin.svg?react'
 import BrandX from '@/assets/icons/offcial-x.svg?react'
@@ -70,7 +69,6 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
     logo: BrandInstagram,
     tooltip: 'Instagram',
   },
-  { name: 'Bluesky', label: 'Bluesky', logo: BrandBluesky, tooltip: 'Bluesky' },
 ]
 
 /**
@@ -140,7 +138,6 @@ export const POST_WORD_COUNT: { [key in channelType]: number } = {
   Twitter: 280,
   LinkedIn: 3000,
   Instagram: 2200,
-  Bluesky: 300,
 }
 
 /**

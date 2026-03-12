@@ -2,7 +2,6 @@ import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import BlueskyPostCard from '@/core/components/post-card/bluesky-post-card'
 import InstagramPostCard from '@/core/components/post-card/instagram-post-card'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import { PostCardMode } from '@/core/components/post-card/post-card.types'
@@ -60,7 +59,6 @@ function Create() {
   const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
   const showTwitter = activeTab === 'all' || activeTab === 'Twitter'
   const showInstagram = activeTab === 'all' || activeTab === 'Instagram'
-  const showBluesky = activeTab === 'all' || activeTab === 'Bluesky'
   const reviewActionsDisabled =
     !draft.hasContent ||
     draft.saveStatus === 'pending' ||
@@ -227,35 +225,6 @@ function Create() {
               />
             </div>
           )}
-
-          {showBluesky && (
-            <div
-              className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
-              }
-            >
-              <BlueskyPostCard
-                loading={draft.isLoading}
-                initialContent={draft.postDrafts.Bluesky?.content}
-                initialImages={draft.postDrafts.Bluesky?.attached_media}
-                mode={cardMode}
-                isActionLoading={isAiGenerating}
-                shimmer={
-                  isAiGenerating &&
-                  (activeTab === 'all' || activeTab === 'Bluesky')
-                }
-                onRequestEdit={
-                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
-                }
-                onContentChange={val =>
-                  draft.handleContentChange(val, 'Bluesky')
-                }
-                onImagesChange={images =>
-                  draft.handleImagesChange(images, 'Bluesky')
-                }
-              />
-            </div>
-          )}
         </div>
       </div>
 
@@ -269,7 +238,6 @@ function Create() {
             linkedin: draft.postDrafts.LinkedIn?.content ?? null,
             twitter: draft.postDrafts.Twitter?.content ?? null,
             instagram: draft.postDrafts.Instagram?.content ?? null,
-            bluesky: draft.postDrafts.Bluesky?.content ?? null,
           }}
           initialOpen={!!initialSource}
           autoSubmitPrompt={initialSource}

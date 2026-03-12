@@ -9,7 +9,6 @@ export const ConnectedChannelsSchema = z.object({
   linkedin: ProjectSocialSchema,
   twitter: ProjectSocialSchema,
   instagram: ProjectSocialSchema.optional(),
-  bluesky: ProjectSocialSchema.optional(),
 })
 export type ConnectedChannels = z.infer<typeof ConnectedChannelsSchema>
 

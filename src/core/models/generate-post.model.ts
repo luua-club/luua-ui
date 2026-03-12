@@ -8,7 +8,6 @@ export interface IGeneratePostRequest {
     linkedin: string | null
     twitter: string | null
     instagram: string | null
-    bluesky: string | null
   } | null
   post_channels?: channelType[]
   is_search_enabled: boolean
@@ -47,12 +46,6 @@ export const GeneratePostResponseSchema = z.object({
     })
     .nullable(),
   generated_instagram_post: z
-    .object({
-      content: z.string(),
-    })
-    .nullable()
-    .optional(),
-  generated_bluesky_post: z
     .object({
       content: z.string(),
     })

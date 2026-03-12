@@ -36,13 +36,6 @@ class OAuthApi extends BaseApiService {
       params: { redirect_to: window.location.href },
     })
   }
-
-  async blueskyConnect(handle: string, app_password: string) {
-    return this.post<{ handle: string; display_name: string; avatar?: string }>(
-      { handle, app_password },
-      '/bluesky/connect'
-    )
-  }
 }
 
 export const oauthApi = new OAuthApi()

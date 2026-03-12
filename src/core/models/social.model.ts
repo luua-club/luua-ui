@@ -1,7 +1,7 @@
 import React from 'react'
 import z from 'zod'
 
-export type channelType = 'Twitter' | 'LinkedIn' | 'Instagram' | 'Bluesky'
+export type channelType = 'Twitter' | 'LinkedIn' | 'Instagram'
 export type LinkedInAccountType = 'personal' | 'page'
 
 export interface ISocialChannel {
