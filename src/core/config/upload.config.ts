@@ -13,4 +13,8 @@ export const UPLOAD_CONFIGS: Record<channelType, UploadConfig> = {
     maxFiles: 4,
     maxSizePerFile: 5 * 1024 * 1024, // 5MB
   },
+  Instagram: {
+    maxFiles: 1,
+    maxSizePerFile: 8 * 1024 * 1024, // 8MB
+  },
 }

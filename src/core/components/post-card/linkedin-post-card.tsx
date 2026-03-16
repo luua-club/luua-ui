@@ -26,8 +26,9 @@ import {
 import LinkedInPostCardHeader from './linkedin-post-card-header'
 import LinkedInPostCardSkeleton from './linkedin-post-card-skeleton'
 import { PostCardMode } from './post-card.types'
-import { PostFormatToolbar } from './post-format-toolbar'
+import { type UploadConfig } from './post-card-actions'
 import { PostPlatformLabel } from './post-platform-label'
+import { PostTextarea } from './post-textarea'
 
 interface CommonCardProps {
   content: string
@@ -35,6 +36,7 @@ interface CommonCardProps {
   channelProfile: ProjectSocial
   textareaRef: RefObject<HTMLTextAreaElement | null>
   isActionLoading?: boolean
+  setContent?: (value: string) => void
   onContentChange?: (value: string) => void
   onRemoveImage?: (index: number) => void
   onSelectionUpdate?: UsePostCardComposer['updateSelectionRef']
@@ -42,6 +44,7 @@ interface CommonCardProps {
   onRequestEdit?: () => void
   shimmer?: boolean
   onFilesUploaded?: (urls: string[]) => void
+  uploadConfig?: UploadConfig
 }
 
 export interface LinkedInPostCardProps {
@@ -63,12 +66,14 @@ function LinkedInEditorCard({
   channelProfile,
   textareaRef,
   isActionLoading,
+  setContent,
   onContentChange,
   onRemoveImage,
   onSelectionUpdate,
   hasUnicodeFormatting,
   shimmer,
   onFilesUploaded,
+  uploadConfig,
 }: CommonCardProps) {
   const [imageGenOpen, setImageGenOpen] = useState(false)
 
@@ -84,23 +89,20 @@ function LinkedInEditorCard({
           <LinkedInPostCardHeader channel={channelProfile} />
 
           <div className="px-4 pt-1 pb-2">
-            <Textarea
-              className={cn(
-                'min-h-52 resize-none text-sm md:min-h-28',
-                'caret-primary selection:bg-brand-accent-yellow border-1 border-dashed selection:text-black',
-                'transition-colors duration-200',
-                'focus:border-1 focus:shadow-none focus:ring-0 focus:outline-none',
-                'focus-visible:border-1 focus-visible:border-dashed focus-visible:shadow-none focus-visible:ring-0'
-              )}
+            <PostTextarea
+              textareaRef={textareaRef}
+              content={content}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              setContent={setContent ?? (() => {})}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              onContentChange={onContentChange ?? (() => {})}
+              onFilesUploaded={onFilesUploaded}
+              uploadConfig={uploadConfig}
               placeholder="Your post starts here — Type or ask AI to help..."
-              ref={textareaRef}
-              value={content}
               maxLength={POST_WORD_COUNT.LinkedIn}
-              onChange={e => onContentChange?.(e.target.value)}
-              onSelect={onSelectionUpdate}
-              onKeyUp={onSelectionUpdate}
-              onClick={onSelectionUpdate}
               disabled={isActionLoading}
+              onSelectionUpdate={onSelectionUpdate}
+              textareaClassName={cn('min-h-52 md:min-h-28')}
             />
           </div>
 
@@ -255,14 +257,18 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
   return (
     <div className="relative">
       {isEditorMode && (
-        <PostFormatToolbar
-          textareaRef={textareaRef}
+        <LinkedInEditorCard
           content={content}
-          setContent={val => {
-            setContent(val)
-            props.onContentChange(val)
-          }}
+          imagePreviews={imagePreviews}
+          channelProfile={channelProfile}
+          textareaRef={textareaRef}
+          isActionLoading={props.isActionLoading}
+          setContent={setContent}
           onContentChange={props.onContentChange}
+          onRemoveImage={removeImageAt}
+          onSelectionUpdate={updateSelectionRef}
+          hasUnicodeFormatting={hasUnicodeFormatting}
+          shimmer={props.shimmer}
           onFilesUploaded={handleFilesUploaded}
           uploadConfig={{
             ...UPLOAD_CONFIGS.LinkedIn,
@@ -271,24 +277,7 @@ function LinkedInPostCard(props: LinkedInPostCardProps) {
         />
       )}
 
-      {isEditorMode ? (
-        <LinkedInEditorCard
-          content={content}
-          imagePreviews={imagePreviews}
-          channelProfile={channelProfile}
-          textareaRef={textareaRef}
-          isActionLoading={props.isActionLoading}
-          onContentChange={val => {
-            setContent(val)
-            props.onContentChange(val)
-          }}
-          onRemoveImage={removeImageAt}
-          onSelectionUpdate={updateSelectionRef}
-          hasUnicodeFormatting={hasUnicodeFormatting}
-          shimmer={props.shimmer}
-          onFilesUploaded={handleFilesUploaded}
-        />
-      ) : (
+      {!isEditorMode && (
         <LinkedInPreviewCard
           content={content}
           imagePreviews={imagePreviews}

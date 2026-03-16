@@ -12,13 +12,16 @@ import {
 } from '@/shared/ui/select'
 
 import AsideGroupSetting from '../components/aside-group-setting'
-import { SETTINGS_GROUPS } from '../config/settings.config'
-import { settingsTabType } from '../models/settings-tabs.model'
+import {
+  settingsGroupType,
+  settingsTabType,
+} from '../models/settings-tabs.model'
 
 type AllSettingsLayoutProps = {
   user: UserState
   activeTab: settingsTabType
   onTabChange: (tab: settingsTabType) => void
+  groups: settingsGroupType[]
   children: ReactNode
 }
 
@@ -26,6 +29,7 @@ function AllSettingsLayout({
   user,
   activeTab,
   onTabChange,
+  groups,
   children,
 }: AllSettingsLayoutProps) {
   return (
@@ -44,7 +48,7 @@ function AllSettingsLayout({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {SETTINGS_GROUPS.map(group => (
+              {groups.map(group => (
                 <SelectGroup key={group.id}>
                   <SelectLabel>{group.label}</SelectLabel>
                   {group.items.map(item => {
@@ -66,7 +70,7 @@ function AllSettingsLayout({
 
         {/* Desktop: full sidebar */}
         <div className="hidden lg:flex lg:flex-col lg:space-y-6">
-          {SETTINGS_GROUPS.map(group => (
+          {groups.map(group => (
             <AsideGroupSetting
               key={group.id}
               group={group}

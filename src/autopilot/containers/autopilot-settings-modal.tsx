@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 
 import { autopilotApi } from '@/core/api/autopilot.api'
 import { QUERY_KEYS } from '@/core/config/constant'
-import { useUserState } from '@/core/hooks/user-state.hook'
 import type { AutopilotSettings } from '@/core/models/autopilot.model'
 import type { channelType } from '@/core/models/social.model'
 import { Button } from '@/shared/ui/button'
@@ -58,11 +57,7 @@ function AutopilotSettingsModal({
   defaultChannels,
   defaultAutoPublish,
 }: AutopilotSettingsModalProps) {
-  const user = useUserState()
-  const baseChannels = useMemo<channelType[]>(
-    () => (user?.plan === 'Pro' ? ['Twitter', 'LinkedIn'] : ['LinkedIn']),
-    [user?.plan]
-  )
+  const baseChannels = useMemo<channelType[]>(() => ['Twitter', 'LinkedIn'], [])
 
   // --- Form ---
   const resolver = zodResolver(

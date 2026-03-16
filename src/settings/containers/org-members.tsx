@@ -39,7 +39,7 @@ type InviteFormValues = z.infer<typeof inviteSchema>
 /** Roles that the viewer can assign, given their own role */
 function assignableRoles(viewerRole: string): Array<'admin' | 'member'> {
   if (viewerRole === 'owner') return ['admin', 'member']
-  if (viewerRole === 'admin') return ['member']
+  if (viewerRole === 'admin') return ['admin', 'member']
   return []
 }
 
@@ -135,7 +135,7 @@ function OrgMembers(_props: { user: UserState }) {
     formState: { errors },
   } = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: '', role: 'admin' },
+    defaultValues: { email: '', role: 'member' },
   })
 
   const inviteMutation = useMutation({
@@ -197,9 +197,8 @@ function OrgMembers(_props: { user: UserState }) {
                 {...register('email')}
               />
               <Select
-                value="admin"
+                defaultValue="member"
                 onValueChange={v => setValue('role', v as 'admin' | 'member')}
-                disabled
               >
                 <SelectTrigger className="w-32 shrink-0">
                   <SelectValue />
@@ -292,7 +291,7 @@ function OrgMembers(_props: { user: UserState }) {
                           role: role as 'admin' | 'member',
                         })
                       }
-                      disabled
+                      disabled={changeRoleMutation.isPending}
                     >
                       <SelectTrigger size="sm" className="w-28">
                         <SelectValue />

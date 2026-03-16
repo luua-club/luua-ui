@@ -1,3 +1,4 @@
+import BrandInstagram from '@/assets/icons/offcial-instagram.svg?react'
 import BrandLinkedIn from '@/assets/icons/offcial-linkedin.svg?react'
 import BrandX from '@/assets/icons/offcial-x.svg?react'
 
@@ -61,6 +62,12 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
     label: 'X / Twitter',
     logo: BrandX,
     tooltip: 'X / Twitter',
+  },
+  {
+    name: 'Instagram',
+    label: 'Instagram',
+    logo: BrandInstagram,
+    tooltip: 'Instagram',
   },
 ]
 
@@ -130,6 +137,7 @@ export enum UserStyleStatus {
 export const POST_WORD_COUNT: { [key in channelType]: number } = {
   Twitter: 280,
   LinkedIn: 3000,
+  Instagram: 2200,
 }
 
 /**
