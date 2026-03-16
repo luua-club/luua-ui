@@ -1,11 +1,12 @@
 import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { type ReactElement, useState } from 'react'
+import { type ReactElement, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import InstagramPostCard from '@/core/components/post-card/instagram-post-card'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import { PostCardMode } from '@/core/components/post-card/post-card.types'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
+import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import type { channelType } from '@/core/models/social.model'
 import { FloatingChat } from '@/creation/components/floating-chat'
 import { DraftLockedBanner } from '@/shared/components/draft-locked-banner'
@@ -48,6 +49,10 @@ function Create() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid')
   const [isAiGenerating, setIsAiGenerating] = useState(false)
   const draft = useDraft()
+  const allChannels = useMemo(
+    () => SOCIAL_PLATFORM.map(platform => platform.name as channelType),
+    []
+  )
 
   // Called by FloatingChat right before it submits the auto-prompt.
   // Strips source from the URL at that point (safe — message is already queued).
@@ -64,12 +69,26 @@ function Create() {
   const cardMode: PostCardMode =
     effectivePreviewMode === 'preview' ? 'preview' : 'editor'
 
+  const enabledChannels =
+    draft.enabledChannels.length > 0
+      ? draft.enabledChannels
+      : draft.draftId
+        ? allChannels.slice(0, 1)
+        : allChannels
+  const isLinkedInEnabled = enabledChannels.includes('LinkedIn')
+  const isTwitterEnabled = enabledChannels.includes('Twitter')
+  const isInstagramEnabled = enabledChannels.includes('Instagram')
+
   // All socials are always available; tabs only control visibility.
-  const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
-  const showTwitter = activeTab === 'all' || activeTab === 'Twitter'
-  const showInstagram = activeTab === 'all' || activeTab === 'Instagram'
+  const showLinkedIn =
+    isLinkedInEnabled && (activeTab === 'all' || activeTab === 'LinkedIn')
+  const showTwitter =
+    isTwitterEnabled && (activeTab === 'all' || activeTab === 'Twitter')
+  const showInstagram =
+    isInstagramEnabled && (activeTab === 'all' || activeTab === 'Instagram')
   const isAllTab = activeTab === 'all'
-  const effectiveLayoutMode = isAllTab ? layoutMode : 'grid'
+  const hasRowToggle = enabledChannels.length > 2
+  const effectiveLayoutMode = isAllTab && hasRowToggle ? layoutMode : 'grid'
   const reviewActionsDisabled =
     !draft.hasContent ||
     draft.saveStatus === 'pending' ||
@@ -82,6 +101,18 @@ function Create() {
       ? `Updated ${formatUpdatedAt(draft.updatedAt)}`
       : 'Updated recently'
     : 'Unsaved changes'
+
+  useEffect(() => {
+    if (activeTab === 'all') return
+    if (enabledChannels.includes(activeTab)) return
+    setActiveTab('all')
+  }, [activeTab, enabledChannels])
+
+  useEffect(() => {
+    if (hasRowToggle) return
+    if (layoutMode === 'grid') return
+    setLayoutMode('grid')
+  }, [hasRowToggle, layoutMode])
 
   const openReviewFlow = (schedule: boolean) => {
     if (!draft.hasContent) {
@@ -131,6 +162,8 @@ function Create() {
           onPreviewModeChange={draft.isReadOnly ? undefined : setPreviewMode}
           layoutMode={effectiveLayoutMode}
           onLayoutModeChange={setLayoutMode}
+          enabledChannels={enabledChannels}
+          onChannelToggle={draft.setChannelEnabled}
           onBackToDashboard={() => navigate({ to: '/dashboard' })}
         />
       </div>
@@ -323,10 +356,17 @@ function Create() {
           onGeneratingChange={setIsAiGenerating}
           channel={activeTab}
           onChannelChange={setActiveTab}
+          enabledChannels={enabledChannels}
           currentState={{
-            linkedin: draft.postDrafts.LinkedIn?.content ?? null,
-            twitter: draft.postDrafts.Twitter?.content ?? null,
-            instagram: draft.postDrafts.Instagram?.content ?? null,
+            linkedin: isLinkedInEnabled
+              ? (draft.postDrafts.LinkedIn?.content ?? null)
+              : null,
+            twitter: isTwitterEnabled
+              ? (draft.postDrafts.Twitter?.content ?? null)
+              : null,
+            instagram: isInstagramEnabled
+              ? (draft.postDrafts.Instagram?.content ?? null)
+              : null,
           }}
           initialOpen={!!initialSource}
           autoSubmitPrompt={initialSource}

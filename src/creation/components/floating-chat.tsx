@@ -1,6 +1,6 @@
 import { ArrowUp, Check, ChevronDown, Globe, Loader2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { generateApi } from '@/core/api/generate-post.api'
 import { AppIconLogo } from '@/core/components/app-logo'
@@ -75,10 +75,16 @@ function PlatformAvatar({
   )
 }
 
-function StackedIcons({ size = 22 }: { size?: number }) {
+function StackedIcons({
+  size = 22,
+  platforms = SOCIAL_PLATFORM,
+}: {
+  size?: number
+  platforms?: typeof SOCIAL_PLATFORM
+}) {
   return (
     <div className="flex items-center">
-      {SOCIAL_PLATFORM.map((platform, i) => {
+      {platforms.map((platform, i) => {
         const Logo = platform.logo
         return (
           <span
@@ -204,6 +210,7 @@ interface FloatingChatProps {
   onGeneratingChange?: (isGenerating: boolean) => void
   channel?: ChannelFilter
   onChannelChange?: (channel: ChannelFilter) => void
+  enabledChannels: channelType[]
   currentState?: {
     linkedin: string | null
     twitter: string | null
@@ -219,6 +226,7 @@ export function FloatingChat({
   onGeneratingChange,
   channel = 'all',
   onChannelChange,
+  enabledChannels,
   currentState,
   initialOpen = false,
   autoSubmitPrompt,
@@ -229,14 +237,35 @@ export function FloatingChat({
   const [searchEnabled, setSearchEnabled] = useState(false)
   const [channelOpen, setChannelOpen] = useState(false)
 
-  const setChannel = (value: ChannelFilter) => onChannelChange?.(value)
+  const setChannel = useCallback(
+    (value: ChannelFilter) => onChannelChange?.(value),
+    [onChannelChange]
+  )
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const autoSubmittedRef = useRef(false)
 
+  const enabledSet = useMemo(() => new Set(enabledChannels), [enabledChannels])
+  const enabledPlatforms = SOCIAL_PLATFORM.filter(platform =>
+    enabledSet.has(platform.name as channelType)
+  )
+  const visiblePlatforms =
+    enabledPlatforms.length > 0 ? enabledPlatforms : SOCIAL_PLATFORM
   const selectedPlatform =
-    channel !== 'all' ? SOCIAL_PLATFORM.find(p => p.name === channel) : null
+    channel !== 'all' && enabledSet.has(channel)
+      ? SOCIAL_PLATFORM.find(p => p.name === channel)
+      : null
+
+  useEffect(() => {
+    if (channel === 'all' && enabledChannels.length === 1) {
+      setChannel(enabledChannels[0])
+      return
+    }
+    if (channel === 'all') return
+    if (enabledSet.has(channel)) return
+    setChannel('all')
+  }, [channel, enabledChannels, enabledSet, setChannel])
 
   // Auto-scroll to bottom on new messages / loading
   useEffect(() => {
@@ -258,10 +287,17 @@ export function FloatingChat({
     onGeneratingChange?.(true)
 
     try {
+      const requestedChannels = channel === 'all' ? enabledChannels : [channel]
+      const filteredChannels = requestedChannels.filter(item =>
+        enabledSet.has(item)
+      )
+      const postChannels =
+        filteredChannels.length > 0 ? filteredChannels : enabledChannels
+
       const res = await generateApi.generatePost({
         user_prompt: trimmed,
         is_search_enabled: searchEnabled,
-        post_channels: channel === 'all' ? undefined : [channel],
+        post_channels: postChannels,
         current_state: currentState ?? null,
       })
 
@@ -511,7 +547,7 @@ export function FloatingChat({
                         {selectedPlatform ? (
                           <PlatformAvatar channel={selectedPlatform.name} />
                         ) : (
-                          <StackedIcons />
+                          <StackedIcons platforms={visiblePlatforms} />
                         )}
                         <span>
                           {selectedPlatform ? selectedPlatform.label : 'All'}
@@ -524,25 +560,29 @@ export function FloatingChat({
                       align="start"
                       side="top"
                     >
-                      <button
-                        onClick={() => {
-                          setChannel('all')
-                          setChannelOpen(false)
-                        }}
-                        className={cn(
-                          'text-foreground flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-xs transition-colors',
-                          channel === 'all' ? 'bg-accent' : 'hover:bg-accent/60'
-                        )}
-                      >
-                        <StackedIcons />
-                        <span className="flex-1 text-left font-medium">
-                          All
-                        </span>
-                        {channel === 'all' && (
-                          <Check className="size-3.5 shrink-0" />
-                        )}
-                      </button>
-                      {SOCIAL_PLATFORM.map(platform => (
+                      {enabledChannels.length > 1 && (
+                        <button
+                          onClick={() => {
+                            setChannel('all')
+                            setChannelOpen(false)
+                          }}
+                          className={cn(
+                            'text-foreground flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-xs transition-colors',
+                            channel === 'all'
+                              ? 'bg-accent'
+                              : 'hover:bg-accent/60'
+                          )}
+                        >
+                          <StackedIcons platforms={visiblePlatforms} />
+                          <span className="flex-1 text-left font-medium">
+                            All
+                          </span>
+                          {channel === 'all' && (
+                            <Check className="size-3.5 shrink-0" />
+                          )}
+                        </button>
+                      )}
+                      {visiblePlatforms.map(platform => (
                         <button
                           key={platform.name}
                           onClick={() => {
