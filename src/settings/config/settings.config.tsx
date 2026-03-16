@@ -8,6 +8,7 @@ import {
   Users,
 } from 'lucide-react'
 
+import { Permission } from '@/core/rbac'
 import SocialsSettings from '@/settings/components/socials-settings'
 import Account from '@/settings/containers/accounts'
 import BillingAndCredits from '@/settings/containers/billing-and-credits'
@@ -65,6 +66,7 @@ export const SETTINGS_GROUPS: settingsGroupType[] = [
         icon: CableIcon,
         label: 'Socials',
         contentComponent: SocialsSettings,
+        requiredPermission: Permission.PROJECT_MANAGE_SOCIAL_OAUTH,
       },
     ],
   },
@@ -83,12 +85,14 @@ export const SETTINGS_GROUPS: settingsGroupType[] = [
         icon: Users,
         label: 'Members',
         contentComponent: OrgMembers,
+        requiredPermission: Permission.ORG_MANAGE_MEMBERS,
       },
       {
         id: 'billing',
         icon: DollarSign,
         label: 'Billing',
         contentComponent: BillingAndCredits,
+        requiredPermission: Permission.ORG_MANAGE_BILLING,
       },
     ],
   },

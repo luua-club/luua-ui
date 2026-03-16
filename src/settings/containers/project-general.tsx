@@ -8,8 +8,10 @@ import z from 'zod'
 
 import { projectApi } from '@/core/api/project.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { usePermission } from '@/core/hooks/use-permission'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { UserState } from '@/core/models/user.model'
+import { Permission } from '@/core/rbac'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -22,7 +24,9 @@ type FormValues = z.infer<typeof schema>
 
 function ProjectGeneral(_props: { user: UserState }) {
   const user = useUserState()
+  const { can } = usePermission()
   const queryClient = useQueryClient()
+  const canEditProject = can(Permission.PROJECT_EDIT_DRAFT)
 
   const {
     register,
@@ -100,28 +104,32 @@ function ProjectGeneral(_props: { user: UserState }) {
         })}
       </div>
 
-      {/* Rename current project */}
-      <div className="mt-4 py-4">
-        <h2 className="text-sm font-medium">Rename current project</h2>
-      </div>
-      <Separator />
+      {/* Rename current project — only for project_admin / editor */}
+      {canEditProject && (
+        <>
+          <div className="mt-4 py-4">
+            <h2 className="text-sm font-medium">Rename current project</h2>
+          </div>
+          <Separator />
 
-      <form
-        onSubmit={handleSubmit(d => mutation.mutate(d))}
-        className="max-w-sm space-y-4 py-6"
-      >
-        <div>
-          <Input {...register('name')} placeholder="Project name" />
-          {errors.name && (
-            <p className="text-destructive mt-1 text-xs">
-              {errors.name.message}
-            </p>
-          )}
-        </div>
-        <Button type="submit" disabled={!isDirty || mutation.isPending}>
-          Save changes
-        </Button>
-      </form>
+          <form
+            onSubmit={handleSubmit(d => mutation.mutate(d))}
+            className="max-w-sm space-y-4 py-6"
+          >
+            <div>
+              <Input {...register('name')} placeholder="Project name" />
+              {errors.name && (
+                <p className="text-destructive mt-1 text-xs">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <Button type="submit" disabled={!isDirty || mutation.isPending}>
+              Save changes
+            </Button>
+          </form>
+        </>
+      )}
     </>
   )
 }
