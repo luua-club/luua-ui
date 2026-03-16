@@ -21,6 +21,9 @@ export function getPublishedUrl(
   if (channel === 'twitter') {
     return `https://x.com/i/web/status/${externalId}`
   }
+  if (channel === 'instagram') {
+    return `https://instagram.com/p/${externalId}`
+  }
   return null
 }
 
