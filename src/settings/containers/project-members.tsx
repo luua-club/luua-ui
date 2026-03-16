@@ -25,16 +25,29 @@ import { Skeleton } from '@/shared/ui/skeleton'
 
 type ProjectRole = 'project_admin' | 'editor' | 'viewer'
 
-/** Roles that the viewer can assign, given their own role */
+/** Roles that the viewer can assign when changing existing members */
 function assignableRoles(viewerRole: string): ProjectRole[] {
   if (viewerRole === 'project_admin')
     return ['project_admin', 'editor', 'viewer']
   return []
 }
 
+/** Roles the viewer can assign when adding new members */
+function addableRoles(viewerRole: string): ProjectRole[] {
+  if (viewerRole === 'project_admin')
+    return ['project_admin', 'editor', 'viewer']
+  if (viewerRole === 'editor') return ['editor', 'viewer']
+  return []
+}
+
 /** Whether the viewer can perform actions on the target member */
-function canAct(viewerRole: string, targetRole: string): boolean {
-  if (viewerRole === 'project_admin') return targetRole !== 'project_admin'
+function canAct(
+  viewerRole: string,
+  targetRole: string,
+  isSelf: boolean
+): boolean {
+  if (isSelf) return false
+  if (viewerRole === 'project_admin') return true
   return false
 }
 
@@ -81,8 +94,7 @@ function ProjectMembers(_props: { user: UserState }) {
   const user = useUserState()
   const queryClient = useQueryClient()
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, setAddRoles] = useState<Record<string, ProjectRole>>({})
+  const [addRoles, setAddRoles] = useState<Record<string, ProjectRole>>({})
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.projectMembers],
@@ -97,12 +109,18 @@ function ProjectMembers(_props: { user: UserState }) {
   const viewerRole: ProjectRole =
     (profileProject?.project_role as ProjectRole) ?? 'viewer'
 
+  const canAdd = viewerRole === 'project_admin' || viewerRole === 'editor'
+
   const { data: orgMembersData } = useQuery({
     queryKey: [QUERY_KEYS.orgMembers],
     queryFn: () => orgApi.getOrgMembers(),
     staleTime: 0,
-    enabled: viewerRole === 'project_admin',
   })
+
+  // Build a set of org owner IDs so we can show them as "Owner" in the project team
+  const orgOwnerIds = new Set(
+    (orgMembersData?.data ?? []).filter(m => m.role === 'owner').map(m => m.id)
+  )
 
   const removeMutation = useMutation({
     mutationFn: (userId: string) => projectApi.removeProjectMember(userId),
@@ -137,12 +155,13 @@ function ProjectMembers(_props: { user: UserState }) {
 
   const roles = assignableRoles(viewerRole)
   const hasActions = roles.length > 0
+  const availableAddRoles = addableRoles(viewerRole)
+  const defaultAddRole: ProjectRole =
+    viewerRole === 'project_admin' ? 'editor' : 'viewer'
 
   const projectMemberIds = new Set(members.map(m => m.id))
   const orgMembers = orgMembersData?.data ?? []
-  const unassignableMembers = orgMembers.filter(
-    m => m.role === 'member' && !projectMemberIds.has(m.id)
-  )
+  const unassignedMembers = orgMembers.filter(m => !projectMemberIds.has(m.id))
 
   return (
     <>
@@ -166,7 +185,11 @@ function ProjectMembers(_props: { user: UserState }) {
         ) : (
           <div className="divide-border divide-y">
             {members.map(member => {
-              const actionsAllowed = canAct(viewerRole, member.role)
+              const isSelf = member.id === user?.id
+              const isOrgOwner = orgOwnerIds.has(member.id)
+              const actionsAllowed =
+                !isOrgOwner && canAct(viewerRole, member.role, isSelf)
+              const displayRole = isOrgOwner ? 'Owner' : roleLabel(member.role)
               return (
                 <div
                   key={member.id}
@@ -222,8 +245,12 @@ function ProjectMembers(_props: { user: UserState }) {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <Badge variant={roleBadgeVariant(member.role)}>
-                      {roleLabel(member.role)}
+                    <Badge
+                      variant={
+                        isOrgOwner ? 'default' : roleBadgeVariant(member.role)
+                      }
+                    >
+                      {displayRole}
                     </Badge>
                   )}
 
@@ -246,7 +273,7 @@ function ProjectMembers(_props: { user: UserState }) {
       </div>
 
       {/* Add from organization */}
-      {hasActions && unassignableMembers.length > 0 && (
+      {canAdd && unassignedMembers.length > 0 && (
         <>
           <Separator />
           <div className="py-4">
@@ -254,9 +281,9 @@ function ProjectMembers(_props: { user: UserState }) {
               Add from organization
             </h2>
             <div className="divide-border divide-y">
-              {unassignableMembers.map(member => {
-                // const selectedRole: ProjectRole =
-                //   addRoles[member.id] ?? 'viewer'
+              {unassignedMembers.map(member => {
+                const selectedRole: ProjectRole =
+                  addRoles[member.id] ?? defaultAddRole
                 return (
                   <div
                     key={member.id}
@@ -282,22 +309,19 @@ function ProjectMembers(_props: { user: UserState }) {
                     </div>
 
                     <Select
-                      value="project_admin"
+                      value={selectedRole}
                       onValueChange={role =>
                         setAddRoles(prev => ({
                           ...prev,
                           [member.id]: role as ProjectRole,
                         }))
                       }
-                      disabled
                     >
                       <SelectTrigger size="sm" className="w-28">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {(
-                          ['project_admin', 'editor', 'viewer'] as ProjectRole[]
-                        ).map(r => (
+                        {availableAddRoles.map(r => (
                           <SelectItem key={r} value={r}>
                             {roleLabel(r)}
                           </SelectItem>
@@ -311,7 +335,7 @@ function ProjectMembers(_props: { user: UserState }) {
                       onClick={() =>
                         addMutation.mutate({
                           userId: member.id,
-                          role: 'project_admin',
+                          role: selectedRole,
                         })
                       }
                     >

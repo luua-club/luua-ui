@@ -28,7 +28,7 @@ export type OrganizationSummary = z.infer<typeof OrganizationSummarySchema>
  * Organization detail schema from /organizations/current
  */
 export const OrganizationDetailSchema = OrganizationSummarySchema.extend({
-  plan: z.enum(['Free', 'Pro']).catch('Free'),
+  plan: z.enum(['Free', 'Pro', 'Teams']).catch('Free'),
   seat_limit: z.number(),
   seat_used: z.number(),
 })

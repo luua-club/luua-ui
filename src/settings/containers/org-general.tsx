@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CheckCircle2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -16,6 +15,8 @@ import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Separator } from '@/shared/ui/separator'
+
+import EntityDetailSection from '../components/entity-detail-section'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -56,13 +57,7 @@ function OrgGeneral(_props: { user: UserState }) {
   if (!user || !user.currentOrg) return null
 
   const { currentOrg, organizations } = user
-  const seatPercent =
-    currentOrg.seat_limit > 0
-      ? Math.min(
-          100,
-          Math.round((currentOrg.seat_used / currentOrg.seat_limit) * 100)
-        )
-      : 0
+  const otherOrgs = organizations.filter(o => o.id !== currentOrg.id)
 
   return (
     <>
@@ -72,96 +67,73 @@ function OrgGeneral(_props: { user: UserState }) {
       </div>
       <Separator />
 
-      {/* Organisations list */}
+      {/* Current org detail card */}
       <div className="py-4">
-        <h2 className="text-sm font-medium">Organisations</h2>
-      </div>
-
-      <div className="divide-border divide-y">
-        {organizations.map(org => {
-          const isCurrent = org.id === currentOrg.id
-          return (
-            <div key={org.id} className="flex items-center gap-3 py-3">
-              {isCurrent ? (
-                <CheckCircle2 className="text-primary size-4 shrink-0" />
-              ) : (
-                <div className="size-4 shrink-0" />
-              )}
-
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{org.name}</p>
-                <p className="text-muted-foreground text-xs capitalize">
-                  {org.org_role}
-                </p>
+        <EntityDetailSection
+          label="Organisation"
+          name={currentOrg.name}
+          role={currentOrg.org_role}
+          plan={currentOrg.plan}
+          seatUsed={currentOrg.seat_used}
+          seatLimit={currentOrg.seat_limit}
+        >
+          {canManageOrg && (
+            <form
+              onSubmit={handleSubmit(d => mutation.mutate(d))}
+              className="max-w-sm space-y-3"
+            >
+              <label className="text-muted-foreground text-sm font-medium">
+                Rename organisation
+              </label>
+              <div>
+                <Input {...register('name')} placeholder="Organisation name" />
+                {errors.name && (
+                  <p className="text-destructive mt-1 text-xs">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
-
-              {isCurrent ? (
-                <Badge variant="secondary">Current</Badge>
-              ) : org.no_projects_assigned ? (
-                <Badge variant="outline">No projects assigned</Badge>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => user.changeOrg(org.id)}
-                >
-                  Switch
-                </Button>
-              )}
-            </div>
-          )
-        })}
+              <Button type="submit" disabled={!isDirty || mutation.isPending}>
+                Save changes
+              </Button>
+            </form>
+          )}
+        </EntityDetailSection>
       </div>
 
-      {/* Plan + Seat usage for current org */}
-      <div className="mt-4 space-y-4 py-4">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">Current Plan</span>
-          <Badge variant={currentOrg.plan === 'Pro' ? 'default' : 'secondary'}>
-            {currentOrg.plan}
-          </Badge>
-        </div>
-
-        <div className="max-w-sm space-y-1.5">
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">Seats</span>
-            <span className="text-muted-foreground">
-              {currentOrg.seat_used} / {currentOrg.seat_limit}
-            </span>
-          </div>
-          <div className="bg-muted h-2 overflow-hidden rounded-full">
-            <div
-              className="bg-primary h-full transition-all"
-              style={{ width: `${seatPercent}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Rename current org — only for owners/admins */}
-      {canManageOrg && (
+      {/* Other organisations */}
+      {otherOrgs.length > 0 && (
         <>
-          <div className="py-4">
-            <h2 className="text-sm font-medium">Rename current organisation</h2>
+          <div className="pt-2 pb-3">
+            <h2 className="text-muted-foreground text-sm font-medium">
+              Other organisations
+            </h2>
           </div>
-          <Separator />
 
-          <form
-            onSubmit={handleSubmit(d => mutation.mutate(d))}
-            className="max-w-sm space-y-4 py-6"
-          >
-            <div>
-              <Input {...register('name')} placeholder="Organisation name" />
-              {errors.name && (
-                <p className="text-destructive mt-1 text-xs">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-            <Button type="submit" disabled={!isDirty || mutation.isPending}>
-              Save changes
-            </Button>
-          </form>
+          <div className="divide-border divide-y">
+            {otherOrgs.map(org => (
+              <div key={org.id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{org.name}</p>
+                  <p className="text-muted-foreground text-xs capitalize">
+                    {org.org_role}
+                  </p>
+                </div>
+
+                {org.no_projects_assigned ? (
+                  <Badge variant="outline">No projects assigned</Badge>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => user.changeOrg(org.id)}
+                  >
+                    Switch
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
         </>
       )}
     </>

@@ -23,7 +23,7 @@ export type User = z.infer<typeof UserSchema>
  * User state interface (plan comes from currentOrg, injected by useUserState hook)
  */
 export interface UserState extends User {
-  plan: 'Free' | 'Pro'
+  plan: 'Free' | 'Pro' | 'Teams'
   logout: () => void
 }
 

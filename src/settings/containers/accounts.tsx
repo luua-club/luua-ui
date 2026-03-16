@@ -1,45 +1,12 @@
-import { useMutation } from '@tanstack/react-query'
-import { LogOut, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { LogOut } from 'lucide-react'
 
-import { userApi } from '@/core/api/user.api'
 import { UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
-import ConfirmDialog from '@/shared/components/confirm-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 
 function Account({ user }: { user: UserState }) {
-  // --- State ---
-  const [confirmOpen, setConfirmOpen] = useState(false)
-
-  // --- Mutation ---
-  /**
-   * Handle account deletion with subscription validation
-   */
-  const deleteAccountMutation = useMutation({
-    mutationFn: () => userApi.deleteAccount(),
-    onSuccess: () => {
-      user.logout()
-    },
-    onError: () => {
-      toast.error('Failed to delete account')
-    },
-    onSettled: () => {
-      setConfirmOpen(false)
-    },
-  })
-
-  // --- Functions ---
-  /**
-   * Handle account deletion
-   */
-  const handleDeleteAccount = () => {
-    deleteAccountMutation.mutate()
-  }
-
   return (
     <>
       {/* Profile Section Header */}
@@ -85,33 +52,6 @@ function Account({ user }: { user: UserState }) {
           Log out
         </Button>
       </div>
-
-      {/* Delete Account Option (requires no active subscription) */}
-      <div className="flex items-center justify-between py-3">
-        <div>
-          <h3 className="font-medium">Delete my account</h3>
-          <p className="text-muted-foreground text-sm">
-            Permanently delete the account and remove all data.
-          </p>
-        </div>
-        <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
-          <Trash2 className="mr-2 size-4" />
-          Delete Account
-        </Button>
-      </div>
-
-      {/* Confirmation Dialog for Account Deletion */}
-      <ConfirmDialog
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        title="Delete account?"
-        description="This action cannot be undone. This will permanently delete your account and remove all data."
-        confirmLabel="Delete"
-        confirmDisabled={deleteAccountMutation.isPending}
-        onConfirm={() => {
-          handleDeleteAccount()
-        }}
-      />
     </>
   )
 }
