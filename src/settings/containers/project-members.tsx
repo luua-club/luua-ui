@@ -43,7 +43,7 @@ function addableRoles(viewerRole: string): ProjectRole[] {
 /** Whether the viewer can perform actions on the target member */
 function canAct(
   viewerRole: string,
-  targetRole: string,
+  _targetRole: string,
   isSelf: boolean
 ): boolean {
   if (isSelf) return false
