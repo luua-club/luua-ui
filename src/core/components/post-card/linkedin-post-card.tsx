@@ -29,6 +29,7 @@ import { PostCardMode } from './post-card.types'
 import { type UploadConfig } from './post-card-actions'
 import { PostPlatformLabel } from './post-platform-label'
 import { PostTextarea } from './post-textarea'
+import { SeeMoreContent } from './see-more-content'
 
 interface CommonCardProps {
   content: string
@@ -161,19 +162,23 @@ function LinkedInPreviewCard({
         <div className="bg-card/95 dark:bg-card relative rounded-md border">
           <LinkedInPostCardHeader channel={channelProfile} />
 
-          <Textarea
-            className="resize-none border-0 border-transparent !bg-transparent pt-0 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
-            placeholder="Your written content will appear here"
-            ref={textareaRef}
-            value={content}
-            maxLength={POST_WORD_COUNT.LinkedIn}
-            readOnly
-            tabIndex={-1}
-            onMouseDown={e => {
-              e.preventDefault()
-              onRequestEdit?.()
-            }}
-          />
+          <div className="px-4 pb-2">
+            <SeeMoreContent content={content} collapsedMaxHeight={80}>
+              <Textarea
+                className="resize-none border-0 border-transparent !bg-transparent p-0 text-sm shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
+                placeholder="Your written content will appear here"
+                ref={textareaRef}
+                value={content}
+                maxLength={POST_WORD_COUNT.LinkedIn}
+                readOnly
+                tabIndex={-1}
+                onMouseDown={e => {
+                  e.preventDefault()
+                  onRequestEdit?.()
+                }}
+              />
+            </SeeMoreContent>
+          </div>
 
           {imagePreviews.length > 0 && (
             <div className="mt-2">

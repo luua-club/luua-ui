@@ -25,11 +25,12 @@ import { Textarea } from '@/shared/ui/textarea'
 import { cn } from '@/shared/utils'
 
 import { extractUserInitial } from '../../utils/common.util'
-import PostImagePreview from '../post-preview/PostImagePreview'
+import { InstagramCarousel } from './instagram-carousel'
 import { PostCardMode } from './post-card.types'
 import type { PostCardActionsHandle, UploadConfig } from './post-card-actions'
 import { PostPlatformLabel } from './post-platform-label'
 import { PostTextarea } from './post-textarea'
+import { SeeMoreContent } from './see-more-content'
 import TwitterPostCardSkeleton from './twitter-post-card-skeleton'
 
 interface CommonCardProps {
@@ -196,8 +197,8 @@ function InstagramEditorCard({
           {/* Image Area */}
           {imagePreviews.length > 0 ? (
             <div className="overflow-hidden">
-              <PostImagePreview
-                imagePreviews={imagePreviews.map(img => img.url)}
+              <InstagramCarousel
+                images={imagePreviews.map(img => img.url)}
                 onRemove={isActionLoading ? undefined : onRemoveImage}
               />
             </div>
@@ -216,7 +217,7 @@ function InstagramEditorCard({
                 <div className="space-y-1">
                   <p className="text-sm font-semibold">Upload photo</p>
                   <p className="text-muted-foreground text-xs">
-                    JPG, PNG • 8MB max • 1 image
+                    JPG, PNG • 8MB max • up to 10 images
                   </p>
                 </div>
                 <span className="bg-card/80 text-foreground/80 border-muted-foreground/20 rounded-full border px-3 py-1 text-xs font-medium">
@@ -302,9 +303,7 @@ function InstagramPreviewCard({
           {/* Image display */}
           {imagePreviews.length > 0 && (
             <div className="overflow-hidden">
-              <PostImagePreview
-                imagePreviews={imagePreviews.map(img => img.url)}
-              />
+              <InstagramCarousel images={imagePreviews.map(img => img.url)} />
             </div>
           )}
 
@@ -317,18 +316,20 @@ function InstagramPreviewCard({
               <p className="mb-0.5 text-sm font-semibold">
                 {channelProfile.user_name}
               </p>
-              <Textarea
-                className="min-h-0 resize-none border-0 border-transparent !bg-transparent p-0 text-sm leading-5 shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
-                ref={textareaRef}
-                value={content}
-                maxLength={POST_WORD_COUNT.Instagram}
-                readOnly
-                tabIndex={-1}
-                onMouseDown={e => {
-                  e.preventDefault()
-                  onRequestEdit?.()
-                }}
-              />
+              <SeeMoreContent content={content} collapsedMaxHeight={60}>
+                <Textarea
+                  className="min-h-0 resize-none border-0 border-transparent !bg-transparent p-0 text-sm leading-5 shadow-none ring-0 transition-colors duration-200 outline-none focus:bg-transparent focus:ring-0 focus-visible:border-0 focus-visible:ring-0 dark:!bg-transparent dark:focus:bg-transparent"
+                  ref={textareaRef}
+                  value={content}
+                  maxLength={POST_WORD_COUNT.Instagram}
+                  readOnly
+                  tabIndex={-1}
+                  onMouseDown={e => {
+                    e.preventDefault()
+                    onRequestEdit?.()
+                  }}
+                />
+              </SeeMoreContent>
             </div>
           ) : null}
         </div>
