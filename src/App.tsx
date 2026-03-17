@@ -26,6 +26,7 @@ import {
 } from './core/store/auth-slice'
 import { loadAuthData } from './core/utils/auth-data.util'
 import { logout } from './core/utils/common.util'
+import { syncExtCookie } from './shared/utils/extension-cookie.util'
 import router from './router'
 import GlobalLoader from './shared/components/global-loader'
 import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
@@ -80,10 +81,9 @@ export function AppContent() {
     dispatch(setAuthInfo(data))
     cascadeCompleted.current = true
 
-    // NOW that LS and Redux have correct org/project data, invalidate
-    // all cached queries so they refetch with correct headers.
-    // This was previously done in invalidateAndResync (before the cascade),
-    // which caused a race: dependent queries fired with stale/partial LS data.
+    // LS now has complete user + org + project — push to extension cookie
+    syncExtCookie(data)
+
     queryClient.invalidateQueries({
       predicate: q => q.queryKey[0] !== QUERY_KEYS.user,
     })

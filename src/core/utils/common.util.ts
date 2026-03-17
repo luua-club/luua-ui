@@ -1,5 +1,6 @@
 import posthog from 'posthog-js'
 
+import { clearExtCookie } from '@/shared/utils/extension-cookie.util'
 import { removeLocalStorageItem } from '@/shared/utils/localstorage.util'
 
 import { LUUA_AUTH_INFO_KEY } from '../config/constant'
@@ -11,6 +12,7 @@ import { LUUA_AUTH_INFO_KEY } from '../config/constant'
 const logout = () => {
   posthog.reset()
   removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
+  clearExtCookie()
   window.location.href = '/login'
 }
 
