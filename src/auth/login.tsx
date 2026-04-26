@@ -360,7 +360,7 @@ const LoginHeader = () => {
       </div>
 
       <h1 className="text-foreground mb-2 text-center text-3xl font-semibold tracking-tight sm:text-5xl">
-        A Social media tool
+        Social media manager
       </h1>
 
       {/* Description */}
