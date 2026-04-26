@@ -5,12 +5,14 @@ import {
   DollarSign,
   FolderOpen,
   MailPlus,
+  ScrollText,
   Users,
 } from 'lucide-react'
 
 import { Permission } from '@/core/rbac'
 import SocialsSettings from '@/settings/components/socials-settings'
 import Account from '@/settings/containers/accounts'
+import AuditLogs from '@/settings/containers/audit-logs'
 import BillingAndCredits from '@/settings/containers/billing-and-credits'
 import OrgGeneral from '@/settings/containers/org-general'
 import OrgMembers from '@/settings/containers/org-members'
@@ -67,6 +69,13 @@ export const SETTINGS_GROUPS: settingsGroupType[] = [
         label: 'Socials',
         contentComponent: SocialsSettings,
         requiredPermission: Permission.PROJECT_MANAGE_SOCIAL_OAUTH,
+      },
+      {
+        id: 'audit-logs',
+        icon: ScrollText,
+        label: 'Audit Logs',
+        contentComponent: AuditLogs,
+        requiredPermission: Permission.PROJECT_VIEW_AUDIT_LOGS,
       },
     ],
   },

@@ -14,6 +14,7 @@ export type settingsTabType =
   | 'org-invitations'
   | 'project-general'
   | 'project-members'
+  | 'audit-logs'
 
 export type settingAsideType = {
   id: settingsTabType

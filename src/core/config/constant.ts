@@ -92,6 +92,7 @@ export const QUERY_KEYS = {
   calendarEvents: 'calendar-events',
   postList: 'post-list',
   analytics: 'analytics',
+  auditLogs: 'audit-logs',
 }
 
 /**
