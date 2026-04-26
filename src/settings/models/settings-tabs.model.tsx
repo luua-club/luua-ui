@@ -7,6 +7,7 @@ import { Permission } from '@/core/rbac'
 export type settingsTabType =
   | 'account'
   | 'pending-invitations'
+  | 'login-page'
   | 'socials'
   | 'billing'
   | 'org-general'

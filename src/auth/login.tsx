@@ -46,6 +46,7 @@ import { GoogleLoginButton } from './components/google-login-button'
 import IconLogo from './components/logo-header'
 import RightPanel from './components/right-panel'
 import { OTPVerification } from './containers/otp-verification'
+import { getLoginPageHeaderText } from './utils/login-page-header.util'
 
 function Login() {
   // ---- States ----
@@ -342,6 +343,8 @@ function Login() {
 }
 
 const LoginHeader = () => {
+  const headerText = getLoginPageHeaderText()
+
   return (
     <>
       {/* Logo */}
@@ -360,7 +363,7 @@ const LoginHeader = () => {
       </div>
 
       <h1 className="text-foreground mb-2 text-center text-3xl font-semibold tracking-tight sm:text-5xl">
-        A Social media tool
+        {headerText}
       </h1>
 
       {/* Description */}

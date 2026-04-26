@@ -4,6 +4,7 @@ import {
   CircleUser,
   DollarSign,
   FolderOpen,
+  LogIn,
   MailPlus,
   ScrollText,
   Users,
@@ -14,6 +15,7 @@ import SocialsSettings from '@/settings/components/socials-settings'
 import Account from '@/settings/containers/accounts'
 import AuditLogs from '@/settings/containers/audit-logs'
 import BillingAndCredits from '@/settings/containers/billing-and-credits'
+import LoginPageSettings from '@/settings/containers/login-page-settings'
 import OrgGeneral from '@/settings/containers/org-general'
 import OrgMembers from '@/settings/containers/org-members'
 import PendingInvitations from '@/settings/containers/pending-invitations'
@@ -44,6 +46,18 @@ export const SETTINGS_GROUPS: settingsGroupType[] = [
         icon: MailPlus,
         label: 'Pending Invitations',
         contentComponent: PendingInvitations,
+      },
+    ],
+  },
+  {
+    id: 'appearance',
+    label: 'Appearance',
+    items: [
+      {
+        id: 'login-page',
+        icon: LogIn,
+        label: 'Login Page',
+        contentComponent: LoginPageSettings,
       },
     ],
   },
