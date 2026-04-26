@@ -38,7 +38,7 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
     return (
       <>
         <div className="py-4">
-          <h1 className="text-lg font-medium">Analysis Summary</h1>
+          <h1 className="text-lg font-medium">Summary</h1>
         </div>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Skeleton className="h-20 w-full rounded-md" />
@@ -116,7 +116,7 @@ const Summary = ({ data, isLoading, onHelperTextClick }: ISummaryProps) => {
       {/* Heading */}
       <div className="flex items-center justify-between py-4">
         <div className="flex flex-col gap-2">
-          <h1 className="text-lg font-medium">Analysis Summary</h1>
+          <h1 className="text-lg font-medium">Summary</h1>
           {status !== UserStyleStatus.INITIAL &&
             status !== UserStyleStatus.IN_PROGRESS && (
               <>
