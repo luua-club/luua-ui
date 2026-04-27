@@ -2,9 +2,7 @@ import { AuditLogsResponse } from '../models/audit-log.model'
 import { BaseApiService } from './base.api'
 
 interface GetAuditLogsParams {
-  /** Single event; takes precedence over `event_types`. */
-  event_type?: string
-  /** OR filter; sent as comma-separated `event_types` query param. */
+  /** OR filter; repeat `event_types` or comma-separated values per FastAPI list query. */
   event_types?: string[]
   limit: number
   offset: number
@@ -23,9 +21,7 @@ class AuditApi extends BaseApiService {
       limit: params.limit,
       offset: params.offset,
     }
-    if (params.event_type) {
-      query.event_type = params.event_type
-    } else if (params.event_types?.length) {
+    if (params.event_types?.length) {
       // Repeat `event_types` for FastAPI list[Query]; avoid axios `event_types[]=` default.
       query.event_types = params.event_types
     }

@@ -56,21 +56,16 @@ function AuditLogs(_props: { user: UserState }) {
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: [QUERY_KEYS.auditLogs, filterKey, offset],
     queryFn: () => {
-      if (queryEventType) {
-        return auditApi.getAuditLogs({
-          event_type: queryEventType,
-          limit: PAGE_SIZE,
-          offset,
-        })
-      }
-      if (categoryEventTypes.length > 0) {
-        return auditApi.getAuditLogs({
-          event_types: categoryEventTypes,
-          limit: PAGE_SIZE,
-          offset,
-        })
-      }
-      return auditApi.getAuditLogs({ limit: PAGE_SIZE, offset })
+      const event_types = queryEventType
+        ? [queryEventType]
+        : categoryEventTypes.length > 0
+          ? categoryEventTypes
+          : undefined
+      return auditApi.getAuditLogs({
+        ...(event_types?.length ? { event_types } : {}),
+        limit: PAGE_SIZE,
+        offset,
+      })
     },
     staleTime: 30_000,
   })
