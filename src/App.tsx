@@ -26,11 +26,11 @@ import {
 } from './core/store/auth-slice'
 import { loadAuthData } from './core/utils/auth-data.util'
 import { logout } from './core/utils/common.util'
-import { syncExtCookie } from './shared/utils/extension-cookie.util'
 import router from './router'
 import GlobalLoader from './shared/components/global-loader'
 import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
 import { ThemeProvider } from './shared/provider/theme-provider'
+import { syncExtCookie } from './shared/utils/extension-cookie.util'
 import { getLocalStorageItem } from './shared/utils/localstorage.util'
 
 // Initialize PostHog only in production
