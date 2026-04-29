@@ -1,9 +1,6 @@
-import { useIsFetching, useMutation } from '@tanstack/react-query'
 import { ArrowLeft, Loader } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { authApi } from '@/core/api/auth.api'
-import { QUERY_KEYS } from '@/core/config/constant'
 import { Button } from '@/shared/ui/button'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/shared/ui/input-otp'
 import { cn } from '@/shared/utils'
@@ -46,9 +43,12 @@ export function OTPVerification({ auth }: OTPVerificationProps) {
   const { state, actions } = auth
   const email = state.email
   const isResending = state.isMagicLinkPending
-  const onVerifySuccess = actions.onOtpVerifySuccess
+  const isVerifying = state.isVerifyingOtp
+  const hasError = state.otpError
   const onResend = actions.onResendOtp
   const onBack = actions.onBackFromOtp
+  const onVerifyOtp = actions.onVerifyOtp
+  const resetOtpError = actions.resetOtpError
 
   const otpLength = OTP_VERIFICATION_INPUT_CONFIG.length
 
@@ -57,23 +57,8 @@ export function OTPVerification({ auth }: OTPVerificationProps) {
   const [resendCooldown, setResendCooldown] = useState(
     OTP_RESEND_COOLDOWN_SECONDS
   )
-  const [hasError, setHasError] = useState(false)
 
   const cooldownIntervalRef = useRef<number | null>(null)
-
-  // ---- Verify mutation ----
-  const verifyOtpMutation = useMutation({
-    mutationFn: (token: string) => authApi.verifyMagicLink({ token }),
-    onSuccess: response => {
-      setHasError(false)
-      onVerifySuccess(response.data)
-    },
-    onError: () => {
-      setOtpValue('')
-      setHasError(true)
-    },
-  })
-  const isFetchingUser = useIsFetching({ queryKey: [QUERY_KEYS.user] })
 
   // ---- Resend cooldown ----
   const startResendCooldown = useCallback(() => {
@@ -108,27 +93,32 @@ export function OTPVerification({ auth }: OTPVerificationProps) {
     }
   }, [startResendCooldown])
 
+  // Clear the input when verification fails so the user can retype.
+  useEffect(() => {
+    if (hasError) setOtpValue('')
+  }, [hasError])
+
   // ---- Handlers ----
   const handleOtpChange = (value: string) => {
     setOtpValue(value)
     if (hasError) {
-      setHasError(false)
+      resetOtpError()
     }
     if (value.length === otpLength) {
-      verifyOtpMutation.mutate(value)
+      onVerifyOtp(value)
     }
   }
 
   const handleResendOtp = () => {
     if (resendCooldown > 0 || isResending) return
     setOtpValue('')
+    resetOtpError()
     onResend()
     startResendCooldown()
   }
 
   // ---- Derived ----
-  const isVerifying = verifyOtpMutation.isPending
-  const isLoading = isVerifying || isFetchingUser > 0
+  const isLoading = isVerifying
 
   return (
     <div className="flex flex-col items-start gap-6 text-start">

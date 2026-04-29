@@ -13,7 +13,9 @@ import {
   LUUA_AUTH_INFO_KEY,
   LUUA_EXTENSION_ID_KEY,
   LUUA_EXTENSION_LOGIN_KEY,
+  QUERY_KEYS,
 } from '@/core/config/constant'
+import { queryClient } from '@/core/config/global.config'
 import { useAppDispatch } from '@/core/hooks/global-state.hook'
 import {
   AuthInfo,
@@ -21,7 +23,7 @@ import {
   MagicLinkRequest,
   MagicLinkRequestSchema,
 } from '@/core/models/auth.model'
-import { clearAuth } from '@/core/store/auth-slice'
+import { clearAuth, setAuthInfo } from '@/core/store/auth-slice'
 import { loadAuthData } from '@/core/utils/auth-data.util'
 import { syncExtCookie } from '@/shared/utils/extension-cookie.util'
 import {
@@ -41,6 +43,8 @@ export type UseLoginAuthResult = {
     email: string
     isLoading: boolean
     isMagicLinkPending: boolean
+    isVerifyingOtp: boolean
+    otpError: boolean
   }
   form: {
     register: UseFormRegister<MagicLinkRequest>
@@ -48,17 +52,35 @@ export type UseLoginAuthResult = {
     onMagicLinkSubmit: (e?: BaseSyntheticEvent) => Promise<void> | void
   }
   actions: {
-    onGoogleSuccess: (credentialResponse: CredentialResponse) => Promise<void>
+    onGoogleSuccess: (credentialResponse: CredentialResponse) => void
     onGoogleError: () => void
     onResendOtp: () => void
     onBackFromOtp: () => void
-    onOtpVerifySuccess: (res: LoginResponse) => void | Promise<void>
+    onVerifyOtp: (otp: string) => void
+    resetOtpError: () => void
   }
 }
 
 /**
  * All login route business logic: extension handshake, Google + magic-link flows,
  * form state, and post-auth redirect (web + extension).
+ *
+ * Both Google sign-in and OTP verification share `completeLogin`, which:
+ *   1. Persists the access token to localStorage.
+ *   2. Runs the user/org/project cascade THROUGH React Query
+ *      (`queryClient.fetchQuery({ queryKey: [QUERY_KEYS.user], ... })`) so the
+ *      result is cached. After we navigate to /dashboard, App.tsx's
+ *      `useQuery({ queryKey: [QUERY_KEYS.user], staleTime: Infinity })` is a
+ *      cache hit — preventing the duplicate cascade we used to see in the HAR.
+ *
+ * The cascade lives inside the mutation's `mutationFn` (not `onSuccess`) so
+ * `mutation.isPending` stays true for the entire login → cascade → redirect
+ * flow. The login button loader keeps spinning until the user is actually
+ * navigated, instead of stopping the moment `POST /login/google` resolves.
+ *
+ * The cascade is run eagerly (before navigate) because the extension flow
+ * builds `chrome-extension://${id}/auth.html?...&email=${authInfo.user.email}`
+ * and needs the resolved email before `window.location.href = ...`.
  */
 export function useLoginAuth(): UseLoginAuthResult {
   // ---- State ----
@@ -85,33 +107,36 @@ export function useLoginAuth(): UseLoginAuthResult {
   })
   const email = watch('email')
 
-  // ---- Handlers (declared before mutations where referenced) ----
+  // ---- Shared post-token helpers ----
 
   /**
-   * Saves the token and redirects to the dashboard or extension.
-   *
-   * Normal web flow: saves token → redirects to /dashboard.
-   * The React Query cascade in App.tsx fires automatically on dashboard load.
-   *
-   * Extension flow: needs the user's email before redirecting, so it runs the
-   * 3-API cascade eagerly via loadAuthData().
+   * Persist the token, then run the user/org/project cascade through React
+   * Query so App.tsx's `useQuery([QUERY_KEYS.user])` finds it in cache and
+   * does not re-fetch after the redirect.
    */
-  const updateDataAndRedirect = useCallback(
-    async (res: LoginResponse) => {
+  const completeLogin = useCallback(
+    async (loginResponse: LoginResponse): Promise<AuthInfo> => {
       setLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY, {
-        access_token: res.access_token,
-        token_type: res.token_type,
-        new_user: res.new_user,
+        access_token: loginResponse.access_token,
+        token_type: loginResponse.token_type,
+        new_user: loginResponse.new_user,
       })
+      return queryClient.fetchQuery({
+        queryKey: [QUERY_KEYS.user],
+        queryFn: loadAuthData,
+        staleTime: Infinity,
+      })
+    },
+    []
+  )
 
-      let authInfo: AuthInfo | null = null
-      try {
-        authInfo = await loadAuthData()
-        syncExtCookie(authInfo)
-      } catch {
-        // Cascade failed — continue to navigate; App.tsx will retry
-      }
-
+  /**
+   * Synchronous post-cascade redirect. For extension logins, builds the
+   * chrome-extension://...auth.html URL using the resolved `authInfo.user.email`.
+   * For normal web logins, navigates to /dashboard.
+   */
+  const redirectAfterLogin = useCallback(
+    (loginResponse: LoginResponse, authInfo: AuthInfo) => {
       const storedExtensionId = getSessionStorageItem<string>(
         LUUA_EXTENSION_ID_KEY
       )
@@ -121,15 +146,14 @@ export function useLoginAuth(): UseLoginAuthResult {
         (typeof extensionLoginFlag === 'boolean' && extensionLoginFlag === true)
 
       if (isFromExtension && storedExtensionId) {
-        if (!authInfo) {
-          removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
-          toast.error('Something went wrong, Please try again !')
-          return
-        }
         removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
         removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
         const emailFromAuth = authInfo.user?.email ?? ''
-        window.location.href = `chrome-extension://${storedExtensionId}/auth.html?token=${encodeURIComponent(res.access_token)}&userId=${encodeURIComponent(emailFromAuth)}&email=${encodeURIComponent(emailFromAuth)}`
+        window.location.href =
+          `chrome-extension://${storedExtensionId}/auth.html` +
+          `?token=${encodeURIComponent(loginResponse.access_token)}` +
+          `&userId=${encodeURIComponent(emailFromAuth)}` +
+          `&email=${encodeURIComponent(emailFromAuth)}`
         return
       }
 
@@ -138,14 +162,48 @@ export function useLoginAuth(): UseLoginAuthResult {
     [router]
   )
 
+  /**
+   * Roll back partial auth state when the post-token cascade fails.
+   * Keeps the user on /login instead of leaving them half-logged-in.
+   */
+  const rollbackPartialAuth = useCallback(() => {
+    removeLocalStorageItem(LUUA_AUTH_INFO_KEY)
+    queryClient.removeQueries({ queryKey: [QUERY_KEYS.user] })
+  }, [])
+
   // ---- Mutations ----
   const loginMutation = useMutation({
-    mutationFn: (token: string) => authApi.login({ token }),
-    onSuccess: response => {
-      void updateDataAndRedirect(response.data)
+    mutationFn: async (token: string) => {
+      const res = await authApi.login({ token })
+      const authInfo = await completeLogin(res.data)
+      return { loginResponse: res.data, authInfo }
+    },
+    onSuccess: ({ loginResponse, authInfo }) => {
+      dispatch(setAuthInfo(authInfo))
+      syncExtCookie(authInfo)
+      redirectAfterLogin(loginResponse, authInfo)
     },
     onError: () => {
+      rollbackPartialAuth()
       toast.error('Something went wrong, Please try again !')
+    },
+  })
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: async (otp: string) => {
+      const res = await authApi.verifyMagicLink({ token: otp })
+      const authInfo = await completeLogin(res.data)
+      return { loginResponse: res.data, authInfo }
+    },
+    onSuccess: ({ loginResponse, authInfo }) => {
+      dispatch(setAuthInfo(authInfo))
+      syncExtCookie(authInfo)
+      redirectAfterLogin(loginResponse, authInfo)
+    },
+    onError: () => {
+      // Keep the user on the OTP screen; the OTP container reads
+      // `verifyOtpMutation.isError` via `state.otpError` to show inline error.
+      rollbackPartialAuth()
     },
   })
 
@@ -163,8 +221,9 @@ export function useLoginAuth(): UseLoginAuthResult {
     },
   })
 
+  // ---- Action handlers ----
   const onGoogleSuccess = useCallback(
-    async (credentialResponse: CredentialResponse) => {
+    (credentialResponse: CredentialResponse) => {
       if (!credentialResponse.credential) return
       loginMutation.mutate(credentialResponse.credential)
     },
@@ -181,7 +240,19 @@ export function useLoginAuth(): UseLoginAuthResult {
 
   const onBackFromOtp = useCallback(() => {
     setShowOtpInput(false)
-  }, [])
+    verifyOtpMutation.reset()
+  }, [verifyOtpMutation])
+
+  const onVerifyOtp = useCallback(
+    (otp: string) => {
+      verifyOtpMutation.mutate(otp)
+    },
+    [verifyOtpMutation]
+  )
+
+  const resetOtpError = useCallback(() => {
+    if (verifyOtpMutation.isError) verifyOtpMutation.reset()
+  }, [verifyOtpMutation])
 
   // ---- Effects ----
   /**
@@ -231,6 +302,8 @@ export function useLoginAuth(): UseLoginAuthResult {
       email,
       isLoading: loginMutation.isPending,
       isMagicLinkPending: magicLinkMutation.isPending,
+      isVerifyingOtp: verifyOtpMutation.isPending,
+      otpError: verifyOtpMutation.isError,
     },
     form: {
       register,
@@ -244,7 +317,8 @@ export function useLoginAuth(): UseLoginAuthResult {
       onGoogleError,
       onResendOtp,
       onBackFromOtp,
-      onOtpVerifySuccess: updateDataAndRedirect,
+      onVerifyOtp,
+      resetOtpError,
     },
   }
 }
