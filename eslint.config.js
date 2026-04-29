@@ -1,15 +1,15 @@
 import js from '@eslint/js'
+import tanstackQuery from '@tanstack/eslint-plugin-query'
 import { defineConfig } from 'eslint/config'
 import prettierConfig from 'eslint-config-prettier'
 import jsonc from 'eslint-plugin-jsonc'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 import pluginReact from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import globals from 'globals'
 import jsoncParser from 'jsonc-eslint-parser'
 import tseslint from 'typescript-eslint'
-import tanstackQuery from '@tanstack/eslint-plugin-query'
-import reactHooks from 'eslint-plugin-react-hooks'
 
 export default defineConfig([
   // ✅ Base JS/TS config
