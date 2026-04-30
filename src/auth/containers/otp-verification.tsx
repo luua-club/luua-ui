@@ -60,6 +60,20 @@ export function OTPVerification({ auth }: OTPVerificationProps) {
 
   const cooldownIntervalRef = useRef<number | null>(null)
 
+  const focusOtpInput = useCallback(() => {
+    const otpInput = document.querySelector<HTMLInputElement>(
+      'input[autocomplete="one-time-code"]'
+    )
+    if (!otpInput) return
+
+    otpInput.focus()
+    try {
+      otpInput.setSelectionRange(0, 0)
+    } catch {
+      // Some input modes may not support setSelectionRange.
+    }
+  }, [])
+
   // ---- Resend cooldown ----
   const startResendCooldown = useCallback(() => {
     if (cooldownIntervalRef.current) {
@@ -95,8 +109,22 @@ export function OTPVerification({ auth }: OTPVerificationProps) {
 
   // Clear the input when verification fails so the user can retype.
   useEffect(() => {
-    if (hasError) setOtpValue('')
+    if (!hasError) return
+
+    setOtpValue('')
   }, [hasError])
+
+  // Focus only after verify loading ends; focusing while disabled causes the
+  // visual caret to appear without accepting keyboard input.
+  useEffect(() => {
+    if (!hasError || isVerifying) return
+
+    requestAnimationFrame(() => {
+      focusOtpInput()
+      // Fallback pass for browsers that settle focus after paint.
+      setTimeout(focusOtpInput, 0)
+    })
+  }, [hasError, isVerifying, focusOtpInput])
 
   // ---- Handlers ----
   const handleOtpChange = (value: string) => {
@@ -217,6 +245,8 @@ function OtpVerificationCodeSection({
   slotIndicesLeft: readonly number[]
   slotIndicesRight: readonly number[]
 }) {
+  const errorMessageId = 'otp-error-message'
+
   return (
     <div className="flex w-full flex-col gap-3">
       <div
@@ -231,6 +261,7 @@ function OtpVerificationCodeSection({
           disabled={isLoading}
           autoFocus={!hasError}
           aria-invalid={hasError}
+          aria-describedby={hasError ? errorMessageId : undefined}
           data-slot="login-otp"
           autoComplete="one-time-code"
           containerClassName="flex flex-wrap items-center justify-center gap-0 sm:justify-start"
@@ -264,7 +295,12 @@ function OtpVerificationCodeSection({
       )}
 
       {hasError && (
-        <p className="text-destructive flex items-center gap-1.5 text-xs">
+        <p
+          id={errorMessageId}
+          role="alert"
+          aria-live="assertive"
+          className="text-destructive flex items-center gap-1.5 text-xs"
+        >
           <span
             aria-hidden
             className="bg-destructive size-1 shrink-0 rounded-full"

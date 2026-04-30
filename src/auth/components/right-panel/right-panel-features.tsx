@@ -11,6 +11,7 @@ type FeatureSlideLayerProps = {
   slide: FeatureSlide
   slideIndex: number
   active: boolean
+  shouldLoadFull: boolean
   theme: string
   reduce: boolean
   fullLoaded: boolean
@@ -21,6 +22,7 @@ export function FeatureSlideLayer({
   slide,
   slideIndex,
   active,
+  shouldLoadFull,
   theme,
   reduce,
   fullLoaded,
@@ -78,27 +80,29 @@ export function FeatureSlideLayer({
                   )
             )}
           />
-          <img
-            src={fullSrc}
-            alt={slide.alt}
-            decoding="async"
-            loading="eager"
-            fetchPriority={slideIndex === 0 ? 'high' : undefined}
-            onLoad={onFullImageLoad}
-            key={`${slide.id}-full-${theme}`}
-            className={cn(
-              'absolute inset-0 h-full w-full object-cover object-top-left',
-              'will-change-[opacity,filter,transform]',
-              reduce
-                ? fullImageClasses
-                : cn(
-                    'transition-[opacity,filter,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
-                    active && fullLoaded
-                      ? 'blur-0 scale-100 opacity-100'
-                      : 'scale-[1.015] opacity-0 blur-[8px]'
-                  )
-            )}
-          />
+          {shouldLoadFull ? (
+            <img
+              src={fullSrc}
+              alt={slide.alt}
+              decoding="async"
+              loading={active ? 'eager' : 'lazy'}
+              fetchPriority={active && slideIndex === 0 ? 'high' : undefined}
+              onLoad={onFullImageLoad}
+              key={`${slide.id}-full-${theme}`}
+              className={cn(
+                'absolute inset-0 h-full w-full object-cover object-top-left',
+                'will-change-[opacity,filter,transform]',
+                reduce
+                  ? fullImageClasses
+                  : cn(
+                      'transition-[opacity,filter,transform] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
+                      active && fullLoaded
+                        ? 'blur-0 scale-100 opacity-100'
+                        : 'scale-[1.015] opacity-0 blur-[8px]'
+                    )
+              )}
+            />
+          ) : null}
         </div>
       </div>
 

@@ -41,8 +41,8 @@ export default function LeftPanel({ auth }: LeftPanelProps) {
         >
           <div
             className={cn(
-              'relative w-full max-w-md',
-              !isOtpStep && '-mt-14 space-y-6'
+              'relative -mt-14 w-full max-w-md',
+              !isOtpStep && 'space-y-6'
             )}
           >
             {isOtpStep ? (
