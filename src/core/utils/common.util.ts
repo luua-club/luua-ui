@@ -97,8 +97,34 @@ const getRandomInt = (min: number, max: number): number => {
   return Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal
 }
 
+/**
+ * Format large product metrics into compact social-style labels.
+ *
+ * @example
+ * formatCompactMetricValue(6543) // '6.5k'
+ * formatCompactMetricValue(600000) // '600k'
+ * formatCompactMetricValue(1250000) // '1.3M'
+ */
+const formatCompactMetricValue = (value: number): string => {
+  const normalizedValue = Math.max(0, Math.round(value))
+
+  if (normalizedValue < 1_000) return normalizedValue.toString()
+  if (normalizedValue < 10_000) {
+    return `${(normalizedValue / 1_000).toFixed(1).replace(/\.0$/, '')}k`
+  }
+  if (normalizedValue < 1_000_000) {
+    return `${Math.round(normalizedValue / 1_000)}k`
+  }
+  if (normalizedValue < 10_000_000) {
+    return `${(normalizedValue / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`
+  }
+
+  return `${Math.round(normalizedValue / 1_000_000)}M`
+}
+
 export {
   extractUserInitial,
+  formatCompactMetricValue,
   getRandomInt,
   logout,
   removeQueryParams,

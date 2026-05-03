@@ -1,4 +1,6 @@
+import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import { ConnectedChannels } from '@/core/models/org.model'
+import { channelType } from '@/core/models/social.model'
 
 /**
  * Checks if a specific social platform is connected for a project.
@@ -27,4 +29,31 @@ const isSocialConnected = (
   return false
 }
 
-export { isSocialConnected }
+/**
+ * Return the product-facing platform label from the shared social platform
+ * config, keeping labels consistent across badges, tooltips, and analytics.
+ */
+const getSocialPlatformLabel = (name: string) => {
+  return SOCIAL_PLATFORM.find(platform => platform.name === name)?.label ?? name
+}
+
+/**
+ * Return the chart color for a platform from the shared social config.
+ * Keep chart usage centralized so light and dark mode stay consistent.
+ */
+const getSocialPlatformChartColor = (
+  name: channelType,
+  mode: 'light' | 'dark'
+) => {
+  return (
+    SOCIAL_PLATFORM.find(platform => platform.name === name)?.colors.chart[
+      mode
+    ] ?? 'currentColor'
+  )
+}
+
+export {
+  getSocialPlatformChartColor,
+  getSocialPlatformLabel,
+  isSocialConnected,
+}
