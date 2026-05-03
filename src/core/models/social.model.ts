@@ -9,6 +9,12 @@ export interface ISocialChannel {
   label: string
   logo: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
   tooltip: string
+  colors: {
+    chart: {
+      light: string
+      dark: string
+    }
+  }
 }
 
 export const InstagramAccountSchema = z.object({

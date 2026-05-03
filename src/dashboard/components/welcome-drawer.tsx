@@ -39,7 +39,7 @@ function WelcomeDrawer() {
       <Button
         variant={'outline'}
         size={'sm'}
-        className="text-primary/80 absolute top-4 right-4 rounded-full text-xs"
+        className="text-primary/80 absolute right-4 bottom-4 rounded-full text-xs"
         onClick={() => setIsWelcomeOpen(true)}
       >
         <Telescope /> Explore

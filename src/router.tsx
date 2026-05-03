@@ -4,6 +4,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 
+import getAnalyticsRoute from '@/analytics/router'
 import { AppContent } from '@/App'
 import getAuthRoute from '@/auth/router'
 import getAutoPilotRoute from '@/autopilot/router'
@@ -37,6 +38,7 @@ const authRoute = getAuthRoute(rootRoute)
 const settingsRouteTree = getSettingsRouteTree(privateRoute)
 const creationRouteTree = getCreationRouteTree(privateRoute)
 const dashboardRoute = getDashboardRoute(privateRoute)
+const analyticsRoute = getAnalyticsRoute(privateRoute)
 const draftsRoute = getDraftsRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
@@ -50,6 +52,7 @@ const routeTree = rootRoute.addChildren([
     settingsRouteTree,
     creationRouteTree,
     dashboardRoute,
+    analyticsRoute,
     draftsRoute,
     preferencesRoute,
     bookmarksRoute,
