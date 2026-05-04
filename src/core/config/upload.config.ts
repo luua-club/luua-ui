@@ -1,5 +1,5 @@
 import { UploadConfig } from '../components/post-card/post-card-actions'
-import { channelType } from '../models/social.model'
+import { type channelType } from '../models/social.model'
 
 /**
  * Upload configuration for each social media platform

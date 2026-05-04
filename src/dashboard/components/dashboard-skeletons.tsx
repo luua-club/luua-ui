@@ -22,7 +22,6 @@ export function ProfileActivitySkeleton() {
               <Skeleton className="size-8 shrink-0 rounded-md" />
             </div>
           </div>
-          s
         </div>
 
         <div className="grid grid-cols-3 gap-2">

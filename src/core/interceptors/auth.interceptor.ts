@@ -4,7 +4,7 @@ import { capitalize } from '@/shared/utils'
 
 import { getLocalStorageItem } from '../../shared/utils/localstorage.util'
 import { LUUA_AUTH_INFO_KEY } from '../config/constant'
-import { AuthInfo } from '../models/auth.model'
+import { type AuthInfo } from '../models/auth.model'
 
 /**
  * Interceptor to add the JWT token and org/project headers to the request

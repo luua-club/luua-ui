@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 
 import { EXTERNAL_URLS } from '@/core/config/constant'
-import { UserState } from '@/core/models/user.model'
+import { type UserState } from '@/core/models/user.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { useTheme } from '@/shared/provider/theme-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'

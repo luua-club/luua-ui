@@ -1,5 +1,5 @@
 import { SOCIAL_PLATFORM } from '../config/constant'
-import { channelType } from '../models/social.model'
+import { type channelType } from '../models/social.model'
 
 function StackedPlatformIcons({ channels }: { channels: channelType[] }) {
   const platforms = channels

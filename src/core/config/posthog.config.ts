@@ -1,7 +1,7 @@
 import posthog from 'posthog-js'
 
-import { DraftItem, IDraftRequest } from '../models/draft.model'
-import { userStyleResponseType } from '../models/user.model'
+import { type DraftItem, type IDraftRequest } from '../models/draft.model'
+import { type userStyleResponseType } from '../models/user.model'
 
 /**
  * -------------------------------

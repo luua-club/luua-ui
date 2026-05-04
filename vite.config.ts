@@ -31,15 +31,21 @@ export default defineConfig({
   build: {
     modulePreload: {
       resolveDependencies: (_url, deps, context) => {
-        if (context.hostType === 'html') {
-          return deps.filter(dep => !dep.includes('/route-'))
-        }
-        return deps
+        return deps.filter(
+          dep =>
+            !dep.includes('/charts-') &&
+            (context.hostType !== 'html' || !dep.includes('/route-'))
+        )
       },
     },
     rollupOptions: {
       output: {
+        hoistTransitiveImports: false,
         manualChunks(id) {
+          if (id.includes('commonjsHelpers.js')) {
+            return 'commonjs-helpers'
+          }
+
           // -------- Vendor chunks --------
           if (id.includes('node_modules')) {
             const pkg = getPackageName(id)
@@ -70,6 +76,27 @@ export default defineConfig({
             }
             if (pkg === 'date-fns') {
               return 'date-fns'
+            }
+            if (
+              pkg === 'clsx' ||
+              pkg === 'tailwind-merge' ||
+              pkg === 'class-variance-authority'
+            ) {
+              return 'style-utils'
+            }
+            if (
+              pkg === 'immer' ||
+              pkg === 'reselect' ||
+              pkg === 'tiny-invariant'
+            ) {
+              return 'redux'
+            }
+            if (
+              pkg === 'recharts' ||
+              pkg === 'victory-vendor' ||
+              pkg.startsWith('d3-')
+            ) {
+              return 'charts'
             }
             if (pkg === 'canvas-confetti') {
               return 'confetti'

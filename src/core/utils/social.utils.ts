@@ -1,6 +1,6 @@
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
-import { ConnectedChannels } from '@/core/models/org.model'
-import { channelType } from '@/core/models/social.model'
+import { type ConnectedChannels } from '@/core/models/org.model'
+import { type channelType } from '@/core/models/social.model'
 
 /**
  * Checks if a specific social platform is connected for a project.
