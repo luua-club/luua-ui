@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Settings } from 'lucide-react'
 
-import { ACTIVITY_WEEKS } from '@/analytics/utils'
 import { analyticsApi } from '@/core/api/analytics.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -13,6 +12,8 @@ import { DownloadSparkline } from '@/shared/components/download-sparkline'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
+
+const ACTIVITY_WEEKS = 52
 
 function formatRole(role: string | null | undefined) {
   if (!role) return 'Viewer'

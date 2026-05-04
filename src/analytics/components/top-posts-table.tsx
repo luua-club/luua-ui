@@ -39,13 +39,13 @@ import {
 } from '@/shared/ui/table'
 import { cn } from '@/shared/utils'
 
+import ChannelBadge from '../../shared/components/channel-badge'
 import {
   commonEngagement,
   formatNumber,
   metricValue,
   toDateKey,
-} from '../utils'
-import ChannelBadge from './channel-badge'
+} from '../utils/utils'
 
 type TopPostsTableProps = {
   posts: IAnalyticsPost[]

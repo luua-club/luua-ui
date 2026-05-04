@@ -1,14 +1,12 @@
 import { cn } from '@/shared/utils'
 
-import { formatChange } from '../utils'
-
 export default function ChangePill({ value }: { value: number | null }) {
   if (value === null) return null
 
-  const formatted = formatChange(value)
-  if (!formatted) return null
+  if (!Number.isFinite(value)) return null
 
   const isPositive = value >= 0
+  const formatted = `${Math.abs(value).toFixed(1)}%`
 
   return (
     <span
