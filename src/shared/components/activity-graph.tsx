@@ -10,16 +10,24 @@ export interface ActivityEntry {
   count: number
 }
 
+type ActivityColorScale = readonly [string, ...string[]]
+type ActivityIntensityThresholds = readonly [number, ...number[]]
+
 export interface ActivityGraphProps
   extends Omit<React.ComponentProps<'div'>, 'children'> {
   /** Activity data entries. */
   data: ActivityEntry[]
   /**
-   * Five CSS classes for intensity levels 0 through 4.
+   * CSS classes for intensity levels, starting with level 0.
    * Level 0 is the empty/no-activity state.
    * Defaults to a GitHub-style green scale.
    */
-  colorScale?: [string, string, string, string, string]
+  colorScale?: ActivityColorScale
+  /**
+   * Minimum counts for non-empty intensity levels. When omitted, intensity is
+   * normalized against the largest count in the supplied data.
+   */
+  intensityThresholds?: ActivityIntensityThresholds
   /**
    * Fixed cell size in pixels. When omitted the component auto-sizes
    * blocks to fill the available container width.
@@ -36,7 +44,7 @@ export interface ActivityGraphProps
   className?: string
 }
 
-const DEFAULT_COLOR_SCALE: [string, string, string, string, string] = [
+const DEFAULT_COLOR_SCALE: ActivityColorScale = [
   'bg-muted',
   'bg-emerald-300/60 dark:bg-emerald-700/50',
   'bg-emerald-400/70 dark:bg-emerald-600/60',
@@ -50,14 +58,33 @@ const MONTH_LABEL_HEIGHT = 16
 const DAY_LABELS = ['Mon', 'Wed', 'Fri'] as const
 const DAY_LABEL_INDICES = [1, 3, 5] as const
 
-function getIntensity(count: number, max: number): 0 | 1 | 2 | 3 | 4 {
+function getIntensity(
+  count: number,
+  max: number,
+  levelCount: number,
+  thresholds?: ActivityIntensityThresholds
+): number {
   if (count <= 0) return 0
+  const activeLevelCount = Math.max(1, levelCount - 1)
+
+  if (thresholds) {
+    const thresholdCount = Math.min(thresholds.length, activeLevelCount)
+
+    for (let level = thresholdCount; level >= 1; level--) {
+      if (count >= thresholds[level - 1]) {
+        return level
+      }
+    }
+
+    return 1
+  }
+
   if (max <= 0) return 0
   const ratio = count / max
-  if (ratio <= 0.25) return 1
-  if (ratio <= 0.5) return 2
-  if (ratio <= 0.75) return 3
-  return 4
+  return Math.min(
+    activeLevelCount,
+    Math.max(1, Math.ceil(ratio * activeLevelCount))
+  )
 }
 
 function buildWeeks(
@@ -157,6 +184,7 @@ export function ActivityGraph({
   weeks: weekCount = 52,
   endDate,
   activityLabel = 'contribution',
+  intensityThresholds,
   className,
   ...props
 }: ActivityGraphProps) {
@@ -264,7 +292,12 @@ export function ActivityGraph({
                   style={{ display: 'flex', flexDirection: 'column', gap: GAP }}
                 >
                   {week.map((day, di) => {
-                    const intensity = getIntensity(day.count, maxCount)
+                    const intensity = getIntensity(
+                      day.count,
+                      maxCount,
+                      colorScale.length,
+                      intensityThresholds
+                    )
                     return (
                       <Tooltip.Provider key={di} delayDuration={100}>
                         <Tooltip.Root>

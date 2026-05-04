@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Settings } from 'lucide-react'
+import { ArrowRight, Settings } from 'lucide-react'
 
 import { analyticsApi } from '@/core/api/analytics.api'
 import { QUERY_KEYS } from '@/core/config/constant'
@@ -14,6 +14,9 @@ import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 
 const ACTIVITY_WEEKS = 52
+const PROFILE_ACTIVITY_STALE_TIME = 15 * 60_000
+const PROFILE_ACTIVITY_CARD_CLASS = 'h-[224px] rounded-lg p-4 pb-0 shadow-sm'
+const PROFILE_ACTIVITY_INTENSITY_THRESHOLDS = [1, 2, 3] as const
 
 function formatRole(role: string | null | undefined) {
   if (!role) return 'Viewer'
@@ -46,19 +49,6 @@ function buildActivitySparklineData(activity: IAnalyticsActivityPoint[]) {
   ).filter(point => point.day)
 }
 
-function getActivitySummary(activity: IAnalyticsActivityPoint[]) {
-  const totalPosts = activity.reduce((sum, point) => sum + point.count, 0)
-  const activeDays = activity.filter(point => point.count > 0).length
-  const weekly = buildActivitySparklineData(activity)
-  const peakWeek = Math.max(...weekly.map(point => point.downloads), 0)
-
-  return {
-    totalPosts,
-    activeDays,
-    peakWeek,
-  }
-}
-
 function ProfileSummaryCard({
   activity,
 }: {
@@ -76,7 +66,7 @@ function ProfileSummaryCard({
   const sparklineData = buildActivitySparklineData(activity)
 
   return (
-    <Card className="min-w-0 gap-4 rounded-lg p-4 shadow-none">
+    <Card className={`${PROFILE_ACTIVITY_CARD_CLASS} min-w-0 gap-4`}>
       <div className="flex items-start gap-2.5">
         <Avatar className="size-10 rounded-full">
           <AvatarImage src={user.profile_image ?? undefined} alt={user.name} />
@@ -160,26 +150,20 @@ function ProfileSummaryCard({
 }
 
 function ProfileActivity() {
-  const { data, isPending } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: [QUERY_KEYS.analytics, 'dashboard-activity'],
     queryFn: () => analyticsApi.getActivity({ weeks: ACTIVITY_WEEKS }),
-    staleTime: 15 * 60_000,
+    staleTime: PROFILE_ACTIVITY_STALE_TIME,
   })
 
-  const activity = data?.activity ?? []
-  const endDate = data?.end_date
-  const activitySummary = data
-    ? {
-        totalPosts: data.total_posts,
-        activeDays: data.active_days,
-        peakWeek: data.peak_week,
-      }
-    : getActivitySummary(activity)
+  const activity = data.activity
 
   return (
     <div className="mb-6 grid items-stretch gap-4 xl:grid-cols-[minmax(280px,0.64fr)_minmax(0,1.36fr)]">
       <ProfileSummaryCard activity={activity} />
-      <Card className="w-full max-w-full gap-6 rounded-lg p-4 shadow-none">
+      <Card
+        className={`${PROFILE_ACTIVITY_CARD_CLASS} w-full max-w-full gap-9`}
+      >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-sm font-semibold">Publishing Activity</h2>
@@ -188,54 +172,30 @@ function ProfileActivity() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 rounded-sm border px-3 py-1 text-right">
-            <div>
-              <p className="text-muted-foreground text-[11px] font-medium">
-                Posts
-              </p>
-              <p className="text-sm font-semibold">
-                {activitySummary.totalPosts}
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground text-[11px] font-medium">
-                Days
-              </p>
-              <p className="text-sm font-semibold">
-                {activitySummary.activeDays}
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground text-[11px] font-medium">
-                Peak
-              </p>
-              <p className="text-sm font-semibold">
-                {activitySummary.peakWeek}
-              </p>
-            </div>
-          </div>
+          <Button variant="outline" size="sm" className="w-fit" asChild>
+            <Link to="/analytics" className="text-xs">
+              View Analytics
+              <ArrowRight className="size-3.5" />
+            </Link>
+          </Button>
         </div>
 
-        {isPending ? (
-          <div className="bg-muted h-28 w-[684px] max-w-full animate-pulse rounded-md" />
-        ) : (
-          <ActivityGraph
-            data={activity}
-            weeks={ACTIVITY_WEEKS}
-            blockSize={9}
-            blockRadius={2}
-            endDate={endDate}
-            activityLabel="post"
-            colorScale={[
-              'bg-muted-foreground/4 ring-1 ring-muted-foreground/12 dark:bg-muted-foreground/12 dark:ring-muted-foreground/20',
-              'bg-emerald-200/80 dark:bg-emerald-950',
-              'bg-emerald-300 dark:bg-emerald-800',
-              'bg-emerald-500 dark:bg-emerald-600',
-              'bg-emerald-700 dark:bg-emerald-400',
-            ]}
-            className="-mx-1 max-w-full px-1 pb-1"
-          />
-        )}
+        <ActivityGraph
+          data={activity}
+          weeks={ACTIVITY_WEEKS}
+          blockSize={9}
+          blockRadius={2}
+          endDate={data.end_date}
+          activityLabel="post"
+          intensityThresholds={PROFILE_ACTIVITY_INTENSITY_THRESHOLDS}
+          colorScale={[
+            'bg-muted-foreground/4 ring-1 ring-muted-foreground/12 dark:bg-muted-foreground/12 dark:ring-muted-foreground/20',
+            'bg-emerald-300 dark:bg-emerald-800',
+            'bg-emerald-500 dark:bg-emerald-600',
+            'bg-emerald-700 dark:bg-emerald-400',
+          ]}
+          className="-mx-1 max-w-full px-1 pb-1"
+        />
       </Card>
     </div>
   )

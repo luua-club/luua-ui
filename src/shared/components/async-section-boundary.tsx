@@ -5,14 +5,16 @@ import { Component, type ReactNode, Suspense } from 'react'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 
-type AnalyticsSectionBoundaryProps = {
+type AsyncSectionBoundaryProps = {
   title: string
   fallback: ReactNode
   children: ReactNode
+  description?: string
 }
 
 type ErrorBoundaryProps = {
   title: string
+  description: string
   onReset: () => void
   children: ReactNode
 }
@@ -21,7 +23,7 @@ type ErrorBoundaryState = {
   error: Error | null
 }
 
-class AnalyticsErrorBoundary extends Component<
+class SectionErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
@@ -48,7 +50,7 @@ class AnalyticsErrorBoundary extends Component<
                 {this.props.title} could not load
               </p>
               <p className="text-muted-foreground mt-1 text-xs">
-                Retry this section without affecting the rest of analytics.
+                {this.props.description}
               </p>
             </div>
             <Button
@@ -70,17 +72,22 @@ class AnalyticsErrorBoundary extends Component<
   }
 }
 
-export default function AnalyticsSectionBoundary({
+export default function AsyncSectionBoundary({
   title,
   fallback,
   children,
-}: AnalyticsSectionBoundaryProps) {
+  description = 'Retry this section without affecting the rest of the page.',
+}: AsyncSectionBoundaryProps) {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
-        <AnalyticsErrorBoundary title={title} onReset={reset}>
+        <SectionErrorBoundary
+          title={title}
+          description={description}
+          onReset={reset}
+        >
           <Suspense fallback={fallback}>{children}</Suspense>
-        </AnalyticsErrorBoundary>
+        </SectionErrorBoundary>
       )}
     </QueryErrorResetBoundary>
   )

@@ -1,6 +1,7 @@
 import { lazy, type ReactNode } from 'react'
 
-import AnalyticsSectionBoundary from '../components/analytics-section-boundary'
+import AsyncSectionBoundary from '@/shared/components/async-section-boundary'
+
 import {
   ActivitySkeleton,
   BreakdownSkeleton,
@@ -20,36 +21,39 @@ export default function AnalyticsSummaryLayout() {
         title="Overview"
         description="At a glance across connected channels."
       >
-        <AnalyticsSectionBoundary
+        <AsyncSectionBoundary
           title="Overview"
           fallback={<OverviewSkeleton />}
+          description="Retry this section without affecting the rest of analytics."
         >
           <OverviewContainer />
-        </AnalyticsSectionBoundary>
+        </AsyncSectionBoundary>
       </AnalyticsSection>
 
       <AnalyticsSection
         title="Breakdown"
         description="How interactions and publishing split across platforms."
       >
-        <AnalyticsSectionBoundary
+        <AsyncSectionBoundary
           title="Breakdown"
           fallback={<BreakdownSkeleton />}
+          description="Retry this section without affecting the rest of analytics."
         >
           <BreakdownContainer />
-        </AnalyticsSectionBoundary>
+        </AsyncSectionBoundary>
       </AnalyticsSection>
 
       <AnalyticsSection
         title="Activity"
         description="Recent published posts and 30-day interaction movement."
       >
-        <AnalyticsSectionBoundary
+        <AsyncSectionBoundary
           title="Activity"
           fallback={<ActivitySkeleton />}
+          description="Retry this section without affecting the rest of analytics."
         >
           <ActivityContainer />
-        </AnalyticsSectionBoundary>
+        </AsyncSectionBoundary>
       </AnalyticsSection>
     </div>
   )

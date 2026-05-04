@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FolderEdit, LucideArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
@@ -13,11 +13,7 @@ import {
 } from '@/core/models/draft.model'
 import { Button } from '@/shared/ui/button'
 
-import {
-  DraftCard,
-  DraftCardSkeleton,
-  NewPostCard,
-} from '../components/draft-card'
+import { DraftCard, NewPostCard } from '../components/draft-card'
 
 const DASHBOARD_DRAFTS_QUERY_KEY = [QUERY_KEYS.drafts, 'dashboard', 7] as const
 
@@ -30,7 +26,7 @@ export default function DashboardDraftGrid() {
   const navigate = useNavigate()
 
   // ---- Query ----
-  const { data, isPending } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: DASHBOARD_DRAFTS_QUERY_KEY,
     queryFn: () => draftsApi.getDrafts({ limit: 7, offset: 0, sort: 'desc' }),
     staleTime: 30_000,
@@ -160,30 +156,25 @@ export default function DashboardDraftGrid() {
 
       <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <NewPostCard onClick={handleNewPost} />
-        {isPending && <DraftCardSkeleton />}
-        {!isPending &&
-          drafts.map(draft => (
-            <DraftCard
-              key={draft.id}
-              draft={draft}
-              onClick={() => handleDraftClick(draft.id)}
-              onRenameSave={name =>
-                renameMutation.mutate({ id: draft.id, name })
-              }
-              onDelete={() => deleteMutation.mutate(draft.id)}
-              isRenamePending={
-                renameMutation.isPending &&
-                renameMutation.variables?.id === draft.id
-              }
-              isDeletePending={
-                deleteMutation.isPending &&
-                deleteMutation.variables === draft.id
-              }
-            />
-          ))}
+        {drafts.map(draft => (
+          <DraftCard
+            key={draft.id}
+            draft={draft}
+            onClick={() => handleDraftClick(draft.id)}
+            onRenameSave={name => renameMutation.mutate({ id: draft.id, name })}
+            onDelete={() => deleteMutation.mutate(draft.id)}
+            isRenamePending={
+              renameMutation.isPending &&
+              renameMutation.variables?.id === draft.id
+            }
+            isDeletePending={
+              deleteMutation.isPending && deleteMutation.variables === draft.id
+            }
+          />
+        ))}
       </div>
 
-      {!isPending && drafts.length === 0 && (
+      {drafts.length === 0 && (
         <p className="text-muted-foreground mt-2 text-xs">
           No drafts yet. Click &quot;New Draft&quot; to get started.
         </p>
