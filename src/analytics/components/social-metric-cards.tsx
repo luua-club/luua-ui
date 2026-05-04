@@ -4,8 +4,7 @@ import { useMemo } from 'react'
 import StackedPlatformIcons from '@/core/components/stacked-platform-icons'
 import {
   type AnalyticsChannel,
-  type IAnalyticsPost,
-  type IAnalyticsPostHistoryResponse,
+  type IAnalyticsMetricSummary,
 } from '@/core/models/analytics.model'
 import { formatCompactMetricValue } from '@/core/utils/common.util'
 import { getSocialPlatformLabel } from '@/core/utils/social.utils'
@@ -15,10 +14,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 import { metricConfigs } from '../config/metric.config'
-import {
-  getAnalyticsHistoryMetricChange,
-  getAnalyticsLatestMetricTotal,
-} from '../utils'
 
 function formatChannelList(channels: AnalyticsChannel[]) {
   return channels.map(channel => getSocialPlatformLabel(channel)).join(' + ')
@@ -107,29 +102,21 @@ function SocialMetricCard({
 // Social Metric Card List
 //---------------------------------
 type SocialMetricCardsProps = {
-  posts: IAnalyticsPost[]
-  histories: IAnalyticsPostHistoryResponse[]
+  metrics: IAnalyticsMetricSummary[]
 }
-export default function SocialMetricCards({
-  posts,
-  histories,
-}: SocialMetricCardsProps) {
+export default function SocialMetricCards({ metrics }: SocialMetricCardsProps) {
   const metricCards = useMemo(
     () =>
-      metricConfigs.map(config => ({
-        ...config,
-        value: getAnalyticsLatestMetricTotal({
-          posts,
-          metric: config.metric,
-          channels: config.channels,
-        }),
-        change: getAnalyticsHistoryMetricChange({
-          histories,
-          metric: config.metric,
-          channels: config.channels,
-        }),
-      })),
-    [histories, posts]
+      metricConfigs.map(config => {
+        const summary = metrics.find(metric => metric.key === config.metric)
+
+        return {
+          ...config,
+          value: summary?.value ?? 0,
+          change: summary?.change_percent ?? null,
+        }
+      }),
+    [metrics]
   )
 
   return (

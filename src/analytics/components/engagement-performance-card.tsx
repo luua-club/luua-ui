@@ -13,6 +13,7 @@ import {
   YAxis,
 } from 'recharts'
 
+import { type IAnalyticsBreakdownResponse } from '@/core/models/analytics.model'
 import {
   getSocialPlatformChartColor,
   getSocialPlatformLabel,
@@ -30,17 +31,11 @@ import {
   TooltipTrigger,
 } from '@/shared/ui/tooltip'
 
-import {
-  type CommonAnalyticsSummary,
-  formatNumber,
-  parseDateKey,
-} from '../utils'
+import { formatNumber, parseDateKey } from '../utils'
 import ChangePill from './change-pill'
 
 type CommonEngagementCardProps = {
-  summary: CommonAnalyticsSummary
-  postCount: number
-  trend: number | null
+  breakdown: IAnalyticsBreakdownResponse
 }
 
 type ChartPoint = {
@@ -64,7 +59,7 @@ type AnalyticsAreaMetricCardProps = {
 }
 
 type LeadingChannelComparisonCardProps = {
-  summary: CommonAnalyticsSummary
+  breakdown: IAnalyticsBreakdownResponse
 }
 
 type PlatformChartColors = {
@@ -272,16 +267,22 @@ function toDateLabel(date: string) {
   return format(parseDateKey(date), 'MMM d')
 }
 
-export function TotalEngagementCard({
-  summary,
-  postCount,
-  trend,
-}: CommonEngagementCardProps) {
+function channelValue(
+  points: { channel: 'LinkedIn' | 'Twitter'; value?: number; count?: number }[],
+  channel: 'LinkedIn' | 'Twitter'
+) {
+  const point = points.find(item => item.channel === channel)
+
+  return point?.value ?? point?.count ?? 0
+}
+
+export function TotalEngagementCard({ breakdown }: CommonEngagementCardProps) {
   const platformColors = usePlatformChartColors()
   const totalChartConfig = createPlatformChartConfig({
     colors: platformColors,
   })
-  const chartData = summary.trend.map(point => ({
+  const interactions = breakdown.interactions
+  const chartData = interactions.daily_trend.map(point => ({
     date: toDateLabel(point.date),
     LinkedIn: point.LinkedIn,
     Twitter: point.Twitter,
@@ -290,10 +291,10 @@ export function TotalEngagementCard({
   return (
     <AnalyticsAreaMetricCard
       title="Total Interactions"
-      value={formatNumber(summary.totalEngagement)}
-      helper={`${formatNumber(postCount)} posts measured`}
+      value={formatNumber(interactions.total)}
+      helper={`${formatNumber(interactions.post_count)} posts measured`}
       tooltip={`Total interactions is the sum of likes and comments across LinkedIn and ${getSocialPlatformLabel('Twitter')} for the selected period.`}
-      trend={trend}
+      trend={interactions.change_percent}
       chartData={chartData}
       chartConfig={totalChartConfig}
       gradientIds={{
@@ -304,42 +305,8 @@ export function TotalEngagementCard({
   )
 }
 
-export function AverageEngagementCard({
-  summary,
-  postCount,
-  trend,
-}: CommonEngagementCardProps) {
-  const platformColors = usePlatformChartColors()
-  const averageChartConfig = createPlatformChartConfig({
-    colors: platformColors,
-  })
-  const linkedinPosts = Math.max(summary.channelPostCount.LinkedIn, 1)
-  const twitterPosts = Math.max(summary.channelPostCount.Twitter, 1)
-  const chartData = summary.trend.map(point => ({
-    date: toDateLabel(point.date),
-    LinkedIn: point.LinkedIn / linkedinPosts,
-    Twitter: point.Twitter / twitterPosts,
-  }))
-
-  return (
-    <AnalyticsAreaMetricCard
-      title="Avg Interactions/Post"
-      value={formatNumber(summary.avgEngagementPerPost)}
-      helper={`across ${formatNumber(postCount)} posts`}
-      tooltip={`Average interactions per post is total likes and comments divided by the number of posts. The chart compares per-post averages for LinkedIn and ${getSocialPlatformLabel('Twitter')}.`}
-      trend={trend}
-      chartData={chartData}
-      chartConfig={averageChartConfig}
-      gradientIds={{
-        LinkedIn: 'averageLinkedinFill',
-        Twitter: 'averageTwitterFill',
-      }}
-    />
-  )
-}
-
 export function LeadingChannelCard({
-  summary,
+  breakdown,
 }: LeadingChannelComparisonCardProps) {
   const platformColors = usePlatformChartColors()
   const twitterLabel = getSocialPlatformLabel('Twitter')
@@ -356,11 +323,17 @@ export function LeadingChannelCard({
       color: platformColors.Twitter,
     },
   } satisfies ChartConfig
-  const { LinkedIn, Twitter } = summary.channelEngagement
-  const total = Math.max(summary.totalEngagement, 1)
-  const leadingChannel = Twitter >= LinkedIn ? twitterLabel : 'LinkedIn'
-  const leadingValue = Math.max(Twitter, LinkedIn)
-  const leadingShare = Math.round((leadingValue / total) * 100)
+  const interactions = breakdown.interactions
+  const LinkedIn = channelValue(interactions.by_channel, 'LinkedIn')
+  const Twitter = channelValue(interactions.by_channel, 'Twitter')
+  const leadingSummary = interactions.leading_channel
+  const leadingChannel =
+    leadingSummary?.channel === 'Twitter' ? twitterLabel : 'LinkedIn'
+  const leadingValue = leadingSummary?.value ?? Math.max(Twitter, LinkedIn)
+  const leadingShare = Math.round(
+    leadingSummary?.share_percent ??
+      (leadingValue / Math.max(interactions.total, 1)) * 100
+  )
   const chartData = [
     {
       channel: 'LinkedIn',
@@ -468,9 +441,9 @@ export function LeadingChannelCard({
 }
 
 export function PostCountByChannelCard({
-  summary,
+  breakdown,
 }: {
-  summary: CommonAnalyticsSummary
+  breakdown: IAnalyticsBreakdownResponse
 }) {
   const platformColors = usePlatformChartColors()
   const postCountChartConfig = {
@@ -486,9 +459,13 @@ export function PostCountByChannelCard({
       color: platformColors.Twitter,
     },
   } satisfies ChartConfig
-  const linkedinPosts = summary.channelPostCount.LinkedIn
-  const twitterPosts = summary.channelPostCount.Twitter
-  const totalPosts = linkedinPosts + twitterPosts
+  const publishing = breakdown.publishing
+  const linkedinPosts = channelValue(
+    publishing.post_count_by_channel,
+    'LinkedIn'
+  )
+  const twitterPosts = channelValue(publishing.post_count_by_channel, 'Twitter')
+  const totalPosts = publishing.total_posts
   const chartData = [
     {
       channel: 'LinkedIn',

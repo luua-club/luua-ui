@@ -1,11 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 import { createLazyRoute } from '@tanstack/react-router'
 import { BarChart3 } from 'lucide-react'
-import { type ReactNode, useMemo } from 'react'
+import { type ReactNode } from 'react'
 
 import { analyticsApi } from '@/core/api/analytics.api'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
-import { ICommonAnalyticsData } from '@/core/models/analytics.model'
+import {
+  type IAnalyticsBreakdownResponse,
+  type IAnalyticsOverviewResponse,
+  type IAnalyticsPostsResponse,
+} from '@/core/models/analytics.model'
 import { getSocialPlatformLabel } from '@/core/utils/social.utils'
 import ErrorBanner from '@/shared/components/error-banner'
 import { Card, CardContent, CardHeader } from '@/shared/ui/card'
@@ -24,11 +28,6 @@ import SocialMetricCards, {
 } from './components/social-metric-cards'
 import TopPostsTable from './components/top-posts-table'
 import WorkInProgress from './components/work-in-progress'
-import {
-  type CommonAnalyticsSummary,
-  getTotalTrendChange,
-  summarizeCommonAnalytics,
-} from './utils'
 
 const LinkedInLogo = SOCIAL_PLATFORM.find(
   platform => platform.name === 'LinkedIn'
@@ -38,14 +37,21 @@ const TwitterLogo = SOCIAL_PLATFORM.find(
 )?.logo
 
 function AnalyticsPage() {
-  const { data, isPending, isError } = useQuery({
-    queryKey: [QUERY_KEYS.analytics, 'common'],
-    queryFn: () => analyticsApi.getCommonAnalytics(),
-    staleTime: 15 * 60_000,
-  })
+  const overviewQuery = useAnalyticsOverviewQuery()
+  const breakdownQuery = useAnalyticsBreakdownQuery()
+  const postsQuery = useAnalyticsPostsQuery()
+  const isError =
+    overviewQuery.isError || breakdownQuery.isError || postsQuery.isError
 
   if (isError) return <ErrorBanner />
-  if (!isPending && data && data.posts.length === 0) return <EmptyState />
+  if (
+    !overviewQuery.isPending &&
+    !breakdownQuery.isPending &&
+    !postsQuery.isPending &&
+    postsQuery.data?.posts.length === 0
+  ) {
+    return <EmptyState />
+  }
 
   return (
     <div className="bg-secondary dark:bg-secondary/70 min-h-screen py-8">
@@ -87,7 +93,11 @@ function AnalyticsPage() {
           </TabsList>
 
           <TabsContent value="summary" className="mt-0 px-2">
-            <SummaryContent isPending={isPending} data={data} />
+            <SummaryContent
+              overviewQuery={overviewQuery}
+              breakdownQuery={breakdownQuery}
+              postsQuery={postsQuery}
+            />
           </TabsContent>
 
           <TabsContent value="linkedin" className="mt-0 px-2">
@@ -103,12 +113,10 @@ function AnalyticsPage() {
   )
 }
 
-//---------------------------------
-// Summarised Metrics Charts Props
-//---------------------------------
-interface SummarisedDataProps {
-  isPending: boolean
-  data?: ICommonAnalyticsData
+interface SummaryContentProps {
+  overviewQuery: ReturnType<typeof useAnalyticsOverviewQuery>
+  breakdownQuery: ReturnType<typeof useAnalyticsBreakdownQuery>
+  postsQuery: ReturnType<typeof useAnalyticsPostsQuery>
 }
 
 interface AnalyticsSectionProps {
@@ -135,20 +143,21 @@ function AnalyticsSection({
   )
 }
 
-function SummaryContent({ isPending, data }: SummarisedDataProps) {
-  const summary = useMemo(
-    () => (data ? summarizeCommonAnalytics(data) : null),
-    [data]
-  )
-  const totalTrend = summary ? getTotalTrendChange(summary.trend) : null
-
+function SummaryContent({
+  overviewQuery,
+  breakdownQuery,
+  postsQuery,
+}: SummaryContentProps) {
   return (
     <div className="space-y-8 md:space-y-10">
       <AnalyticsSection
         title="Overview"
         description="At a glance across connected channels."
       >
-        <SummarisedMetricsCards isPending={isPending} data={data} />
+        <SummarisedMetricsCards
+          isPending={overviewQuery.isPending}
+          data={overviewQuery.data}
+        />
       </AnalyticsSection>
 
       <AnalyticsSection
@@ -156,10 +165,8 @@ function SummaryContent({ isPending, data }: SummarisedDataProps) {
         description="How interactions and publishing split across platforms."
       >
         <SummarisedChartCards
-          isPending={isPending}
-          data={data}
-          summary={summary}
-          totalTrend={totalTrend}
+          isPending={breakdownQuery.isPending}
+          data={breakdownQuery.data}
         />
       </AnalyticsSection>
 
@@ -168,34 +175,63 @@ function SummaryContent({ isPending, data }: SummarisedDataProps) {
         description="Recent published posts and 30-day interaction movement."
       >
         <SummarisedRecentPosts
-          isPending={isPending}
-          data={data}
-          summary={summary}
+          isPending={postsQuery.isPending}
+          data={postsQuery.data}
         />
       </AnalyticsSection>
     </div>
   )
 }
 
-function SummarisedMetricsCards({ isPending, data }: SummarisedDataProps) {
-  if (isPending || !data) return <SocialMetricCardsSkeleton />
-  return <SocialMetricCards posts={data.posts} histories={data.histories} />
+function useAnalyticsOverviewQuery() {
+  return useQuery<IAnalyticsOverviewResponse>({
+    queryKey: [QUERY_KEYS.analytics, 'overview'],
+    queryFn: () => analyticsApi.getOverview(),
+    staleTime: 15 * 60_000,
+  })
 }
 
-//---------------------------------
-// Summarised Chart Cards
-//---------------------------------
-interface SummarisedChartCardsProps extends SummarisedDataProps {
-  summary: CommonAnalyticsSummary | null
-  totalTrend: number | null
+function useAnalyticsBreakdownQuery() {
+  return useQuery<IAnalyticsBreakdownResponse>({
+    queryKey: [QUERY_KEYS.analytics, 'breakdown'],
+    queryFn: () => analyticsApi.getBreakdown(),
+    staleTime: 15 * 60_000,
+  })
 }
 
-function SummarisedChartCards({
+function useAnalyticsPostsQuery() {
+  return useQuery<IAnalyticsPostsResponse>({
+    queryKey: [QUERY_KEYS.analytics, 'recent-posts'],
+    queryFn: () =>
+      analyticsApi.getPosts({
+        limit: 100,
+        offset: 0,
+        sort_by: 'published_at',
+        sort_order: 'desc',
+        include_trend: true,
+        trend_metric: 'common_interactions',
+      }),
+    staleTime: 15 * 60_000,
+  })
+}
+
+function SummarisedMetricsCards({
   isPending,
   data,
-  summary,
-  totalTrend,
-}: SummarisedChartCardsProps) {
+}: {
+  isPending: boolean
+  data?: IAnalyticsOverviewResponse
+}) {
+  if (isPending || !data) return <SocialMetricCardsSkeleton />
+  return <SocialMetricCards metrics={data.metrics} />
+}
+
+interface SummarisedChartCardsProps {
+  isPending: boolean
+  data?: IAnalyticsBreakdownResponse
+}
+
+function SummarisedChartCards({ isPending, data }: SummarisedChartCardsProps) {
   if (isPending || !data)
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -204,49 +240,34 @@ function SummarisedChartCards({
         <ChartCardSkeleton variant="donut" />
       </div>
     )
-  if (!summary) return null
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      <TotalEngagementCard
-        summary={summary}
-        postCount={data.total}
-        trend={totalTrend}
-      />
-      <LeadingChannelCard summary={summary} />
-      <PostCountByChannelCard summary={summary} />
+      <TotalEngagementCard breakdown={data} />
+      <LeadingChannelCard breakdown={data} />
+      <PostCountByChannelCard breakdown={data} />
     </div>
   )
 }
 
-//---------------------------------
-// Summarised Recent Posts
-//---------------------------------
-interface SummarisedRecentPostsProps extends SummarisedDataProps {
-  summary: CommonAnalyticsSummary | null
+interface SummarisedRecentPostsProps {
+  isPending: boolean
+  data?: IAnalyticsPostsResponse
 }
 
 function SummarisedRecentPosts({
   isPending,
   data,
-  summary,
 }: SummarisedRecentPostsProps) {
   if (isPending || !data) return <RecentPostsTableSkeleton />
-  if (!summary) return null
 
   return (
     <div className="w-full overflow-x-auto">
-      <TopPostsTable
-        posts={data.posts}
-        historiesByPostId={summary.historiesByPostId}
-      />
+      <TopPostsTable posts={data.posts} />
     </div>
   )
 }
 
-//---------------------------------
-// Loading Skeletons
-//---------------------------------
 type ChartCardSkeletonProps = {
   variant: 'area' | 'bar' | 'donut'
 }

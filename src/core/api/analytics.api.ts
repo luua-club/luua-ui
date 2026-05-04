@@ -1,84 +1,65 @@
-import { format, subDays } from 'date-fns'
-
 import {
-  IAnalyticsPostHistoryRequest,
-  IAnalyticsPostHistoryResponse,
+  IAnalyticsActivityRequest,
+  IAnalyticsActivityResponse,
+  IAnalyticsBreakdownResponse,
+  IAnalyticsDateRangeRequest,
+  IAnalyticsOverviewResponse,
   IAnalyticsPostsRequest,
   IAnalyticsPostsResponse,
-  ICommonAnalyticsData,
 } from '../models/analytics.model'
-import { ApiResponse } from '../models/api.model'
 import { BaseApiService } from './base.api'
-
-const ANALYTICS_PAGE_LIMIT = 100
-const HISTORY_WINDOW_DAYS = 30
 
 class AnalyticsApi extends BaseApiService {
   constructor() {
     super('/analytics')
   }
 
+  async getOverview(
+    req: IAnalyticsDateRangeRequest = {}
+  ): Promise<IAnalyticsOverviewResponse> {
+    const response = await this.get<IAnalyticsOverviewResponse>('/overview', {
+      params: this.toParams(req),
+    })
+
+    return response.data
+  }
+
+  async getBreakdown(
+    req: IAnalyticsDateRangeRequest = {}
+  ): Promise<IAnalyticsBreakdownResponse> {
+    const response = await this.get<IAnalyticsBreakdownResponse>('/breakdown', {
+      params: this.toParams(req),
+    })
+
+    return response.data
+  }
+
+  async getActivity(
+    req: IAnalyticsActivityRequest = {}
+  ): Promise<IAnalyticsActivityResponse> {
+    const response = await this.get<IAnalyticsActivityResponse>('/activity', {
+      params: this.toParams(req),
+    })
+
+    return response.data
+  }
+
   async getPosts(
     req: IAnalyticsPostsRequest = {}
-  ): Promise<ApiResponse<IAnalyticsPostsResponse>> {
-    return this.get<IAnalyticsPostsResponse>('/posts', { params: req })
-  }
-
-  async getPostHistory(
-    postId: string,
-    req: IAnalyticsPostHistoryRequest = {}
-  ): Promise<ApiResponse<IAnalyticsPostHistoryResponse>> {
-    return this.get<IAnalyticsPostHistoryResponse>(
-      `/posts/${encodeURIComponent(postId)}/history`,
-      { params: req }
-    )
-  }
-
-  async getCommonAnalytics(): Promise<ICommonAnalyticsData> {
-    const endDate = format(new Date(), 'yyyy-MM-dd')
-    const startDate = format(
-      subDays(new Date(), HISTORY_WINDOW_DAYS - 1),
-      'yyyy-MM-dd'
-    )
-    const postsResponse = await this.getPosts({
-      limit: ANALYTICS_PAGE_LIMIT,
-      offset: 0,
-      sort_by: 'published_at',
-      sort_order: 'desc',
+  ): Promise<IAnalyticsPostsResponse> {
+    const response = await this.get<IAnalyticsPostsResponse>('/posts', {
+      params: req,
     })
-    const posts = [...postsResponse.data.posts]
-    const total = postsResponse.data.total
 
-    for (
-      let offset = postsResponse.data.offset + postsResponse.data.limit;
-      offset < total;
-      offset += ANALYTICS_PAGE_LIMIT
-    ) {
-      const pageResponse = await this.getPosts({
-        limit: ANALYTICS_PAGE_LIMIT,
-        offset,
-        sort_by: 'published_at',
-        sort_order: 'desc',
-      })
+    return response.data
+  }
 
-      posts.push(...pageResponse.data.posts)
-    }
-
-    const histories = await Promise.all(
-      posts.map(post =>
-        this.getPostHistory(post.post_id, {
-          start_date: startDate,
-          end_date: endDate,
-        }).then(response => response.data)
-      )
-    )
+  private toParams<T extends { channels?: readonly string[] }>(req: T) {
+    const { channels, ...params } = req
 
     return {
-      posts,
-      total,
-      histories,
-      startDate,
-      endDate,
+      ...params,
+      channels: channels?.join(','),
     }
   }
 }

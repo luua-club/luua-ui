@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Settings } from 'lucide-react'
 
-import { ACTIVITY_WEEKS, type ActivityPoint } from '@/analytics/utils'
-import { summarizeCommonAnalytics } from '@/analytics/utils'
+import { ACTIVITY_WEEKS } from '@/analytics/utils'
 import { analyticsApi } from '@/core/api/analytics.api'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
+import { type IAnalyticsActivityPoint } from '@/core/models/analytics.model'
 import { extractUserInitial } from '@/core/utils/common.util'
 import { ActivityGraph } from '@/shared/components/activity-graph'
 import { DownloadSparkline } from '@/shared/components/download-sparkline'
@@ -28,7 +28,7 @@ function formatRole(role: string | null | undefined) {
     .join(' ')
 }
 
-function buildActivitySparklineData(activity: ActivityPoint[]) {
+function buildActivitySparklineData(activity: IAnalyticsActivityPoint[]) {
   const visibleDays = activity.slice(-12 * 7)
 
   return Array.from(
@@ -45,7 +45,7 @@ function buildActivitySparklineData(activity: ActivityPoint[]) {
   ).filter(point => point.day)
 }
 
-function getActivitySummary(activity: ActivityPoint[]) {
+function getActivitySummary(activity: IAnalyticsActivityPoint[]) {
   const totalPosts = activity.reduce((sum, point) => sum + point.count, 0)
   const activeDays = activity.filter(point => point.count > 0).length
   const weekly = buildActivitySparklineData(activity)
@@ -58,7 +58,11 @@ function getActivitySummary(activity: ActivityPoint[]) {
   }
 }
 
-function ProfileSummaryCard({ activity }: { activity: ActivityPoint[] }) {
+function ProfileSummaryCard({
+  activity,
+}: {
+  activity: IAnalyticsActivityPoint[]
+}) {
   const user = useUserState()
 
   if (!user) return null
@@ -157,13 +161,19 @@ function ProfileSummaryCard({ activity }: { activity: ActivityPoint[] }) {
 function ProfileActivity() {
   const { data, isPending } = useQuery({
     queryKey: [QUERY_KEYS.analytics, 'dashboard-activity'],
-    queryFn: () => analyticsApi.getCommonAnalytics(),
-    staleTime: 5 * 60_000,
+    queryFn: () => analyticsApi.getActivity({ weeks: ACTIVITY_WEEKS }),
+    staleTime: 15 * 60_000,
   })
 
-  const activity = data ? summarizeCommonAnalytics(data).activity : []
-  const endDate = activity[activity.length - 1]?.date
-  const activitySummary = getActivitySummary(activity)
+  const activity = data?.activity ?? []
+  const endDate = data?.end_date
+  const activitySummary = data
+    ? {
+        totalPosts: data.total_posts,
+        activeDays: data.active_days,
+        peakWeek: data.peak_week,
+      }
+    : getActivitySummary(activity)
 
   return (
     <div className="mb-6 grid items-stretch gap-4 xl:grid-cols-[minmax(280px,0.64fr)_minmax(0,1.36fr)]">

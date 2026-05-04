@@ -2,9 +2,10 @@ import commentsPeep from '@/assets/images/comments-peep.svg'
 import likesPeep from '@/assets/images/likes-peep.svg'
 import repostPeep from '@/assets/images/repost-peep.svg'
 import sharePeep from '@/assets/images/share-peep.svg'
-import { AnalyticsChannel } from '@/core/models/analytics.model'
-
-import { AnalyticsMetricKey } from '../utils'
+import {
+  AnalyticsChannel,
+  AnalyticsMetricKey,
+} from '@/core/models/analytics.model'
 
 export type SocialMetricConfig = {
   title: string

@@ -10,14 +10,13 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { format, subDays } from 'date-fns'
+import { format } from 'date-fns'
 import { ArrowUpDown, ExternalLink } from 'lucide-react'
 import * as React from 'react'
 
 import {
   type AnalyticsChannel,
   type IAnalyticsPost,
-  type IAnalyticsPostHistoryResponse,
 } from '@/core/models/analytics.model'
 import { getSocialPlatformLabel } from '@/core/utils/social.utils'
 import { DownloadSparkline } from '@/shared/components/download-sparkline'
@@ -42,19 +41,14 @@ import { cn } from '@/shared/utils'
 
 import {
   commonEngagement,
-  commonEngagementPoint,
   formatNumber,
   metricValue,
-  parseDateKey,
   toDateKey,
 } from '../utils'
 import ChannelBadge from './channel-badge'
 
-const RECENT_POST_TREND_DAYS = 30
-
 type TopPostsTableProps = {
   posts: IAnalyticsPost[]
-  historiesByPostId: Map<string, IAnalyticsPostHistoryResponse>
 }
 
 type SortableHeaderProps = {
@@ -91,35 +85,21 @@ function formatPublishedDate(value: string | null) {
   return format(new Date(value), 'MMM d, yyyy')
 }
 
-function buildTrendData(
-  post: IAnalyticsPost,
-  history: IAnalyticsPostHistoryResponse | undefined
-) {
-  const orderedDataPoints =
-    history?.data_points
-      .slice()
-      .sort((a, b) => a.snapshot_date.localeCompare(b.snapshot_date)) ?? []
-  const lastDataPoint = orderedDataPoints[orderedDataPoints.length - 1]
-  const startDate = lastDataPoint
-    ? subDays(
-        parseDateKey(lastDataPoint.snapshot_date),
-        RECENT_POST_TREND_DAYS - 1
-      )
-    : null
-  const points = orderedDataPoints
-    .filter(point => {
-      if (!startDate) return true
-      return parseDateKey(point.snapshot_date) >= startDate
-    })
-    .map(point => ({
-      day: point.snapshot_date,
-      downloads: commonEngagementPoint(point),
-    }))
+function latestMetric(post: IAnalyticsPost, metric: 'likes' | 'comments') {
+  return metricValue(post.latest_metrics?.[metric])
+}
+
+function buildTrendData(post: IAnalyticsPost) {
+  const points =
+    post.trend?.map(point => ({
+      day: point.date,
+      downloads: point.value,
+    })) ?? []
 
   if (points.length >= 2) return points
 
   const fallbackDate =
-    post.latest_metrics.snapshot_date ?? toDateKey(post.published_at) ?? ''
+    post.latest_metrics?.snapshot_date ?? toDateKey(post.published_at) ?? ''
 
   return [
     { day: fallbackDate, downloads: 0 },
@@ -127,9 +107,7 @@ function buildTrendData(
   ]
 }
 
-function buildColumns(
-  historiesByPostId: Map<string, IAnalyticsPostHistoryResponse>
-): ColumnDef<IAnalyticsPost>[] {
+function buildColumns(): ColumnDef<IAnalyticsPost>[] {
   return [
     {
       accessorKey: 'content_preview',
@@ -184,25 +162,25 @@ function buildColumns(
     },
     {
       id: 'likes',
-      accessorFn: row => metricValue(row.latest_metrics.likes),
+      accessorFn: row => latestMetric(row, 'likes'),
       header: ({ column }) => (
         <SortableHeader label="Likes" column={column} align="right" />
       ),
       cell: ({ row }) => (
         <div className="text-right font-medium">
-          {formatNumber(metricValue(row.original.latest_metrics.likes))}
+          {formatNumber(latestMetric(row.original, 'likes'))}
         </div>
       ),
     },
     {
       id: 'comments',
-      accessorFn: row => metricValue(row.latest_metrics.comments),
+      accessorFn: row => latestMetric(row, 'comments'),
       header: ({ column }) => (
         <SortableHeader label="Comments" column={column} align="right" />
       ),
       cell: ({ row }) => (
         <div className="text-right font-medium">
-          {formatNumber(metricValue(row.original.latest_metrics.comments))}
+          {formatNumber(latestMetric(row.original, 'comments'))}
         </div>
       ),
     },
@@ -211,7 +189,7 @@ function buildColumns(
       header: 'Trend',
       cell: ({ row }) => {
         const post = row.original
-        const data = buildTrendData(post, historiesByPostId.get(post.post_id))
+        const data = buildTrendData(post)
 
         return (
           <DownloadSparkline
@@ -261,14 +239,8 @@ function buildColumns(
   ]
 }
 
-export default function TopPostsTable({
-  posts,
-  historiesByPostId,
-}: TopPostsTableProps) {
-  const columns = React.useMemo(
-    () => buildColumns(historiesByPostId),
-    [historiesByPostId]
-  )
+export default function TopPostsTable({ posts }: TopPostsTableProps) {
+  const columns = React.useMemo(() => buildColumns(), [])
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: 'published_at', desc: true },
   ])
