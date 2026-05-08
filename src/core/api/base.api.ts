@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 
 import { API_CONSTANTS, BASE_API_URL } from '../config/constant'
 import { authInterceptor } from '../interceptors/auth.interceptor'
-import { ApiError, ApiResponse } from '../models/api.model'
+import { type ApiError, type ApiResponse } from '../models/api.model'
 import { logout } from '../utils/common.util'
 
 export class BaseApiService {

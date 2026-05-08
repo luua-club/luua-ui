@@ -2,7 +2,7 @@ import { orgApi } from '@/core/api/org.api'
 import { projectApi } from '@/core/api/project.api'
 import { userApi } from '@/core/api/user.api'
 import { LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
-import { AuthInfo } from '@/core/models/auth.model'
+import { type AuthInfo } from '@/core/models/auth.model'
 import {
   getLocalStorageItem,
   setLocalStorageItem,

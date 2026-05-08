@@ -1,9 +1,12 @@
-import { channelType, LinkedInAccountType } from '../models/social.model'
 import {
-  IUserStyleRequest,
-  User,
-  UserOnboardingRequest,
-  userStyleResponseType,
+  type channelType,
+  type LinkedInAccountType,
+} from '../models/social.model'
+import {
+  type IUserStyleRequest,
+  type User,
+  type UserOnboardingRequest,
+  type userStyleResponseType,
 } from '../models/user.model'
 import { BaseApiService } from './base.api'
 

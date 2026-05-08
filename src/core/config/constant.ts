@@ -2,7 +2,7 @@ import BrandInstagram from '@/assets/icons/offcial-instagram.svg?react'
 import BrandLinkedIn from '@/assets/icons/offcial-linkedin.svg?react'
 import BrandX from '@/assets/icons/offcial-x.svg?react'
 
-import { channelType, ISocialChannel } from '../models/social.model'
+import { type channelType, type ISocialChannel } from '../models/social.model'
 
 /**
  * The key to store auth info (token + user + org + project) in local storage
@@ -56,18 +56,36 @@ export const SOCIAL_PLATFORM: ISocialChannel[] = [
     label: 'LinkedIn',
     logo: BrandLinkedIn,
     tooltip: 'Linkedin',
+    colors: {
+      chart: {
+        light: '#0A66C2',
+        dark: '#0A66C2',
+      },
+    },
   },
   {
     name: 'Twitter',
     label: 'X / Twitter',
     logo: BrandX,
     tooltip: 'X / Twitter',
+    colors: {
+      chart: {
+        light: '#000000',
+        dark: '#71767B',
+      },
+    },
   },
   {
     name: 'Instagram',
     label: 'Instagram',
     logo: BrandInstagram,
     tooltip: 'Instagram',
+    colors: {
+      chart: {
+        light: '#E4405F',
+        dark: '#E4405F',
+      },
+    },
   },
 ]
 

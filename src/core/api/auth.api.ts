@@ -1,9 +1,9 @@
 import {
-  LoginRequest,
-  LoginResponse,
-  MagicLinkRequest,
-  MagicLinkResponse,
-  MagicLinkVerifyRequest,
+  type LoginRequest,
+  type LoginResponse,
+  type MagicLinkRequest,
+  type MagicLinkResponse,
+  type MagicLinkVerifyRequest,
 } from '../models/auth.model'
 import { BaseApiService } from './base.api'
 

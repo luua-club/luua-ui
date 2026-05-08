@@ -1,5 +1,5 @@
 import { LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
-import { AuthInfo } from '@/core/models/auth.model'
+import { type AuthInfo } from '@/core/models/auth.model'
 
 import { getLocalStorageItem } from './localstorage.util'
 

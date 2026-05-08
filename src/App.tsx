@@ -17,7 +17,7 @@ import {
 } from './core/config/constant'
 import { queryClient } from './core/config/global.config'
 import { useAppDispatch, useAppSelector } from './core/hooks/global-state.hook'
-import { AuthInfo } from './core/models/auth.model'
+import { type AuthInfo } from './core/models/auth.model'
 import { store } from './core/store'
 import {
   clearAuth,

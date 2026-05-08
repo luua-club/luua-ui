@@ -1,4 +1,4 @@
-import { IUserAdvancedStyleRequest } from '../models/user.model'
+import { type IUserAdvancedStyleRequest } from '../models/user.model'
 import { BaseApiService } from './base.api'
 
 class StylesApi extends BaseApiService {

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { postStatusType } from '@/core/models/post.model'
+import { type postStatusType } from '@/core/models/post.model'
 
 interface IPostsViewState {
   statusFilter: postStatusType | 'all'

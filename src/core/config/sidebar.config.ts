@@ -1,4 +1,12 @@
-import { Bookmark, Files, Gauge, Network, Plus, Rocket } from 'lucide-react'
+import {
+  Bookmark,
+  ChartNoAxesColumn,
+  Files,
+  Gauge,
+  Network,
+  Plus,
+  Rocket,
+} from 'lucide-react'
 
 import {
   SidebarActionItem,
@@ -23,6 +31,12 @@ export const coreLinks: SidebarLinkItem[] = [
     title: 'Dashboard',
     url: '/dashboard',
     icon: Gauge,
+  },
+  {
+    kind: 'link',
+    title: 'Analytics',
+    url: '/analytics',
+    icon: ChartNoAxesColumn,
   },
   {
     kind: 'link',
