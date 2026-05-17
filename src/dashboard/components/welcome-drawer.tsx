@@ -3,27 +3,25 @@ import { useEffect, useState } from 'react'
 
 import { EXTERNAL_URLS, LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
 import { AuthInfo } from '@/core/models/auth.model'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { Button } from '@/shared/ui/button'
 import { Drawer, DrawerContent } from '@/shared/ui/drawer'
 import { HeroVideoDialog } from '@/shared/ui/hero-video-dialog'
+import { useSidebar } from '@/shared/ui/sidebar'
 import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
 
 import FeaturesGrid from './features-grid'
+import { InviteCodePromo } from './invite-code-promo'
 
 const LUUA_WELCOME_SHOWN = 'LUUA_WELCOME_SHOWN'
 
 function WelcomeDrawer() {
-  // --- States ---
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false)
 
-  // --- Hooks ---
-  const isMobile = useIsMobile()
+  const { isMobile } = useSidebar()
 
-  // --- Effects ---
   useEffect(() => {
     const authData = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
     const alreadyShown = getLocalStorageItem<boolean>(LUUA_WELCOME_SHOWN)
@@ -35,17 +33,19 @@ function WelcomeDrawer() {
 
   return (
     <>
-      {/** Floating Button to render */}
-      <Button
-        variant={'outline'}
-        size={'sm'}
-        className="text-primary/80 absolute right-4 bottom-4 rounded-full text-xs"
-        onClick={() => setIsWelcomeOpen(true)}
-      >
-        <Telescope /> Explore
-      </Button>
+      <div className="absolute right-4 bottom-4 z-30 flex flex-row-reverse items-center gap-2 max-sm:right-3 max-sm:bottom-[max(1rem,env(safe-area-inset-bottom,0px)+0.5rem)]">
+        <Button
+          variant={'outline'}
+          size={'sm'}
+          className="text-primary/80 rounded-full text-xs shadow-sm"
+          type="button"
+          onClick={() => setIsWelcomeOpen(true)}
+        >
+          <Telescope /> Explore
+        </Button>
+        <InviteCodePromo />
+      </div>
 
-      {/** Drawer content that opens on clicking floating btn */}
       <Drawer
         direction="right"
         open={isWelcomeOpen}
@@ -61,8 +61,7 @@ function WelcomeDrawer() {
               <span className="truncate">What do you want to do today ?</span>
             </h2>
 
-            <div className="flex gap-4">
-              {/** Video */}
+            <div className="flex shrink-0 gap-2 sm:gap-4">
               <HeroVideoDialog videoSrc={EXTERNAL_URLS.youtube_main_video}>
                 <Button size="sm" className="text-xs">
                   <Lightbulb className="size-3.5" /> How it works ?

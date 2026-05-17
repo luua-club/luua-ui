@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CircleAlert, Loader, Play, Settings2 } from 'lucide-react'
+import { Loader, Play, Settings2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -66,16 +66,6 @@ function AutopilotActions({
 
   if (!user) {
     return <Loader className="size-4 animate-spin" />
-  }
-
-  if (limitReached && !isLoading) {
-    return (
-      <div className="flex items-center gap-2">
-        <p className="text-destructive flex items-center gap-1 text-xs font-bold">
-          <CircleAlert className="size-3.5" /> Limit Reached
-        </p>
-      </div>
-    )
   }
 
   return (

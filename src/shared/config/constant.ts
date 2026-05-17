@@ -2,6 +2,12 @@
  * Sidebar constants
  */
 export const MOBILE_BREAKPOINT = 768
+
+/**
+ * Viewports at this width and below use the off-canvas sidebar sheet (matches
+ * Tailwind `lg` minus 1px) so tablet-sized layouts keep full-width content.
+ */
+export const SIDEBAR_SHEET_LAYOUT_MAX_WIDTH_PX = 1023
 export const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 export const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 export const SIDEBAR_WIDTH = '16rem'

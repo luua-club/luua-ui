@@ -49,6 +49,7 @@ import {
 
 type TopPostsTableProps = {
   posts: IAnalyticsPost[]
+  showTrends?: boolean
 }
 
 type SortableHeaderProps = {
@@ -107,8 +108,8 @@ function buildTrendData(post: IAnalyticsPost) {
   ]
 }
 
-function buildColumns(): ColumnDef<IAnalyticsPost>[] {
-  return [
+function buildColumns(showTrends: boolean): ColumnDef<IAnalyticsPost>[] {
+  const columns: ColumnDef<IAnalyticsPost>[] = [
     {
       accessorKey: 'content_preview',
       header: 'Post',
@@ -184,7 +185,10 @@ function buildColumns(): ColumnDef<IAnalyticsPost>[] {
         </div>
       ),
     },
-    {
+  ]
+
+  if (showTrends) {
+    columns.push({
       id: 'trend',
       header: 'Trend',
       cell: ({ row }) => {
@@ -208,7 +212,10 @@ function buildColumns(): ColumnDef<IAnalyticsPost>[] {
         )
       },
       enableSorting: false,
-    },
+    })
+  }
+
+  columns.push(
     {
       id: 'interactions',
       accessorFn: commonEngagement,
@@ -235,12 +242,17 @@ function buildColumns(): ColumnDef<IAnalyticsPost>[] {
         )
       },
       enableSorting: false,
-    },
-  ]
+    }
+  )
+
+  return columns
 }
 
-export default function TopPostsTable({ posts }: TopPostsTableProps) {
-  const columns = React.useMemo(() => buildColumns(), [])
+export default function TopPostsTable({
+  posts,
+  showTrends = true,
+}: TopPostsTableProps) {
+  const columns = React.useMemo(() => buildColumns(showTrends), [showTrends])
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: 'published_at', desc: true },
   ])
@@ -283,8 +295,9 @@ export default function TopPostsTable({ posts }: TopPostsTableProps) {
         <div>
           <CardTitle className="text-sm">Recent Posts</CardTitle>
           <p className="text-muted-foreground mt-1 text-xs">
-            Sorted by latest published date. Trend shows likes + comments over
-            the last 30 days.
+            {showTrends
+              ? 'Sorted by latest published date. Trend shows likes + comments over the last 30 days.'
+              : 'Sorted by latest published date across connected channels.'}
           </p>
         </div>
         <Select

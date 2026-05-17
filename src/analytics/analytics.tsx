@@ -2,7 +2,9 @@ import { createLazyRoute } from '@tanstack/react-router'
 import { BarChart3 } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { canUseAnalytics } from '@/core/billing/plan-entitlements'
 import { SOCIAL_PLATFORM } from '@/core/config/constant'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { getSocialPlatformLabel } from '@/core/utils/social.utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 
@@ -10,6 +12,8 @@ import WorkInProgress from './components/work-in-progress'
 import AnalyticsSummaryLayout from './layouts/analytics-layout'
 
 function AnalyticsPage() {
+  const user = useUserState()
+
   // --- Variables ---
   const LinkedInLogo = useMemo(
     () => SOCIAL_PLATFORM.find(platform => platform.name === 'LinkedIn')?.logo,
@@ -19,6 +23,10 @@ function AnalyticsPage() {
     () => SOCIAL_PLATFORM.find(platform => platform.name === 'Twitter')?.logo,
     []
   )
+
+  if (!user) return null
+
+  const hasPaidAnalyticsAccess = canUseAnalytics(user.plan)
 
   return (
     <div className="bg-secondary dark:bg-secondary/70 min-h-screen py-8">
@@ -60,7 +68,9 @@ function AnalyticsPage() {
           </TabsList>
 
           <TabsContent value="summary" className="mt-0 px-2">
-            <AnalyticsSummaryLayout />
+            <AnalyticsSummaryLayout
+              hasPaidAnalyticsAccess={hasPaidAnalyticsAccess}
+            />
           </TabsContent>
 
           <TabsContent value="linkedin" className="mt-0 px-2">

@@ -20,6 +20,8 @@ import getReviewRoute from '@/review/router'
 import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
 
+import getPaymentsRoute from './payments/router'
+
 // This is root, it sets up auth guard.
 // only few pages like login page works without guard
 export const rootRoute = createRootRoute({
@@ -45,6 +47,7 @@ const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
 const postsViewhubRoute = getPostsViewRoute(privateRoute)
+const paymentsRoute = getPaymentsRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -59,6 +62,7 @@ const routeTree = rootRoute.addChildren([
     autopilotRoute,
     reviewRoute,
     postsViewhubRoute,
+    paymentsRoute,
   ]),
 ])
 

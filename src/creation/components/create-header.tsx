@@ -59,6 +59,7 @@ interface CreateHeaderProps {
   saveDisabled?: boolean
   onSchedule?: () => void
   scheduleDisabled?: boolean
+  scheduleUsageLabel?: string
   onPublish?: () => void
   publishDisabled?: boolean
   onTitleChange?: (title: string) => void
@@ -74,6 +75,7 @@ function CreateHeader({
   saveDisabled,
   onSchedule,
   scheduleDisabled,
+  scheduleUsageLabel,
   onPublish,
   publishDisabled,
   onTitleChange,
@@ -182,6 +184,12 @@ function CreateHeader({
         </Button>
 
         <Separator orientation="vertical" className="!h-6" />
+
+        {scheduleUsageLabel ? (
+          <span className="text-muted-foreground hidden max-w-28 truncate text-xs xl:inline">
+            {scheduleUsageLabel}
+          </span>
+        ) : null}
 
         <ActionButton
           variant="outline"

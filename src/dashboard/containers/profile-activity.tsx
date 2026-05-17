@@ -3,19 +3,19 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, Settings } from 'lucide-react'
 
 import { analyticsApi } from '@/core/api/analytics.api'
+import { CurrentUserPlanAvatar } from '@/core/components/billing'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { type IAnalyticsActivityPoint } from '@/core/models/analytics.model'
-import { extractUserInitial } from '@/core/utils/common.util'
 import { ActivityGraph } from '@/shared/components/activity-graph'
 import { DownloadSparkline } from '@/shared/components/download-sparkline'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 
 const ACTIVITY_WEEKS = 52
 const PROFILE_ACTIVITY_STALE_TIME = 15 * 60_000
-const PROFILE_ACTIVITY_CARD_CLASS = 'h-[224px] rounded-lg p-4 pb-0 shadow-sm'
+const PROFILE_SUMMARY_CARD_CLASS =
+  'min-h-[224px] rounded-lg p-4 pb-0 shadow-sm sm:h-[224px]'
 const PROFILE_ACTIVITY_INTENSITY_THRESHOLDS = [1, 2, 3] as const
 
 function formatRole(role: string | null | undefined) {
@@ -66,14 +66,16 @@ function ProfileSummaryCard({
   const sparklineData = buildActivitySparklineData(activity)
 
   return (
-    <Card className={`${PROFILE_ACTIVITY_CARD_CLASS} min-w-0 gap-4`}>
+    <Card className={`${PROFILE_SUMMARY_CARD_CLASS} min-w-0 gap-4`}>
       <div className="flex items-start gap-2.5">
-        <Avatar className="size-10 rounded-full">
-          <AvatarImage src={user.profile_image ?? undefined} alt={user.name} />
-          <AvatarFallback className="bg-amber-400 font-semibold text-black">
-            {extractUserInitial(user.name)}
-          </AvatarFallback>
-        </Avatar>
+        <CurrentUserPlanAvatar
+          name={user.name}
+          profileImage={user.profile_image}
+          plan={user.plan}
+          avatarClassName="size-10"
+          fallbackClassName="font-semibold"
+          showFreeBadge
+        />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
@@ -101,7 +103,7 @@ function ProfileSummaryCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <div className="min-w-0">
           <p className="text-muted-foreground text-xs font-medium">Project</p>
           <p className="mt-1 truncate text-sm font-semibold">
@@ -150,6 +152,14 @@ function ProfileSummaryCard({
 }
 
 function ProfileActivity() {
+  const user = useUserState()
+
+  if (!user) return null
+
+  return <ProfileActivityContent />
+}
+
+function ProfileActivityContent() {
   const { data } = useSuspenseQuery({
     queryKey: [QUERY_KEYS.analytics, 'dashboard-activity'],
     queryFn: () => analyticsApi.getActivity({ weeks: ACTIVITY_WEEKS }),
@@ -161,18 +171,21 @@ function ProfileActivity() {
   return (
     <div className="mb-6 grid items-stretch gap-4 xl:grid-cols-[minmax(280px,0.64fr)_minmax(0,1.36fr)]">
       <ProfileSummaryCard activity={activity} />
-      <Card
-        className={`${PROFILE_ACTIVITY_CARD_CLASS} w-full max-w-full gap-9`}
-      >
+      <Card className="flex max-w-full min-w-0 flex-col gap-6 rounded-lg p-4 pb-0 shadow-sm sm:gap-9">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
+          <div className="min-w-0">
             <h2 className="text-sm font-semibold">Publishing Activity</h2>
             <p className="text-muted-foreground mt-1 text-xs font-medium">
               Daily posts published over the last year
             </p>
           </div>
 
-          <Button variant="outline" size="sm" className="w-fit" asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-fit shrink-0"
+            asChild
+          >
             <Link to="/analytics" className="text-xs">
               View Analytics
               <ArrowRight className="size-3.5" />
@@ -183,7 +196,6 @@ function ProfileActivity() {
         <ActivityGraph
           data={activity}
           weeks={ACTIVITY_WEEKS}
-          blockSize={9}
           blockRadius={2}
           endDate={data.end_date}
           activityLabel="post"
@@ -194,7 +206,7 @@ function ProfileActivity() {
             'bg-emerald-500 dark:bg-emerald-600',
             'bg-emerald-700 dark:bg-emerald-400',
           ]}
-          className="-mx-1 max-w-full px-1 pb-1"
+          className="-mx-1 max-w-full min-w-0 px-1 pb-1"
         />
       </Card>
     </div>
