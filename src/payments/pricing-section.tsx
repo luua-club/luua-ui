@@ -25,12 +25,10 @@ import {
   type PlanId,
   type PurchasablePlan,
 } from '@/payments/pricing-data'
+import { RedemptionCodeSection } from '@/payments/redemption-code-section'
 import ConfirmDialog from '@/shared/components/confirm-dialog'
 import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
-import { Badge } from '@/shared/ui/badge'
-import { BorderBeam } from '@/shared/ui/border-beam'
 import { DiagonalStripe } from '@/shared/ui/diagonal-stripe'
-import { cn } from '@/shared/utils/index'
 
 function isActiveSubscriptionError(error: unknown) {
   const apiError = error as ApiError
@@ -48,7 +46,8 @@ type CheckoutFlowInput = {
 }
 
 export function PricingSection() {
-  const activePlan: BillingPlanId = useUserState()?.plan ?? 'Free'
+  const user = useUserState()
+  const activePlan: BillingPlanId = user?.plan ?? 'Free'
   const queryClient = useQueryClient()
   const [upgradeIntent, setUpgradeIntent] = useState<PurchasablePlan | null>(
     null
@@ -137,16 +136,22 @@ export function PricingSection() {
               Simple and Feasible Pricing
             </h2>
 
-            <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-8 overflow-clip sm:mt-12 sm:grid-cols-2 md:grid-cols-3">
+            <div className="mt-8 grid w-full max-w-full grid-cols-1 gap-x-6 gap-y-8 overflow-clip sm:mt-10 sm:grid-cols-2 md:grid-cols-3">
+              {activePlan === 'Free' ? (
+                <div className="col-span-full min-w-0">
+                  <RedemptionCodeSection orgRole={user?.currentOrg?.org_role} />
+                </div>
+              ) : null}
               {PLAN_IDS.map(planId => (
-                <PlanCard
-                  activePlan={activePlan}
-                  isUpgradePending={paymentLinkMutation.isPending}
-                  key={planId}
-                  onUpgradePlan={handleUpgradePlan}
-                  planId={planId}
-                  upgradingPlan={upgradingPlan}
-                />
+                <div className="min-w-0" key={planId}>
+                  <PlanCard
+                    activePlan={activePlan}
+                    isUpgradePending={paymentLinkMutation.isPending}
+                    onUpgradePlan={handleUpgradePlan}
+                    planId={planId}
+                    upgradingPlan={upgradingPlan}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -200,39 +205,10 @@ function PlanCard({
   const canUpgrade = isHigherTier(planId, activePlan)
   const canSelfServeUpgrade = canUpgrade && isPurchasablePlan(planId)
   const isUpgradeLoading = upgradingPlan === planId
-  const shouldHighlightUpgrade = activePlan === 'Free' && planId === 'Pro'
 
   return (
-    <div
-      className={cn(
-        'bg-muted/50 dark:bg-muted/75 relative flex flex-col rounded-xl border p-1',
-        shouldHighlightUpgrade && 'shadow-sm'
-      )}
-    >
-      {shouldHighlightUpgrade ? (
-        <BorderBeam borderWidth={1} duration={8} size={120} />
-      ) : null}
-
+    <div className="bg-muted/50 dark:bg-muted/75 relative flex flex-col rounded-xl border p-1">
       <div className="bg-background relative overflow-hidden rounded-lg border px-6 pt-5 pb-4 shadow-sm dark:shadow-black/20">
-        {shouldHighlightUpgrade ? (
-          <Badge className="absolute top-3 right-3" variant={'destructive'}>
-            Most Popular
-          </Badge>
-        ) : null}
-        {shouldHighlightUpgrade && (
-          <div
-            className="pointer-events-none absolute inset-0 -top-px -left-2 z-0 not-dark:opacity-50"
-            style={{
-              backgroundImage: `
-        repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
-        repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
-        radial-gradient(circle at 20px 20px, rgba(55, 65, 81, 0.12) 2px, transparent 2px),
-        radial-gradient(circle at 40px 40px, rgba(55, 65, 81, 0.12) 2px, transparent 2px)
-      `,
-              backgroundSize: '40px 40px, 40px 40px, 40px 40px, 40px 40px',
-            }}
-          />
-        )}
         <Icon className="text-primary relative z-10 mb-5" />
         <div className="relative z-10 flex items-center gap-1">
           <h3 className="text-2xl font-medium tracking-tight">{copy.title}</h3>

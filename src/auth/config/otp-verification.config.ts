@@ -25,6 +25,14 @@ export const OTP_VERIFICATION_INPUT_CONFIG: OtpVerificationInputConfig = {
   characterSet: 'digits-only',
 }
 
+/** Invite / billing redemption codes (6 alphanumeric slots). */
+export const REDEMPTION_CODE_OTP_CONFIG: OtpVerificationInputConfig = {
+  length: 6,
+  characterSet: 'digits-and-letters',
+}
+
+export const REDEMPTION_CODE_LENGTH = REDEMPTION_CODE_OTP_CONFIG.length
+
 export function getOtpInputPattern(characterSet: OtpCharacterSet): string {
   return characterSet === 'digits-only'
     ? REGEXP_ONLY_DIGITS

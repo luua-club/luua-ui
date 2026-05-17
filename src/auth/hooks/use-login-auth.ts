@@ -25,6 +25,7 @@ import {
 } from '@/core/models/auth.model'
 import { clearAuth, setAuthInfo } from '@/core/store/auth-slice'
 import { loadAuthData } from '@/core/utils/auth-data.util'
+import { parseSafeAppRedirect } from '@/core/utils/safe-app-redirect.util'
 import { syncExtCookie } from '@/shared/utils/extension-cookie.util'
 import {
   getLocalStorageItem,
@@ -154,6 +155,19 @@ export function useLoginAuth(): UseLoginAuthResult {
           `?token=${encodeURIComponent(loginResponse.access_token)}` +
           `&userId=${encodeURIComponent(emailFromAuth)}` +
           `&email=${encodeURIComponent(emailFromAuth)}`
+        return
+      }
+
+      const redirectRaw = new URLSearchParams(window.location.search).get(
+        'redirect'
+      )
+      const safeTarget = parseSafeAppRedirect(redirectRaw)
+
+      if (safeTarget) {
+        router.navigate({
+          to: safeTarget.pathname,
+          search: safeTarget.search,
+        })
         return
       }
 

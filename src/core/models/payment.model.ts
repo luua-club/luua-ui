@@ -6,6 +6,7 @@ export interface PaymentSuccessResponse {
   message?: string
 }
 
+export type BillingPlan = 'Free' | 'Pro' | 'Team' | 'Enterprise'
 export type PurchasablePlan = 'Pro' | 'Team'
 export type SubscriptionType = 'monthly' | 'annual'
 
@@ -14,9 +15,20 @@ export interface CreatePaymentLinkRequest {
   subscription_type: SubscriptionType
 }
 
+export interface RedeemCodeRequest {
+  code: string
+}
+
+export interface RedeemCodeResponse {
+  plan: BillingPlan
+  duration_days: number
+  applied_to_org_id: string
+  redeemed_at: string
+}
+
 export interface ISubscriptionDetails {
   id: string
-  plan: 'Free' | 'Pro' | 'Team' | 'Enterprise'
+  plan: BillingPlan
   status: string
   started_at: string | null
   expires_at: string | null

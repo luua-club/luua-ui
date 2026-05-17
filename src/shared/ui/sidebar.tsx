@@ -7,11 +7,11 @@ import {
   SIDEBAR_COOKIE_MAX_AGE,
   SIDEBAR_COOKIE_NAME,
   SIDEBAR_KEYBOARD_SHORTCUT,
+  SIDEBAR_SHEET_LAYOUT_MAX_WIDTH_PX,
   SIDEBAR_WIDTH,
   SIDEBAR_WIDTH_ICON,
   SIDEBAR_WIDTH_MOBILE,
 } from '@/shared/config/constant'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Separator } from '@/shared/ui/separator'
@@ -43,6 +43,28 @@ type SidebarContextProps = {
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
 
+function useSidebarSheetLayout() {
+  const [matches, setMatches] = React.useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia(`(max-width: ${SIDEBAR_SHEET_LAYOUT_MAX_WIDTH_PX}px)`)
+          .matches
+      : false
+  )
+
+  React.useEffect(() => {
+    const query = `(max-width: ${SIDEBAR_SHEET_LAYOUT_MAX_WIDTH_PX}px)`
+    const mql = window.matchMedia(query)
+    const onChange = () => setMatches(mql.matches)
+
+    mql.addEventListener('change', onChange)
+    setMatches(mql.matches)
+
+    return () => mql.removeEventListener('change', onChange)
+  }, [])
+
+  return matches
+}
+
 function useSidebar() {
   const context = React.useContext(SidebarContext)
   if (!context) {
@@ -65,7 +87,8 @@ function SidebarProvider({
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
-  const isMobile = useIsMobile()
+  /** Off-canvas sheet for viewport widths up to SIDEBAR_SHEET_LAYOUT_MAX_WIDTH_PX */
+  const isMobile = useSidebarSheetLayout()
   const [openMobile, setOpenMobile] = React.useState(false)
 
   // This is the internal state of the sidebar.
