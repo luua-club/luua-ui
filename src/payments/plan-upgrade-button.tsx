@@ -36,7 +36,7 @@ export function PlanUpgradeButton({
       {isLoading ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          Redirecting
+          Processing
         </>
       ) : (
         PLAN_UPGRADE_CTA

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, XCircle } from 'lucide-react'
+import { Info, Loader2, XCircle } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -21,6 +21,16 @@ function isCancellableSubscription(subscription: ISubscriptionDetails) {
     !subscription.cancelled_at &&
     !['cancelled', 'canceled', 'expired'].includes(status)
   )
+}
+
+function shouldShowPlanSyncNotice({
+  storePlan,
+  usagePlan,
+}: {
+  storePlan: string
+  usagePlan?: string
+}) {
+  return ['Pro', 'Team'].includes(storePlan) && usagePlan === 'Free'
 }
 
 function BillingAndCredits() {
@@ -54,6 +64,11 @@ function BillingAndCredits() {
 
   // --- Variables ---
   const subscriptions = subscriptionDetails?.data?.subscriptions
+  const usageSummaryData = usageSummary?.data?.usage_summary
+  const showPlanSyncNotice = shouldShowPlanSyncNotice({
+    storePlan: user?.plan ?? 'Free',
+    usagePlan: usageSummaryData?.plan_type,
+  })
   const activeSubscription = useMemo(
     () => subscriptions?.find(isCancellableSubscription),
     [subscriptions]
@@ -86,7 +101,25 @@ function BillingAndCredits() {
   return (
     <>
       {/* Display current usage statistics */}
-      <UsageSummary usageSummary={usageSummary?.data?.usage_summary} />
+      <UsageSummary usageSummary={usageSummaryData} />
+
+      {showPlanSyncNotice ? (
+        <div className="mb-4 flex gap-3 rounded-md border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-950 dark:border-cyan-900/70 dark:bg-cyan-950/30 dark:text-cyan-100">
+          <Info className="mt-0.5 size-4 shrink-0" />
+          <p className="leading-6">
+            Your {user.plan} plan is active, but usage limits may take some time
+            to reflect. If it is not updated in 15-20 minutes, please reach out
+            to us at{' '}
+            <a
+              className="font-medium underline"
+              href="mailto:connect@luua.club"
+            >
+              connect@luua.club
+            </a>
+            .
+          </p>
+        </div>
+      ) : null}
 
       {/* Display subscription details and plans */}
       <div className="mt-4">

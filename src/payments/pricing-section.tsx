@@ -1,9 +1,10 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleCheck } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
-import { API_CONSTANTS } from '@/core/config/constant'
+import { API_CONSTANTS, QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { type ApiError } from '@/core/models/api.model'
 import {
@@ -24,6 +25,7 @@ import {
   type PlanId,
   type PurchasablePlan,
 } from '@/payments/pricing-data'
+import ConfirmDialog from '@/shared/components/confirm-dialog'
 import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Badge } from '@/shared/ui/badge'
 import { BorderBeam } from '@/shared/ui/border-beam'
@@ -40,14 +42,37 @@ function isActiveSubscriptionError(error: unknown) {
   )
 }
 
+type CheckoutFlowInput = {
+  plan: PurchasablePlan
+  cancelCurrentPlan?: boolean
+}
+
 export function PricingSection() {
   const activePlan: BillingPlanId = useUserState()?.plan ?? 'Free'
+  const queryClient = useQueryClient()
+  const [upgradeIntent, setUpgradeIntent] = useState<PurchasablePlan | null>(
+    null
+  )
   const paymentLinkMutation = useMutation({
-    mutationFn: (plan: PurchasablePlan) =>
-      paymentApi.createPaymentLink({
+    mutationFn: async ({ plan, cancelCurrentPlan }: CheckoutFlowInput) => {
+      if (cancelCurrentPlan) {
+        await paymentApi.cancelSubscription()
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.subscriptionDetails],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [QUERY_KEYS.usageSummary],
+          }),
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] }),
+        ])
+      }
+
+      return paymentApi.createPaymentLink({
         plan,
         subscription_type: 'monthly',
-      }),
+      })
+    },
     onSuccess: response => {
       const paymentLink = response.data.payment_link
 
@@ -58,11 +83,14 @@ export function PricingSection() {
 
       window.location.href = paymentLink
     },
-    onError: error => {
+    onError: (error, variables) => {
       if (isActiveSubscriptionError(error)) {
-        toast.error(
-          'Cancel your current subscription from Billing before changing plans.'
-        )
+        if (!variables.cancelCurrentPlan) {
+          setUpgradeIntent(variables.plan)
+          return
+        }
+
+        toast.error('Cancel your current subscription before changing plans.')
         return
       }
 
@@ -71,52 +99,85 @@ export function PricingSection() {
   })
 
   const upgradingPlan = paymentLinkMutation.isPending
-    ? paymentLinkMutation.variables
+    ? paymentLinkMutation.variables?.plan
     : undefined
 
   const handleUpgradePlan = (plan: PurchasablePlan) => {
-    paymentLinkMutation.mutate(plan)
+    if (activePlan !== 'Free' && isHigherTier(plan, activePlan)) {
+      setUpgradeIntent(plan)
+      return
+    }
+
+    paymentLinkMutation.mutate({ plan })
+  }
+
+  const handleConfirmPlanChange = () => {
+    if (!upgradeIntent) return
+
+    paymentLinkMutation.mutate(
+      { plan: upgradeIntent, cancelCurrentPlan: true },
+      {
+        onSettled: () => setUpgradeIntent(null),
+      }
+    )
   }
 
   return (
-    <section className="w-full">
-      {/* Single content column with continuous side borders (matches marketing table) */}
-      <div className="mx-auto w-full max-w-7xl border-x">
-        <DiagonalStripe className="h-8 border-x-0 border-b" />
-        <div className="flex flex-col items-center justify-center px-4 pt-8 sm:px-6 md:px-8">
-          <AnimatedGradientText className="text-sm">
-            Pricing
-          </AnimatedGradientText>
+    <>
+      <section className="w-full">
+        {/* Single content column with continuous side borders (matches marketing table) */}
+        <div className="mx-auto w-full max-w-7xl border-x">
+          <DiagonalStripe className="h-8 border-x-0 border-b" />
+          <div className="flex flex-col items-center justify-center px-4 pt-8 sm:px-6 md:px-8">
+            <AnimatedGradientText className="text-sm">
+              Pricing
+            </AnimatedGradientText>
 
-          <h2 className="text-center tracking-[0.04em] text-balance sm:text-[2rem]">
-            Simple and Feasible Pricing
-          </h2>
+            <h2 className="text-center tracking-[0.04em] text-balance sm:text-[2rem]">
+              Simple and Feasible Pricing
+            </h2>
 
-          <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-8 overflow-clip sm:mt-12 sm:grid-cols-2 md:grid-cols-3">
-            {PLAN_IDS.map(planId => (
-              <PlanCard
-                activePlan={activePlan}
-                isUpgradePending={paymentLinkMutation.isPending}
-                key={planId}
-                onUpgradePlan={handleUpgradePlan}
-                planId={planId}
-                upgradingPlan={upgradingPlan}
-              />
-            ))}
+            <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-8 overflow-clip sm:mt-12 sm:grid-cols-2 md:grid-cols-3">
+              {PLAN_IDS.map(planId => (
+                <PlanCard
+                  activePlan={activePlan}
+                  isUpgradePending={paymentLinkMutation.isPending}
+                  key={planId}
+                  onUpgradePlan={handleUpgradePlan}
+                  planId={planId}
+                  upgradingPlan={upgradingPlan}
+                />
+              ))}
+            </div>
           </div>
+
+          <div className="border-border mt-16 border-t" aria-hidden />
+
+          <PricingCompareTable
+            activePlan={activePlan}
+            isUpgradePending={paymentLinkMutation.isPending}
+            onUpgradePlan={handleUpgradePlan}
+            upgradingPlan={upgradingPlan}
+          />
+          <DiagonalStripe className="h-8 border-x-0 border-t" />
         </div>
+      </section>
 
-        <div className="border-border mt-16 border-t" aria-hidden />
-
-        <PricingCompareTable
-          activePlan={activePlan}
-          isUpgradePending={paymentLinkMutation.isPending}
-          onUpgradePlan={handleUpgradePlan}
-          upgradingPlan={upgradingPlan}
-        />
-        <DiagonalStripe className="h-8 border-x-0 border-t" />
-      </div>
-    </section>
+      <ConfirmDialog
+        cancelLabel="Not now"
+        confirmDisabled={paymentLinkMutation.isPending}
+        confirmLabel="Cancel and upgrade"
+        description={`To upgrade from ${activePlan} to ${upgradeIntent ?? 'this plan'}, we need to cancel your current subscription first. After that, checkout for the new plan will start automatically.`}
+        onConfirm={handleConfirmPlanChange}
+        onOpenChange={open => {
+          if (!open && !paymentLinkMutation.isPending) {
+            setUpgradeIntent(null)
+          }
+        }}
+        open={upgradeIntent !== null}
+        title="Cancel current plan first?"
+      />
+    </>
   )
 }
 
