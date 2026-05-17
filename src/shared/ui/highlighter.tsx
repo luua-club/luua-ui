@@ -23,6 +23,8 @@ interface HighlighterProps {
   padding?: number
   multiline?: boolean
   isView?: boolean
+  /** When false, no rough-notation SVG is attached (e.g. carousel slide not active). Avoids stacked colours and overflow past opacity-hidden parents. */
+  enabled?: boolean
 }
 
 export function Highlighter({
@@ -35,6 +37,7 @@ export function Highlighter({
   padding = 2,
   multiline = true,
   isView = false,
+  enabled = true,
 }: HighlighterProps) {
   const elementRef = useRef<HTMLSpanElement>(null)
   const annotationRef = useRef<RoughAnnotation | null>(null)
@@ -44,14 +47,23 @@ export function Highlighter({
     margin: '-10%',
   })
 
-  // If isView is false, always show. If isView is true, wait for inView
-  const shouldShow = !isView || isInView
+  const shouldAnnotate = enabled && (!isView || isInView)
 
   useEffect(() => {
-    if (!shouldShow) return
-
     const element = elementRef.current
     if (!element) return
+
+    annotationRef.current?.remove()
+    annotationRef.current = null
+
+    const parent = element.parentElement
+    if (parent) {
+      parent
+        .querySelectorAll(':scope > svg.rough-annotation')
+        .forEach(node => node.parentElement?.removeChild(node))
+    }
+
+    if (!shouldAnnotate) return
 
     const annotationConfig = {
       type: action,
@@ -66,7 +78,7 @@ export function Highlighter({
     const annotation = annotate(element, annotationConfig)
 
     annotationRef.current = annotation
-    annotationRef.current.show()
+    annotation.show()
 
     const resizeObserver = new ResizeObserver(() => {
       annotation.hide()
@@ -74,16 +86,19 @@ export function Highlighter({
     })
 
     resizeObserver.observe(element)
-    resizeObserver.observe(document.body)
 
     return () => {
-      if (element) {
-        annotate(element, { type: action }).remove()
-        resizeObserver.disconnect()
+      annotation.remove()
+      annotationRef.current = null
+      resizeObserver.disconnect()
+      if (parent) {
+        parent
+          .querySelectorAll(':scope > svg.rough-annotation')
+          .forEach(node => node.parentElement?.removeChild(node))
       }
     }
   }, [
-    shouldShow,
+    shouldAnnotate,
     action,
     color,
     strokeWidth,

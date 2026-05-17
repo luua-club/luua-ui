@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { CloudUpload, Paperclip, SmilePlus, X } from 'lucide-react'
-import { useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 import { toast } from 'sonner'
 
 import { filesApi } from '@/core/api/files.api'
@@ -31,19 +31,33 @@ export interface UploadConfig {
   maxSizePerFile: number // Maximum size per file in bytes
 }
 
+export interface PostCardActionsHandle {
+  openUploadDialog: () => void
+}
+
 interface IPostCardActionsProps {
   onEmojiSelect: (emoji: string) => void
   onFilesUploaded?: (fileUrls: string[]) => void
   uploadConfig?: UploadConfig
 }
 
-function PostCardActions({
-  onEmojiSelect,
-  onFilesUploaded,
-  uploadConfig = { maxFiles: 5, maxSizePerFile: 5 * 1024 * 1024 }, // Default: 5 files, 5MB each
-}: IPostCardActionsProps) {
+const PostCardActions = forwardRef<
+  PostCardActionsHandle,
+  IPostCardActionsProps
+>(function PostCardActions(
+  {
+    onEmojiSelect,
+    onFilesUploaded,
+    uploadConfig = { maxFiles: 5, maxSizePerFile: 5 * 1024 * 1024 }, // Default: 5 files, 5MB each
+  },
+  ref
+) {
   // --- State ---
   const [open, setOpen] = useState(false)
+
+  useImperativeHandle(ref, () => ({
+    openUploadDialog: () => setOpen(true),
+  }))
   const [files, setFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string>('')
@@ -219,6 +233,6 @@ function PostCardActions({
       </Dialog>
     </div>
   )
-}
+})
 
 export default PostCardActions

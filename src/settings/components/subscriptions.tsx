@@ -19,6 +19,11 @@ interface ISubscriptionProps {
   subscriptionDetails: ISubscriptionDetails[] | undefined
 }
 
+function formatSubscriptionDate(date: string | null) {
+  if (!date) return '-'
+  return format(new Date(date), 'dd MMM yyyy')
+}
+
 function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
   // --- Early Return ---
   // Show skeleton while subscription data is loading
@@ -134,12 +139,12 @@ function Subscription({ user, subscriptionDetails }: ISubscriptionProps) {
                         {subscription.status.toUpperCase()}
                       </Badge>
                     </TableCell>
-                    <TableCell>{user.plan}</TableCell>
+                    <TableCell>{subscription.plan ?? user.plan}</TableCell>
                     <TableCell className="text-right">
-                      {format(new Date(subscription.started_at), 'dd MMM yyyy')}
+                      {formatSubscriptionDate(subscription.started_at)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {format(new Date(subscription.expires_at), 'dd MMM yyyy')}
+                      {formatSubscriptionDate(subscription.expires_at)}
                     </TableCell>
                   </TableRow>
                 ))}

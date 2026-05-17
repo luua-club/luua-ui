@@ -30,6 +30,12 @@ class OAuthApi extends BaseApiService {
       },
     })
   }
+
+  async instagramAuthorize() {
+    return this.get<{ authorization_url: string }>('/instagram/authorize', {
+      params: { redirect_to: window.location.href },
+    })
+  }
 }
 
 export const oauthApi = new OAuthApi()

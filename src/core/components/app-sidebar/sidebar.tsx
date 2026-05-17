@@ -18,6 +18,7 @@ import AppSidebarHeader from './sidebar-header'
 import AppSidebarUngrouped from './sidebar-ungrouped'
 
 const dashboardItem = coreLinks.find(item => item.url === '/dashboard')!
+const analyticsItem = coreLinks.find(item => item.url === '/analytics')!
 const allPostsItem = coreLinks.find(item => item.url === '/posts-view')!
 
 function AppSidebar() {
@@ -31,10 +32,10 @@ function AppSidebar() {
           variant="ghost"
           size="sm"
           onClick={toggleSidebar}
-          className="bg-background/90 fixed top-1/2 left-0 z-30 h-18 w-4 -translate-y-1/2 rounded-r-md border border-l-0 px-0 shadow-sm md:hidden"
+          className="bg-background/95 fixed top-1/2 left-2 z-40 flex h-12 w-10 -translate-y-1/2 items-center justify-center rounded-r-lg border px-0 shadow-md"
           aria-label="Open sidebar"
         >
-          <PanelRightOpen className="size-3" />
+          <PanelRightOpen className="size-4" />
         </Button>
       )}
 
@@ -47,7 +48,9 @@ function AppSidebar() {
         {/* Content */}
         <SidebarContent>
           {/* Core Navigation */}
-          <AppSidebarUngrouped ungroupedItems={[dashboardItem]} />
+          <AppSidebarUngrouped
+            ungroupedItems={[dashboardItem, analyticsItem]}
+          />
           <AppSidebarAllPosts item={allPostsItem} />
 
           {/* Automation */}

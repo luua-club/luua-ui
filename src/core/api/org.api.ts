@@ -1,4 +1,4 @@
-import { Member, OrganizationDetail } from '../models/org.model'
+import { type Member, type OrganizationDetail } from '../models/org.model'
 import { BaseApiService } from './base.api'
 
 class OrgApi extends BaseApiService {

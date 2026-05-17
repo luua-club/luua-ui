@@ -2,7 +2,11 @@ import z from 'zod'
 
 import { UserStyleStatus } from '../config/constant'
 import { writingStyles } from '../config/user-preferences.config'
-import { OrganizationSummarySchema, ProjectSchema } from './org.model'
+import {
+  type BillingPlan,
+  OrganizationSummarySchema,
+  ProjectSchema,
+} from './org.model'
 
 /**
  * User schema
@@ -23,7 +27,7 @@ export type User = z.infer<typeof UserSchema>
  * User state interface (plan comes from currentOrg, injected by useUserState hook)
  */
 export interface UserState extends User {
-  plan: 'Free' | 'Pro'
+  plan: BillingPlan
   logout: () => void
 }
 

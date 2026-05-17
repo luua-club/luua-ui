@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
@@ -42,12 +42,18 @@ export function useDraft() {
   const search = useSearch({ from: '/creation/create' })
   const draftId = search.draftId
 
+  const allChannels = useMemo(
+    () => SOCIAL_PLATFORM.map(platform => platform.name as channelType),
+    []
+  )
   const [postDrafts, setPostDrafts] = useState<PostDrafts>({})
   const [draftName, setDraftName] = useState('')
   const [updatedAt, setUpdatedAt] = useState<string | null>(null)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const [isLocked, setIsLocked] = useState<boolean | null>(null)
   const [lockedByUser, setLockedByUser] = useState<ILockedByUser | null>(null)
+  const [enabledChannels, setEnabledChannels] =
+    useState<channelType[]>(allChannels)
   // Source-of-truth ID used during save orchestration. This prevents duplicate
   // draft creation when a queued save runs before router search params update.
   const activeDraftIdRef = useRef<string | null>(draftId ?? null)
@@ -96,6 +102,15 @@ export function useDraft() {
     activeDraftIdRef.current = draftId ?? null
   }, [draftId])
 
+  useEffect(() => {
+    if (enabledChannels.length > 0) return
+    if (draftId) {
+      setEnabledChannels(allChannels.slice(0, 1))
+      return
+    }
+    setEnabledChannels(allChannels)
+  }, [allChannels, draftId, enabledChannels.length])
+
   // ─── Load existing draft ───────────────────────────────────────────────────
 
   const draftQuery = useQuery<DraftItem>({
@@ -126,15 +141,24 @@ export function useDraft() {
     versionRef.current = draftQuery.data.version
 
     const nextDrafts: PostDrafts = {}
+    const enabledFromContent = new Set<channelType>()
 
     draftQuery.data.posts.forEach(post => {
       nextDrafts[post.channel] = post
+      if (hasDraftContent(post)) {
+        enabledFromContent.add(post.channel)
+      }
     })
 
     setPostDrafts(nextDrafts)
     setDraftName(draftQuery.data.name ?? '')
     setUpdatedAt(draftQuery.data.updated_at ?? null)
-  }, [clearAutoSaveTimer, clearSaveStatusTimer, draftQuery.data])
+    setEnabledChannels(
+      enabledFromContent.size > 0
+        ? Array.from(enabledFromContent)
+        : allChannels.slice(0, 1)
+    )
+  }, [allChannels, clearAutoSaveTimer, clearSaveStatusTimer, draftQuery.data])
 
   // ─── Lock lifecycle ─────────────────────────────────────────────────────────
 
@@ -277,16 +301,35 @@ export function useDraft() {
     []
   )
 
+  const setChannelEnabled = useCallback(
+    (channel: channelType, enabled: boolean) => {
+      setEnabledChannels(prev => {
+        if (enabled) {
+          if (prev.includes(channel)) return prev
+          return [...prev, channel]
+        }
+        if (prev.length <= 1 && !(prev.length === 1 && prev[0] === 'Instagram'))
+          return prev
+        return prev.filter(item => item !== channel)
+      })
+
+      if (!draftId) return
+      if (!enabled) {
+        isDirtyRef.current = true
+      }
+    },
+    [draftId]
+  )
+
   // ─── Computed ──────────────────────────────────────────────────────────────
 
   // Draft is valid only when at least one social post has text or media.
-  const hasContent = SOCIAL_PLATFORM.some(({ name }) =>
-    hasDraftContent(postDrafts[name as channelType])
+  const hasContent = enabledChannels.some(channel =>
+    hasDraftContent(postDrafts[channel])
   )
 
   // True when any post's content exceeds its platform character limit.
-  const hasExceededCharLimit = SOCIAL_PLATFORM.some(({ name }) => {
-    const channel = name as channelType
+  const hasExceededCharLimit = enabledChannels.some(channel => {
     const content = postDrafts[channel]?.content ?? ''
     return content.length > POST_WORD_COUNT[channel]
   })
@@ -312,9 +355,10 @@ export function useDraft() {
         payload.version = versionRef.current
       }
     }
-    // Always evaluate all socials; include only posts that have content/media.
-    SOCIAL_PLATFORM.forEach(({ name }) => {
-      const channel = name as channelType
+    const enabledSet = new Set(enabledChannels)
+
+    // Include enabled socials that have content/media.
+    enabledChannels.forEach(channel => {
       const draft = postDrafts[channel]
       if (!hasDraftContent(draft)) return
 
@@ -326,8 +370,24 @@ export function useDraft() {
       })
     })
 
+    // For disabled socials, clear on BE when draft exists and we have data.
+    if (activeDraftId) {
+      SOCIAL_PLATFORM.forEach(({ name }) => {
+        const channel = name as channelType
+        if (enabledSet.has(channel)) return
+        const draft = postDrafts[channel]
+        if (!draft?.id && !hasDraftContent(draft)) return
+        payload.posts.push({
+          ...(draft?.id ? { id: draft.id } : {}),
+          channel,
+          content: '',
+          attached_media: [],
+        })
+      })
+    }
+
     return payload
-  }, [draftName, postDrafts])
+  }, [draftName, enabledChannels, postDrafts])
 
   const buildPayloadRef = useRef(buildPayload)
   buildPayloadRef.current = buildPayload
@@ -486,7 +546,14 @@ export function useDraft() {
     }, AUTO_SAVE_DELAY_MS)
 
     return () => clearAutoSaveTimer()
-  }, [clearAutoSaveTimer, hasContent, isReadOnly, postDrafts, requestSave])
+  }, [
+    clearAutoSaveTimer,
+    enabledChannels,
+    hasContent,
+    isReadOnly,
+    postDrafts,
+    requestSave,
+  ])
 
   // ─── Manual save ───────────────────────────────────────────────────────────
 
@@ -526,8 +593,10 @@ export function useDraft() {
     version: versionRef.current,
     hasContent,
     hasExceededCharLimit,
+    enabledChannels,
     handleContentChange,
     handleImagesChange,
+    setChannelEnabled,
     handleSaveDraft,
     handleRenameDraft,
   }

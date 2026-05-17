@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CheckCircle2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,12 +7,15 @@ import z from 'zod'
 
 import { projectApi } from '@/core/api/project.api'
 import { QUERY_KEYS } from '@/core/config/constant'
+import { usePermission } from '@/core/hooks/use-permission'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { UserState } from '@/core/models/user.model'
-import { Badge } from '@/shared/ui/badge'
+import { Permission } from '@/core/rbac'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Separator } from '@/shared/ui/separator'
+
+import EntityDetailSection from '../components/entity-detail-section'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -22,7 +24,9 @@ type FormValues = z.infer<typeof schema>
 
 function ProjectGeneral(_props: { user: UserState }) {
   const user = useUserState()
+  const { can } = usePermission()
   const queryClient = useQueryClient()
+  const canEditProject = can(Permission.PROJECT_EDIT_DRAFT)
 
   const {
     register,
@@ -52,6 +56,8 @@ function ProjectGeneral(_props: { user: UserState }) {
   if (!user || !user.currentProject) return null
 
   const { currentProject, orgProjects } = user
+  const profileProject = user.projects?.find(p => p.id === currentProject.id)
+  const otherProjects = orgProjects.filter(p => p.id !== currentProject.id)
 
   return (
     <>
@@ -61,32 +67,56 @@ function ProjectGeneral(_props: { user: UserState }) {
       </div>
       <Separator />
 
-      {/* Projects list */}
+      {/* Current project detail card */}
       <div className="py-4">
-        <h2 className="text-sm font-medium">Projects</h2>
+        <EntityDetailSection
+          label="Project"
+          name={currentProject.name}
+          role={profileProject?.project_role}
+        >
+          {canEditProject && (
+            <form
+              onSubmit={handleSubmit(d => mutation.mutate(d))}
+              className="max-w-sm space-y-3"
+            >
+              <label className="text-muted-foreground text-sm font-medium">
+                Rename project
+              </label>
+              <div>
+                <Input {...register('name')} placeholder="Project name" />
+                {errors.name && (
+                  <p className="text-destructive mt-1 text-xs">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+              <Button type="submit" disabled={!isDirty || mutation.isPending}>
+                Save changes
+              </Button>
+            </form>
+          )}
+        </EntityDetailSection>
       </div>
 
-      <div className="divide-border divide-y">
-        {orgProjects.map(project => {
-          const isCurrent = project.id === currentProject.id
-          return (
-            <div key={project.id} className="flex items-center gap-3 py-3">
-              {isCurrent ? (
-                <CheckCircle2 className="text-primary size-4 shrink-0" />
-              ) : (
-                <div className="size-4 shrink-0" />
-              )}
+      {/* Other projects */}
+      {otherProjects.length > 0 && (
+        <>
+          <div className="pt-2 pb-3">
+            <h2 className="text-muted-foreground text-sm font-medium">
+              Other projects
+            </h2>
+          </div>
 
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{project.name}</p>
-                <p className="text-muted-foreground text-xs capitalize">
-                  {project.project_role}
-                </p>
-              </div>
+          <div className="divide-border divide-y">
+            {otherProjects.map(project => (
+              <div key={project.id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{project.name}</p>
+                  <p className="text-muted-foreground text-xs capitalize">
+                    {project.project_role}
+                  </p>
+                </div>
 
-              {isCurrent ? (
-                <Badge variant="secondary">Current</Badge>
-              ) : (
                 <Button
                   variant="outline"
                   size="sm"
@@ -94,34 +124,11 @@ function ProjectGeneral(_props: { user: UserState }) {
                 >
                   Switch
                 </Button>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Rename current project */}
-      <div className="mt-4 py-4">
-        <h2 className="text-sm font-medium">Rename current project</h2>
-      </div>
-      <Separator />
-
-      <form
-        onSubmit={handleSubmit(d => mutation.mutate(d))}
-        className="max-w-sm space-y-4 py-6"
-      >
-        <div>
-          <Input {...register('name')} placeholder="Project name" />
-          {errors.name && (
-            <p className="text-destructive mt-1 text-xs">
-              {errors.name.message}
-            </p>
-          )}
-        </div>
-        <Button type="submit" disabled={!isDirty || mutation.isPending}>
-          Save changes
-        </Button>
-      </form>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </>
   )
 }

@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 
 import { API_CONSTANTS, BASE_API_URL } from '../config/constant'
 import { authInterceptor } from '../interceptors/auth.interceptor'
-import { ApiError, ApiResponse } from '../models/api.model'
+import { type ApiError, type ApiResponse } from '../models/api.model'
 import { logout } from '../utils/common.util'
 
 export class BaseApiService {
@@ -216,7 +216,11 @@ export class BaseApiService {
       logout()
     }
 
-    if (status === API_CONSTANTS.statusCode.conflict) {
+    if (
+      status === API_CONSTANTS.statusCode.conflict &&
+      this.getErrorCode(apiError) !==
+        API_CONSTANTS.errorCode.activeSubscriptionFound
+    ) {
       toast.error(
         this.getErrorMessage(
           apiError,
@@ -242,6 +246,11 @@ export class BaseApiService {
     if (typeof apiError.detail === 'object' && apiError.detail?.error)
       return apiError.detail.error
     return defaultMessage
+  }
+
+  private getErrorCode(apiError: ApiError): string | undefined {
+    if (typeof apiError.detail === 'object') return apiError.detail?.error_code
+    return undefined
   }
 
   /**

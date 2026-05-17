@@ -461,31 +461,31 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                         'lg:grid-cols-2'
                       )}
                     >
-                      {(['LinkedIn', 'Twitter'] as channelType[]).map(
-                        (channel, i) => {
-                          const platform = SOCIAL_PLATFORM.find(
-                            p => p.name === channel
-                          )
-                          const post = getPost(
-                            `${draft.id}-${idx + i}`,
-                            channel,
-                            draft,
-                            postId => openDeletePost(draft.id, postId)
-                          )
-                          if (!post || !platform) return null
-                          return (
-                            <div key={channel} className="flex flex-col gap-2">
-                              <div className="flex items-center gap-1.5">
-                                <platform.logo className="size-4" />
-                                <p className="text-sm font-semibold">
-                                  {platform.label}
-                                </p>
-                              </div>
-                              {post}
+                      {(
+                        ['LinkedIn', 'Twitter', 'Instagram'] as channelType[]
+                      ).map((channel, i) => {
+                        const platform = SOCIAL_PLATFORM.find(
+                          p => p.name === channel
+                        )
+                        const post = getPost(
+                          `${draft.id}-${idx + i}`,
+                          channel,
+                          draft,
+                          postId => openDeletePost(draft.id, postId)
+                        )
+                        if (!post || !platform) return null
+                        return (
+                          <div key={channel} className="flex flex-col gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <platform.logo className="size-4" />
+                              <p className="text-sm font-semibold">
+                                {platform.label}
+                              </p>
                             </div>
-                          )
-                        }
-                      )}
+                            {post}
+                          </div>
+                        )
+                      })}
                     </div>
 
                     <div className="text-accent-foreground/40 absolute top-0 right-0 flex items-center justify-end gap-2 p-4 font-medium">

@@ -1,15 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
-import { AuthInfo } from '@/core/models/auth.model'
-import { OrganizationDetail } from '@/core/models/org.model'
-import { User } from '@/core/models/user.model'
+import { type AuthInfo } from '@/core/models/auth.model'
+import { type OrganizationDetail } from '@/core/models/org.model'
+import { type User } from '@/core/models/user.model'
 import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
 
-import { ProjectDetail } from '../models/org.model'
+import { type ProjectDetail } from '../models/org.model'
 
 interface IAuthState {
   isLoading: boolean

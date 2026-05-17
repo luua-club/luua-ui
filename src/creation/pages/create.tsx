@@ -1,13 +1,28 @@
 import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
+import {
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
 
+import InstagramPostCard from '@/core/components/post-card/instagram-post-card'
 import LinkedInPostCard from '@/core/components/post-card/linkedin-post-card'
 import { PostCardMode } from '@/core/components/post-card/post-card.types'
 import TwitterPostCard from '@/core/components/post-card/twitter-post-card'
+import { SOCIAL_PLATFORM } from '@/core/config/constant'
 import type { channelType } from '@/core/models/social.model'
 import { FloatingChat } from '@/creation/components/floating-chat'
 import { DraftLockedBanner } from '@/shared/components/draft-locked-banner'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/shared/ui/carousel'
 
 import CreateHeader from '../components/create-header'
 import { CreateHeaderOptions } from '../components/create-header-options'
@@ -15,6 +30,12 @@ import { useDraft } from '../hooks/use-draft.hook'
 
 type SocialTab = channelType | 'all'
 type PreviewMode = 'editor' | 'preview'
+type LayoutMode = 'grid' | 'row'
+
+// Instagram composer toggle is paused (flip flag when launching).
+const INSTAGRAM_COMPOSER_DISABLED_PENDING_BE = true
+const INSTAGRAM_COMPOSER_DISABLED_TOAST_MESSAGE =
+  'Instagram is not available yet—this is still a work in progress.'
 
 function formatUpdatedAt(value: string) {
   const date = new Date(value)
@@ -36,8 +57,13 @@ function Create() {
   const [initialSource] = useState(source)
   const [activeTab, setActiveTab] = useState<SocialTab>('all')
   const [previewMode, setPreviewMode] = useState<PreviewMode>('editor')
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('grid')
   const [isAiGenerating, setIsAiGenerating] = useState(false)
   const draft = useDraft()
+  const allChannels = useMemo(
+    () => SOCIAL_PLATFORM.map(platform => platform.name as channelType),
+    []
+  )
 
   // Called by FloatingChat right before it submits the auto-prompt.
   // Strips source from the URL at that point (safe — message is already queued).
@@ -54,9 +80,63 @@ function Create() {
   const cardMode: PostCardMode =
     effectivePreviewMode === 'preview' ? 'preview' : 'editor'
 
+  const baseEnabledChannels =
+    draft.enabledChannels.length > 0
+      ? draft.enabledChannels
+      : draft.draftId
+        ? allChannels.slice(0, 1)
+        : allChannels
+
+  /* When INSTAGRAM_COMPOSER_DISABLED_PENDING_BE is false, restore:
+   *   const enabledChannels = baseEnabledChannels
+   */
+  const enabledChannels = useMemo(() => {
+    if (!INSTAGRAM_COMPOSER_DISABLED_PENDING_BE) return baseEnabledChannels
+    const withoutInstagram = baseEnabledChannels.filter(
+      ch => ch !== 'Instagram'
+    )
+    return withoutInstagram.length > 0
+      ? withoutInstagram
+      : allChannels.filter(ch => ch !== 'Instagram')
+  }, [baseEnabledChannels, allChannels])
+
+  useEffect(() => {
+    if (!INSTAGRAM_COMPOSER_DISABLED_PENDING_BE) return
+    if (!draft.enabledChannels.includes('Instagram')) return
+    draft.setChannelEnabled('Instagram', false)
+  }, [draft.enabledChannels, draft.setChannelEnabled])
+
+  const handleChannelToggle = useCallback(
+    (channel: channelType, enabled: boolean) => {
+      if (!INSTAGRAM_COMPOSER_DISABLED_PENDING_BE || channel !== 'Instagram') {
+        draft.setChannelEnabled(channel, enabled)
+        return
+      }
+      if (enabled) {
+        toast.info(INSTAGRAM_COMPOSER_DISABLED_TOAST_MESSAGE)
+      }
+      // Keep Instagram off regardless of attempted toggle direction.
+      if (!enabled && draft.enabledChannels.includes('Instagram')) {
+        draft.setChannelEnabled('Instagram', false)
+      }
+    },
+    [draft.enabledChannels, draft.setChannelEnabled]
+  )
+
+  const isLinkedInEnabled = enabledChannels.includes('LinkedIn')
+  const isTwitterEnabled = enabledChannels.includes('Twitter')
+  const isInstagramEnabled = enabledChannels.includes('Instagram')
+
   // All socials are always available; tabs only control visibility.
-  const showLinkedIn = activeTab === 'all' || activeTab === 'LinkedIn'
-  const showTwitter = activeTab === 'all' || activeTab === 'Twitter'
+  const showLinkedIn =
+    isLinkedInEnabled && (activeTab === 'all' || activeTab === 'LinkedIn')
+  const showTwitter =
+    isTwitterEnabled && (activeTab === 'all' || activeTab === 'Twitter')
+  const showInstagram =
+    isInstagramEnabled && (activeTab === 'all' || activeTab === 'Instagram')
+  const isAllTab = activeTab === 'all'
+  const hasRowToggle = enabledChannels.length > 2
+  const effectiveLayoutMode = isAllTab && hasRowToggle ? layoutMode : 'grid'
   const reviewActionsDisabled =
     !draft.hasContent ||
     draft.saveStatus === 'pending' ||
@@ -69,6 +149,19 @@ function Create() {
       ? `Updated ${formatUpdatedAt(draft.updatedAt)}`
       : 'Updated recently'
     : 'Unsaved changes'
+  const scheduleUsageLabel = undefined
+
+  useEffect(() => {
+    if (activeTab === 'all') return
+    if (enabledChannels.includes(activeTab)) return
+    setActiveTab('all')
+  }, [activeTab, enabledChannels])
+
+  useEffect(() => {
+    if (hasRowToggle) return
+    if (layoutMode === 'grid') return
+    setLayoutMode('grid')
+  }, [hasRowToggle, layoutMode])
 
   const openReviewFlow = (schedule: boolean) => {
     if (!draft.hasContent) {
@@ -105,6 +198,7 @@ function Create() {
           }
           onSchedule={() => openReviewFlow(true)}
           scheduleDisabled={reviewActionsDisabled}
+          scheduleUsageLabel={scheduleUsageLabel}
           onPublish={() => openReviewFlow(false)}
           publishDisabled={reviewActionsDisabled}
           onTitleChange={draft.isReadOnly ? undefined : draft.handleRenameDraft}
@@ -116,6 +210,10 @@ function Create() {
           onChange={setActiveTab}
           previewMode={effectivePreviewMode}
           onPreviewModeChange={draft.isReadOnly ? undefined : setPreviewMode}
+          layoutMode={effectiveLayoutMode}
+          onLayoutModeChange={setLayoutMode}
+          enabledChannels={enabledChannels}
+          onChannelToggle={handleChannelToggle}
           onBackToDashboard={() => navigate({ to: '/dashboard' })}
         />
       </div>
@@ -130,71 +228,176 @@ function Create() {
       )}
 
       <div className="flex-1 p-4 pt-6">
-        <div
-          className={
-            activeTab === 'all'
-              ? 'mx-auto grid max-w-6xl grid-cols-1 gap-6 xl:grid-cols-2'
-              : 'mx-auto flex max-w-6xl gap-6'
-          }
-        >
-          {showLinkedIn && (
-            <div
-              className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
-              }
-            >
-              <LinkedInPostCard
-                loading={draft.isLoading}
-                initialContent={draft.postDrafts.LinkedIn?.content}
-                initialImages={draft.postDrafts.LinkedIn?.attached_media}
-                mode={cardMode}
-                isActionLoading={isAiGenerating}
-                shimmer={
-                  isAiGenerating &&
-                  (activeTab === 'all' || activeTab === 'LinkedIn')
+        {(() => {
+          const cardItems = [
+            showLinkedIn
+              ? {
+                  key: 'linkedin',
+                  node: (
+                    <div
+                      className={
+                        isAllTab ? 'w-full' : 'mx-auto w-full max-w-2xl'
+                      }
+                    >
+                      <LinkedInPostCard
+                        loading={draft.isLoading}
+                        initialContent={draft.postDrafts.LinkedIn?.content}
+                        initialImages={
+                          draft.postDrafts.LinkedIn?.attached_media
+                        }
+                        mode={cardMode}
+                        isActionLoading={isAiGenerating}
+                        shimmer={
+                          isAiGenerating &&
+                          (activeTab === 'all' || activeTab === 'LinkedIn')
+                        }
+                        onRequestEdit={
+                          draft.isReadOnly
+                            ? undefined
+                            : () => setPreviewMode('editor')
+                        }
+                        onContentChange={val =>
+                          draft.handleContentChange(val, 'LinkedIn')
+                        }
+                        onImagesChange={images =>
+                          draft.handleImagesChange(images, 'LinkedIn')
+                        }
+                      />
+                    </div>
+                  ),
                 }
-                onRequestEdit={
-                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
+              : null,
+            showTwitter
+              ? {
+                  key: 'twitter',
+                  node: (
+                    <div
+                      className={
+                        isAllTab ? 'w-full' : 'mx-auto w-full max-w-2xl'
+                      }
+                    >
+                      <TwitterPostCard
+                        loading={draft.isLoading}
+                        initialContent={draft.postDrafts.Twitter?.content}
+                        initialImages={draft.postDrafts.Twitter?.attached_media}
+                        mode={cardMode}
+                        isActionLoading={isAiGenerating}
+                        shimmer={
+                          isAiGenerating &&
+                          (activeTab === 'all' || activeTab === 'Twitter')
+                        }
+                        onRequestEdit={
+                          draft.isReadOnly
+                            ? undefined
+                            : () => setPreviewMode('editor')
+                        }
+                        onContentChange={val =>
+                          draft.handleContentChange(val, 'Twitter')
+                        }
+                        onImagesChange={images =>
+                          draft.handleImagesChange(images, 'Twitter')
+                        }
+                      />
+                    </div>
+                  ),
                 }
-                onContentChange={val =>
-                  draft.handleContentChange(val, 'LinkedIn')
+              : null,
+            showInstagram
+              ? {
+                  key: 'instagram',
+                  node: (
+                    <div
+                      className={
+                        isAllTab ? 'w-full' : 'mx-auto w-full max-w-[470px]'
+                      }
+                    >
+                      <InstagramPostCard
+                        loading={draft.isLoading}
+                        initialContent={draft.postDrafts.Instagram?.content}
+                        initialImages={
+                          draft.postDrafts.Instagram?.attached_media
+                        }
+                        mode={cardMode}
+                        isActionLoading={isAiGenerating}
+                        shimmer={
+                          isAiGenerating &&
+                          (activeTab === 'all' || activeTab === 'Instagram')
+                        }
+                        onRequestEdit={
+                          draft.isReadOnly
+                            ? undefined
+                            : () => setPreviewMode('editor')
+                        }
+                        onContentChange={val =>
+                          draft.handleContentChange(val, 'Instagram')
+                        }
+                        onImagesChange={images =>
+                          draft.handleImagesChange(images, 'Instagram')
+                        }
+                      />
+                    </div>
+                  ),
                 }
-                onImagesChange={images =>
-                  draft.handleImagesChange(images, 'LinkedIn')
-                }
-              />
-            </div>
-          )}
+              : null,
+          ].filter(
+            (item): item is { key: string; node: ReactElement } => item !== null
+          )
 
-          {showTwitter && (
-            <div
-              className={
-                activeTab === 'all' ? 'w-full' : 'mx-auto w-full max-w-2xl'
-              }
-            >
-              <TwitterPostCard
-                loading={draft.isLoading}
-                initialContent={draft.postDrafts.Twitter?.content}
-                initialImages={draft.postDrafts.Twitter?.attached_media}
-                mode={cardMode}
-                isActionLoading={isAiGenerating}
-                shimmer={
-                  isAiGenerating &&
-                  (activeTab === 'all' || activeTab === 'Twitter')
-                }
-                onRequestEdit={
-                  draft.isReadOnly ? undefined : () => setPreviewMode('editor')
-                }
-                onContentChange={val =>
-                  draft.handleContentChange(val, 'Twitter')
-                }
-                onImagesChange={images =>
-                  draft.handleImagesChange(images, 'Twitter')
-                }
-              />
+          if (isAllTab && effectiveLayoutMode === 'row') {
+            return (
+              <>
+                <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 lg:hidden">
+                  {cardItems.map(item => (
+                    <div key={item.key}>{item.node}</div>
+                  ))}
+                </div>
+                <Carousel
+                  opts={{
+                    align: 'start',
+                    slidesToScroll: 1,
+                    breakpoints: {
+                      '(min-width: 768px)': { slidesToScroll: 2 },
+                    },
+                  }}
+                  className="mx-auto hidden max-w-6xl lg:block"
+                >
+                  <CarouselContent className="overflow-visible">
+                    {cardItems.map(item => (
+                      <CarouselItem
+                        key={item.key}
+                        className="basis-full md:basis-[45%]"
+                      >
+                        {item.node}
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="-left-5 h-8 w-8" />
+                  <CarouselNext className="-right-5 h-8 w-8" />
+                </Carousel>
+              </>
+            )
+          }
+
+          if (isAllTab) {
+            return (
+              <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 xl:grid-cols-2">
+                {cardItems.map(item => (
+                  <div key={item.key}>{item.node}</div>
+                ))}
+              </div>
+            )
+          }
+
+          return (
+            <div className="mx-auto flex w-full max-w-6xl justify-center">
+              {cardItems.map(item => (
+                <div key={item.key} className="w-full">
+                  {item.node}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
+          )
+        })()}
       </div>
 
       {!draft.isReadOnly && (
@@ -203,9 +406,17 @@ function Create() {
           onGeneratingChange={setIsAiGenerating}
           channel={activeTab}
           onChannelChange={setActiveTab}
+          enabledChannels={enabledChannels}
           currentState={{
-            linkedin: draft.postDrafts.LinkedIn?.content ?? null,
-            twitter: draft.postDrafts.Twitter?.content ?? null,
+            linkedin: isLinkedInEnabled
+              ? (draft.postDrafts.LinkedIn?.content ?? null)
+              : null,
+            twitter: isTwitterEnabled
+              ? (draft.postDrafts.Twitter?.content ?? null)
+              : null,
+            instagram: isInstagramEnabled
+              ? (draft.postDrafts.Instagram?.content ?? null)
+              : null,
           }}
           initialOpen={!!initialSource}
           autoSubmitPrompt={initialSource}

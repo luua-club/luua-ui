@@ -4,6 +4,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 
+import getAnalyticsRoute from '@/analytics/router'
 import { AppContent } from '@/App'
 import getAuthRoute from '@/auth/router'
 import getAutoPilotRoute from '@/autopilot/router'
@@ -18,6 +19,8 @@ import getPreferencesRoute from '@/preferences/router'
 import getReviewRoute from '@/review/router'
 import getSettingsRouteTree from '@/settings/router'
 import GlobalLoader from '@/shared/components/global-loader'
+
+import getPaymentsRoute from './payments/router'
 
 // This is root, it sets up auth guard.
 // only few pages like login page works without guard
@@ -37,12 +40,14 @@ const authRoute = getAuthRoute(rootRoute)
 const settingsRouteTree = getSettingsRouteTree(privateRoute)
 const creationRouteTree = getCreationRouteTree(privateRoute)
 const dashboardRoute = getDashboardRoute(privateRoute)
+const analyticsRoute = getAnalyticsRoute(privateRoute)
 const draftsRoute = getDraftsRoute(privateRoute)
 const preferencesRoute = getPreferencesRoute(privateRoute)
 const bookmarksRoute = getBookmarksRoute(privateRoute)
 const autopilotRoute = getAutoPilotRoute(privateRoute)
 const reviewRoute = getReviewRoute(privateRoute)
 const postsViewhubRoute = getPostsViewRoute(privateRoute)
+const paymentsRoute = getPaymentsRoute(privateRoute)
 
 const routeTree = rootRoute.addChildren([
   authRoute,
@@ -50,12 +55,14 @@ const routeTree = rootRoute.addChildren([
     settingsRouteTree,
     creationRouteTree,
     dashboardRoute,
+    analyticsRoute,
     draftsRoute,
     preferencesRoute,
     bookmarksRoute,
     autopilotRoute,
     reviewRoute,
     postsViewhubRoute,
+    paymentsRoute,
   ]),
 ])
 

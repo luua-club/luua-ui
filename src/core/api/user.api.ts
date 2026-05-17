@@ -1,9 +1,12 @@
-import { channelType, LinkedInAccountType } from '../models/social.model'
 import {
-  IUserStyleRequest,
-  User,
-  UserOnboardingRequest,
-  userStyleResponseType,
+  type channelType,
+  type LinkedInAccountType,
+} from '../models/social.model'
+import {
+  type IUserStyleRequest,
+  type User,
+  type UserOnboardingRequest,
+  type userStyleResponseType,
 } from '../models/user.model'
 import { BaseApiService } from './base.api'
 
@@ -61,6 +64,10 @@ class UserApi extends BaseApiService {
     organization_id: string | null
   }) {
     return this.patch<void, typeof data>(data, '/linkedin-target')
+  }
+
+  async setInstagramTarget(data: { instagram_account_id: string }) {
+    return this.patch<void, typeof data>(data, '/instagram-target')
   }
 
   /**

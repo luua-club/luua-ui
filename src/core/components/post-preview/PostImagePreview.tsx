@@ -1,4 +1,5 @@
 import { X } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/shared/ui/button'
 
@@ -9,17 +10,32 @@ const PostImagePreview = ({
   imagePreviews: string[]
   onRemove?: (index: number) => void
 }) => {
+  const [singleAspectRatio, setSingleAspectRatio] = useState(1)
+  const minRatio = 4 / 5
+  const maxRatio = 191 / 100
   if (imagePreviews.length === 0) return null
 
   const count = Math.min(imagePreviews.length, 4)
 
   if (count === 1) {
     return (
-      <div className="group bg-muted relative overflow-hidden">
+      <div
+        className="group bg-muted relative overflow-hidden"
+        style={{ aspectRatio: singleAspectRatio }}
+      >
         <img
           src={imagePreviews[0]}
           alt="attachment-0"
-          className="aspect-video h-full w-full object-cover"
+          className="h-full w-full object-cover"
+          onLoad={e => {
+            const { naturalWidth, naturalHeight } = e.currentTarget
+            if (!naturalWidth || !naturalHeight) return
+            const ratio = naturalWidth / naturalHeight
+            const clamped = Math.min(Math.max(ratio, minRatio), maxRatio)
+            if (Math.abs(clamped - singleAspectRatio) > 0.01) {
+              setSingleAspectRatio(clamped)
+            }
+          }}
           loading="eager"
           decoding="async"
           fetchPriority="high"

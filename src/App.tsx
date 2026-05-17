@@ -17,7 +17,7 @@ import {
 } from './core/config/constant'
 import { queryClient } from './core/config/global.config'
 import { useAppDispatch, useAppSelector } from './core/hooks/global-state.hook'
-import { AuthInfo } from './core/models/auth.model'
+import { type AuthInfo } from './core/models/auth.model'
 import { store } from './core/store'
 import {
   clearAuth,
@@ -30,6 +30,7 @@ import router from './router'
 import GlobalLoader from './shared/components/global-loader'
 import { THEME_LOCAL_STORAGE_KEY } from './shared/config/constant'
 import { ThemeProvider } from './shared/provider/theme-provider'
+import { syncExtCookie } from './shared/utils/extension-cookie.util'
 import { getLocalStorageItem } from './shared/utils/localstorage.util'
 
 // Initialize PostHog only in production
@@ -80,10 +81,9 @@ export function AppContent() {
     dispatch(setAuthInfo(data))
     cascadeCompleted.current = true
 
-    // NOW that LS and Redux have correct org/project data, invalidate
-    // all cached queries so they refetch with correct headers.
-    // This was previously done in invalidateAndResync (before the cascade),
-    // which caused a race: dependent queries fired with stale/partial LS data.
+    // LS now has complete user + org + project — push to extension cookie
+    syncExtCookie(data)
+
     queryClient.invalidateQueries({
       predicate: q => q.queryKey[0] !== QUERY_KEYS.user,
     })

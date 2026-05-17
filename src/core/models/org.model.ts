@@ -8,6 +8,7 @@ import { ProjectSocialSchema } from './social.model'
 export const ConnectedChannelsSchema = z.object({
   linkedin: ProjectSocialSchema,
   twitter: ProjectSocialSchema,
+  instagram: ProjectSocialSchema.optional(),
 })
 export type ConnectedChannels = z.infer<typeof ConnectedChannelsSchema>
 
@@ -23,11 +24,17 @@ export const OrganizationSummarySchema = z.object({
 })
 export type OrganizationSummary = z.infer<typeof OrganizationSummarySchema>
 
+export const BillingPlanSchema = z.preprocess(
+  value => (value === 'Teams' ? 'Team' : value),
+  z.enum(['Free', 'Pro', 'Team', 'Enterprise']).catch('Free')
+)
+export type BillingPlan = z.infer<typeof BillingPlanSchema>
+
 /**
  * Organization detail schema from /organizations/current
  */
 export const OrganizationDetailSchema = OrganizationSummarySchema.extend({
-  plan: z.enum(['Free', 'Pro']).catch('Free'),
+  plan: BillingPlanSchema,
   seat_limit: z.number(),
   seat_used: z.number(),
 })

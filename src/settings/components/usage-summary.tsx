@@ -16,7 +16,12 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
   const user = useUserState()
 
   // --- Variables ---
-  const isProPlan = user?.plan === 'Pro'
+  const planName = user?.plan ?? 'Free'
+  const planDescription: Record<string, string> = {
+    Free: 'Basic tools for exploring',
+    Pro: 'Advanced tools for serious growth',
+    Team: 'Collaborate and scale together',
+  }
 
   // --- Early Return ---
   if (!usageSummary) {
@@ -43,14 +48,12 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
         <Card className="gap-2 rounded-md p-3 shadow-none">
           <CardHeader className="flex items-center gap-1 px-2">
             <Flower className="size-4" />
-            <p className="font-semibold">{isProPlan ? 'Pro' : 'Free'}</p>
+            <p className="font-semibold">{planName}</p>
           </CardHeader>
 
           <CardContent className="px-2">
             <p className="text-muted-foreground text-xs">
-              {isProPlan
-                ? 'Advanced tools for serious growth'
-                : 'Basic tools for exploring'}
+              {planDescription[planName] ?? planDescription.Free}
             </p>
           </CardContent>
         </Card>

@@ -1,8 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
 
 import { LUUA_AUTH_INFO_KEY, QUERY_KEYS } from '@/core/config/constant'
-import { AuthInfo } from '@/core/models/auth.model'
-import { OrganizationDetail, ProjectDetail } from '@/core/models/org.model'
+import { type AuthInfo } from '@/core/models/auth.model'
+import {
+  type OrganizationDetail,
+  type ProjectDetail,
+} from '@/core/models/org.model'
 import { logout as logoutUtil } from '@/core/utils/common.util'
 import {
   getLocalStorageItem,

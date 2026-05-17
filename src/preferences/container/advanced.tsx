@@ -19,6 +19,7 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.userStyle] })
       toast.success('Advanced user style updated successfully')
+      setActiveTab(PREFERENCES_TAB_VALUES[0])
 
       // POSTHOG
       postHogStyleEnhancedCapture(
@@ -71,7 +72,6 @@ function Advanced({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
                   setAdvancedUserStyleMutation.mutate({
                     gcp_storage_doc_ids: fileIds,
                   })
-                  setActiveTab(PREFERENCES_TAB_VALUES[0])
                 }}
               />
             </TabsContent>
