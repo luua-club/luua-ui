@@ -1,5 +1,11 @@
 import { createLazyRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { type ReactElement, useEffect, useMemo, useState } from 'react'
+import {
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
 
 import InstagramPostCard from '@/core/components/post-card/instagram-post-card'
@@ -25,6 +31,11 @@ import { useDraft } from '../hooks/use-draft.hook'
 type SocialTab = channelType | 'all'
 type PreviewMode = 'editor' | 'preview'
 type LayoutMode = 'grid' | 'row'
+
+// Instagram composer toggle is paused (flip flag when launching).
+const INSTAGRAM_COMPOSER_DISABLED_PENDING_BE = true
+const INSTAGRAM_COMPOSER_DISABLED_TOAST_MESSAGE =
+  'Instagram is not available yet—this is still a work in progress.'
 
 function formatUpdatedAt(value: string) {
   const date = new Date(value)
@@ -69,12 +80,49 @@ function Create() {
   const cardMode: PostCardMode =
     effectivePreviewMode === 'preview' ? 'preview' : 'editor'
 
-  const enabledChannels =
+  const baseEnabledChannels =
     draft.enabledChannels.length > 0
       ? draft.enabledChannels
       : draft.draftId
         ? allChannels.slice(0, 1)
         : allChannels
+
+  /* When INSTAGRAM_COMPOSER_DISABLED_PENDING_BE is false, restore:
+   *   const enabledChannels = baseEnabledChannels
+   */
+  const enabledChannels = useMemo(() => {
+    if (!INSTAGRAM_COMPOSER_DISABLED_PENDING_BE) return baseEnabledChannels
+    const withoutInstagram = baseEnabledChannels.filter(
+      ch => ch !== 'Instagram'
+    )
+    return withoutInstagram.length > 0
+      ? withoutInstagram
+      : allChannels.filter(ch => ch !== 'Instagram')
+  }, [baseEnabledChannels, allChannels])
+
+  useEffect(() => {
+    if (!INSTAGRAM_COMPOSER_DISABLED_PENDING_BE) return
+    if (!draft.enabledChannels.includes('Instagram')) return
+    draft.setChannelEnabled('Instagram', false)
+  }, [draft.enabledChannels, draft.setChannelEnabled])
+
+  const handleChannelToggle = useCallback(
+    (channel: channelType, enabled: boolean) => {
+      if (!INSTAGRAM_COMPOSER_DISABLED_PENDING_BE || channel !== 'Instagram') {
+        draft.setChannelEnabled(channel, enabled)
+        return
+      }
+      if (enabled) {
+        toast.info(INSTAGRAM_COMPOSER_DISABLED_TOAST_MESSAGE)
+      }
+      // Keep Instagram off regardless of attempted toggle direction.
+      if (!enabled && draft.enabledChannels.includes('Instagram')) {
+        draft.setChannelEnabled('Instagram', false)
+      }
+    },
+    [draft.enabledChannels, draft.setChannelEnabled]
+  )
+
   const isLinkedInEnabled = enabledChannels.includes('LinkedIn')
   const isTwitterEnabled = enabledChannels.includes('Twitter')
   const isInstagramEnabled = enabledChannels.includes('Instagram')
@@ -165,7 +213,7 @@ function Create() {
           layoutMode={effectiveLayoutMode}
           onLayoutModeChange={setLayoutMode}
           enabledChannels={enabledChannels}
-          onChannelToggle={draft.setChannelEnabled}
+          onChannelToggle={handleChannelToggle}
           onBackToDashboard={() => navigate({ to: '/dashboard' })}
         />
       </div>

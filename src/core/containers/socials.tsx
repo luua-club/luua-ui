@@ -15,6 +15,11 @@ import {
   LinkedInAccountType,
 } from '@/core/models/social.model'
 
+// Instagram connect from settings is paused (flip flag when launching).
+const INSTAGRAM_CONNECT_DISABLED_PENDING_BE = true
+const INSTAGRAM_CONNECT_DISABLED_MESSAGE =
+  'Instagram is not available yet—this is still a work in progress.'
+
 const Socials = ({ channels }: { channels?: channelType[] }) => {
   const queryClient = useQueryClient()
   const userState = useUserState()
@@ -46,6 +51,10 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
   const [isInstagramSelectorOpen, setIsInstagramSelectorOpen] = useState(false)
 
   const handleConnect = async (platform: channelType) => {
+    if (INSTAGRAM_CONNECT_DISABLED_PENDING_BE && platform === 'Instagram') {
+      toast.info(INSTAGRAM_CONNECT_DISABLED_MESSAGE)
+      return
+    }
     try {
       setSocialLoading(platform, true)
       let response: { data?: { authorization_url: string } } | undefined
@@ -54,7 +63,8 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
       } else if (platform === 'LinkedIn') {
         response = await oauthApi.linkedinAuthorize()
       } else if (platform === 'Instagram') {
-        response = await oauthApi.instagramAuthorize()
+        // Re-enable when Instagram OAuth ships:
+        // response = await oauthApi.instagramAuthorize()
       }
 
       if (response?.data) {
@@ -173,6 +183,8 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
             isLoading={
               loadingStates.Instagram || instagramTargetMutation.isPending
             }
+            connectDisabled={INSTAGRAM_CONNECT_DISABLED_PENDING_BE}
+            connectDisabledReason={INSTAGRAM_CONNECT_DISABLED_MESSAGE}
             onConnect={() =>
               isInstagramSetupPending
                 ? setIsInstagramSelectorOpen(true)

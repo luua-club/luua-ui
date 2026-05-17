@@ -19,6 +19,9 @@ interface SocialCardProps {
   isLoading?: boolean
   onConnect?: () => void
   onDisconnect?: () => void
+  /** When set, blocks connect / “complete setup” for disconnected or pending setups. */
+  connectDisabled?: boolean
+  connectDisabledReason?: string
 }
 
 function SocialCard({
@@ -27,6 +30,8 @@ function SocialCard({
   isLoading,
   onConnect,
   onDisconnect,
+  connectDisabled,
+  connectDisabledReason,
 }: SocialCardProps) {
   const isLinkedInPending =
     platform.name === 'LinkedIn' &&
@@ -149,11 +154,31 @@ function SocialCard({
               </Tooltip>
             </div>
           </div>
+        ) : connectDisabled && connectDisabledReason ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex w-full">
+                <Button
+                  type="button"
+                  variant="default"
+                  className="w-full"
+                  disabled={Boolean(isLoading) || Boolean(connectDisabled)}
+                >
+                  {isLoading && <Loader className="size-4 animate-spin" />}
+                  {isLinkedInPending ? 'Complete setup' : 'Connect'}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{connectDisabledReason}</p>
+            </TooltipContent>
+          </Tooltip>
         ) : (
           <Button
+            type="button"
             variant="default"
             className="w-full"
-            disabled={isLoading}
+            disabled={Boolean(isLoading) || Boolean(connectDisabled)}
             onClick={onConnect}
           >
             {isLoading && <Loader className="size-4 animate-spin" />}
