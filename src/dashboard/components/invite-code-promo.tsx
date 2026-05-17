@@ -5,6 +5,7 @@ import { type FormEvent, useEffect, useState } from 'react'
 
 import { REDEMPTION_CODE_LENGTH } from '@/auth/config/otp-verification.config'
 import { AppIconLogo } from '@/core/components/app-logo'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -21,6 +22,7 @@ function normalizeRedemptionCodeParam(raw: string): string {
 }
 
 export function InviteCodePromo() {
+  const userState = useUserState()
   const navigate = useNavigate()
 
   const [open, setOpen] = useState(false)
@@ -33,6 +35,10 @@ export function InviteCodePromo() {
       setError(null)
     }
   }, [open])
+
+  if (!userState || userState.plan !== 'Free') {
+    return null
+  }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
