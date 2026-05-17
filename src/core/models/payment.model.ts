@@ -2,11 +2,25 @@ export interface PaymentLinkResponse {
   payment_link: string
 }
 
+export interface PaymentSuccessResponse {
+  message?: string
+}
+
+export type PurchasablePlan = 'Pro' | 'Team'
+export type SubscriptionType = 'monthly' | 'annual'
+
+export interface CreatePaymentLinkRequest {
+  plan: PurchasablePlan
+  subscription_type: SubscriptionType
+}
+
 export interface ISubscriptionDetails {
   id: string
+  plan: 'Free' | 'Pro' | 'Team' | 'Enterprise'
   status: string
-  started_at: string
-  expires_at: string
+  started_at: string | null
+  expires_at: string | null
+  cancelled_at: string | null
 }
 
 export interface ISubscriptionDetailsResponse {

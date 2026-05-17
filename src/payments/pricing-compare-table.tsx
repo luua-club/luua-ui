@@ -1,14 +1,20 @@
 import { Check, Info, Mail, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { CurrentPlanAffordance } from '@/payments/current-plan-affordance'
-import { PlanPriceTag } from '@/payments/plan-price-tag'
 import {
+  CurrentPlanAffordance,
+  IncludedPlanAffordance,
+} from '@/payments/current-plan-affordance'
+import { PlanPriceTag } from '@/payments/plan-price-tag'
+import { PlanUpgradeButton } from '@/payments/plan-upgrade-button'
+import {
+  type BillingPlanId,
   COMPARISON_ROWS,
   ENTERPRISE_FEATURES,
   isHigherTier,
-  PLAN_UPGRADE_CTA,
+  isPurchasablePlan,
   type PlanId,
+  type PurchasablePlan,
 } from '@/payments/pricing-data'
 import { Button } from '@/shared/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip'
@@ -113,10 +119,18 @@ function ComparisonLabel({ label }: { label: string }) {
 }
 
 export interface PricingCompareTableProps {
-  activePlan: PlanId
+  activePlan: BillingPlanId
+  onUpgradePlan: (planId: PurchasablePlan) => void
+  isUpgradePending: boolean
+  upgradingPlan?: PurchasablePlan
 }
 
-export function PricingCompareTable({ activePlan }: PricingCompareTableProps) {
+export function PricingCompareTable({
+  activePlan,
+  onUpgradePlan,
+  isUpgradePending,
+  upgradingPlan,
+}: PricingCompareTableProps) {
   return (
     <div className="w-full">
       <div className="overflow-x-auto">
@@ -131,19 +145,28 @@ export function PricingCompareTable({ activePlan }: PricingCompareTableProps) {
                 title="Free"
                 activePlan={activePlan}
                 ctaVariant="outline"
+                isUpgradePending={isUpgradePending}
+                onUpgradePlan={onUpgradePlan}
+                upgradingPlan={upgradingPlan}
               />
               <PlanColumnHeader
                 planId="Pro"
                 title="Pro"
                 activePlan={activePlan}
                 ctaVariant="default"
+                isUpgradePending={isUpgradePending}
+                onUpgradePlan={onUpgradePlan}
+                upgradingPlan={upgradingPlan}
               />
               <PlanColumnHeader
-                planId="Teams"
+                planId="Team"
                 title="Team"
                 activePlan={activePlan}
                 ctaVariant="outline"
                 className="pr-4 sm:pr-6 md:pr-8"
+                isUpgradePending={isUpgradePending}
+                onUpgradePlan={onUpgradePlan}
+                upgradingPlan={upgradingPlan}
               />
             </tr>
           </thead>
@@ -240,14 +263,22 @@ function PlanColumnHeader({
   activePlan,
   ctaVariant,
   className,
+  onUpgradePlan,
+  isUpgradePending,
+  upgradingPlan,
 }: {
   planId: PlanId
   title: string
-  activePlan: PlanId
+  activePlan: BillingPlanId
   ctaVariant: 'default' | 'outline'
   className?: string
+  onUpgradePlan: (planId: PurchasablePlan) => void
+  isUpgradePending: boolean
+  upgradingPlan?: PurchasablePlan
 }) {
   const canUpgrade = isHigherTier(planId, activePlan)
+  const canSelfServeUpgrade = canUpgrade && isPurchasablePlan(planId)
+  const isUpgradeLoading = upgradingPlan === planId
 
   return (
     <th className={cn('min-w-[160px] px-4 pt-10 pb-6 align-bottom', className)}>
@@ -255,12 +286,18 @@ function PlanColumnHeader({
       <PlanPriceTag className="mt-2" planId={planId} size="compact" />
       {activePlan === planId ? (
         <CurrentPlanAffordance size="compact" />
-      ) : canUpgrade ? (
-        <Button className="mt-4 w-full" size="sm" variant={ctaVariant}>
-          {PLAN_UPGRADE_CTA}
-        </Button>
+      ) : canSelfServeUpgrade ? (
+        <PlanUpgradeButton
+          className="mt-4 w-full"
+          isLoading={isUpgradeLoading}
+          isPending={isUpgradePending}
+          onUpgradePlan={onUpgradePlan}
+          planId={planId}
+          size="sm"
+          variant={ctaVariant}
+        />
       ) : (
-        <div className="mt-4 h-8" aria-hidden />
+        <IncludedPlanAffordance size="compact" />
       )}
     </th>
   )

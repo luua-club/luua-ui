@@ -14,7 +14,7 @@ interface EntityDetailSectionProps {
 }
 
 function planBadgeVariant(plan: string): 'default' | 'secondary' | 'outline' {
-  if (plan === 'Teams') return 'default'
+  if (plan === 'Team') return 'default'
   if (plan === 'Pro') return 'default'
   return 'secondary'
 }

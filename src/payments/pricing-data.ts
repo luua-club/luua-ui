@@ -1,14 +1,17 @@
 import { Box, Gem, type LucideIcon, Users } from 'lucide-react'
 
 /** Matches org billing plan from API / `useUserState().plan`. */
-export type PlanId = 'Free' | 'Pro' | 'Teams'
+export type PlanId = 'Free' | 'Pro' | 'Team'
+export type BillingPlanId = PlanId | 'Enterprise'
+export type PurchasablePlan = Extract<PlanId, 'Pro' | 'Team'>
 
-export const PLAN_IDS: readonly PlanId[] = ['Free', 'Pro', 'Teams']
+export const PLAN_IDS: readonly PlanId[] = ['Free', 'Pro', 'Team']
 
-export const PLAN_RANK: Record<PlanId, number> = {
+export const PLAN_RANK: Record<BillingPlanId, number> = {
   Free: 0,
   Pro: 1,
-  Teams: 2,
+  Team: 2,
+  Enterprise: 3,
 }
 
 export type ComparisonCellValue = boolean | string
@@ -82,13 +85,13 @@ export interface PlanPricing {
 export const PLAN_PRICES: Record<PlanId, PlanPricing> = {
   Free: { monthly: 0 },
   Pro: { monthly: 15 },
-  Teams: { monthly: 49 },
+  Team: { monthly: 49 },
 }
 
 export const PLAN_USER_LABELS: Record<PlanId, string> = {
   Free: '1 user',
   Pro: '1 user',
-  Teams: 'Up to 15 users',
+  Team: 'Up to 15 users',
 }
 
 export interface PlanCardCopy {
@@ -108,7 +111,7 @@ export const PLAN_CARD_COPY: Record<PlanId, PlanCardCopy> = {
     description: 'Ideal for professionals.',
     isRecommended: true,
   },
-  Teams: {
+  Team: {
     title: 'Team',
     description: 'Best for growing teams.',
     isRecommended: false,
@@ -130,7 +133,7 @@ export const PLAN_CARD_FEATURES: Record<PlanId, string[]> = {
     'Advanced style generation',
     '1 project',
   ],
-  Teams: [
+  Team: [
     'Everything in Pro',
     '5,000 credits / month',
     'Up to 15 users, shared pool & billing',
@@ -142,11 +145,18 @@ export const PLAN_CARD_FEATURES: Record<PlanId, string[]> = {
 export const PLAN_ICONS: Record<PlanId, LucideIcon> = {
   Free: Box,
   Pro: Gem,
-  Teams: Users,
+  Team: Users,
 }
 
-export function isHigherTier(planId: PlanId, activePlan: PlanId): boolean {
+export function isHigherTier(
+  planId: PlanId,
+  activePlan: BillingPlanId
+): boolean {
   return PLAN_RANK[planId] > PLAN_RANK[activePlan]
+}
+
+export function isPurchasablePlan(planId: PlanId): planId is PurchasablePlan {
+  return planId === 'Pro' || planId === 'Team'
 }
 
 /** CTA label for any plan the user can switch to (not current). */

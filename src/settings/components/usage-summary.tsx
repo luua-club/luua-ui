@@ -20,7 +20,7 @@ function UsageSummary({ usageSummary }: IUsageSummaryProps) {
   const planDescription: Record<string, string> = {
     Free: 'Basic tools for exploring',
     Pro: 'Advanced tools for serious growth',
-    Teams: 'Collaborate and scale together',
+    Team: 'Collaborate and scale together',
   }
 
   // --- Early Return ---
