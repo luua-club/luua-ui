@@ -7,5 +7,5 @@ export default function getPaymentsRoute(privateRoute: AnyRoute) {
     getParentRoute: () => privateRoute,
     path: '/payments',
     validateSearch: parsePaymentsSearch,
-  }).lazy(() => import('./payments').then(d => d.Route))
+  }).lazy(() => import('./Payments').then(d => d.Route))
 }
