@@ -73,6 +73,7 @@ function ProfileSummaryCard({
           plan={user.plan}
           avatarClassName="size-10"
           fallbackClassName="font-semibold"
+          showFreeBadge
         />
 
         <div className="min-w-0 flex-1">

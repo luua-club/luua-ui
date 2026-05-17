@@ -74,6 +74,7 @@ export function UserSidebarCard({ user }: UserSidebarCardProps) {
                 plan={user.plan}
                 avatarClassName="h-8 w-8"
                 fallbackClassName="rounded-lg"
+                showFreeBadge
               />
 
               {/* Username and email */}
@@ -180,6 +181,7 @@ const UserCardDropdownTrigger = ({ user }: UserCardDropdownProps) => {
           plan={user.plan}
           avatarClassName="h-8 w-8"
           fallbackClassName="rounded-lg"
+          showFreeBadge
         />
 
         {/** Username and email */}
