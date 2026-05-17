@@ -1,5 +1,10 @@
 import { Box, Gem, type LucideIcon, Users } from 'lucide-react'
 
+import {
+  FREE_AUTOPILOT_RUNS_LIMIT,
+  FREE_SCHEDULED_POSTS_LIMIT,
+} from '@/core/billing/plan-entitlements'
+
 /** Matches org billing plan from API / `useUserState().plan`. */
 export type PlanId = 'Free' | 'Pro' | 'Team'
 export type BillingPlanId = PlanId | 'Enterprise'
@@ -38,13 +43,13 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
   },
   {
     label: 'Scheduled posts',
-    free: '5 / month',
+    free: `${FREE_SCHEDULED_POSTS_LIMIT} / month`,
     pro: 'Unlimited',
     team: 'Unlimited',
   },
   {
     label: 'Autopilot runs',
-    free: '5 / month',
+    free: `${FREE_AUTOPILOT_RUNS_LIMIT} / month`,
     pro: 'Unlimited',
     team: 'Unlimited',
   },
@@ -121,8 +126,8 @@ export const PLAN_CARD_COPY: Record<PlanId, PlanCardCopy> = {
 export const PLAN_CARD_FEATURES: Record<PlanId, string[]> = {
   Free: [
     '100 credits / month',
-    '5 scheduled posts / month',
-    '5 autopilot runs / month',
+    `${FREE_SCHEDULED_POSTS_LIMIT} scheduled posts / month`,
+    `${FREE_AUTOPILOT_RUNS_LIMIT} autopilot runs / month`,
     'Basic style generation',
     '1 project',
   ],

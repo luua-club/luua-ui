@@ -7,10 +7,15 @@ import AutoPilotImage from '@/assets/images/autopilot.webp'
 import AutoPilotImageDark from '@/assets/images/autopilot-dark.webp'
 import { autopilotApi } from '@/core/api/autopilot.api'
 import { paymentApi } from '@/core/api/payment.api'
+import {
+  isUsageLimitReached,
+  shouldShowFreeLimitNudge,
+} from '@/core/billing/plan-entitlements'
+import { UpgradeCallout } from '@/core/components/billing'
 import { EXTERNAL_URLS, QUERY_KEYS } from '@/core/config/constant'
 import Drafts from '@/core/containers/Drafts'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import { AutopilotSettings } from '@/core/models/autopilot.model'
-import { IUsageSummary } from '@/core/models/payment.model'
 import { useTheme } from '@/shared/provider/theme-provider'
 import { HeroVideoDialog } from '@/shared/ui/hero-video-dialog'
 import { Separator } from '@/shared/ui/separator'
@@ -23,6 +28,7 @@ function AutoPilot() {
   const [checked, setChecked] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const { theme } = useTheme()
+  const user = useUserState()
 
   // --- Queries ---
   const { data, isLoading } = useQuery({
@@ -46,15 +52,14 @@ function AutoPilot() {
     }
   }, [data?.enabled])
 
-  const limitReached = (usageSummary: IUsageSummary | undefined) => {
-    if (!usageSummary) return false
-    if (usageSummary.limits.auto_pilot_posts.total === -1) return false
-
-    return (
-      usageSummary.limits.auto_pilot_posts.used >=
-      usageSummary.limits.auto_pilot_posts.total
-    )
-  }
+  const autoPilotUsageLimit =
+    usageSummary?.data?.usage_summary.limits.auto_pilot_posts
+  const autoPilotLimitReached =
+    user?.plan === 'Free' && isUsageLimitReached(autoPilotUsageLimit)
+  const showAutopilotLimitNudge = shouldShowFreeLimitNudge(
+    user?.plan,
+    autoPilotUsageLimit
+  )
 
   return (
     <div className="m-auto mt-10 max-w-5xl p-4 md:mt-4">
@@ -72,7 +77,7 @@ function AutoPilot() {
             setChecked={setChecked}
             setIsSettingsOpen={setIsSettingsOpen}
             isLoading={isLoading || isUsageSummaryLoading}
-            limitReached={limitReached(usageSummary?.data?.usage_summary)}
+            limitReached={autoPilotLimitReached}
           />
         </div>
 
@@ -89,6 +94,24 @@ function AutoPilot() {
             email, and lets you control how frequently drafts are created and
             which social channels they’re targeted for.
           </p>
+
+          {showAutopilotLimitNudge ? (
+            <UpgradeCallout
+              compact
+              title={
+                autoPilotLimitReached
+                  ? 'Free autopilot limit reached'
+                  : 'Almost at your autopilot limit'
+              }
+              description="Free includes 5 autopilot runs each month. Upgrade for unlimited autopilot."
+              usage={{
+                label: 'Autopilot runs',
+                limit: autoPilotUsageLimit,
+              }}
+              actionLabel="Upgrade to Pro"
+              className="max-w-md text-left"
+            />
+          ) : null}
         </div>
 
         <div className="border-t p-4">

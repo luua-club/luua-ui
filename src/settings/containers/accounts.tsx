@@ -1,8 +1,7 @@
 import { LogOut } from 'lucide-react'
 
+import { CurrentUserPlanAvatar } from '@/core/components/billing'
 import { UserState } from '@/core/models/user.model'
-import { extractUserInitial } from '@/core/utils/common.util'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Separator } from '@/shared/ui/separator'
 
@@ -17,15 +16,13 @@ function Account({ user }: { user: UserState }) {
       {/* User Profile Display */}
       <div className="py-8">
         <div className="flex items-center gap-4">
-          <Avatar className="size-12">
-            <AvatarImage
-              src={user.profile_image ?? undefined}
-              alt={user.name}
-            />
-            <AvatarFallback className="bg-muted text-base font-medium">
-              {extractUserInitial(user.name)}
-            </AvatarFallback>
-          </Avatar>
+          <CurrentUserPlanAvatar
+            name={user.name}
+            profileImage={user.profile_image}
+            plan={user.plan}
+            avatarClassName="size-12"
+            fallbackClassName="bg-muted text-base"
+          />
           <div className="space-y-1">
             <h2 className="text-base font-medium">{user.name}</h2>
             <p className="text-muted-foreground">{user.email}</p>

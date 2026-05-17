@@ -101,6 +101,7 @@ function Create() {
       ? `Updated ${formatUpdatedAt(draft.updatedAt)}`
       : 'Updated recently'
     : 'Unsaved changes'
+  const scheduleUsageLabel = undefined
 
   useEffect(() => {
     if (activeTab === 'all') return
@@ -149,6 +150,7 @@ function Create() {
           }
           onSchedule={() => openReviewFlow(true)}
           scheduleDisabled={reviewActionsDisabled}
+          scheduleUsageLabel={scheduleUsageLabel}
           onPublish={() => openReviewFlow(false)}
           publishDisabled={reviewActionsDisabled}
           onTitleChange={draft.isReadOnly ? undefined : draft.handleRenameDraft}

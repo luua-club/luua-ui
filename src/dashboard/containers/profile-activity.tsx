@@ -3,13 +3,12 @@ import { Link } from '@tanstack/react-router'
 import { ArrowRight, Settings } from 'lucide-react'
 
 import { analyticsApi } from '@/core/api/analytics.api'
+import { CurrentUserPlanAvatar } from '@/core/components/billing'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { type IAnalyticsActivityPoint } from '@/core/models/analytics.model'
-import { extractUserInitial } from '@/core/utils/common.util'
 import { ActivityGraph } from '@/shared/components/activity-graph'
 import { DownloadSparkline } from '@/shared/components/download-sparkline'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 
@@ -68,12 +67,13 @@ function ProfileSummaryCard({
   return (
     <Card className={`${PROFILE_ACTIVITY_CARD_CLASS} min-w-0 gap-4`}>
       <div className="flex items-start gap-2.5">
-        <Avatar className="size-10 rounded-full">
-          <AvatarImage src={user.profile_image ?? undefined} alt={user.name} />
-          <AvatarFallback className="bg-amber-400 font-semibold text-black">
-            {extractUserInitial(user.name)}
-          </AvatarFallback>
-        </Avatar>
+        <CurrentUserPlanAvatar
+          name={user.name}
+          profileImage={user.profile_image}
+          plan={user.plan}
+          avatarClassName="size-10"
+          fallbackClassName="font-semibold"
+        />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
@@ -150,6 +150,14 @@ function ProfileSummaryCard({
 }
 
 function ProfileActivity() {
+  const user = useUserState()
+
+  if (!user) return null
+
+  return <ProfileActivityContent />
+}
+
+function ProfileActivityContent() {
   const { data } = useSuspenseQuery({
     queryKey: [QUERY_KEYS.analytics, 'dashboard-activity'],
     queryFn: () => analyticsApi.getActivity({ weeks: ACTIVITY_WEEKS }),

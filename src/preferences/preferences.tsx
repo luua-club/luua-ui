@@ -4,7 +4,10 @@ import { Frown, List, UserRoundPen } from 'lucide-react'
 import { useState } from 'react'
 
 import { userApi } from '@/core/api/user.api'
+import { canUseAdvancedStyle } from '@/core/billing/plan-entitlements'
+import { PaidFeatureLock } from '@/core/components/billing'
 import { QUERY_KEYS, UserStyleStatus } from '@/core/config/constant'
+import { useUserState } from '@/core/hooks/user-state.hook'
 import UserStyles from '@/preferences/components/user-styles'
 import { PREFERENCES_TAB_VALUES } from '@/preferences/constants'
 import Advanced from '@/preferences/container/advanced'
@@ -14,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 function Preferences() {
   // --- State ---
   const [activeTab, setActiveTab] = useState<string>(PREFERENCES_TAB_VALUES[0])
+  const user = useUserState()
 
   // --- Query ---
   const { data, isLoading, isPending, isError } = useQuery({
@@ -31,6 +35,8 @@ function Preferences() {
       </div>
     )
   }
+
+  const hasAdvancedStyleAccess = canUseAdvancedStyle(user?.plan)
 
   return (
     <div className="m-auto mt-4 flex max-w-4xl flex-col p-5 md:mt-0">
@@ -67,6 +73,7 @@ function Preferences() {
             value={PREFERENCES_TAB_VALUES[1]}
             className="px-2 py-4 text-sm"
             disabled={
+              hasAdvancedStyleAccess &&
               data?.data.style_gen_state === UserStyleStatus.IN_PROGRESS
             }
           >
@@ -91,11 +98,26 @@ function Preferences() {
 
         {/* --- Tabs Content: Advanced --- */}
         <TabsContent value={PREFERENCES_TAB_VALUES[1]}>
-          <p className="text-card-foreground mt-2 mb-8 text-base">
-            Share your writing samples, and Luua will learn your tone and style
-            to create content that sounds like you.
-          </p>
-          <Advanced setActiveTab={setActiveTab} />
+          {hasAdvancedStyleAccess ? (
+            <>
+              <p className="text-card-foreground mt-2 mb-8 text-base">
+                Share your writing samples, and Luua will learn your tone and
+                style to create content that sounds like you.
+              </p>
+              <Advanced setActiveTab={setActiveTab} />
+            </>
+          ) : (
+            <PaidFeatureLock
+              title="Advanced style is a Pro feature"
+              description="Presets stay available on Free. Upgrade to train Luua on your own writing samples and generate content that sounds more like you."
+              features={[
+                'Advanced style generation',
+                'File samples',
+                'Text samples',
+              ]}
+              className="mt-4"
+            />
+          )}
         </TabsContent>
       </Tabs>
     </div>

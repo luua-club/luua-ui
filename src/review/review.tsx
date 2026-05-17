@@ -11,6 +11,12 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { draftsApi } from '@/core/api/drafts.api'
+import { paymentApi } from '@/core/api/payment.api'
+import {
+  isUsageLimitReached,
+  shouldShowFreeLimitNudge,
+} from '@/core/billing/plan-entitlements'
+import { UpgradeCallout } from '@/core/components/billing'
 import { QUERY_KEYS } from '@/core/config/constant'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
@@ -151,6 +157,25 @@ function Review() {
   // --- Computed variables ---
   const postViewSteps =
     search.schedule === 'true' ? schedulePostSteps : publishPostSteps
+  const isScheduleFlow = search.schedule === 'true'
+
+  const { data: usageSummary } = useQuery({
+    queryKey: [QUERY_KEYS.usageSummary, 'review-schedule'],
+    queryFn: () => paymentApi.getUsage(),
+    enabled: isScheduleFlow && userState?.plan === 'Free',
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+  })
+
+  const scheduleUsageLimit =
+    usageSummary?.data?.usage_summary.limits.scheduled_posts
+  const showScheduleLimitNudge = shouldShowFreeLimitNudge(
+    userState?.plan,
+    scheduleUsageLimit
+  )
+  const scheduleLimitReached =
+    userState?.plan === 'Free' && isUsageLimitReached(scheduleUsageLimit)
 
   const selectedChannels = Array.from(
     new Set(selectedPosts.map(p => p.channel))
@@ -230,7 +255,27 @@ function Review() {
                 )}
 
                 {step.id === 'schedule' && (
-                  <SchedulePost setSelectedUTCDate={setSelectedUTCDate} />
+                  <div className="flex flex-col gap-3">
+                    <SchedulePost setSelectedUTCDate={setSelectedUTCDate} />
+
+                    {showScheduleLimitNudge ? (
+                      <UpgradeCallout
+                        compact
+                        title={
+                          scheduleLimitReached
+                            ? 'Free schedule limit reached'
+                            : 'Almost at your schedule limit'
+                        }
+                        description="Free includes 5 scheduled posts each month. Upgrade for unlimited scheduling."
+                        usage={{
+                          label: 'Scheduled posts',
+                          limit: scheduleUsageLimit,
+                        }}
+                        actionLabel="Upgrade to Pro"
+                        className="max-w-md"
+                      />
+                    ) : null}
+                  </div>
                 )}
 
                 {step.id === 'publish' && (
@@ -261,6 +306,7 @@ function Review() {
             scheduleDraft={scheduleDraft}
             version={versionRef.current}
             isLocked={isLocked}
+            isScheduleLimitReached={scheduleLimitReached}
           />
         </Stepper>
       </div>
@@ -288,6 +334,7 @@ interface StepperNavigationProps {
   scheduleDraft: ReturnType<typeof useScheduleDraft>['mutation']
   version: number | null
   isLocked: boolean | null
+  isScheduleLimitReached: boolean
 }
 
 function StepperNavigation({
@@ -306,6 +353,7 @@ function StepperNavigation({
   scheduleDraft,
   version,
   isLocked,
+  isScheduleLimitReached,
 }: StepperNavigationProps) {
   const navigate = useNavigate()
 
@@ -355,6 +403,18 @@ function StepperNavigation({
         showConfetti()
         navigate({ to: '/posts-view/list' })
       } catch {
+        if (isSchedule && isScheduleLimitReached) {
+          toast.error('Free scheduling limit reached', {
+            description:
+              'Free includes 5 scheduled posts each month. Upgrade to Pro for unlimited scheduling.',
+            action: {
+              label: 'Upgrade',
+              onClick: () => navigate({ to: '/payments' }),
+            },
+          })
+          return
+        }
+
         toast.error(
           isSchedule ? 'Failed to schedule posts' : 'Failed to publish posts'
         )
