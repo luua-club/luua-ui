@@ -103,7 +103,7 @@ function ProfileSummaryCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <div className="min-w-0">
           <p className="text-muted-foreground text-xs font-medium">Project</p>
           <p className="mt-1 truncate text-sm font-semibold">
@@ -111,13 +111,9 @@ function ProfileSummaryCard({
           </p>
         </div>
         <div className="min-w-0">
-          <p className="text-muted-foreground text-xs font-medium">Org</p>
-          <p className="mt-1 truncate text-sm font-semibold">
-            {user.currentOrg?.name || 'No organization selected'}
+          <p className="text-muted-foreground text-xs font-medium">
+            Project Role
           </p>
-        </div>
-        <div className="min-w-0">
-          <p className="text-muted-foreground text-xs font-medium">Role</p>
           <p className="mt-1 truncate text-sm font-semibold">
             {formatRole(projectRole)}
           </p>

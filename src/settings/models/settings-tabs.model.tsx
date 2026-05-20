@@ -24,6 +24,8 @@ export type settingAsideType = {
   contentComponent: ComponentType<{ user: UserState }>
   /** When set, the tab is only visible if the user has this permission */
   requiredPermission?: Permission
+  /** When set, the tab is only visible if the current plan allows it */
+  requiredPlanAccess?: (user: UserState) => boolean
 }
 
 export type settingsGroupType = {
