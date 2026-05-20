@@ -4,21 +4,17 @@ import { toast } from 'sonner'
 
 import { oauthApi } from '@/core/api/oauth.api'
 import { userApi } from '@/core/api/user.api'
-import InstagramPageSelectorDialog from '@/core/components/instagram-page-selector-dialog'
 import LinkedInTargetSelectorDialog from '@/core/components/linkedin-target-selector-dialog'
 import SocialCard from '@/core/components/social-card'
 import { QUERY_KEYS, SOCIAL_PLATFORM } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
-import {
-  channelType,
-  InstagramAccount,
-  LinkedInAccountType,
-} from '@/core/models/social.model'
+import { channelType, LinkedInAccountType } from '@/core/models/social.model'
 
-// Instagram connect from settings is paused (flip flag when launching).
-const INSTAGRAM_CONNECT_DISABLED_PENDING_BE = true
-const INSTAGRAM_CONNECT_DISABLED_MESSAGE =
-  'Instagram is not available yet—this is still a work in progress.'
+const INSTAGRAM_OAUTH_ERROR_PARAM = 'instagram_oauth_error'
+const INSTAGRAM_OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  personal_account_unsupported:
+    "Personal Instagram accounts can't post via API. Switch your account to Business or Creator in the Instagram app and try again.",
+}
 
 const Socials = ({ channels }: { channels?: channelType[] }) => {
   const queryClient = useQueryClient()
@@ -42,19 +38,8 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
   const [isLinkedInSelectorOpen, setIsLinkedInSelectorOpen] = useState(false)
 
   const instagramChannel = connectedChannels?.instagram
-  const instagramAccounts = (instagramChannel?.meta?.accounts ??
-    []) as InstagramAccount[]
-  const isInstagramSetupPending = Boolean(
-    instagramChannel?.connected &&
-      !instagramChannel?.meta?.selected_instagram_account_id
-  )
-  const [isInstagramSelectorOpen, setIsInstagramSelectorOpen] = useState(false)
 
   const handleConnect = async (platform: channelType) => {
-    if (INSTAGRAM_CONNECT_DISABLED_PENDING_BE && platform === 'Instagram') {
-      toast.info(INSTAGRAM_CONNECT_DISABLED_MESSAGE)
-      return
-    }
     try {
       setSocialLoading(platform, true)
       let response: { data?: { authorization_url: string } } | undefined
@@ -63,8 +48,7 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
       } else if (platform === 'LinkedIn') {
         response = await oauthApi.linkedinAuthorize()
       } else if (platform === 'Instagram') {
-        // Re-enable when Instagram OAuth ships:
-        // response = await oauthApi.instagramAuthorize()
+        response = await oauthApi.instagramAuthorize()
       }
 
       if (response?.data) {
@@ -122,26 +106,20 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
     setIsLinkedInSelectorOpen(false)
   }, [isLinkedInSetupPending])
 
-  const instagramTargetMutation = useMutation({
-    mutationFn: (instagram_account_id: string) =>
-      userApi.setInstagramTarget({ instagram_account_id }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] })
-      toast.success('Instagram account setup completed')
-      setIsInstagramSelectorOpen(false)
-    },
-    onError: () => {
-      toast.error('Failed to save Instagram account selection')
-    },
-  })
-
+  // Surface OAuth callback errors that the backend appends to the redirect URL
+  // (e.g. ?instagram_oauth_error=personal_account_unsupported). One-shot:
+  // strip the param after showing the toast so refresh doesn't re-fire it.
   useEffect(() => {
-    if (isInstagramSetupPending) {
-      setIsInstagramSelectorOpen(true)
-      return
-    }
-    setIsInstagramSelectorOpen(false)
-  }, [isInstagramSetupPending])
+    const url = new URL(window.location.href)
+    const errorCode = url.searchParams.get(INSTAGRAM_OAUTH_ERROR_PARAM)
+    if (!errorCode) return
+    const message =
+      INSTAGRAM_OAUTH_ERROR_MESSAGES[errorCode] ??
+      'Failed to connect Instagram. Please try again.'
+    toast.error(message)
+    url.searchParams.delete(INSTAGRAM_OAUTH_ERROR_PARAM)
+    window.history.replaceState({}, '', url.toString())
+  }, [])
 
   const setSocialLoading = (payload: channelType, isLoading: boolean) => {
     setLoadingStates(prev => ({ ...prev, [payload]: isLoading }))
@@ -180,16 +158,8 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
           <SocialCard
             platform={instagram}
             channel={instagramChannel}
-            isLoading={
-              loadingStates.Instagram || instagramTargetMutation.isPending
-            }
-            connectDisabled={INSTAGRAM_CONNECT_DISABLED_PENDING_BE}
-            connectDisabledReason={INSTAGRAM_CONNECT_DISABLED_MESSAGE}
-            onConnect={() =>
-              isInstagramSetupPending
-                ? setIsInstagramSelectorOpen(true)
-                : handleConnect('Instagram')
-            }
+            isLoading={loadingStates.Instagram}
+            onConnect={() => handleConnect('Instagram')}
             onDisconnect={() => handleDisconnectMutation.mutate('Instagram')}
           />
         )}
@@ -202,21 +172,6 @@ const Socials = ({ channels }: { channels?: channelType[] }) => {
           linkedInChannel={linkedInChannel}
           isSubmitting={linkedInTargetMutation.isPending}
           onSubmit={linkedInTargetMutation.mutate}
-        />
-      )}
-
-      {(!channels || channels.includes('Instagram')) && (
-        <InstagramPageSelectorDialog
-          open={isInstagramSelectorOpen}
-          onOpenChange={setIsInstagramSelectorOpen}
-          accounts={instagramAccounts}
-          selectedAccountId={
-            instagramChannel?.meta?.selected_instagram_account_id as
-              | string
-              | null
-          }
-          isSubmitting={instagramTargetMutation.isPending}
-          onSubmit={instagramTargetMutation.mutate}
         />
       )}
     </>
