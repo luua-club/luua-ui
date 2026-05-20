@@ -308,8 +308,7 @@ export function useDraft() {
           if (prev.includes(channel)) return prev
           return [...prev, channel]
         }
-        if (prev.length <= 1 && !(prev.length === 1 && prev[0] === 'Instagram'))
-          return prev
+        if (prev.length <= 1) return prev
         return prev.filter(item => item !== channel)
       })
 
