@@ -60,8 +60,8 @@ const EmptyState = ({ onNavigate }: { onNavigate: () => void }) => (
     </div>
 
     <Button
-      variant="default"
-      className="dark:bg-brand-accent-yellow !h-7 w-full text-xs dark:font-semibold"
+      variant="outline"
+      className="!h-7 w-full text-xs"
       onClick={onNavigate}
     >
       Set up styles <ArrowRight className="size-3" />

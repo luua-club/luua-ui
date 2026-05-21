@@ -11,34 +11,23 @@ import { cn } from '@/shared/utils'
 
 interface IAppSidebarItemProps {
   item: ISidebarItem
+  className?: string
 }
 
-function AppSideBarItem({ item }: IAppSidebarItemProps) {
-  // --- State and Variables ---
+function AppSideBarItem({ item, className }: IAppSidebarItemProps) {
   const linkClassName = cn(
     '[&.active]:font-semibold [&.active]:text-black',
     'dark:[&.active]:bg-sidebar-accent dark:[&.active]:font-bold dark:[&.active]:text-white'
   )
 
-  // --- Hooks ---
   const { isMobile, setOpenMobile } = useSidebar()
 
-  // --- Handlers ---
-  /**
-   * Handles the click event of the sidebar item
-
-   */
   const handleClick = () => {
     if (isMobile) {
       setOpenMobile(false)
     }
   }
 
-  /**
-   * Renders the content of the sidebar item
-   *
-   * @returns The content of the sidebar item
-   */
   const renderContent = () => {
     if (item.externalUrl) {
       return (
@@ -66,7 +55,7 @@ function AppSideBarItem({ item }: IAppSidebarItemProps) {
   }
 
   return (
-    <SidebarMenuItem key={item.title}>
+    <SidebarMenuItem key={item.title} className={className}>
       <SidebarMenuButton tooltip={item.title} asChild onClick={handleClick}>
         {renderContent()}
       </SidebarMenuButton>

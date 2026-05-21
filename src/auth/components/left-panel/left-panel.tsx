@@ -8,7 +8,7 @@ import { LeftPanelHero } from './left-panel-hero'
 import { LeftPanelTerms } from './left-panel-terms'
 
 /** Horizontal inset matched to the right-panel rhythm */
-const LEFT_PANEL_INSET = 'px-6 pr-12 sm:pl-8 sm:pr-14 lg:px-22 lg:pr-14'
+const LEFT_PANEL_INSET = 'px-6 sm:px-8 lg:px-22 lg:pr-14'
 
 export type LeftPanelProps = {
   auth: UseLoginAuthResult

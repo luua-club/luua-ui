@@ -1,12 +1,5 @@
 import { formatDistanceToNow } from 'date-fns'
-import {
-  Check,
-  EllipsisVertical,
-  FileText,
-  Plus,
-  Trash2,
-  X,
-} from 'lucide-react'
+import { Check, EllipsisVertical, FileText, Trash2, X } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 
 import StackedPlatformIcons from '@/core/components/stacked-platform-icons'
@@ -132,31 +125,6 @@ export function DraftCardSkeleton() {
           <Skeleton className="h-2 w-20" />
         </div>
       </CardFooter>
-    </Card>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// NewPostCard
-// ---------------------------------------------------------------------------
-export function NewPostCard({ onClick }: { onClick: () => void }) {
-  return (
-    <Card
-      onClick={onClick}
-      className={cn(
-        'bg-card/70 h-44 w-full min-w-0 cursor-pointer',
-        'gap-0 overflow-hidden rounded-md border-dashed p-0 shadow-none'
-      )}
-    >
-      <CardContent
-        className={cn(
-          'flex h-full flex-col items-center justify-center',
-          'gap-2 p-3'
-        )}
-      >
-        <Plus className="size-8" />
-        <span className="text-sm font-medium">New Draft</span>
-      </CardContent>
     </Card>
   )
 }

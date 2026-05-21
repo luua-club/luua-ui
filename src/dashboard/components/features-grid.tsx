@@ -74,7 +74,7 @@ function FeaturesGrid({ gridClassName }: { gridClassName?: string }) {
       transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
     >
       <BentoGrid
-        className={`mx-auto max-w-4xl md:auto-rows-[20rem] ${gridClassName ?? ''}`}
+        className={`mx-auto max-w-4xl auto-rows-auto lg:auto-rows-[20rem] ${gridClassName ?? ''}`}
       >
         {items.map((item, i) => (
           <BentoGridItem key={i} {...item} />

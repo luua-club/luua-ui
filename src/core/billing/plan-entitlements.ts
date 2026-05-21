@@ -23,6 +23,10 @@ export function canUseAnalytics(plan: BillingPlan | null | undefined): boolean {
   return isPaidPlan(plan)
 }
 
+export function canUseAuditLogs(plan: BillingPlan | null | undefined): boolean {
+  return plan === 'Team' || plan === 'Enterprise'
+}
+
 export function isUnlimitedUsage(limit: UsageLimit | undefined): boolean {
   return limit?.total === -1
 }

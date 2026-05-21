@@ -1,19 +1,23 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, Settings } from 'lucide-react'
 
 import { analyticsApi } from '@/core/api/analytics.api'
 import { CurrentUserPlanAvatar } from '@/core/components/billing'
-import { QUERY_KEYS } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { type IAnalyticsActivityPoint } from '@/core/models/analytics.model'
+import { ProfileActivitySkeleton } from '@/dashboard/components/dashboard-skeletons'
+import {
+  DASHBOARD_ACTIVITY_GC_TIME,
+  DASHBOARD_ACTIVITY_QUERY_KEY,
+  DASHBOARD_ACTIVITY_STALE_TIME,
+  DASHBOARD_ACTIVITY_WEEKS,
+} from '@/dashboard/config/dashboard-queries'
 import { ActivityGraph } from '@/shared/components/activity-graph'
 import { DownloadSparkline } from '@/shared/components/download-sparkline'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 
-const ACTIVITY_WEEKS = 52
-const PROFILE_ACTIVITY_STALE_TIME = 15 * 60_000
 const PROFILE_SUMMARY_CARD_CLASS =
   'min-h-[224px] rounded-lg p-4 pb-0 shadow-sm sm:h-[224px]'
 const PROFILE_ACTIVITY_INTENSITY_THRESHOLDS = [1, 2, 3] as const
@@ -103,7 +107,7 @@ function ProfileSummaryCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <div className="min-w-0">
           <p className="text-muted-foreground text-xs font-medium">Project</p>
           <p className="mt-1 truncate text-sm font-semibold">
@@ -111,13 +115,9 @@ function ProfileSummaryCard({
           </p>
         </div>
         <div className="min-w-0">
-          <p className="text-muted-foreground text-xs font-medium">Org</p>
-          <p className="mt-1 truncate text-sm font-semibold">
-            {user.currentOrg?.name || 'No organization selected'}
+          <p className="text-muted-foreground text-xs font-medium">
+            Project Role
           </p>
-        </div>
-        <div className="min-w-0">
-          <p className="text-muted-foreground text-xs font-medium">Role</p>
           <p className="mt-1 truncate text-sm font-semibold">
             {formatRole(projectRole)}
           </p>
@@ -152,19 +152,17 @@ function ProfileSummaryCard({
 }
 
 function ProfileActivity() {
-  const user = useUserState()
-
-  if (!user) return null
-
-  return <ProfileActivityContent />
-}
-
-function ProfileActivityContent() {
-  const { data } = useSuspenseQuery({
-    queryKey: [QUERY_KEYS.analytics, 'dashboard-activity'],
-    queryFn: () => analyticsApi.getActivity({ weeks: ACTIVITY_WEEKS }),
-    staleTime: PROFILE_ACTIVITY_STALE_TIME,
+  const { data, isPending } = useQuery({
+    queryKey: DASHBOARD_ACTIVITY_QUERY_KEY,
+    queryFn: () =>
+      analyticsApi.getActivity({ weeks: DASHBOARD_ACTIVITY_WEEKS }),
+    staleTime: DASHBOARD_ACTIVITY_STALE_TIME,
+    gcTime: DASHBOARD_ACTIVITY_GC_TIME,
   })
+
+  if (isPending || !data) {
+    return <ProfileActivitySkeleton />
+  }
 
   const activity = data.activity
 
@@ -195,7 +193,7 @@ function ProfileActivityContent() {
 
         <ActivityGraph
           data={activity}
-          weeks={ACTIVITY_WEEKS}
+          weeks={DASHBOARD_ACTIVITY_WEEKS}
           blockRadius={2}
           endDate={data.end_date}
           activityLabel="post"

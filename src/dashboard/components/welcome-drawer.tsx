@@ -52,10 +52,13 @@ function WelcomeDrawer() {
         onOpenChange={setIsWelcomeOpen}
       >
         <DrawerContent
-          className="bg-secondary overflow-x-hidden overflow-y-auto"
-          style={{ maxWidth: isMobile ? '100%' : '70vw' }}
+          className="bg-secondary h-dvh max-h-dvh overflow-hidden"
+          style={{
+            width: isMobile ? '80vw' : '70vw',
+            maxWidth: isMobile ? '80vw' : '70vw',
+          }}
         >
-          <div className="!bg-primary-foreground mb-6 flex items-center justify-between gap-3 px-4 py-4 shadow">
+          <div className="!bg-primary-foreground flex shrink-0 items-center justify-between gap-3 px-4 py-4 shadow">
             <h2 className="flex min-w-0 flex-1 items-center gap-2 truncate text-sm font-semibold sm:text-base">
               <LampDeskIcon className="size-4 shrink-0" />
               <span className="truncate">What do you want to do today ?</span>
@@ -79,7 +82,7 @@ function WelcomeDrawer() {
             </div>
           </div>
 
-          <div className="px-2 pb-6">
+          <div className="scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pt-6 pb-6">
             <FeaturesGrid />
           </div>
         </DrawerContent>
