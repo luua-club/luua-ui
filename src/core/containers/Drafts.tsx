@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   Pencil,
   PencilRuler,
+  Plus,
   Send,
   Trash,
   Trash2,
@@ -192,15 +193,27 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
           )}
         </h1>
 
-        {isInspirationView && (
-          <Button
-            size="sm"
-            className="w-full sm:w-auto"
-            onClick={() => navigate({ to: '/drafts' })}
-          >
-            Show all drafts
-          </Button>
-        )}
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          {isInspirationView && (
+            <Button
+              size="sm"
+              className="w-full sm:w-auto"
+              onClick={() => navigate({ to: '/drafts' })}
+            >
+              Show all drafts
+            </Button>
+          )}
+          {!isInspirationView && !showOnlyAutoPilot && (
+            <Button
+              size="sm"
+              className="w-full gap-1.5 sm:w-auto"
+              onClick={() => navigate({ to: '/creation/create' })}
+            >
+              <Plus className="size-4" />
+              Create post
+            </Button>
+          )}
+        </div>
       </div>
 
       {!isInspirationView && (
@@ -277,8 +290,18 @@ const Drafts = ({ showOnlyAutoPilot = false, inspirationId }: DraftsProps) => {
                   ? 'Your Autopilot generated drafts will appear here'
                   : isInspirationView
                     ? 'It could be either deleted or published'
-                    : ' Your saved drafts will appear here.'}
+                    : 'Your saved drafts will appear here.'}
               </p>
+              {!showOnlyAutoPilot && !isInspirationView && (
+                <Button
+                  size="sm"
+                  className="mt-1 gap-1.5"
+                  onClick={() => navigate({ to: '/creation/create' })}
+                >
+                  <Plus className="size-4" />
+                  Create post
+                </Button>
+              )}
             </div>
           )}
 

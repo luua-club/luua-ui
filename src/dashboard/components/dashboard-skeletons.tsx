@@ -1,6 +1,6 @@
 import { FolderEdit } from 'lucide-react'
 
-import { Card, CardContent } from '@/shared/ui/card'
+import { Card } from '@/shared/ui/card'
 import { Skeleton } from '@/shared/ui/skeleton'
 
 import { DraftCardSkeleton } from './draft-card'
@@ -64,21 +64,19 @@ export function ProfileActivitySkeleton() {
 export function DashboardDraftGridSkeleton() {
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4 flex items-center gap-6">
-        <h1 className="flex gap-2 text-sm font-semibold">
-          <FolderEdit className="size-5" /> Pick Up Where You Left Off
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h1 className="flex items-end gap-2.5">
+          <span className="flex items-center gap-2 text-base font-semibold">
+            <FolderEdit className="size-5" />
+            Saved Drafts
+          </span>
+          <Skeleton className="mb-px h-3 w-14 rounded-sm" />
         </h1>
-        <Skeleton className="h-6 w-16 rounded-sm" />
+        <Skeleton className="h-8 w-24 shrink-0 rounded-sm" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <Card className="bg-card/70 h-44 w-full min-w-0 gap-0 overflow-hidden rounded-md border-dashed p-0 shadow-none">
-          <CardContent className="flex h-full flex-col items-center justify-center gap-2 p-3">
-            <Skeleton className="size-8 rounded-md" />
-            <Skeleton className="h-4 w-20 rounded-md" />
-          </CardContent>
-        </Card>
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 4 }).map((_, index) => (
           <DraftCardSkeleton key={index} />
         ))}
       </div>

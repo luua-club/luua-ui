@@ -164,7 +164,26 @@ function getMonthLabels(
     }
   }
 
-  return months
+  // Skip labels that would overlap the previous one (e.g. May + Jun at the
+  // start of a 52-week window when the range begins near month-end).
+  const LABEL_CHAR_WIDTH = 6.5
+  const MIN_LABEL_GAP = 4
+  const visible: { label: string; offset: number }[] = []
+
+  for (const month of months) {
+    const previous = visible.at(-1)
+    if (!previous) {
+      visible.push(month)
+      continue
+    }
+
+    const previousWidth = previous.label.length * LABEL_CHAR_WIDTH
+    if (month.offset >= previous.offset + previousWidth + MIN_LABEL_GAP) {
+      visible.push(month)
+    }
+  }
+
+  return visible
 }
 
 function formatDate(date: Date): string {
