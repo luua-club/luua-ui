@@ -44,7 +44,7 @@ function SidebarPrimaryNav() {
 
       <SidebarFullWidthDivider />
 
-      <SidebarGroup className="py-0">
+      <SidebarGroup className="py-2">
         <SidebarGroupContent>
           <SidebarMenu className="gap-1">
             <AppSideBarItem item={analyticsItem} />
