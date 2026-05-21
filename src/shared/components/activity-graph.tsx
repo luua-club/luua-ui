@@ -171,7 +171,7 @@ function getMonthLabels(
   const visible: { label: string; offset: number }[] = []
 
   for (const month of months) {
-    const previous = visible.at(-1)
+    const previous = visible[visible.length - 1]
     if (!previous) {
       visible.push(month)
       continue
