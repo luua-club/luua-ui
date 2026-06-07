@@ -55,6 +55,19 @@ function SocialCard({
       channel?.user_profile_picture
     : channel?.user_profile_picture
 
+  const accountTypeLabel =
+    platform.name === 'LinkedIn'
+      ? isPageAccount
+        ? 'Page Account'
+        : 'Personal Account'
+      : platform.name === 'Instagram'
+        ? channel?.meta?.account_type === 'BUSINESS'
+          ? 'Business Account'
+          : channel?.meta?.account_type === 'MEDIA_CREATOR'
+            ? 'Creator Account'
+            : null
+        : null
+
   return (
     <div
       className={cn(
@@ -123,9 +136,11 @@ function SocialCard({
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="dark:text-card-foreground/70 text-xs text-gray-500">
-                  {isPageAccount ? 'Page Account' : 'Personal Account'}
-                </p>
+                {accountTypeLabel && (
+                  <p className="dark:text-card-foreground/70 text-xs text-gray-500">
+                    {accountTypeLabel}
+                  </p>
+                )}
                 <p className="dark:text-card-foreground text-sm font-semibold text-gray-900">
                   {accountName}
                 </p>
