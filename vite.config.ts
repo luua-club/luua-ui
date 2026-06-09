@@ -141,7 +141,12 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    // Main app runs on 3001 in local dev; the luua-landing site owns 3000.
+    port: 3001,
+    // Fail loudly if 3001 is taken instead of silently moving to another port —
+    // the backend's CORS allowlist is keyed to the origin, so a bumped port
+    // causes confusing CORS errors on login.
+    strictPort: true,
     host: true,
     watch: {
       usePolling: true,

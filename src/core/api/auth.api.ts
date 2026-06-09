@@ -16,7 +16,8 @@ class AuthApi extends BaseApiService {
    * Authenticates a user using a Google OAuth token.
    *
    * @param token - The login request containing the Google OAuth token.
-   * @returns A promise resolving to the authentication response containing user data and JWT.
+   * @returns A promise resolving to the login response ({ new_user }); the auth
+   *   cookie is set by the server (httpOnly).
    */
   async login(token: LoginRequest) {
     return this.post<LoginResponse>(token, '/login/google')
@@ -36,10 +37,21 @@ class AuthApi extends BaseApiService {
    * Verifies the magic link OTP token.
    *
    * @param data - The verify request containing the OTP token.
-   * @returns A promise resolving to the authentication response containing user data and JWT.
+   * @returns A promise resolving to the login response ({ new_user }); the auth
+   *   cookie is set by the server (httpOnly).
    */
   async verifyMagicLink(data: MagicLinkVerifyRequest) {
     return this.post<LoginResponse>(data, '/login/email/verify')
+  }
+
+  /**
+   * Logs the user out by clearing the auth cookie server-side.
+   * The endpoint is idempotent and returns 204 No Content.
+   *
+   * @returns A promise resolving when the cookie has been cleared.
+   */
+  async logout() {
+    return this.post<void>({}, '/logout')
   }
 }
 

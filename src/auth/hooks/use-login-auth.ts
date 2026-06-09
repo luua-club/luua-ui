@@ -28,7 +28,6 @@ import { loadAuthData } from '@/core/utils/auth-data.util'
 import { parseSafeAppRedirect } from '@/core/utils/safe-app-redirect.util'
 import { syncExtCookie } from '@/shared/utils/extension-cookie.util'
 import {
-  getLocalStorageItem,
   removeLocalStorageItem,
   setLocalStorageItem,
 } from '@/shared/utils/localstorage.util'
@@ -111,15 +110,17 @@ export function useLoginAuth(): UseLoginAuthResult {
   // ---- Shared post-token helpers ----
 
   /**
-   * Persist the token, then run the user/org/project cascade through React
-   * Query so App.tsx's `useQuery([QUERY_KEYS.user])` finds it in cache and
-   * does not re-fetch after the redirect.
+   * Cookie-based auth: the backend has already set the httpOnly auth cookie on
+   * the login response, so there is no token to persist. We seed LS with the
+   * non-sensitive `new_user` flag (so it survives the cascade into the cached
+   * AuthInfo — the welcome drawer reads it), then run the user/org/project
+   * cascade through React Query. The cookie is attached automatically, and
+   * caching the result means App.tsx's `useQuery([QUERY_KEYS.user])` is a hit
+   * after we redirect (no duplicate cascade).
    */
   const completeLogin = useCallback(
     async (loginResponse: LoginResponse): Promise<AuthInfo> => {
       setLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY, {
-        access_token: loginResponse.access_token,
-        token_type: loginResponse.token_type,
         new_user: loginResponse.new_user,
       })
       return queryClient.fetchQuery({
@@ -132,49 +133,36 @@ export function useLoginAuth(): UseLoginAuthResult {
   )
 
   /**
-   * Synchronous post-cascade redirect. For extension logins, builds the
-   * chrome-extension://...auth.html URL using the resolved `authInfo.user.email`.
-   * For normal web logins, navigates to /dashboard.
+   * Synchronous post-cascade redirect to the web app.
+   *
+   * The extension handoff is DORMANT under cookie auth: the web login no longer
+   * returns a token to pass to `chrome-extension://…/auth.html`, so we simply
+   * clear any extension handshake flags and fall through to the normal web
+   * redirect. TODO: extension handoff pending cookie migration.
    */
-  const redirectAfterLogin = useCallback(
-    (loginResponse: LoginResponse, authInfo: AuthInfo) => {
-      const storedExtensionId = getSessionStorageItem<string>(
-        LUUA_EXTENSION_ID_KEY
-      )
-      const extensionLoginFlag = getSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
-      const isFromExtension =
-        extensionLoginFlag === 'true' ||
-        (typeof extensionLoginFlag === 'boolean' && extensionLoginFlag === true)
+  const redirectAfterLogin = useCallback(() => {
+    if (getSessionStorageItem(LUUA_EXTENSION_ID_KEY)) {
+      removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
+    }
+    if (getSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)) {
+      removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
+    }
 
-      if (isFromExtension && storedExtensionId) {
-        removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
-        removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
-        const emailFromAuth = authInfo.user?.email ?? ''
-        window.location.href =
-          `chrome-extension://${storedExtensionId}/auth.html` +
-          `?token=${encodeURIComponent(loginResponse.access_token)}` +
-          `&userId=${encodeURIComponent(emailFromAuth)}` +
-          `&email=${encodeURIComponent(emailFromAuth)}`
-        return
-      }
+    const redirectRaw = new URLSearchParams(window.location.search).get(
+      'redirect'
+    )
+    const safeTarget = parseSafeAppRedirect(redirectRaw)
 
-      const redirectRaw = new URLSearchParams(window.location.search).get(
-        'redirect'
-      )
-      const safeTarget = parseSafeAppRedirect(redirectRaw)
+    if (safeTarget) {
+      router.navigate({
+        to: safeTarget.pathname,
+        search: safeTarget.search,
+      })
+      return
+    }
 
-      if (safeTarget) {
-        router.navigate({
-          to: safeTarget.pathname,
-          search: safeTarget.search,
-        })
-        return
-      }
-
-      router.navigate({ to: '/dashboard', search: {} })
-    },
-    [router]
-  )
+    router.navigate({ to: '/dashboard', search: {} })
+  }, [router])
 
   /**
    * Roll back partial auth state when the post-token cascade fails.
@@ -189,13 +177,12 @@ export function useLoginAuth(): UseLoginAuthResult {
   const loginMutation = useMutation({
     mutationFn: async (token: string) => {
       const res = await authApi.login({ token })
-      const authInfo = await completeLogin(res.data)
-      return { loginResponse: res.data, authInfo }
+      return completeLogin(res.data)
     },
-    onSuccess: ({ loginResponse, authInfo }) => {
+    onSuccess: authInfo => {
       dispatch(setAuthInfo(authInfo))
       syncExtCookie(authInfo)
-      redirectAfterLogin(loginResponse, authInfo)
+      redirectAfterLogin()
     },
     onError: () => {
       rollbackPartialAuth()
@@ -206,13 +193,12 @@ export function useLoginAuth(): UseLoginAuthResult {
   const verifyOtpMutation = useMutation({
     mutationFn: async (otp: string) => {
       const res = await authApi.verifyMagicLink({ token: otp })
-      const authInfo = await completeLogin(res.data)
-      return { loginResponse: res.data, authInfo }
+      return completeLogin(res.data)
     },
-    onSuccess: ({ loginResponse, authInfo }) => {
+    onSuccess: authInfo => {
       dispatch(setAuthInfo(authInfo))
       syncExtCookie(authInfo)
-      redirectAfterLogin(loginResponse, authInfo)
+      redirectAfterLogin()
     },
     onError: () => {
       // Keep the user on the OTP screen; the OTP container reads
@@ -277,19 +263,10 @@ export function useLoginAuth(): UseLoginAuthResult {
     if (isExtensionLogin && extensionId) {
       setSessionStorageItem(LUUA_EXTENSION_ID_KEY, extensionId)
       setSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY, 'true')
-
-      const existingAuth = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
-      if (existingAuth?.access_token && existingAuth?.user?.email) {
-        syncExtCookie()
-
-        const extensionRedirectUrl = `chrome-extension://${extensionId}/auth.html?token=${encodeURIComponent(existingAuth.access_token)}&userId=${encodeURIComponent(existingAuth.user.email)}&email=${encodeURIComponent(existingAuth.user.email)}`
-
-        removeSessionStorageItem(LUUA_EXTENSION_ID_KEY)
-        removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
-
-        window.location.href = extensionRedirectUrl
-        return
-      }
+      // DORMANT: previously, an already-logged-in user handed their stored JWT
+      // to chrome-extension://…/auth.html here. Cookie auth no longer exposes a
+      // token to JS, so there is nothing to hand off.
+      // TODO: extension handoff pending cookie migration.
     }
   }, [isExtensionLogin, extensionId])
 
