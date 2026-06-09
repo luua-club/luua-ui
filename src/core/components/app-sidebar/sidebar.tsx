@@ -15,10 +15,8 @@ import AppSidebarAllPosts from './sidebar-all-posts'
 import AppSidebarAutomation from './sidebar-automation'
 import AppSidebarFooter from './sidebar-footer'
 import AppSidebarHeader from './sidebar-header'
-import AppSidebarUngrouped from './sidebar-ungrouped'
+import SidebarPrimaryNav from './sidebar-primary-nav'
 
-const dashboardItem = coreLinks.find(item => item.url === '/dashboard')!
-const analyticsItem = coreLinks.find(item => item.url === '/analytics')!
 const allPostsItem = coreLinks.find(item => item.url === '/posts-view')!
 
 function AppSidebar() {
@@ -47,10 +45,7 @@ function AppSidebar() {
 
         {/* Content */}
         <SidebarContent>
-          {/* Core Navigation */}
-          <AppSidebarUngrouped
-            ungroupedItems={[dashboardItem, analyticsItem]}
-          />
+          <SidebarPrimaryNav />
           <AppSidebarAllPosts item={allPostsItem} />
 
           {/* Automation */}

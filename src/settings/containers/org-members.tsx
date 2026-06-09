@@ -291,7 +291,7 @@ function OrgMembers(_props: { user: UserState }) {
                           role: role as 'admin' | 'member',
                         })
                       }
-                      disabled={changeRoleMutation.isPending}
+                      disabled
                     >
                       <SelectTrigger size="sm" className="w-28">
                         <SelectValue />

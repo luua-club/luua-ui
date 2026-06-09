@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import * as React from 'react'
 
 import { cn } from '@/shared/utils/index'
@@ -403,8 +404,9 @@ function TrendIndicator({ trendPct }: { trendPct: number }) {
   )
 }
 
-async function DownloadSparkline({
+function DownloadSparklineContent({
   package: packageName,
+  points,
   range = 'last-month',
   variant = 'line',
   color = 'currentColor',
@@ -416,11 +418,9 @@ async function DownloadSparkline({
   showTrend = false,
   showDateRange = false,
   showBaseline = false,
-  data: dataProp,
   className,
   ...rest
-}: DownloadSparklineProps) {
-  const points = dataProp ?? (await fetchNpmDownloads(packageName, range))
+}: DownloadSparklineProps & { points: NpmDownloadPoint[] }) {
   if (points.length === 0) return null
 
   const stats = computeStats(points)
@@ -486,6 +486,49 @@ async function DownloadSparkline({
         </span>
       )}
     </div>
+  )
+}
+
+function DownloadSparklineRemote({
+  package: packageName,
+  range = 'last-month',
+  ...rest
+}: DownloadSparklineProps) {
+  const { data: points = [] } = useQuery({
+    queryKey: ['npm-downloads', packageName, range],
+    queryFn: () => fetchNpmDownloads(packageName, range),
+    staleTime: 5 * 60_000,
+  })
+
+  return (
+    <DownloadSparklineContent
+      package={packageName}
+      range={range}
+      points={points}
+      {...rest}
+    />
+  )
+}
+
+function DownloadSparkline({
+  package: packageName,
+  range = 'last-month',
+  data: dataProp,
+  ...rest
+}: DownloadSparklineProps) {
+  if (dataProp !== undefined) {
+    return (
+      <DownloadSparklineContent
+        package={packageName}
+        range={range}
+        points={dataProp}
+        {...rest}
+      />
+    )
+  }
+
+  return (
+    <DownloadSparklineRemote package={packageName} range={range} {...rest} />
   )
 }
 

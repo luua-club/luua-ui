@@ -9,17 +9,27 @@ import {
 } from '@/shared/utils/localstorage.util'
 
 /**
+ * Synchronous "logged-in" hint for the router guard.
+ *
+ * Authentication is actually carried by the httpOnly cookie (unreadable from
+ * JS), so we treat the presence of the cached AuthInfo in localStorage as the
+ * hint. It is written after a successful login/cascade and removed on logout
+ * or on a 401 — so a stale hint self-heals on the next API call.
+ */
+export function isAuthenticated(): boolean {
+  return !!getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
+}
+
+/**
  * 3-API cascade: fetches user profile, resolves org/project IDs, then fetches
  * org and project detail in parallel. Writes resolved IDs to LS before the
  * parallel calls so the interceptor sends the correct headers.
  *
- * Assumes access_token is already present in LS under LUUA_AUTH_INFO_KEY.
+ * Authentication is via the httpOnly cookie (sent automatically), so no token
+ * needs to be present in LS — a 401 from /user/profile means "not logged in".
  */
 export async function loadAuthData(): Promise<AuthInfo> {
-  const stored = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
-  if (!stored?.access_token) {
-    throw new Error('No access token found')
-  }
+  const stored = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY) ?? {}
 
   // Step 1: fetch user profile
   const userRes = await userApi.getUser()

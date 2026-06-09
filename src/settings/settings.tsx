@@ -28,17 +28,20 @@ const Settings = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Filter settings groups based on user permissions
+  // Filter settings groups based on user permissions and plan entitlements
   const filteredGroups = useMemo(
     () =>
       SETTINGS_GROUPS.map(group => ({
         ...group,
         items: group.items.filter(
-          item => !item.requiredPermission || can(item.requiredPermission)
+          item =>
+            (!item.requiredPermission || can(item.requiredPermission)) &&
+            (!item.requiredPlanAccess ||
+              (user ? item.requiredPlanAccess(user) : false))
         ),
       })).filter(group => group.items.length > 0),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user?.currentOrg?.org_role, user?.currentProject?.id]
+    [user?.currentOrg?.org_role, user?.currentProject?.id, user?.plan]
   )
 
   const params = new URLSearchParams(location.search)

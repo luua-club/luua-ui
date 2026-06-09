@@ -18,10 +18,10 @@ import {
 export const workActions: Array<SidebarActionItem | SidebarLinkItem> = [
   {
     kind: 'action',
-    title: 'Create Post',
+    title: 'Create post',
     url: '/creation/create',
     icon: Plus,
-    emphasis: 'medium',
+    emphasis: 'high',
   },
 ]
 

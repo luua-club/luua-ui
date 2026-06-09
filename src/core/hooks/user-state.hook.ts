@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 
+import { authApi } from '@/core/api/auth.api'
 import { LUUA_AUTH_INFO_KEY, QUERY_KEYS } from '@/core/config/constant'
 import { type AuthInfo } from '@/core/models/auth.model'
 import {
@@ -66,6 +67,20 @@ export const useUserState = () => {
     invalidateAndResync()
   }
 
+  /**
+   * User-initiated logout. Asks the server to clear the auth cookie
+   * (best-effort — errors are swallowed so logout always proceeds), then clears
+   * local state, the extension cookie, and redirects to /login via logoutUtil.
+   */
+  const logout = async () => {
+    try {
+      await authApi.logout()
+    } catch {
+      // Ignore network/HTTP errors — clear client state regardless.
+    }
+    logoutUtil()
+  }
+
   return {
     // User fields (id, email, name, profile_image, deactivated, organizations, projects)
     ...user,
@@ -94,6 +109,6 @@ export const useUserState = () => {
     // Actions
     changeOrg,
     changeProject,
-    logout: logoutUtil,
+    logout,
   }
 }

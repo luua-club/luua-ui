@@ -9,6 +9,7 @@ import {
   Users,
 } from 'lucide-react'
 
+import { canUseAuditLogs } from '@/core/billing/plan-entitlements'
 import { Permission } from '@/core/rbac'
 import SocialsSettings from '@/settings/components/socials-settings'
 import Account from '@/settings/containers/accounts'
@@ -76,6 +77,7 @@ export const SETTINGS_GROUPS: settingsGroupType[] = [
         label: 'Audit Logs',
         contentComponent: AuditLogs,
         requiredPermission: Permission.PROJECT_VIEW_AUDIT_LOGS,
+        requiredPlanAccess: user => canUseAuditLogs(user.plan),
       },
     ],
   },
