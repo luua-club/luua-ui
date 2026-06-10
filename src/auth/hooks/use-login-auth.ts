@@ -25,7 +25,10 @@ import {
 } from '@/core/models/auth.model'
 import { clearAuth, setAuthInfo } from '@/core/store/auth-slice'
 import { loadAuthData } from '@/core/utils/auth-data.util'
-import { parseSafeAppRedirect } from '@/core/utils/safe-app-redirect.util'
+import {
+  parseExternalReturnTo,
+  parseSafeAppRedirect,
+} from '@/core/utils/safe-app-redirect.util'
 import { syncExtCookie } from '@/shared/utils/extension-cookie.util'
 import {
   removeLocalStorageItem,
@@ -148,9 +151,17 @@ export function useLoginAuth(): UseLoginAuthResult {
       removeSessionStorageItem(LUUA_EXTENSION_LOGIN_KEY)
     }
 
-    const redirectRaw = new URLSearchParams(window.location.search).get(
-      'redirect'
-    )
+    const params = new URLSearchParams(window.location.search)
+
+    // Allowlisted external return (e.g. back to the landing's /pricing to resume
+    // a checkout). Full-page navigation since it leaves the app origin.
+    const externalReturn = parseExternalReturnTo(params.get('returnTo'))
+    if (externalReturn) {
+      window.location.href = externalReturn
+      return
+    }
+
+    const redirectRaw = params.get('redirect')
     const safeTarget = parseSafeAppRedirect(redirectRaw)
 
     if (safeTarget) {

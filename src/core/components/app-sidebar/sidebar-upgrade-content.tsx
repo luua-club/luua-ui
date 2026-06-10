@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router'
 import { BadgeCheck, Check } from 'lucide-react'
 
+import { LANDING_PRICING_URL } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -31,7 +31,7 @@ function SidebarUpgradeContent() {
           </div>
         </div>
         <Button asChild variant="outline" className="h-7 w-full text-xs">
-          <Link to="/payments">Manage billing</Link>
+          <a href={LANDING_PRICING_URL}>Manage billing</a>
         </Button>
       </div>
     )
@@ -59,7 +59,7 @@ function SidebarUpgradeContent() {
       </div>
 
       <Button asChild className="h-8 w-full text-xs">
-        <Link to="/payments">View plans</Link>
+        <a href={LANDING_PRICING_URL}>View plans</a>
       </Button>
     </div>
   )

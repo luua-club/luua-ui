@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Info, Loader2, XCircle } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { paymentApi } from '@/core/api/payment.api'
@@ -31,6 +31,42 @@ function shouldShowPlanSyncNotice({
   usagePlan?: string
 }) {
   return ['Pro', 'Team'].includes(storePlan) && usagePlan === 'Free'
+}
+
+/**
+ * After a Dodo checkout, the backend `return_url` lands the user back here
+ * (settings → billing). Dodo appends a status to that URL — we classify it
+ * tolerantly (the exact param name is backend-configured) into success /
+ * queued / error so we can confirm, reassure, or warn.
+ */
+type CheckoutReturnKind = 'success' | 'queued' | 'error'
+
+const CHECKOUT_STATUS_PARAM_KEYS = [
+  'status',
+  'payment_status',
+  'subscription_status',
+  'redirect_status',
+]
+
+function classifyCheckoutReturnStatus(
+  raw: string | null | undefined
+): CheckoutReturnKind | null {
+  if (!raw) return null
+  const value = raw.toLowerCase()
+  if (['active', 'succeeded', 'success', 'completed', 'paid'].includes(value)) {
+    return 'success'
+  }
+  if (
+    ['processing', 'pending', 'queued', 'on_hold', 'requires_action'].includes(
+      value
+    )
+  ) {
+    return 'queued'
+  }
+  if (['failed', 'cancelled', 'canceled', 'error', 'expired'].includes(value)) {
+    return 'error'
+  }
+  return null
 }
 
 function BillingAndCredits() {
@@ -92,6 +128,59 @@ function BillingAndCredits() {
       toast.error('Failed to cancel subscription. Please try again.')
     },
   })
+
+  // --- Post-checkout return ---
+  // Surface the Dodo checkout result (success / queued / error) once, then strip
+  // the status params and refresh subscription + usage + plan.
+  const checkoutReturnHandledRef = useRef(false)
+  useEffect(() => {
+    if (checkoutReturnHandledRef.current) return
+
+    const params = new URLSearchParams(window.location.search)
+    const raw = CHECKOUT_STATUS_PARAM_KEYS.map(key => params.get(key)).find(
+      Boolean
+    )
+    const kind = classifyCheckoutReturnStatus(raw)
+    if (!kind) return
+
+    checkoutReturnHandledRef.current = true
+
+    // Remove checkout params so a refresh doesn't re-trigger the toast.
+    for (const key of [
+      ...CHECKOUT_STATUS_PARAM_KEYS,
+      'payment_id',
+      'subscription_id',
+    ]) {
+      params.delete(key)
+    }
+    const qs = params.toString()
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${qs ? `?${qs}` : ''}`
+    )
+
+    if (kind === 'success') {
+      toast.success('Subscription activated — welcome to your new plan!')
+    } else if (kind === 'queued') {
+      toast('Finishing up your subscription…', {
+        description:
+          'This can take a moment to activate. Refresh in a bit if your plan has not updated.',
+      })
+    } else {
+      toast.error(
+        'Your payment did not go through. Please try again from the pricing page.'
+      )
+    }
+
+    void Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.subscriptionDetails],
+      }),
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.usageSummary] }),
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.user] }),
+    ])
+  }, [queryClient])
 
   // --- Early Return ---
   if (!user) {
