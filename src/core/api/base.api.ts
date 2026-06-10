@@ -21,6 +21,8 @@ export class BaseApiService {
     this.api = axios.create({
       baseURL: `${url}${endpoint}`,
       timeout: 60000,
+      // Send the httpOnly auth cookie with every request (cookie-based auth).
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },

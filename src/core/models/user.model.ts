@@ -28,7 +28,7 @@ export type User = z.infer<typeof UserSchema>
  */
 export interface UserState extends User {
   plan: BillingPlan
-  logout: () => void
+  logout: () => Promise<void>
 }
 
 /**

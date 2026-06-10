@@ -1,17 +1,14 @@
 import { ParsedLocation, redirect } from '@tanstack/react-router'
 
-import { LUUA_AUTH_INFO_KEY } from '@/core/config/constant'
-import { AuthInfo } from '@/core/models/auth.model'
+import { isAuthenticated } from '@/core/utils/auth-data.util'
 import {
   parseSafeAppRedirect,
   serializeLocationSearch,
 } from '@/core/utils/safe-app-redirect.util'
 import { syncExtCookie } from '@/shared/utils/extension-cookie.util'
-import { getLocalStorageItem } from '@/shared/utils/localstorage.util'
 
 export const AuthGuard = ({ location }: { location: ParsedLocation }) => {
-  const authInfo = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
-  const isLoggedIn = !!authInfo?.access_token
+  const isLoggedIn = isAuthenticated()
 
   if (isLoggedIn) {
     syncExtCookie()
