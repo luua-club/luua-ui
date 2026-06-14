@@ -66,10 +66,6 @@ class UserApi extends BaseApiService {
     return this.patch<void, typeof data>(data, '/linkedin-target')
   }
 
-  async setInstagramTarget(data: { instagram_account_id: string }) {
-    return this.patch<void, typeof data>(data, '/instagram-target')
-  }
-
   /**
    * Set the user onboarding
    

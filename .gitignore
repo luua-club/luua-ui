@@ -30,10 +30,15 @@ coverage
 .env.development.local
 .env.test.local
 .env.production.local
+# Local-only files used to import env vars into the Vercel dashboard (not committed)
+.env.vercel*
 
 # Vite specific
 .vite
 *.tsbuildinfo
+
+# Vercel CLI (org/project IDs + pulled env values) — must never be committed
+.vercel
 
 # IDE specific files
 .idea/

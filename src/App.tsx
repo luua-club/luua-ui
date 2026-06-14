@@ -47,8 +47,10 @@ export function AppContent() {
   const location = useLocation()
   const isLoginRoute = location.pathname === '/login'
 
+  // Cookie-based auth: the httpOnly cookie is the real credential. The cached
+  // AuthInfo in LS is a synchronous "logged-in" hint; a 401 clears it.
   const authInfo = getLocalStorageItem<AuthInfo>(LUUA_AUTH_INFO_KEY)
-  const isLoggedIn = !!authInfo?.access_token
+  const isLoggedIn = !!authInfo
 
   // Reactive org/project from Redux — set by hydrateFromStorage (sync on mount)
   // or setAuthInfo (after cascade). Used to gate Outlet rendering.

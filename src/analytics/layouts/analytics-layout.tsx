@@ -1,7 +1,7 @@
-import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, LockKeyhole } from 'lucide-react'
 import { lazy, type ReactNode } from 'react'
 
+import { LANDING_PRICING_URL } from '@/core/config/constant'
 import AsyncSectionBoundary from '@/shared/components/async-section-boundary'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -127,10 +127,10 @@ function AnalyticsSectionLock({
           </div>
 
           <Button asChild size="sm" className="mt-5 w-full sm:w-fit">
-            <Link to="/payments">
+            <a href={LANDING_PRICING_URL}>
               Upgrade to Pro
               <ArrowUpRight className="size-3.5" />
-            </Link>
+            </a>
           </Button>
         </div>
       </div>

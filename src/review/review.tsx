@@ -17,7 +17,7 @@ import {
   shouldShowFreeLimitNudge,
 } from '@/core/billing/plan-entitlements'
 import { UpgradeCallout } from '@/core/components/billing'
-import { QUERY_KEYS } from '@/core/config/constant'
+import { LANDING_PRICING_URL, QUERY_KEYS } from '@/core/config/constant'
 import { usePublishDraft } from '@/core/hooks/publish-draft.hook'
 import { useScheduleDraft } from '@/core/hooks/schedule-draft.hook'
 import { useUserState } from '@/core/hooks/user-state.hook'
@@ -409,7 +409,9 @@ function StepperNavigation({
               'Free includes 5 scheduled posts each month. Upgrade to Pro for unlimited scheduling.',
             action: {
               label: 'Upgrade',
-              onClick: () => navigate({ to: '/payments' }),
+              onClick: () => {
+                window.location.href = LANDING_PRICING_URL
+              },
             },
           })
           return

@@ -1,10 +1,10 @@
-import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, Sparkles } from 'lucide-react'
 
 import {
   getUsagePercent,
   type UsageLimit,
 } from '@/core/billing/plan-entitlements'
+import { LANDING_PRICING_URL } from '@/core/config/constant'
 import { Button } from '@/shared/ui/button'
 import { Progress } from '@/shared/ui/progress'
 import { cn } from '@/shared/utils'
@@ -82,10 +82,10 @@ export function UpgradeCallout({
           size="sm"
           className="h-8 w-full shrink-0 px-3 text-xs sm:w-auto"
         >
-          <Link to="/payments">
+          <a href={LANDING_PRICING_URL}>
             {actionLabel}
             <ArrowUpRight className="size-3.5" />
-          </Link>
+          </a>
         </Button>
       </div>
 

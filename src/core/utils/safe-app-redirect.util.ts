@@ -43,6 +43,60 @@ export function parseSafeAppRedirect(
   return { pathname: pathPart, search }
 }
 
+/**
+ * Origins the post-login `returnTo` is allowed to point at. This is the Luua
+ * landing site (where pricing now lives), so a checkout started on the landing
+ * can send the guest to login and bounce them back to resume. An allowlist of
+ * exact origins keeps this from becoming an open redirect.
+ */
+const ALLOWED_RETURN_ORIGINS: string[] = (() => {
+  const origins = new Set<string>(['https://luua.club'])
+
+  const fromEnv = import.meta.env.VITE_LUUA_LANDING_URL
+  if (typeof fromEnv === 'string' && fromEnv) {
+    try {
+      origins.add(new URL(fromEnv).origin)
+    } catch {
+      // Ignore a malformed override.
+    }
+  }
+
+  // Local dev: the landing runs on :3000 (the app on :3001).
+  if (import.meta.env.DEV) origins.add('http://localhost:3000')
+
+  return Array.from(origins)
+})()
+
+/**
+ * Validates an absolute post-login `returnTo` URL against
+ * {@link ALLOWED_RETURN_ORIGINS}. Returns the normalized URL string when the
+ * origin is allowlisted, otherwise `null` (blocking open redirects).
+ */
+export function parseExternalReturnTo(
+  encoded: string | null | undefined
+): string | null {
+  if (encoded == null || encoded === '') return null
+
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(encoded)
+  } catch {
+    return null
+  }
+
+  let url: URL
+  try {
+    url = new URL(decoded)
+  } catch {
+    return null
+  }
+
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+  if (!ALLOWED_RETURN_ORIGINS.includes(url.origin)) return null
+
+  return url.toString()
+}
+
 export function serializeLocationSearch(
   search: Record<string, unknown>
 ): string {

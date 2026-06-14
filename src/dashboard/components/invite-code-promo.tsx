@@ -1,10 +1,10 @@
-import { useNavigate } from '@tanstack/react-router'
 import { Gift, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { type FormEvent, useEffect, useState } from 'react'
 
 import { REDEMPTION_CODE_LENGTH } from '@/auth/config/otp-verification.config'
 import { AppIconLogo } from '@/core/components/app-logo'
+import { LANDING_PRICING_URL } from '@/core/config/constant'
 import { useUserState } from '@/core/hooks/user-state.hook'
 import { AnimatedGradientText } from '@/shared/ui/animated-gradient-text'
 import { Button } from '@/shared/ui/button'
@@ -23,7 +23,6 @@ function normalizeRedemptionCodeParam(raw: string): string {
 
 export function InviteCodePromo() {
   const userState = useUserState()
-  const navigate = useNavigate()
 
   const [open, setOpen] = useState(false)
   const [codeInput, setCodeInput] = useState('')
@@ -50,10 +49,8 @@ export function InviteCodePromo() {
 
     setError(null)
     setOpen(false)
-    navigate({
-      to: '/payments',
-      search: { code },
-    })
+    // Redemption now lives on the landing pricing page; deep-link with the code.
+    window.location.href = `${LANDING_PRICING_URL}?code=${encodeURIComponent(code)}`
   }
 
   return (

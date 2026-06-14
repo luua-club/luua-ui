@@ -29,6 +29,16 @@ export const LUUA_EXTENSION_LOGIN_KEY: string = 'isExtensionLogin'
 export const BASE_API_URL = import.meta.env.VITE_LUUA_BACKEND_URL
 
 /**
+ * Luua landing site base URL — pricing now lives there (not in this app).
+ * Overridable via `VITE_LUUA_LANDING_URL`; defaults to the production landing.
+ */
+export const LANDING_BASE_URL: string =
+  import.meta.env.VITE_LUUA_LANDING_URL || 'https://luua.club'
+
+/** Landing pricing page — destination for the app's in-app upgrade CTAs. */
+export const LANDING_PRICING_URL = `${LANDING_BASE_URL.replace(/\/+$/, '')}/pricing`
+
+/**
  * Suggested text that is shown inside prompt box
  */
 export const SUGGESTED_PROMPT_TEXT = [

@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, LockKeyhole, Sparkles } from 'lucide-react'
 
+import { LANDING_PRICING_URL } from '@/core/config/constant'
 import { Button } from '@/shared/ui/button'
 import { cn } from '@/shared/utils'
 
@@ -53,10 +53,10 @@ export function PaidFeatureLock({
         ) : null}
 
         <Button asChild>
-          <Link to="/payments">
+          <a href={LANDING_PRICING_URL}>
             {actionLabel}
             <ArrowUpRight className="size-4" />
-          </Link>
+          </a>
         </Button>
       </div>
     </div>
