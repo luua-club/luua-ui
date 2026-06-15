@@ -7,70 +7,65 @@ import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { cn } from '@/shared/utils'
 
-type LeftPanelMagicLinkFormProps = {
+type MagicLinkFormProps = {
   register: UseFormRegister<MagicLinkRequest>
   errors: FieldErrors<MagicLinkRequest>
-  /** Watched email value for submit enabled state */
-  email: string
   isLoading: boolean
   isMagicLinkPending: boolean
   onSubmit: (e?: BaseSyntheticEvent) => Promise<void> | void
 }
 
 /**
- * Email capture + OTP request CTA. Validation comes from react-hook-form in the parent.
+ * Email capture + OTP request. Stacked field + full-width CTA (login-05 style).
+ * Validation comes from react-hook-form in the parent.
  */
-export function LeftPanelMagicLinkForm({
+export function MagicLinkForm({
   register,
   errors,
-  email,
   isLoading,
   isMagicLinkPending,
   onSubmit,
-}: LeftPanelMagicLinkFormProps) {
+}: MagicLinkFormProps) {
   const disabledFields = isLoading || isMagicLinkPending
-  const submitDisabled = disabledFields || !email?.trim() || !!errors.email
+  // Enabled at rest — empty/invalid email is caught by the zod resolver on
+  // submit (no API call fires), keeping a confident primary CTA.
+  const submitDisabled = disabledFields
 
   return (
-    <form className="space-y-1" onSubmit={onSubmit} noValidate>
-      <div className="relative">
-        <Mail className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2" />
-
+    <form className="flex flex-col gap-3" onSubmit={onSubmit} noValidate>
+      <div className="flex flex-col gap-2">
         <Input
+          id="email"
           type="email"
-          placeholder="Enter your email"
+          placeholder="you@example.com"
           {...register('email')}
           className={cn(
-            'border-border bg-background text-foreground',
-            'placeholder:text-muted-foreground h-11 rounded-md pr-[7.25rem] pl-11 text-base',
-            errors.email && 'border-red-500 focus-visible:ring-red-500'
+            'h-11 rounded-sm text-base',
+            errors.email && 'border-destructive focus-visible:ring-destructive'
           )}
           disabled={disabledFields}
+          aria-invalid={!!errors.email}
         />
-
-        <Button
-          type="submit"
-          className={cn(
-            'absolute top-1/2 right-1.5 h-8 -translate-y-1/2 rounded-md',
-            'px-4 text-xs font-medium'
-          )}
-          variant="default"
-          size="sm"
-          disabled={submitDisabled}
-        >
-          {isMagicLinkPending ? (
-            <Loader className="size-4 animate-spin" />
-          ) : (
-            'Get OTP'
-          )}
-        </Button>
+        {errors.email && (
+          <p className="text-destructive text-xs">{errors.email.message}</p>
+        )}
       </div>
 
-      {errors.email && (
-        <p className="text-center text-xs text-red-500 lg:pl-3 lg:text-left">
-          {errors.email.message}
-        </p>
-      )}
+      <Button
+        type="submit"
+        variant="outline"
+        className="bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground h-11 w-full rounded-sm border text-sm font-semibold"
+        disabled={submitDisabled}
+      >
+        {isMagicLinkPending ? (
+          <Loader className="size-4 animate-spin" />
+        ) : (
+          <>
+            <Mail className="mr-2 size-4" aria-hidden />
+            Continue with email
+          </>
+        )}
+      </Button>
     </form>
   )
 }

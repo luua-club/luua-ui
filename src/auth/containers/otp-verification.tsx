@@ -196,24 +196,15 @@ function OtpVerificationIntro({
 }) {
   return (
     <div className="flex w-full flex-col gap-3">
-      <p className="text-muted-foreground flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.22em] uppercase">
-        <span
-          aria-hidden
-          className="bg-foreground/40 inline-block h-px w-6 shrink-0"
-        />
+      <p className="text-muted-foreground text-[0.65rem] font-semibold tracking-[0.2em] uppercase">
         Verification
       </p>
 
-      <h2
-        className={cn(
-          'text-foreground text-3xl font-semibold tracking-tight text-balance',
-          'leading-[1.05] sm:text-4xl'
-        )}
-      >
+      <h2 className="text-foreground text-3xl leading-tight font-semibold tracking-tight text-balance">
         Check your <span className="font-medium italic">inbox</span>.
       </h2>
 
-      <p className="text-foreground/70 text-sm leading-relaxed">
+      <p className="text-muted-foreground text-sm leading-relaxed">
         We sent a {codeDescriptor} code to{' '}
         <span className="text-foreground font-medium underline decoration-dotted underline-offset-4">
           {email}

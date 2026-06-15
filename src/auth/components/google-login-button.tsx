@@ -28,8 +28,7 @@ export function GoogleLoginButton({
       <div
         className={cn(
           'pointer-events-none absolute inset-0 flex items-center justify-center',
-          'rounded-md bg-neutral-800 text-white',
-          'dark:ring-1 dark:ring-white/15'
+          'border-border bg-background text-foreground dark:bg-input/30 dark:border-input rounded-sm border'
         )}
       >
         {isLoading ? (
